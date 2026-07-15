@@ -945,7 +945,7 @@
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 7/15/2026, 7:14:18 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pushed at 7/15/2026, 7:31:39 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -1208,7 +1208,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- NEW CHAT PROMPT MODAL -->
-<div id="newChatModal" style="display:none; position:fixed; inset:0; z-index:10035; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; padding:16px;">
+<div id="newChatModal" style="display: flex; position: fixed; inset: 0px; z-index: 10035; background: rgba(0, 0, 0, 0.7); align-items: center; justify-content: center; padding: 16px;">
   <div style="background:#fff; border-radius:12px; max-width:720px; width:100%; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 24px 60px rgba(0,0,0,0.4); overflow:hidden;">
     <div style="background:#1a5276; color:#fff; padding:14px 20px; display:flex; align-items:center; gap:10px;">
       <span style="font-size:16px; font-weight:800;">💬 New Chat Handoff — paste this into a fresh chat</span>
@@ -1216,10 +1216,10 @@ KEYBOARD SHORTCUTS
     <div style="padding:14px 20px 6px; font-size:13px; color:#333;">
       Copy the text below into the FIRST message of a new chat, and <strong>attach the current CP-RevNNN.html file to that same message</strong> (new chats can't see this chat's files). Replace the "First task" line with what you want done.
     </div>
-    <div id="newChatSrc" style="padding:0 20px 4px; font-size:12px; font-weight:700; color:#8a8a8a;">Loading shared prompt…</div>
+    <div id="newChatSrc" style="padding: 0px 20px 4px; font-size: 12px; font-weight: 700; color: rgb(176, 106, 0);">ℹ Using the built-in copy (shared GitHub file not reachable yet)</div>
     <textarea id="newChatText" readonly="" style="flex:1; margin:8px 20px; min-height:300px; font-family:monospace; font-size:12px; line-height:1.5; border:1px solid #ccc; border-radius:8px; padding:12px; resize:vertical; white-space:pre-wrap;"></textarea>
     <div style="display:flex; gap:10px; padding:12px 20px 18px; justify-content:flex-end;">
-      <span id="newChatCopied" style="margin-right:auto; color:#2c6e49; font-weight:700; font-size:13px; display:none;">✓ Copied to clipboard</span>
+      <span id="newChatCopied" style="margin-right: auto; color: rgb(44, 110, 73); font-weight: 700; font-size: 13px; display: inline;">✓ Copied to clipboard</span>
       <button type="button" onclick="copyNewChatPrompt()" style="padding:10px 20px; font-size:14px; font-weight:700; background:#2c6e49; color:#fff; border:none; border-radius:8px; cursor:pointer;">📋 Copy</button>
       <button type="button" onclick="document.getElementById('newChatModal').style.display='none'" style="padding:10px 18px; font-size:14px; font-weight:700; background:#e9e6e1; color:#3a352f; border:1px solid #cfc9c0; border-radius:8px; cursor:pointer;">Close</button>
     </div>
@@ -1273,8 +1273,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- FLASH MESSAGE -->
-<div id="flash" class="flash error hidden">❌ Push failed: GitHub PUT failed: 409 {
-  "message": "is at df917a125c163d09507dfdf613260f2d0b0d9b01 but expected 155ea8e540851bfe33f5bdc5</div>
+<div id="flash" class="flash hidden">✓ Data pushed to GitHub</div>
 
 <!-- BOOT -->
 <script>
