@@ -339,12 +339,12 @@
   }
 </style>
 </head>
-<body>
+<body><div id="appPushFailBanner" style="background: rgb(138, 28, 28); color: rgb(255, 255, 255); padding: 8px 14px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;"><span>⚠ Auto-sync to GitHub didn’t complete (GitHub still shows an older/unknown rev). Your data is safe locally.</span><button style="background: rgb(255, 255, 255); color: rgb(138, 28, 28); border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; border-radius: 5px; padding: 5px 14px; font-size: 13px; font-weight: 800; cursor: pointer;">Retry sync</button><button style="background: transparent; color: rgb(255, 255, 255); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 5px; padding: 4px 9px; font-size: 12px; cursor: pointer;">✕</button></div>
 
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-422 · Jul 15, 2026</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-423 · Jul 15, 2026</span>
   <button id="headerPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-right:8px;">⬆️ Push App</button>
   <button class="ob-back" id="headerBack">← Back</button>
 </header>
@@ -366,7 +366,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-422 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">Jul 15, 2026</span></div>
+        <div class="brand-sub" id="brandRev">REV-423 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">Jul 15, 2026</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -429,7 +429,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-422 · Built Jul 15, 2026</span>
+    <span id="revFooter">App Rev-423 · Built Jul 15, 2026</span>
   </div>
 </div>
 
@@ -945,7 +945,7 @@
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 7/15/2026, 4:39:50 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pushed at 7/15/2026, 5:03:57 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -1277,7 +1277,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-422";
+const APP_REV = "Rev-423";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1291,6 +1291,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-15", rev: "App Rev-423", type: "App", changes: ["DATA-LOSS GUARD + PUBLISH FIX \u2014 three fixes. (1) SAFETY: ghPush now REFUSES to push when this device has 0 projects and GitHub has some; it blocks the write and tells you to Pull first. Previously an empty device could silently overwrite the project index for every device. (2) Rev-420 pushed the moment GitHub was configured, which is backwards for a FRESH device (new download, or the new website address) \u2014 it has no data yet, so it would push nothing over everything. On connect the app now checks: 0 projects locally \u2192 PULL your data down; has projects \u2192 push up. (3) PUBLISH: the website publish got the file\u2019s blob SHA from the contents API, which refuses files over 1MB (this app is ~1.5MB) \u2014 so publishing succeeded once (while index.html didn\u2019t exist) and then failed forever with 422 \u201csha wasn\u2019t supplied\u201d. It now reads the SHA from the Git Trees API, which has no size limit, so re-publishing works every time."] },
   { ts: "2026-07-15", rev: "App Rev-422", type: "App", changes: ["\u201cPUBLISH TO WEBSITE\u201d BUTTON \u2014 Admin \u2192 GitHub Sync now has a one-tap \ud83c\udf10 Publish to Website button that uploads THIS app to the cp-app repo as index.html using your token, so GitHub Pages serves it. This exists because Android\u2019s file picker on some phones offers only Camera/Photos and no file browser, making the normal github.com drag-and-drop upload impossible from a phone \u2014 the app publishing itself sidesteps that completely. Rev-421 already had the ghPublishPages() engine but no way to trigger it; this wires it to a button. The first successful manual publish also flips ghPagesSync ON, so from then on every newer rev republishes ITSELF to the website automatically on the 60s tick \u2014 no upload, no button, no file picker, ever again."] },
   { ts: "2026-07-14", rev: "App Rev-421", type: "App", changes: ["WEBSITE MODE \u2014 the app can now publish ITSELF to a GitHub Pages repo, so it can be opened from a fixed https address instead of a downloaded file. This is the real fix for re-entering the token: storage belongs to the ADDRESS, not the file, so the token is entered ONCE PER DEVICE and then survives closed tabs, reboots and new revs \u2014 on desktop AND phone. Added ghPublishPages() (PUT this app\u2019s HTML to index.html of the Pages repo, with the same 409-conflict retry as the app push) and ghAutoPublishPages() on the 60s tick, which republishes automatically whenever this rev is newer than the published one. Auto-publish is OPT-IN via localStorage ghPagesSync=1 so nothing is published by surprise; the target repo defaults to \u2018cp-app\u2019 and is overridable via localStorage ghPagesRepo. Also added cpRequestPersistentStorage() \u2014 on a secure (https) origin the app now asks the browser to mark its storage PERMANENT so data is never evicted; this is a no-op on a downloaded file, which is exactly why hosting is the durable answer."] },
   { ts: "2026-07-14", rev: "App Rev-420", type: "App", changes: ["AUTO-PUSH ON CONNECT \u2014 pushing to GitHub is now fully hands-free from the moment you paste your token. Saving GitHub settings used to store the token but push NOTHING, so a freshly-downloaded rev sat there until you either changed some data or waited for the 60s auto-update tick. Now, the instant the settings are valid, the app immediately fires a silent data push AND a verified app push. Also added a safety net: leaving/closing/backgrounding the app flushes a silent data push so your last edits never sit only on the device. NOTE \u2014 auto-push was ALREADY built in and ON by default (data pushes on ~22 change points via ghAutoSyncPush; the app file pushes itself within 60s via ghAutoUpdateApp \u2192 ghAutoPushVerified). The only thing that ever stopped it was a missing TOKEN: every newly-downloaded HTML file on Android gets its own empty localStorage, so the new file had no token and every auto-push silently did nothing. Enter the token once per downloaded file and everything from then on is automatic \u2014 no manual Push."] },
@@ -8232,8 +8233,17 @@ function saveGitHubSettings(){
   // pushing ever felt "manual" was a new file's empty localStorage having no token yet.
   if(ghConfigured()){
     try {
-      ghSetStatus('Connected — syncing to GitHub now…');
-      ghPush(true);                                                    // data file (silent)
+      // Rev-423: direction matters. Rev-420 pushed on connect, which is exactly WRONG for a fresh
+      // device (new download, or a new website address): it has no data yet, so pushing would
+      // overwrite the cloud with nothing. Decide by what's actually here.
+      const localCount = (JSON.parse(localStorage.getItem('cpProjects') || '[]') || []).length;
+      if(localCount === 0){
+        ghSetStatus('Connected — pulling your data from GitHub…');
+        ghPull(true);            // fresh device: bring data DOWN, never push emptiness up
+      } else {
+        ghSetStatus('Connected — syncing to GitHub now…');
+        ghPush(true);            // this device has data: mirror it up
+      }
       if(typeof ghAutoPushVerified === 'function') ghAutoPushVerified(); // app file (verified)
     } catch(e){}
   }
@@ -8578,14 +8588,23 @@ async function ghPushApp(silent){
 function ghPagesRepo(){ return localStorage.getItem('ghPagesRepo') || GH_PAGES_REPO_DEFAULT; }
 
 async function ghGetPagesFile(){
+  // Rev-423: get the blob SHA from the Git TREES api, not the contents api. The contents api
+  // refuses files over 1MB (this app is ~1.5MB), so the old code threw, left sha null, and the
+  // PUT came back 422 "sha wasn't supplied" — i.e. publishing worked ONCE (file absent) and then
+  // failed forever after. Trees returns the blob sha at any size.
   const c = ghConfig();
-  const url = 'https://api.github.com/repos/' + c.user + '/' + ghPagesRepo() + '/contents/' + GH_PAGES_FILE;
-  const resp = await fetch(url, { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' } });
-  if(resp.status === 404) return null;
-  if(!resp.ok) throw new Error('GitHub GET (pages) failed: ' + resp.status);
-  const data = await resp.json();
-  const h = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
-  return { sha: data.sha, html: h };
+  const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+  try {
+    const tUrl = 'https://api.github.com/repos/' + c.user + '/' + ghPagesRepo() + '/git/trees/main';
+    const tr = await fetch(tUrl, { headers: hdrs });
+    if(tr.status === 404 || tr.status === 409) return null;   // empty repo / no main yet
+    if(tr.ok){
+      const tj = await tr.json();
+      const hit = (tj.tree || []).find(e => e.path === GH_PAGES_FILE && e.type === 'blob');
+      return hit ? { sha: hit.sha, html: '' } : null;
+    }
+  } catch(e){ /* fall through */ }
+  return null;
 }
 
 async function ghPublishPages(silent){
@@ -8718,11 +8737,26 @@ async function ghPush(silent){
   if(!silent) flash('Pushing data to GitHub...');
   try {
     if(!silent) ghSetStatus('Pushing...');
-    let sha = null;
+    let sha = null, existing = null;
     try {
-      const existing = await ghGetFile();
+      existing = await ghGetFile();
       if(existing) sha = existing.sha; // works even if content is corrupted
     } catch(e){ /* file may not exist yet */ }
+    // Rev-423 SAFETY GUARD — never let an EMPTY device overwrite a populated GitHub.
+    // A freshly-opened app (new file, or a brand-new website address) starts with zero projects.
+    // Pushing that would wipe the project index for every device. Refuse and tell the user to pull.
+    try {
+      const localCount  = (JSON.parse(localStorage.getItem('cpProjects') || '[]') || []).length;
+      const remoteCount = (existing && existing.content && Array.isArray(existing.content.projects))
+                            ? existing.content.projects.length : 0;
+      if(localCount === 0 && remoteCount > 0){
+        const msg = 'Push BLOCKED — this device has 0 projects but GitHub has ' + remoteCount +
+                    '. Pull Data from GitHub first (nothing was overwritten).';
+        ghSetStatus(msg, true);
+        if(!silent) flash(msg, true);
+        return;
+      }
+    } catch(e){ /* if the guard itself fails, fall through to normal push */ }
     const bundle = buildDataBundle();
     await ghPutFile(bundle, sha);
     const stamp = new Date().toLocaleString();
