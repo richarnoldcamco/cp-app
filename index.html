@@ -2404,7 +2404,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-446";
+const APP_REV = "Rev-447";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2418,6 +2418,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-447", type: "App", changes: ["INSPECTION REPORTS SCALES TO HUNDREDS OF RUNS \u2014 the screen previously read only the first 200 run files, and since the GitHub listing is alphabetical, a repo with more runs would silently show an arbitrary subset \u2014 and worse, the per-day efficiency math would count PARTIAL days as whole ones, producing confidently wrong percentages. The cap is now 1500 and files are fetched in chunks of 50 with a live progress counter, so 500 sample runs (or a real production month) load reliably and every day\u2019s numbers are computed from that day\u2019s complete set."] },
   { ts: "2026-07-16", rev: "App Rev-446", type: "App", changes: ["SHIFT EFFICIENCY % FROM STANDARD CYCLE TIMES \u2014 end to end. (1) SETUP: the New Control Plan form gains a \u2018Cycle Time (min/part)\u2019 field next to Machine; it saves with drafts, persists into the saved project, and survives plan edits. (2) CARRY: the injected validation part and every new run record the cycle time (run.cycleMinutes), so the pushed run JSON is self-contained. (3) REPORT: on Inspection Reports, each part now shows an efficiency line per operation per calendar day, colour-coded (green \u226585%, amber \u226560%, red below): earned time = completed parts \u00d7 cycle time; actual window = first measurement of the day to the last; efficiency = earned \u00f7 window. Honest floors: plans with no cycle time say so instead of guessing, and the window is floored at one cycle so a single fast run cannot read as 400%. Runs recorded before this rev have no cycle stamped and fall back to the plan\u2019s note. Embedded Machinist Validation app bumped to REV-109."] },
   { ts: "2026-07-16", rev: "App Rev-445", type: "App", changes: ["RUN TIMING STATISTICS on the Inspection Reports screen \u2014 each expanded run now opens with a stats block computed from its measurement timestamps: (1) the FIVE LARGEST GAPS between consecutive measurements, each showing the duration and which balloons/times bound it; (2) the LAST measurement before each shift boundary \u2014 the 9:30 AM break, the 12:00 PM lunch, and the 3:15 PM end of shift \u2014 with how long before the mark it landed; (3) the FIRST measurement after 7:00 AM start, 9:40 AM back-from-break, and 12:15 PM back-from-lunch, with how long after the mark it landed. Times are the station\u2019s local clock; each boundary is anchored to the day the run\u2019s first reading was taken; a boundary with no qualifying reading shows a dash rather than guessing. Uses last-updated timestamps (falling back to created), so re-measurements count at their actual time. Shift marks live in one SHIFT_MARKS constant for easy future adjustment. Display-only \u2014 nothing is written anywhere."] },
   { ts: "2026-07-16", rev: "App Rev-444", type: "App", changes: ["A TIMESTAMP ON EVERY MEASUREMENT \u2014 each saved reading now carries updatedUtc, stamped on EVERY save, alongside the existing createdUtc which stays frozen at first entry; so a re-measured feature keeps its original time AND shows when it was last changed, which is the honest pair for an inspection record. The Inspection Reports screen now shows the time (last-updated, falling back to created) on every reading row, next to the value. Also fixed on the Reports screen: reading descriptions were blank because the screen read a field name the stored readings never had (desc vs the actual characteristic) \u2014 descriptions now display. Embedded Machinist Validation app bumped to REV-108."] },
@@ -9165,12 +9166,17 @@ async function loadRunReports(){
 
   status.textContent = 'Loading ' + files.length + ' run(s)…';
   const runs = [];
-  await Promise.all(files.slice(0, 200).map(async f => {
-    try{
-      const r = await fetch(f.url, { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw+json' } });
-      if(r.ok) runs.push(JSON.parse(await r.text()));
-    }catch(e){}
-  }));
+  // Rev-447: fetch in chunks of 50 so hundreds of runs load reliably (cap 1500)
+  const queue = files.slice(0, 1500);
+  for(let i = 0; i < queue.length; i += 50){
+    await Promise.all(queue.slice(i, i + 50).map(async f => {
+      try{
+        const r = await fetch(f.url, { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw+json' } });
+        if(r.ok) runs.push(JSON.parse(await r.text()));
+      }catch(e){}
+    }));
+    status.textContent = 'Loading runs… ' + Math.min(i + 50, queue.length) + ' / ' + queue.length;
+  }
   if(!runs.length){ status.textContent = 'Runs exist but none could be read.'; return; }
   runs.sort((a,b) => String((b.run&&b.run.dateCompletedUtc)||'').localeCompare(String((a.run&&a.run.dateCompletedUtc)||'')));
 
