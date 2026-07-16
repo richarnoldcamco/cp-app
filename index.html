@@ -346,7 +346,7 @@
   <span class="spacer"></span>
   <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-430 · Jul 15, 2026</span>
   <button id="headerPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-right:8px;">⬆️ Push App</button>
-  <button class="ob-back" id="headerBack">← Back</button>
+  <button class="ob-back hidden" id="headerBack">← Back</button>
 </header>
 
 <div id="newerVersionBanner" style="display:none; background:#2c6e49; color:#fff; padding:6px 12px; font-size:12px; line-height:1.3; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
@@ -360,7 +360,7 @@
 </div>
 
 <!-- MAIN MENU -->
-<div id="menuScreen" class="menu hidden">
+<div id="menuScreen" class="menu">
   <div class="brand" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
     <div style="display:flex; align-items:center; gap:12px;">
       <div class="brand-mark">📋</div>
@@ -700,7 +700,7 @@
 </div>
 
 <!-- PROJECTS SCREEN -->
-<div id="projectsScreen" class="setup">
+<div id="projectsScreen" class="setup hidden">
   <button class="ob-back" id="projectsBack">← Back</button>
   <h1>Control Plans</h1>
   <p class="sub">All Control Plans on this device — drafts and saved projects together</p>
@@ -945,7 +945,7 @@
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: rgb(198, 40, 40); padding: 10px; background: var(--panel-2); border-radius: 6px;">Pull failed: Failed to fetch</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pushed at 7/15/2026, 9:43:59 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -11859,4 +11859,4 @@ if(ghConfigured()){
 </div>
 
 
-<div id="mvPanel" style="position: fixed; inset: 0px; z-index: 100000; background: rgb(233, 230, 223); display: flex; flex-direction: column;"><iframe id="mvFrame" style="flex: 1 1 auto; width: 100%; height: 100%; border: 0px; background: rgb(255, 255, 255);"></iframe><button style="position: fixed; top: 7px; left: 10px; z-index: 100002; background: rgb(122, 20, 20); color: rgb(255, 255, 255); border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; border-radius: 6px; font-weight: 800; padding: 7px 12px; cursor: pointer; font-size: 13px; box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 6px;">← Control Plans</button></div></body></html>
+</body></html>
