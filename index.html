@@ -1523,6 +1523,11 @@ Rev-40
         <b style="font-size:13px;">Recent Changes</b>
         <small style="font-size:10px; color:var(--ink-dim);">App & document change log</small>
       </button>
+      <button class="menu-btn" id="mReports" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
+        <span style="font-size:24px; margin-bottom:4px;">📊</span>
+        <b style="font-size:13px;">Inspection Reports</b>
+        <small style="font-size:10px; color:var(--ink-dim);">All runs, every station</small>
+      </button>
       <button class="menu-btn" id="mCsharpPlan" onclick="openCsharpPlan()" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
         <span style="font-size:24px; margin-bottom:4px;">🔷</span>
         <b style="font-size:13px;">C# Conversion Plan</b>
@@ -2154,6 +2159,18 @@ Rev-40
   <div id="recentChangesList"></div>
 </div>
 
+<!-- INSPECTION REPORTS SCREEN (Rev-443) -->
+<div id="reportsScreen" class="setup hidden">
+  <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+    <button class="ob-back" id="reportsBack" style="margin:0;">← Back</button>
+    <h1 style="margin:0; font-size:20px;">Inspection Reports</h1>
+    <button id="reportsRefreshBtn" style="background:#2c6e49; color:#fff; border:none; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; margin-left:auto;">⟳ Refresh</button>
+  </div>
+  <p class="sub" style="margin-bottom:8px;">Every completed run saved to GitHub by any station, newest first. Tap a run to see its readings.</p>
+  <p id="reportsStatus" style="font-size:12px; color:var(--ink-faint); margin-bottom:12px;"></p>
+  <div id="reportsList"></div>
+</div>
+
 <!-- APP INSTRUCTIONS SCREEN -->
 <div id="appInstructionsScreen" class="setup hidden">
   <button class="ob-back" id="appInstructionsBack">← Back</button>
@@ -2383,7 +2400,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-442";
+const APP_REV = "Rev-443";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2397,6 +2414,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-443", type: "App", changes: ["\ud83d\udcca INSPECTION REPORTS \u2014 new home-screen tile (tools row) opening a read-only screen that pulls every runs/*.json the stations have pushed (Rev-442) and shows all inspections in one place: grouped by part, newest first, each run a card with operation, shop order, serial, operator initials, an ALL IN TOL / N OUT OF TOL badge, a skipped-by-frequency count, and the completion time. Tap a card to expand the full readings \u2014 balloon, description, value, IN/OUT verdict \u2014 plus the frequency-skip list. Reads up to the 200 most recent run files in parallel using the tab\u2019s saved GitHub settings; stations without sync get a plain explanation instead of an error. Strictly read-only \u2014 this screen never writes to the repo. All nine existing screen-switch functions were taught to hide the new screen so it cannot overlap another view."] },
   { ts: "2026-07-16", rev: "App Rev-442", type: "App", changes: ["COMPLETED INSPECTION RUNS AUTO-SAVE TO GITHUB \u2014 when a run finishes, the whole record (run header, every reading with timestamps, and the frequency-skip list from Rev-441) is pushed as one JSON file to the data repo at runs/PART_OP_SHOPORDER_SERIAL_runid.json. Credentials are the SAME GitHub settings the outer CP app keeps in this tab (the embedded app shares the tab\u2019s storage), so a station that syncs today needs zero extra setup. Deliberate rules: the push NEVER blocks or fails an inspection \u2014 the run is saved locally first and the summary shows immediately, with the push running behind it (fire-and-forget); a failed push flashes a warning and the local copy stays authoritative, with Email / Export as the manual backup; a station with no token silently stays local-only rather than nagging the machinist; filenames are sanitised to safe characters. On success the run is stamped cloudSavedUtc so a future report screen can tell synced from unsynced. Embedded Machinist Validation app bumped to REV-107."] },
   { ts: "2026-07-16", rev: "App Rev-441", type: "App", changes: ["FREQUENCY-GATED INSPECTION RUNS \u2014 a real inspection run now reads each feature\u2019s Control Plan FREQ (EVERY) and AUTO-SKIPS features that are not due on this part. How due-ness is decided: percentages become count intervals (20% \u2192 every 5th part, 10% \u2192 every 10th, 100% \u2192 every part), with the part\u2019s sequence number computed from prior saved runs on the same part + operation + shop order; event frequencies that no app can infer \u2014 tool change / offset, once per shift, after set-up \u2014 are asked as yes/no questions ONCE at run start, and only the questions that at least one feature actually needs. Strings mixing both (\u201820% at tool change & after offset\u2019) are due if EITHER the count lands or the event happened, mirroring the checksheet\u2019s intent. Safety rails: anything the parser cannot confidently read defaults to DUE (the app never skips what it does not understand); if gating would leave an empty run, everything is shown instead; edit and preview modes are never gated; a resumed run keeps its original skips rather than re-deciding. Skipped features are not silently gone \u2014 the run summary lists them under \u2018NOT DUE THIS PART \u2014 SKIPPED BY FREQUENCY\u2019 with the frequency and the reason, so the record shows WHY a blank is blank. Embedded Machinist Validation app bumped to REV-106."] },
   { ts: "2026-07-16", rev: "App Rev-440", type: "App", changes: ["DEAD GITHUB LINKS REMOVED FROM THE INSPECTION SCREENS \u2014 the green \ud83d\udd17 GITHUB button on the editing-screen top bar and the \u2018Open from GitHub (data persists)\u2019 button on the menu are gone. Both were plain links to the OLD standalone app at richarnoldcamco.github.io/Inspection-app/\u2026 \u2014 a repo that has since been renamed to machinist-validation-app, so the links were dead; and even alive they were a trap here, navigating away from the embedded validation session mid-inspection. They existed for the downloaded-file era, when jumping to a hosted copy was the way to get persistent storage \u2014 obsolete now that the whole app runs on the website. The \u2018Open the Live App\u2019 bar is untouched: it points at the CURRENT repo and has its own show/hide logic. Embedded Machinist Validation app bumped to REV-105."] },
@@ -2940,6 +2958,7 @@ function showMenu(){
   $('adminScreen').classList.add('hidden');
   $('appInstructionsScreen').classList.add('hidden');
   $('recentChangesScreen').classList.add('hidden');
+  if($('reportsScreen'))$('reportsScreen').classList.add('hidden');
   $('historyScreen').classList.add('hidden');
   updateMenuBadges();
   updateSyncStatus();
@@ -2958,6 +2977,7 @@ function showNewCP(fresh){
   $('adminScreen').classList.add('hidden');
   $('appInstructionsScreen').classList.add('hidden');
   $('recentChangesScreen').classList.add('hidden');
+  if($('reportsScreen'))$('reportsScreen').classList.add('hidden');
   $('historyScreen').classList.add('hidden');
   setHeaderBackVisible(true);
   populateCustomerDropdown();
@@ -3100,6 +3120,7 @@ function showProjects(){
   $('adminScreen').classList.add('hidden');
   $('appInstructionsScreen').classList.add('hidden');
   $('recentChangesScreen').classList.add('hidden');
+  if($('reportsScreen'))$('reportsScreen').classList.add('hidden');
   $('historyScreen').classList.add('hidden');
   setHeaderBackVisible(true);
   renderProjects();
@@ -6794,6 +6815,7 @@ function showMasterList(){
   $('adminScreen').classList.add('hidden');
   $('appInstructionsScreen').classList.add('hidden');
   $('recentChangesScreen').classList.add('hidden');
+  if($('reportsScreen'))$('reportsScreen').classList.add('hidden');
   $('historyScreen').classList.add('hidden');
   $('masterListScreen').classList.remove('hidden');
   setHeaderBackVisible(true);
@@ -6817,6 +6839,7 @@ function showCustomers(){
   $('adminScreen').classList.add('hidden');
   $('appInstructionsScreen').classList.add('hidden');
   $('recentChangesScreen').classList.add('hidden');
+  if($('reportsScreen'))$('reportsScreen').classList.add('hidden');
   $('historyScreen').classList.add('hidden');
   $('customersScreen').classList.remove('hidden');
   setHeaderBackVisible(true);
@@ -7047,6 +7070,7 @@ function showInstructions(){
   $('adminScreen').classList.add('hidden');
   $('appInstructionsScreen').classList.add('hidden');
   $('recentChangesScreen').classList.add('hidden');
+  if($('reportsScreen'))$('reportsScreen').classList.add('hidden');
   $('historyScreen').classList.add('hidden');
   $('instructionsScreen').classList.remove('hidden');
   setHeaderBackVisible(true);
@@ -8883,6 +8907,7 @@ function showSettings(){
   $('adminScreen').classList.add('hidden');
   $('appInstructionsScreen').classList.add('hidden');
   $('recentChangesScreen').classList.add('hidden');
+  if($('reportsScreen'))$('reportsScreen').classList.add('hidden');
   $('historyScreen').classList.add('hidden');
   $('settingsScreen').classList.remove('hidden');
   setHeaderBackVisible(true);
@@ -8917,6 +8942,7 @@ function showHistory(presetFilter){
   $('adminScreen').classList.add('hidden');
   $('appInstructionsScreen').classList.add('hidden');
   $('recentChangesScreen').classList.add('hidden');
+  if($('reportsScreen'))$('reportsScreen').classList.add('hidden');
   $('historyScreen').classList.remove('hidden');
   setHeaderBackVisible(true);
   if(typeof presetFilter === 'string'){
@@ -9034,8 +9060,99 @@ function showAppInstructions(){
   $('historyScreen').classList.add('hidden');
   $('adminScreen').classList.add('hidden');
   $('recentChangesScreen').classList.add('hidden');
+  if($('reportsScreen'))$('reportsScreen').classList.add('hidden');
   $('appInstructionsScreen').classList.remove('hidden');
   setHeaderBackVisible(true);
+}
+
+
+/* ---------- Rev-443: Inspection Reports ----------
+   Reads every runs/*.json the stations have pushed (Rev-442) and shows them in one
+   place: grouped by part, newest first, pass/fail at a glance, tap to expand the
+   readings and the frequency-skip list. Read-only -- this screen never writes. */
+async function loadRunReports(){
+  const list = $('reportsList'), status = $('reportsStatus');
+  if(!ghConfigured()){ status.textContent = 'GitHub sync is not set up on this device — reports read from the data repo.'; list.innerHTML=''; return; }
+  status.textContent = 'Loading runs from GitHub…';
+  list.innerHTML = '';
+  const c = ghConfig();
+  const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+  let files = [];
+  try{
+    const resp = await fetch('https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/runs', { headers: hdrs });
+    if(resp.status === 404){ status.textContent = 'No runs saved yet — complete an inspection on any synced station and it will appear here.'; return; }
+    if(!resp.ok){ status.textContent = 'Could not list runs (' + resp.status + ').'; return; }
+    files = (await resp.json()).filter(f => f.name.endsWith('.json'));
+  }catch(err){ status.textContent = 'Could not reach GitHub: ' + err.message; return; }
+  if(!files.length){ status.textContent = 'No runs saved yet.'; return; }
+
+  status.textContent = 'Loading ' + files.length + ' run(s)…';
+  const runs = [];
+  await Promise.all(files.slice(0, 200).map(async f => {
+    try{
+      const r = await fetch(f.url, { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw+json' } });
+      if(r.ok) runs.push(JSON.parse(await r.text()));
+    }catch(e){}
+  }));
+  if(!runs.length){ status.textContent = 'Runs exist but none could be read.'; return; }
+  runs.sort((a,b) => String((b.run&&b.run.dateCompletedUtc)||'').localeCompare(String((a.run&&a.run.dateCompletedUtc)||'')));
+
+  const esc = s => String(s==null?'':s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  const byPart = {};
+  runs.forEach(p => { const k = (p.run && p.run.partNumber) || '?'; (byPart[k] = byPart[k] || []).push(p); });
+
+  let htmlOut = '';
+  Object.keys(byPart).sort().forEach(part => {
+    htmlOut += '<div style="font-weight:800; font-size:14px; letter-spacing:.04em; margin:18px 0 8px;">PART ' + esc(part) + ' <span style="color:var(--ink-faint); font-weight:600;">· ' + byPart[part].length + ' run(s)</span></div>';
+    byPart[part].forEach((p, i) => {
+      const r = p.run || {};
+      const reads = p.readings || [];
+      const nOut = reads.filter(x => x.inTolerance === false).length;
+      const nSkip = (r.freqSkipped || []).length;
+      const badge = nOut ? '<span style="background:rgba(200,40,40,.12); color:#a02020; border:1px solid #a02020; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:800;">' + nOut + ' OUT OF TOL</span>'
+                         : '<span style="background:rgba(30,122,52,.12); color:#1e7a34; border:1px solid #1e7a34; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:800;">ALL IN TOL</span>';
+      const when = r.dateCompletedUtc ? new Date(r.dateCompletedUtc).toLocaleString() : '—';
+      const rid = 'rrun_' + part.replace(/[^A-Za-z0-9]/g,'') + '_' + i;
+      htmlOut += '<div style="border:1px solid var(--line-strong); border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer;" onclick="var d=document.getElementById(\'' + rid + '\'); d.style.display = d.style.display===\'none\' ? \'block\' : \'none\';">'
+        + '<div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:13px;">'
+        + '<b>' + esc(r.operation||'?') + '</b>'
+        + '<span>SO <b>' + esc(r.shopOrder||'—') + '</b></span>'
+        + '<span>S/N <b>' + esc(r.serialNumber||'—') + '</b></span>'
+        + '<span>OP INITIALS <b>' + esc(r.operatorInitials||'—') + '</b></span>'
+        + badge
+        + (nSkip ? '<span style="color:var(--ink-faint); font-size:11px;">' + nSkip + ' skipped by freq</span>' : '')
+        + '<span style="margin-left:auto; color:var(--ink-faint); font-size:11px;">' + esc(when) + '</span>'
+        + '</div>'
+        + '<div id="' + rid + '" style="display:none; margin-top:10px; border-top:1px solid var(--line-strong); padding-top:8px;">'
+        + reads.map(x => '<div style="display:flex; gap:10px; padding:4px 0; font-size:12px;">'
+            + '<b style="flex:0 0 34px;">' + esc(x.bubble) + '</b>'
+            + '<span style="flex:1;">' + esc(x.desc||'') + '</span>'
+            + '<span class="mono" style="flex:0 0 auto; font-weight:700;">' + esc(x.raw==null?'—':x.raw) + '</span>'
+            + '<span style="flex:0 0 70px; text-align:right; font-weight:800; color:' + (x.inTolerance===false ? '#a02020' : (x.inTolerance===true ? '#1e7a34' : 'var(--ink-faint)')) + ';">' + (x.inTolerance===false ? 'OUT' : (x.inTolerance===true ? 'IN' : 'n/a')) + '</span>'
+            + '</div>').join('')
+        + ((r.freqSkipped||[]).length ? '<div style="margin-top:8px; font-size:11px; color:var(--ink-faint);"><b>Skipped by frequency:</b> '
+            + r.freqSkipped.map(s => esc(s.bubble) + ' (' + esc(s.freq||'') + ')').join(', ') + '</div>' : '')
+        + '</div></div>';
+    });
+  });
+  list.innerHTML = htmlOut;
+  status.textContent = runs.length + ' run(s) loaded from GitHub.';
+}
+function showInspectionReports(){
+  $('menuScreen').classList.add('hidden');
+  $('newCPScreen').classList.add('hidden');
+  $('projectsScreen').classList.add('hidden');
+  $('masterListScreen').classList.add('hidden');
+  $('customersScreen').classList.add('hidden');
+  $('instructionsScreen').classList.add('hidden');
+  $('settingsScreen').classList.add('hidden');
+  $('historyScreen').classList.add('hidden');
+  $('adminScreen').classList.add('hidden');
+  $('appInstructionsScreen').classList.add('hidden');
+  $('recentChangesScreen').classList.add('hidden');
+  $('reportsScreen').classList.remove('hidden');
+  setHeaderBackVisible(true);
+  loadRunReports();
 }
 
 function showRecentChanges(){
@@ -12477,6 +12594,9 @@ $('mCustomers').onclick = showCustomers;
 $('cpCustomer').onchange = onCustomerSelect;
 $('mInstructions').onclick = showInstructions;
 $('mRecentChanges').onclick = showRecentChanges;
+if($('mReports')) $('mReports').onclick = showInspectionReports;
+if($('reportsBack')) $('reportsBack').onclick = () => { $('reportsScreen').classList.add('hidden'); $('menuScreen').classList.remove('hidden'); setHeaderBackVisible(false); };
+if($('reportsRefreshBtn')) $('reportsRefreshBtn').onclick = loadRunReports;
 $('mAdmin').onclick = showAdmin;
 $('historyBack').onclick = showMenu;
 $('historyFilter').onchange = renderHistory;
