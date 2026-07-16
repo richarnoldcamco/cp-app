@@ -346,7 +346,7 @@
   <span class="spacer"></span>
   <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-434 · Jul 15, 2026</span>
   <button id="headerPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-right:8px;">⬆️ Push App</button>
-  <button class="ob-back hidden" id="headerBack">← Back</button>
+  <button class="ob-back" id="headerBack">← Back</button>
 </header>
 
 <div id="newerVersionBanner" style="display:none; background:#2c6e49; color:#fff; padding:6px 12px; font-size:12px; line-height:1.3; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
@@ -360,7 +360,7 @@
 </div>
 
 <!-- MAIN MENU -->
-<div id="menuScreen" class="menu">
+<div id="menuScreen" class="menu hidden">
   <div class="brand" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
     <div style="display:flex; align-items:center; gap:12px;">
       <div class="brand-mark">📋</div>
@@ -700,7 +700,7 @@
 </div>
 
 <!-- PROJECTS SCREEN -->
-<div id="projectsScreen" class="setup hidden">
+<div id="projectsScreen" class="setup">
   <button class="ob-back" id="projectsBack">← Back</button>
   <h1>Control Plans</h1>
   <p class="sub">All Control Plans on this device — drafts and saved projects together</p>
@@ -715,9 +715,9 @@
         <th>Action</th>
       </tr>
     </thead>
-    <tbody id="projectsTbody"></tbody>
+    <tbody id="projectsTbody"><tr><td><strong>1000222892</strong></td><td>Rev-1</td><td><span style="background:#e6a817; color:#3a2c00; font-weight:700; font-size:11px; padding:2px 8px; border-radius:10px; white-space:nowrap;">🚧 UNDER CONSTRUCTION</span></td><td>7/11/2026</td><td style="white-space: nowrap;"><button class="btn-ghost" style="margin-right: 6px; background: rgb(44, 110, 73); color: rgb(255, 255, 255); border: 1px solid rgb(33, 82, 54);">✏️ Edit</button><button class="btn-ghost">Download</button><button class="btn-ghost" title="Change this plan’s part number (and rev) IN PLACE — no duplicate is created" style="margin-left: 6px; background: rgb(26, 82, 118); color: rgb(255, 255, 255); border: 1px solid rgb(21, 67, 96);">✏️ Rename</button><button class="btn-ghost" style="margin-left: 6px; background: rgb(217, 83, 79); color: rgb(255, 255, 255); border: 1px solid rgb(201, 48, 44);">🗑️ Delete</button><button class="btn-ghost" title="Open / edit the Machinist Validation for this Control Plan" style="margin-left: 6px; background: rgb(91, 58, 134); color: rgb(255, 255, 255); border: 1px solid rgb(71, 45, 105);">🔧 Edit Machinist Validation</button></td></tr><tr><td><strong>912993</strong></td><td>Rev-1</td><td><span style="background:#2c6e49; color:#fff; font-weight:700; font-size:11px; padding:2px 8px; border-radius:10px; white-space:nowrap;">✓ SAVED</span></td><td>7/11/2026</td><td style="white-space: nowrap;"><button class="btn-ghost" style="margin-right: 6px; background: rgb(44, 110, 73); color: rgb(255, 255, 255); border: 1px solid rgb(33, 82, 54);">✏️ Edit</button><button class="btn-ghost">Download</button><button class="btn-ghost" title="Change this plan’s part number (and rev) IN PLACE — no duplicate is created" style="margin-left: 6px; background: rgb(26, 82, 118); color: rgb(255, 255, 255); border: 1px solid rgb(21, 67, 96);">✏️ Rename</button><button class="btn-ghost" style="margin-left: 6px; background: rgb(217, 83, 79); color: rgb(255, 255, 255); border: 1px solid rgb(201, 48, 44);">🗑️ Delete</button><button class="btn-ghost" title="Create a Machinist Validation inspection from this Control Plan" style="margin-left: 6px; background: rgb(91, 58, 134); color: rgb(255, 255, 255); border: 1px solid rgb(71, 45, 105);">🔧 Create Machinist Validation</button></td></tr><tr><td><strong>Test1</strong></td><td>Rev-1</td><td><span style="background:#2c6e49; color:#fff; font-weight:700; font-size:11px; padding:2px 8px; border-radius:10px; white-space:nowrap;">✓ SAVED</span></td><td>7/4/2026</td><td style="white-space: nowrap;"><button class="btn-ghost" style="margin-right: 6px; background: rgb(44, 110, 73); color: rgb(255, 255, 255); border: 1px solid rgb(33, 82, 54);">✏️ Edit</button><button class="btn-ghost">Download</button><button class="btn-ghost" title="Change this plan’s part number (and rev) IN PLACE — no duplicate is created" style="margin-left: 6px; background: rgb(26, 82, 118); color: rgb(255, 255, 255); border: 1px solid rgb(21, 67, 96);">✏️ Rename</button><button class="btn-ghost" style="margin-left: 6px; background: rgb(217, 83, 79); color: rgb(255, 255, 255); border: 1px solid rgb(201, 48, 44);">🗑️ Delete</button><button class="btn-ghost" title="Create a Machinist Validation inspection from this Control Plan" style="margin-left: 6px; background: rgb(91, 58, 134); color: rgb(255, 255, 255); border: 1px solid rgb(71, 45, 105);">🔧 Create Machinist Validation</button></td></tr></tbody>
   </table>
-  <p id="projectsEmpty" class="sub" style="margin-top:24px;text-align:center">No saved projects yet</p>
+  <p id="projectsEmpty" class="sub" style="margin-top: 24px; text-align: center; display: none;">No saved projects yet</p>
 </div>
 
 <!-- CONTROL PLAN MASTER LIST SCREEN -->
@@ -896,7 +896,7 @@
       <option value="desktop">Force Desktop</option>
       <option value="phone">Force Phone</option>
     </select>
-    <p style="font-size:12px; color:var(--ink-dim); margin-top:8px;" id="cpDeviceModeNote">Auto-detect — currently seeing this as a PHONE. Phone-specific hints adjust accordingly.</p>
+    <p style="font-size:12px; color:var(--ink-dim); margin-top:8px;" id="cpDeviceModeNote">Controls phone-specific hints (e.g. "run Locate on desktop"). Auto-detect uses your browser/screen. Override if it guesses wrong.</p>
   </div>
 
   <div style="margin-top: 28px; padding-top: 24px; border-top: 2px solid var(--signal);">
@@ -948,7 +948,7 @@
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 7/15/2026, 10:37:56 PM</p>
+    <p id="ghStatus" style="font-size:12px; color:var(--ink-dim); padding:10px; background:var(--panel-2); border-radius:6px;">✓ Pulled + merged at 7/16/2026, 6:02:23 AM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -956,7 +956,7 @@
   <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line);">
     <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">🧠 Shop Learning (control-type proposals)</h2>
     <p class="sub" style="margin-bottom: 12px;">The app learns feature → control-type mappings from every plan you build and syncs them shop-wide. Seed it from your entire plan history in one pass so the 📌 and 🤖 proposals are sharp right away.</p>
-    <p id="cpLearnStatus" style="font-size:12px; color:var(--ink-dim); padding:10px; background:var(--panel-2); border-radius:6px; margin-bottom:10px;">6 learned feature→type mappings in shop memory.</p>
+    <p id="cpLearnStatus" style="font-size:12px; color:var(--ink-dim); padding:10px; background:var(--panel-2); border-radius:6px; margin-bottom:10px;">—</p>
     <button class="btn-ghost" id="cpLearnAllBtn" onclick="cpLearnFromAllPlans()" style="width:100%; min-height:48px; background:#1a5276; color:#fff; border:1px solid #154360; font-weight:700;">📚 Learn from all saved plans</button>
     <p style="font-size:11px; color:var(--ink-dim); margin-top:8px;">Scans every saved project's rows for a feature + chosen control type, records the mappings (newest plan wins on conflicts, existing corrections kept), and syncs them to GitHub so all desktops share them. Safe to re-run anytime.</p>
     <button class="btn-ghost" id="cpLearnReportBtn" onclick="cpExportLearnedReport()" style="width:100%; min-height:44px; margin-top:10px;">📄 Export Learned Behavior (printable report)</button>
@@ -1007,8 +1007,8 @@
   <div style="margin-bottom: 24px; padding-top: 24px; border-top: 1px solid var(--line);">
     <h3 style="font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px;">Data Storage</h3>
     <div style="background: var(--panel-2); padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 13px;">
-      <p style="margin: 0;"><strong>Master List:</strong> <span id="adminMasterCount">64</span> rows</p>
-      <p style="margin: 8px 0 0 0;"><strong>Saved Projects:</strong> <span id="adminProjectCount">3</span> projects</p>
+      <p style="margin: 0;"><strong>Master List:</strong> <span id="adminMasterCount">0</span> rows</p>
+      <p style="margin: 8px 0 0 0;"><strong>Saved Projects:</strong> <span id="adminProjectCount">0</span> projects</p>
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
       <button class="btn-secondary" onclick="downloadBackup()" style="font-size:13px; padding:10px;">⬆️ Backup</button>
@@ -1276,7 +1276,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- FLASH MESSAGE -->
-<div id="flash" class="flash hidden">✓ Data pushed to GitHub</div>
+<div id="flash" class="flash hidden">🔧 Machinist Validation opened — 1000222892 Rev-1</div>
 
 <!-- BOOT -->
 <script>
@@ -11980,4 +11980,4 @@ if(ghConfigured()){
 </div>
 
 
-</body></html>
+<div id="mvPanel" style="position: fixed; inset: 0px; z-index: 100000; background: rgb(233, 230, 223); display: flex; flex-direction: column;"><iframe id="mvFrame" style="flex: 1 1 auto; width: 100%; height: 100%; border: 0px; background: rgb(255, 255, 255);"></iframe><button style="position: fixed; top: 7px; left: 10px; z-index: 100002; background: rgb(122, 20, 20); color: rgb(255, 255, 255); border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; border-radius: 6px; font-weight: 800; padding: 7px 12px; cursor: pointer; font-size: 13px; box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 6px;">← Control Plans</button></div></body></html>
