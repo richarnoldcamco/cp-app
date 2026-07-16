@@ -2400,7 +2400,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-444";
+const APP_REV = "Rev-445";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2414,6 +2414,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-445", type: "App", changes: ["RUN TIMING STATISTICS on the Inspection Reports screen \u2014 each expanded run now opens with a stats block computed from its measurement timestamps: (1) the FIVE LARGEST GAPS between consecutive measurements, each showing the duration and which balloons/times bound it; (2) the LAST measurement before each shift boundary \u2014 the 9:30 AM break, the 12:00 PM lunch, and the 3:15 PM end of shift \u2014 with how long before the mark it landed; (3) the FIRST measurement after 7:00 AM start, 9:40 AM back-from-break, and 12:15 PM back-from-lunch, with how long after the mark it landed. Times are the station\u2019s local clock; each boundary is anchored to the day the run\u2019s first reading was taken; a boundary with no qualifying reading shows a dash rather than guessing. Uses last-updated timestamps (falling back to created), so re-measurements count at their actual time. Shift marks live in one SHIFT_MARKS constant for easy future adjustment. Display-only \u2014 nothing is written anywhere."] },
   { ts: "2026-07-16", rev: "App Rev-444", type: "App", changes: ["A TIMESTAMP ON EVERY MEASUREMENT \u2014 each saved reading now carries updatedUtc, stamped on EVERY save, alongside the existing createdUtc which stays frozen at first entry; so a re-measured feature keeps its original time AND shows when it was last changed, which is the honest pair for an inspection record. The Inspection Reports screen now shows the time (last-updated, falling back to created) on every reading row, next to the value. Also fixed on the Reports screen: reading descriptions were blank because the screen read a field name the stored readings never had (desc vs the actual characteristic) \u2014 descriptions now display. Embedded Machinist Validation app bumped to REV-108."] },
   { ts: "2026-07-16", rev: "App Rev-443", type: "App", changes: ["\ud83d\udcca INSPECTION REPORTS \u2014 new home-screen tile (tools row) opening a read-only screen that pulls every runs/*.json the stations have pushed (Rev-442) and shows all inspections in one place: grouped by part, newest first, each run a card with operation, shop order, serial, operator initials, an ALL IN TOL / N OUT OF TOL badge, a skipped-by-frequency count, and the completion time. Tap a card to expand the full readings \u2014 balloon, description, value, IN/OUT verdict \u2014 plus the frequency-skip list. Reads up to the 200 most recent run files in parallel using the tab\u2019s saved GitHub settings; stations without sync get a plain explanation instead of an error. Strictly read-only \u2014 this screen never writes to the repo. All nine existing screen-switch functions were taught to hide the new screen so it cannot overlap another view."] },
   { ts: "2026-07-16", rev: "App Rev-442", type: "App", changes: ["COMPLETED INSPECTION RUNS AUTO-SAVE TO GITHUB \u2014 when a run finishes, the whole record (run header, every reading with timestamps, and the frequency-skip list from Rev-441) is pushed as one JSON file to the data repo at runs/PART_OP_SHOPORDER_SERIAL_runid.json. Credentials are the SAME GitHub settings the outer CP app keeps in this tab (the embedded app shares the tab\u2019s storage), so a station that syncs today needs zero extra setup. Deliberate rules: the push NEVER blocks or fails an inspection \u2014 the run is saved locally first and the summary shows immediately, with the push running behind it (fire-and-forget); a failed push flashes a warning and the local copy stays authoritative, with Email / Export as the manual backup; a station with no token silently stays local-only rather than nagging the machinist; filenames are sanitised to safe characters. On success the run is stamped cloudSavedUtc so a future report screen can tell synced from unsynced. Embedded Machinist Validation app bumped to REV-107."] },
@@ -9071,6 +9072,48 @@ function showAppInstructions(){
    Reads every runs/*.json the stations have pushed (Rev-442) and shows them in one
    place: grouped by part, newest first, pass/fail at a glance, tap to expand the
    readings and the frequency-skip list. Read-only -- this screen never writes. */
+
+/* ---------- Rev-445: per-run timing statistics ----------
+   Computed from measurement timestamps (last-updated, falling back to created),
+   in the station's local time. Shift boundaries per CAMCO: 7:00 start,
+   9:30-9:40 break, 12:00-12:15 lunch, 3:15 end. Change SHIFT_MARKS to adjust. */
+const SHIFT_MARKS = {
+  before: [ ['9:30 AM break', 9, 30], ['12:00 PM break', 12, 0], ['3:15 PM end of shift', 15, 15] ],
+  after:  [ ['7:00 AM start', 7, 0], ['9:40 AM back from break', 9, 40], ['12:15 PM back from lunch', 12, 15] ]
+};
+function fmtDur(ms){
+  if(ms < 0) ms = 0;
+  const m = Math.floor(ms / 60000), hh = Math.floor(m / 60), mm = m % 60, ss = Math.floor((ms % 60000) / 1000);
+  if(hh) return hh + 'h ' + mm + 'm';
+  if(m)  return mm + 'm ' + ss + 's';
+  return ss + 's';
+}
+function fmtClock(d){ return d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
+function computeRunStats(reads){
+  const pts = reads
+    .map(x => ({ bubble: x.bubble, t: new Date(x.updatedUtc || x.createdUtc) }))
+    .filter(p => !isNaN(p.t))
+    .sort((a,b) => a.t - b.t);
+  if(pts.length < 1) return null;
+  const gaps = [];
+  for(let i = 1; i < pts.length; i++)
+    gaps.push({ ms: pts[i].t - pts[i-1].t, a: pts[i-1], b: pts[i] });
+  gaps.sort((a,b) => b.ms - a.ms);
+  const day = pts[0].t;   // boundaries anchored to the day the run's first reading was taken
+  const mark = (hh,mm) => { const d = new Date(day); d.setHours(hh, mm, 0, 0); return d; };
+  const before = SHIFT_MARKS.before.map(([label,hh,mm]) => {
+    const B = mark(hh,mm);
+    const last = [...pts].reverse().find(p => p.t < B && p.t.toDateString() === B.toDateString());
+    return { label, val: last ? (fmtClock(last.t) + ' — ' + fmtDur(B - last.t) + ' before') : '—' };
+  });
+  const after = SHIFT_MARKS.after.map(([label,hh,mm]) => {
+    const B = mark(hh,mm);
+    const first = pts.find(p => p.t >= B && p.t.toDateString() === B.toDateString());
+    return { label, val: first ? (fmtClock(first.t) + ' — ' + fmtDur(first.t - B) + ' after') : '—' };
+  });
+  return { top5: gaps.slice(0,5), before, after };
+}
+
 async function loadRunReports(){
   const list = $('reportsList'), status = $('reportsStatus');
   if(!ghConfigured()){ status.textContent = 'GitHub sync is not set up on this device — reports read from the data repo.'; list.innerHTML=''; return; }
@@ -9125,6 +9168,17 @@ async function loadRunReports(){
         + '<span style="margin-left:auto; color:var(--ink-faint); font-size:11px;">' + esc(when) + '</span>'
         + '</div>'
         + '<div id="' + rid + '" style="display:none; margin-top:10px; border-top:1px solid var(--line-strong); padding-top:8px;">'
+        + (function(){
+            const st = computeRunStats(reads);
+            if(!st) return '';
+            return '<div style="border:1px dashed var(--line-strong); border-radius:8px; padding:10px 12px; margin-bottom:10px; font-size:11px;">'
+              + '<div style="font-weight:800; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:6px;">RUN TIMING STATISTICS</div>'
+              + (st.top5.length ? '<div style="margin-bottom:6px;"><b>Largest gaps between measurements:</b> '
+                  + st.top5.map(g => fmtDur(g.ms) + ' (' + esc(g.a.bubble) + ' ' + fmtClock(g.a.t) + ' \u2192 ' + esc(g.b.bubble) + ' ' + fmtClock(g.b.t) + ')').join(' · ') + '</div>' : '')
+              + '<div style="margin-bottom:4px;"><b>Last measurement before:</b> ' + st.before.map(x => x.label + ': ' + x.val).join(' · ') + '</div>'
+              + '<div><b>First measurement after:</b> ' + st.after.map(x => x.label + ': ' + x.val).join(' · ') + '</div>'
+              + '</div>';
+          })()
         + reads.map(x => '<div style="display:flex; gap:10px; padding:4px 0; font-size:12px; align-items:center;">'
             + '<b style="flex:0 0 34px;">' + esc(x.bubble) + '</b>'
             + '<span style="flex:1;">' + esc(x.characteristic||x.desc||'') + '</span>'
