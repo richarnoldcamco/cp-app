@@ -2193,10 +2193,10 @@ Rev-40
   <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
     <label style="font-size:12px; font-weight:700; color:var(--ink-dim);">Sort batches by</label>
     <select id="reportsSortSel" style="height:38px; border:1px solid var(--line-strong); border-radius:8px; padding:0 8px; font-size:13px;">
+      <option value="date_desc" selected>Date — newest first</option>
+      <option value="date_asc">Date — oldest first</option>
       <option value="so_desc">Shop order — newest first</option>
       <option value="so_asc">Shop order — oldest first</option>
-      <option value="date_desc">Date — newest first</option>
-      <option value="date_asc">Date — oldest first</option>
       <option value="part_asc">Part number — A to Z</option>
       <option value="part_desc">Part number — Z to A</option>
       <option value="runs_desc">Run count — high to low</option>
@@ -2435,7 +2435,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-461";
+const APP_REV = "Rev-462";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2449,6 +2449,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-462", type: "App", changes: ["DATE \u2014 NEWEST FIRST IS THE DEFAULT SORT on Inspection Reports. The index draws immediately (briefly in shop-order fallback while the per-batch dates load), then snaps into true date order the moment they arrive \u2014 the existing post-fetch re-render already handled that."] },
   { ts: "2026-07-16", rev: "App Rev-461", type: "App", changes: ["EVERY BATCH CARD SHOWS ITS DATE \u2014 the one-run-per-batch date fetch (Rev-460) now runs automatically right after the index draws, and each batch card displays its date between the shop order and the run count. The index still appears instantly; dates pop in a moment later when the handful of small reads complete. Date sorting reuses the same shared fetcher instead of its own copy."] },
   { ts: "2026-07-16", rev: "App Rev-460", type: "App", changes: ["SORT BY PART NUMBER AND BY DATE \u2014 the Reports sort dropdown gains Part number (A\u2192Z / Z\u2192A, reordering the part groups) and Date (newest / oldest first). Dates are not in the filenames, so the first time a date sort is chosen the app fetches exactly ONE run file per batch to learn each batch\u2019s date, remembers it for the session, and sorts both the batches and the part groups by it \u2014 a handful of small reads, never the whole folder."] },
   { ts: "2026-07-16", rev: "App Rev-459", type: "App", changes: ["SORT DROPDOWN ON INSPECTION REPORTS \u2014 batches can be ordered by shop order (newest or oldest first), run count, or operation. Re-sorting redraws from the cached index without a single refetch, and batches already loaded keep their downloaded runs across re-sorts (cache re-keyed from transient card ids to stable part+batch keys to make that true)."] },
@@ -9359,7 +9360,7 @@ function renderRunIndex(){
   const byPart = window._reportIndex || {};
   const c = ghConfig();
   const esc = s => String(s==null?'':s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
-  const mode = ($('reportsSortSel') && $('reportsSortSel').value) || 'so_desc';
+  const mode = ($('reportsSortSel') && $('reportsSortSel').value) || 'date_desc';
   const sorter = {
     so_desc: (a,b) => b[1].so.localeCompare(a[1].so),
     so_asc:  (a,b) => a[1].so.localeCompare(b[1].so),
