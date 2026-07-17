@@ -2422,7 +2422,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-457";
+const APP_REV = "Rev-458";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2436,6 +2436,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-458", type: "App", changes: ["EFFICIENCY LINE SIMPLIFIED \u2014 the per-day line inside a batch now reads just \u20187/10/2026 \u2014 Efficiency: 109% \u00b7 19 good part(s)\u2019; the full working (parts \u00d7 cycle = earned over window, paused minutes excluded, scrapped count) is tucked behind a tap on the line, chevron and all, matching the tap-for-detail pattern everywhere else on the screen. Efficiency lines with no cycle time or no timestamps still report their good-part count."] },
   { ts: "2026-07-16", rev: "App Rev-457", type: "App", changes: ["GAP ROWS SHOW TIMES ONLY \u2014 the balloon numbers were noise in the largest-gaps lists; rows now read \u201813m 55s \u00b7 7:19 AM \u2192 7:33 AM\u2019 in both the batch report and the per-run stats."] },
   { ts: "2026-07-16", rev: "App Rev-456", type: "App", changes: ["INSPECTION REPORTS LOADS LAZILY \u2014 opening the screen now makes ONE call for the runs-folder listing and draws collapsed batch cards (part \u2192 operation \u00b7 shop order, with run counts) parsed straight from the filenames; a batch\u2019s run files download only when its card is first tapped, with a per-batch progress note, then stay cached for the session. 500 stored runs no longer cost 500 downloads to glance at the screen \u2014 you pay only for what you open. Inside an opened batch: per-day efficiency lines, the full batch report (Rev-452) shown directly, then the individual run cards, still expandable, with taps stop-propagated so opening a run cannot collapse its batch. The Email-daily-results digest now covers the batches you have opened \u2014 the button already told you to load first. The 1500-file cap is gone; the screen scales with the folder, not against it. Run cards inside a batch drop the redundant OP/SO columns (the batch header carries them) in favour of S/N-first."] },
   { ts: "2026-07-16", rev: "App Rev-455", type: "App", changes: ["GAP ROWS TIGHTENED \u2014 the duration column in the LARGEST GAPS lists was sized like the break-boundary labels (44% of the width), leaving a dead field between \u20182m 16s\u2019 and its balloons; it is now a fixed 76px, so the balloon\u2192balloon text sits right beside the duration. Break-boundary rows keep the wider label they actually need. Both batch and per-run stats."] },
@@ -9136,7 +9137,7 @@ function fmtClock(d){ return d.toLocaleTimeString([], {hour:'numeric', minute:'2
    at least the window of one cycle so a single fast run can't read as 400%. */
 function computeShiftEfficiency(dayRuns){
   const cyc = dayRuns.map(p => (p.run && parseFloat(p.run.cycleMinutes)) || 0).find(v => v > 0) || 0;
-  if(!cyc) return { text: 'no cycle time set on this plan', pct: null };
+  if(!cyc) return { text: 'no cycle time set on this plan', pct: null, goodParts: dayRuns.filter(p => !(p.run && p.run.scrapped)).length };
   let lo = null, hi = null, pausedMin = 0, scrapN = 0;
   dayRuns.forEach(p => {
     (p.readings||[]).forEach(x => {
@@ -9149,7 +9150,7 @@ function computeShiftEfficiency(dayRuns){
     if(r.scrapped) scrapN++;
     (r.pauses||[]).forEach(pa => { const d = new Date(pa.endUtc) - new Date(pa.startUtc); if(d > 0) pausedMin += d/60000; });
   });
-  if(lo === null) return { text: 'no timestamped readings', pct: null };
+  if(lo === null) return { text: 'no timestamped readings', pct: null, goodParts: dayRuns.filter(p => !(p.run && p.run.scrapped)).length };
   const windowMin = Math.max((hi - lo) / 60000 - pausedMin, cyc);   // Rev-448: paused time excluded
   const goodParts = dayRuns.length - scrapN;
   const earnedMin = goodParts * cyc;
@@ -9387,8 +9388,11 @@ function renderBatchInner(runs){
     window._reportDigestLines = window._reportDigestLines || [];
     const r0 = (byDay[day][0].run || {});
     window._reportDigestLines.push('PART ' + (r0.partNumber||'?') + ' \u00b7 ' + (r0.operation||'?') + ' \u00b7 ' + day + ' \u2014 ' + (ef.pct===null ? ef.text : (ef.pct + '% \u2014 ' + ef.text)));
-    out += '<div style="font-size:12px; margin:0 0 6px; padding:6px 10px; border-left:3px solid ' + (ef.pct===null ? 'var(--line-strong)' : (ef.pct>=85 ? '#1e7a34' : (ef.pct>=60 ? '#b8860b' : '#a02020'))) + '; background:rgba(0,0,0,.03);">'
-      + '<b>' + esc(day) + '</b> — Shift efficiency: ' + (ef.pct===null ? '<span style="color:var(--ink-faint);">' + esc(ef.text) + '</span>' : '<b>' + ef.pct + '%</b> <span style="color:var(--ink-faint);">(' + esc(ef.text) + ')</span>')
+    const did = 'rday_' + Math.random().toString(36).slice(2, 9);
+    out += '<div class="rday-card" data-rid="' + did + '" style="font-size:13px; margin:0 0 6px; padding:8px 10px; border-left:3px solid ' + (ef.pct===null ? 'var(--line-strong)' : (ef.pct>=85 ? '#1e7a34' : (ef.pct>=60 ? '#b8860b' : '#a02020'))) + '; background:rgba(0,0,0,.03); cursor:pointer; -webkit-user-select:none; user-select:none;">'
+      + '<span id="' + did + '_chev" style="font-weight:800; margin-right:6px;">\u25b8</span>'
+      + '<b>' + esc(day) + '</b> — Efficiency: ' + (ef.pct===null ? '<span style="color:var(--ink-faint);">n/a</span>' : '<b>' + ef.pct + '%</b>') + ' \u00b7 <b>' + ef.goodParts + '</b> good part(s)'
+      + '<div id="' + did + '" style="display:none; margin-top:8px; font-size:12px; color:var(--ink-faint);">' + esc(ef.text) + '</div>'
       + '</div>';
   });
   out += buildBatchReport(runs);
@@ -9444,6 +9448,18 @@ function renderBatchInner(runs){
 }
 
 function wireRunCards(scope){
+  scope.querySelectorAll('.rday-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const rid = card.getAttribute('data-rid');
+      const d = document.getElementById(rid);
+      const ch = document.getElementById(rid + '_chev');
+      if(!d) return;
+      const open = d.style.display !== 'none';
+      d.style.display = open ? 'none' : 'block';
+      if(ch) ch.textContent = open ? '\u25b8' : '\u25be';
+    });
+  });
   scope.querySelectorAll('.rrun-card').forEach(card => {
     card.addEventListener('click', (e) => {
       e.stopPropagation();   // don't collapse the batch when tapping a run
