@@ -1332,7 +1332,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-471";
+const APP_REV = "Rev-472";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1346,6 +1346,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-17", rev: "App Rev-472", type: "App", changes: ["SAMPLE DATA HIDDEN \u2014 the generated test runs (part 1000222892, SO-7701 through SO-7705, 100 pcs) no longer appear in Inspection Reports. The files stay in the repo untouched; the index just filters them. The pc/batch count line reflects only what is shown, and a faint line at the bottom of the list \u2014 \u2018100 sample pc(s) in 5 batch(es) hidden \u2014 tap to show\u2019 \u2014 toggles them back any time (remembered per device). Say \u2018delete sample data\u2019 when you want them gone from the repo for good."] },
   { ts: "2026-07-17", rev: "App Rev-471", type: "App", changes: ["BATCH CARDS TIGHTENED \u2014 (1) dates on the Inspection Reports cards use the short M/D/YY form (7/16/26, not 7/16/2026); (2) the redundant SO label is gone \u2014 the value already starts with SO-; (3) each card now shows the OPERATOR INITIALS. Initials ride on the same one-tiny-read-per-batch that already fetched missing dates \u2014 the index still draws instantly and initials pop in a moment later. Both card layouts (flat date stream and grouped) changed together."] },
   { ts: "2026-07-17", rev: "App Rev-470", type: "App", changes: ["NEVER-DOWNGRADE GUARD ON EVERY APP PUSH \u2014 found because the user updated to a newer rev and the tab \u2018returned to 467\u2019: a stale tab holding the token was pushing ITSELF back over the newly-imported rev, then Update pulled the old code right back down. The two push functions (ghPushApp for cp_app.html and ghPublishPages for the website) pushed this tab\u2019s code with NO check against what GitHub already held \u2014 the rev comparisons lived only in some callers (boot, 60s tick), so unguarded paths like push-on-connect could drag the repo backwards. Both functions now read the remote rev FIRST and refuse to overwrite a newer one: silent pushes skip and show the one-tap update banner so the stale tab upgrades itself; a manual push demands explicit confirmation before erasing newer code. IMPORTANT: tabs running revs OLDER than 470 don\u2019t carry this guard \u2014 close them; from 470 on, no tab can ever resurrect a dead rev again."] },
   { ts: "2026-07-17", rev: "App Rev-469", type: "App", changes: ["DUPLICATE DATE REMOVED \u2014 since Rev-466 every batch is exactly one day, so the per-day efficiency line inside a batch was repeating the same date the batch card already shows. The line now reads just \u2018Efficiency: 55% \u00b7 19 good part(s)\u2019. The nightly email digest keeps its date \u2014 that line stands alone in an inbox and still needs it."] },
@@ -8264,8 +8265,7 @@ async function loadRunReports(){
 
   window._reportIndex = byPart;
   window._reportBatchCache = window._reportBatchCache || {};
-  renderRunIndex();
-  status.textContent = files.length + ' pc(s) indexed across ' + Object.values(byPart).reduce((a,p) => a + Object.keys(p).length, 0) + ' batch(es). Tap a batch to load it.';
+  renderRunIndex();   // Rev-472: renderRunIndex sets the count line (it knows what's hidden)
   // Rev-461: fetch one run per batch so every card can show its date (a handful of tiny reads)
   ensureBatchDates().then(() => renderRunIndex());
 }
@@ -8299,7 +8299,28 @@ async function ensureBatchDates(){
 // changing the sort never refetches anything.
 function renderRunIndex(){
   const list = $('reportsList');
-  const byPart = window._reportIndex || {};
+  // Rev-472: SAMPLE DATA HIDDEN by default. The generated test runs (part 1000222892,
+  // shop orders SO-7701..SO-7705) stay in the repo untouched but are filtered out of the
+  // index unless the user taps the show-toggle at the bottom of the list.
+  const _showSample = localStorage.getItem('showSampleRuns') === '1';
+  const _isSample = (part, b) => part === '1000222892' && /^SO-770[1-5]$/.test(b.so);
+  const _all = window._reportIndex || {};
+  let _hiddenPcs = 0, _hiddenBatches = 0;
+  const byPart = {};
+  Object.keys(_all).forEach(part => {
+    Object.entries(_all[part]).forEach(([bk, b]) => {
+      if(!_showSample && _isSample(part, b)){ _hiddenPcs += b.files.length; _hiddenBatches++; return; }
+      (byPart[part] = byPart[part] || {})[bk] = b;
+    });
+  });
+  // Rev-472: the count line reflects only what is shown
+  (function(){
+    const st = $('reportsStatus');
+    if(!st) return;
+    let pcs = 0, bats = 0;
+    Object.values(byPart).forEach(pk => Object.values(pk).forEach(b => { pcs += b.files.length; bats++; }));
+    st.textContent = pcs + ' pc(s) indexed across ' + bats + ' batch(es). Tap a batch to load it.';
+  })();
   const c = ghConfig();
   const esc = s => String(s==null?'':s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
   const mode = ($('reportsSortSel') && $('reportsSortSel').value) || 'date_desc';
@@ -8341,8 +8362,9 @@ function renderRunIndex(){
         + '<div id="' + bid + '" style="display:none; margin-top:10px; border-top:1px solid var(--line-strong); padding-top:8px;"></div>'
         + '</div>';
     });
-    list.innerHTML = htmlOut;
+    list.innerHTML = htmlOut + sampleToggleHtml(_hiddenPcs, _hiddenBatches, _showSample);
     wireBatchCards(list);
+    wireSampleToggle(list);
     return;
   }
   let partKeys = Object.keys(byPart).sort();
@@ -8368,8 +8390,25 @@ function renderRunIndex(){
         + '</div>';
     });
   });
-  list.innerHTML = htmlOut;
+  list.innerHTML = htmlOut + sampleToggleHtml(_hiddenPcs, _hiddenBatches, _showSample);
   wireBatchCards(list);
+  wireSampleToggle(list);
+}
+
+// (status line helper lives with the toggle below)
+// Rev-472: faint one-line toggle at the bottom of the Reports list
+function sampleToggleHtml(pcs, batches, showing){
+  if(showing) return '<div id="sampleToggle" style="margin:14px 0 6px; text-align:center; color:var(--ink-faint); font-size:11px; cursor:pointer; -webkit-user-select:none; user-select:none;">sample data shown \u2014 tap to hide</div>';
+  if(!pcs) return '';
+  return '<div id="sampleToggle" style="margin:14px 0 6px; text-align:center; color:var(--ink-faint); font-size:11px; cursor:pointer; -webkit-user-select:none; user-select:none;">' + pcs + ' sample pc(s) in ' + batches + ' batch(es) hidden \u2014 tap to show</div>';
+}
+function wireSampleToggle(list){
+  const t = list.querySelector('#sampleToggle');
+  if(t) t.onclick = (e) => {
+    e.stopPropagation();
+    localStorage.setItem('showSampleRuns', localStorage.getItem('showSampleRuns') === '1' ? '0' : '1');
+    renderRunIndex();
+  };
 }
 
 function wireBatchCards(list){
