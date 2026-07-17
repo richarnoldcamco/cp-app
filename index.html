@@ -2435,7 +2435,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-466";
+const APP_REV = "Rev-467";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2449,6 +2449,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-467", type: "App", changes: ["DATE SORTS ARE STRICTLY CHRONOLOGICAL \u2014 with Date (newest/oldest) selected, batches render as ONE flat stream across every part, no part grouping; each card carries date \u00b7 part \u00b7 op \u00b7 SO \u00b7 pcs. Part/shop-order/count sorts keep the grouped view. Batch-card wiring factored into one function shared by both layouts, with loaded batches still cached across re-sorts."] },
   { ts: "2026-07-16", rev: "App Rev-466", type: "App", changes: ["ONE BATCH PER DAY \u2014 each day/part/operation is its own data set, never rolled up. Run filenames now carry a date token (PART_OP_SO_YYYYMMDD_SN_RID.json; the embedded validation app REV-111 stamps it on every save, and all existing repo files were renamed to the new form), so the Reports index batches by part+op+DAY straight from the names \u2014 dates show instantly with zero per-batch fetching, and lazy loading is untouched. Cards read OP \u00b7 date \u00b7 SO \u00b7 pcs. Legacy undated names still group by shop order as a fallback."] },
   { ts: "2026-07-16", rev: "App Rev-465", type: "App", changes: ["RUN INDEX SCALES PAST 1000 FILES \u2014 discovered importing 959 pieces of real 912767-M history: GitHub\u2019s plain folder listing silently stops at 1000 entries, so a production-sized runs/ folder would quietly lose files from the index. The index now enumerates via the git TREE (uncapped), keeping the old listing only as a fallback (with an explicit truncation note) for when the tree service has one of its outages. Batch loading is unchanged \u2014 file reads still go through the contents raw path."] },
   { ts: "2026-07-16", rev: "App Rev-464", type: "App", changes: ["DURATIONS IN WHOLE MINUTES \u2014 every gap and before/after-boundary duration in the timing statistics rounds to the nearest minute (14m 3s \u2192 14m, 2m 30s \u2192 3m, 3m 15s after \u2192 3m after); hours keep the h m form. One shared formatter, so batch and per-run views change together."] },
@@ -9398,15 +9399,39 @@ function renderRunIndex(){
     runs_desc: (a,b) => b[1].files.length - a[1].files.length || b[1].so.localeCompare(a[1].so),
     op: (a,b) => a[1].op.localeCompare(b[1].op) || b[1].so.localeCompare(a[1].so)
   }[mode];
-  // part-group order: alphabetical normally, reversed for Z-to-A, by batch date for date sorts
-  let partKeys = Object.keys(byPart).sort();
-  if(mode === 'part_desc') partKeys.reverse();
-  if(mode === 'date_desc' || mode === 'date_asc'){
-    const pdate = p => Object.values(byPart[p]).map(b => String(b.date||'')).sort().pop() || '';
-    partKeys.sort((a,b) => mode === 'date_desc' ? pdate(b).localeCompare(pdate(a)) : pdate(a).localeCompare(pdate(b)));
-  }
   window._reportBatchFiles = {};
   let bi = 0, htmlOut = '';
+  // Rev-467: date sorts are STRICTLY chronological across every part -- one flat
+  // stream, no part grouping; the part number rides on each card instead.
+  if(mode === 'date_desc' || mode === 'date_asc'){
+    const flat = [];
+    Object.keys(byPart).forEach(part => Object.entries(byPart[part]).forEach(([bk, b]) => flat.push([part, bk, b])));
+    flat.sort((x, y) => {
+      const dx = String(x[2].date||''), dy = String(y[2].date||'');
+      return mode === 'date_desc' ? (dy.localeCompare(dx) || y[2].so.localeCompare(x[2].so)) : (dx.localeCompare(dy) || x[2].so.localeCompare(y[2].so));
+    });
+    flat.forEach(([part, bk, b]) => {
+      const bid = 'rbatch_' + (bi++);
+      window._reportBatchFiles[bid] = b.files;
+      window._reportBatchFiles[bid]._ck = part + '|' + bk;
+      htmlOut += '<div class="rbatch-card" data-bid="' + bid + '" style="border:1px solid var(--line-strong); border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer; -webkit-user-select:none; user-select:none;">'
+        + '<div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:13px;">'
+        + '<span id="' + bid + '_chev" style="font-weight:800;">\u25b8</span>'
+        + (b.date ? '<span style="font-weight:800;">' + esc(new Date(b.date).toLocaleDateString()) + '</span>' : '')
+        + '<b>' + esc(part) + '</b><span>' + esc(b.op) + '</span>'
+        + '<span style="color:var(--ink-dim);">SO <b>' + esc(b.so) + '</b></span>'
+        + '<span style="color:var(--ink-faint);">' + b.files.length + ' pc(s)</span>'
+        + '<span id="' + bid + '_note" style="margin-left:auto; color:var(--ink-faint); font-size:11px;">tap to load</span>'
+        + '</div>'
+        + '<div id="' + bid + '" style="display:none; margin-top:10px; border-top:1px solid var(--line-strong); padding-top:8px;"></div>'
+        + '</div>';
+    });
+    list.innerHTML = htmlOut;
+    wireBatchCards(list);
+    return;
+  }
+  let partKeys = Object.keys(byPart).sort();
+  if(mode === 'part_desc') partKeys.reverse();
   partKeys.forEach(part => {
     const total = Object.values(byPart[part]).reduce((a,b) => a + b.files.length, 0);
     htmlOut += '<div style="font-weight:800; font-size:14px; letter-spacing:.04em; margin:18px 0 8px;">PART ' + esc(part) + ' <span style="color:var(--ink-faint); font-weight:600;">\u00b7 ' + total + ' pc(s)</span></div>';
@@ -9428,6 +9453,11 @@ function renderRunIndex(){
     });
   });
   list.innerHTML = htmlOut;
+  wireBatchCards(list);
+}
+
+function wireBatchCards(list){
+  const c = ghConfig();
   list.querySelectorAll('.rbatch-card').forEach(card => {
     card.addEventListener('click', async (e) => {
       if(e.target.closest('.rrun-card')) return;   // taps inside loaded content have their own handlers
@@ -9468,7 +9498,6 @@ function renderRunIndex(){
     });
   });
 }
-
 // Rev-456: everything shown inside a loaded batch: per-day efficiency lines, the
 // full batch report, then the individual run cards (expandable as before).
 function renderBatchInner(runs){
