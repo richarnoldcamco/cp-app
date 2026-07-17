@@ -2435,7 +2435,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-460";
+const APP_REV = "Rev-461";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2449,6 +2449,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-461", type: "App", changes: ["EVERY BATCH CARD SHOWS ITS DATE \u2014 the one-run-per-batch date fetch (Rev-460) now runs automatically right after the index draws, and each batch card displays its date between the shop order and the run count. The index still appears instantly; dates pop in a moment later when the handful of small reads complete. Date sorting reuses the same shared fetcher instead of its own copy."] },
   { ts: "2026-07-16", rev: "App Rev-460", type: "App", changes: ["SORT BY PART NUMBER AND BY DATE \u2014 the Reports sort dropdown gains Part number (A\u2192Z / Z\u2192A, reordering the part groups) and Date (newest / oldest first). Dates are not in the filenames, so the first time a date sort is chosen the app fetches exactly ONE run file per batch to learn each batch\u2019s date, remembers it for the session, and sorts both the batches and the part groups by it \u2014 a handful of small reads, never the whole folder."] },
   { ts: "2026-07-16", rev: "App Rev-459", type: "App", changes: ["SORT DROPDOWN ON INSPECTION REPORTS \u2014 batches can be ordered by shop order (newest or oldest first), run count, or operation. Re-sorting redraws from the cached index without a single refetch, and batches already loaded keep their downloaded runs across re-sorts (cache re-keyed from transient card ids to stable part+batch keys to make that true)."] },
   { ts: "2026-07-16", rev: "App Rev-458", type: "App", changes: ["EFFICIENCY LINE SIMPLIFIED \u2014 the per-day line inside a batch now reads just \u20187/10/2026 \u2014 Efficiency: 109% \u00b7 19 good part(s)\u2019; the full working (parts \u00d7 cycle = earned over window, paused minutes excluded, scrapped count) is tucked behind a tap on the line, chevron and all, matching the tap-for-detail pattern everywhere else on the screen. Efficiency lines with no cycle time or no timestamps still report their good-part count."] },
@@ -9334,6 +9335,21 @@ async function loadRunReports(){
   window._reportBatchCache = window._reportBatchCache || {};
   renderRunIndex();
   status.textContent = files.length + ' run(s) indexed across ' + Object.values(byPart).reduce((a,p) => a + Object.keys(p).length, 0) + ' batch(es). Tap a batch to load it.';
+  // Rev-461: fetch one run per batch so every card can show its date (a handful of tiny reads)
+  ensureBatchDates().then(() => renderRunIndex());
+}
+
+async function ensureBatchDates(){
+  const c = ghConfig(), jobs = [];
+  Object.values(window._reportIndex || {}).forEach(pk => Object.values(pk).forEach(b => {
+    if(!b.date && b.files.length) jobs.push((async () => {
+      try{
+        const r = await fetch(b.files[0].url, { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw' } });
+        if(r.ok){ const p = JSON.parse(await r.text()); b.date = (p.run && (p.run.dateCompletedUtc || p.run.createdUtc)) || ''; }
+      }catch(e){ b.date = ''; }
+    })());
+  }));
+  if(jobs.length) await Promise.all(jobs);
 }
 
 // Rev-459: draws the batch index from the cached listing using the chosen sort --
@@ -9374,6 +9390,7 @@ function renderRunIndex(){
         + '<div style="display:flex; gap:10px; align-items:center; font-size:13px;">'
         + '<span id="' + bid + '_chev" style="font-weight:800;">\u25b8</span>'
         + '<b>' + esc(b.op) + '</b><span>SO <b>' + esc(b.so) + '</b></span>'
+        + (b.date ? '<span style="color:var(--ink-dim); font-weight:700;">' + esc(new Date(b.date).toLocaleDateString()) + '</span>' : '')
         + '<span style="color:var(--ink-faint);">' + b.files.length + ' run(s)</span>'
         + '<span id="' + bid + '_note" style="margin-left:auto; color:var(--ink-faint); font-size:11px;">tap to load</span>'
         + '</div>'
@@ -13037,23 +13054,7 @@ if($('reportsRefreshBtn')) $('reportsRefreshBtn').onclick = loadRunReports;
 if($('reportsSortSel')) $('reportsSortSel').onchange = async () => {
   if(!window._reportIndex) return;
   const mode = $('reportsSortSel').value;
-  if(mode === 'date_desc' || mode === 'date_asc'){
-    // Rev-460: dates aren't in filenames -- fetch ONE run per batch (once) to learn each batch's date
-    const c = ghConfig(), jobs = [];
-    Object.values(window._reportIndex).forEach(pk => Object.values(pk).forEach(b => {
-      if(!b.date && b.files.length) jobs.push((async () => {
-        try{
-          const r = await fetch(b.files[0].url, { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw' } });
-          if(r.ok){ const p = JSON.parse(await r.text()); b.date = (p.run && (p.run.dateCompletedUtc || p.run.createdUtc)) || ''; }
-        }catch(e){ b.date = ''; }
-      })());
-    }));
-    if(jobs.length){
-      const st = $('reportsStatus'); if(st) st.textContent = 'Fetching batch dates\u2026';
-      await Promise.all(jobs);
-      if(st) st.textContent = 'Sorted by date.';
-    }
-  }
+  if(mode === 'date_desc' || mode === 'date_asc') await ensureBatchDates();
   renderRunIndex();
 };
 if($('reportsEmailBtn')) $('reportsEmailBtn').onclick = () => {
