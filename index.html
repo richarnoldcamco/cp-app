@@ -2435,7 +2435,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-464";
+const APP_REV = "Rev-465";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2449,6 +2449,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-465", type: "App", changes: ["RUN INDEX SCALES PAST 1000 FILES \u2014 discovered importing 959 pieces of real 912767-M history: GitHub\u2019s plain folder listing silently stops at 1000 entries, so a production-sized runs/ folder would quietly lose files from the index. The index now enumerates via the git TREE (uncapped), keeping the old listing only as a fallback (with an explicit truncation note) for when the tree service has one of its outages. Batch loading is unchanged \u2014 file reads still go through the contents raw path."] },
   { ts: "2026-07-16", rev: "App Rev-464", type: "App", changes: ["DURATIONS IN WHOLE MINUTES \u2014 every gap and before/after-boundary duration in the timing statistics rounds to the nearest minute (14m 3s \u2192 14m, 2m 30s \u2192 3m, 3m 15s after \u2192 3m after); hours keep the h m form. One shared formatter, so batch and per-run views change together."] },
   { ts: "2026-07-16", rev: "App Rev-463", type: "App", changes: ["SHOP-FLOOR LANGUAGE: RUNS \u2192 PCS \u2014 batch cards, part headers, the index status line, and the batch-report totals now count pc(s); a run of one serial IS a piece. Efficiency lines already said good part(s)."] },
   { ts: "2026-07-16", rev: "App Rev-462", type: "App", changes: ["DATE \u2014 NEWEST FIRST IS THE DEFAULT SORT on Inspection Reports. The index draws immediately (briefly in shop-order fallback while the per-batch dates load), then snaps into true date order the moment they arrive \u2014 the existing post-fetch re-render already handled that."] },
@@ -9315,12 +9316,30 @@ async function loadRunReports(){
   list.innerHTML = '';
   window._reportDigestLines = [];
   let files = [];
+  // Rev-465: enumerate via the git TREE (no size cap) -- the plain folder listing
+  // stops at 1000 files, which a real runs/ folder exceeds. Falls back to the
+  // listing (with a truncation warning) if the tree service is down.
+  const mkurl = name => 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/runs/' + encodeURIComponent(name);
   try{
-    const resp = await fetch('https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/runs', { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' }, cache: 'no-store' });
-    if(resp.status === 404){ status.textContent = 'No runs saved yet — complete an inspection on any synced station and it will appear here.'; return; }
-    if(!resp.ok){ status.textContent = 'Could not list runs (' + resp.status + ').'; return; }
-    files = (await resp.json()).filter(f => f.name.endsWith('.json'));
-  }catch(err){ status.textContent = 'Could not reach GitHub: ' + err.message; return; }
+    const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+    const tr = await fetch('https://api.github.com/repos/' + c.user + '/' + c.repo + '/git/trees/main?recursive=1', { headers: hdrs, cache: 'no-store' });
+    if(tr.ok){
+      const tj = await tr.json();
+      files = (tj.tree || []).filter(e => e.type === 'blob' && e.path.startsWith('runs/') && e.path.endsWith('.json'))
+        .map(e => ({ name: e.path.slice(5), url: mkurl(e.path.slice(5)) }));
+      if(tj.truncated) status.textContent = 'Warning: run list truncated by GitHub.';
+    }
+  }catch(err){}
+  if(!files.length){
+    try{
+      const resp = await fetch('https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/runs', { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' }, cache: 'no-store' });
+      if(resp.status === 404){ status.textContent = 'No runs saved yet — complete an inspection on any synced station and it will appear here.'; return; }
+      if(!resp.ok){ status.textContent = 'Could not list runs (' + resp.status + ').'; return; }
+      const lj = await resp.json();
+      files = lj.filter(f => f.name.endsWith('.json')).map(f => ({ name: f.name, url: f.url }));
+      if(lj.length >= 1000 && $('reportsStatus')) $('reportsStatus').textContent = 'Note: showing the first 1000 files only (fallback path).';
+    }catch(err){ status.textContent = 'Could not reach GitHub: ' + err.message; return; }
+  }
   if(!files.length){ status.textContent = 'No runs saved yet.'; return; }
 
   const esc = s => String(s==null?'':s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
