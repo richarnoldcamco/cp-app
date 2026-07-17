@@ -2422,7 +2422,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-456";
+const APP_REV = "Rev-457";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2436,6 +2436,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-457", type: "App", changes: ["GAP ROWS SHOW TIMES ONLY \u2014 the balloon numbers were noise in the largest-gaps lists; rows now read \u201813m 55s \u00b7 7:19 AM \u2192 7:33 AM\u2019 in both the batch report and the per-run stats."] },
   { ts: "2026-07-16", rev: "App Rev-456", type: "App", changes: ["INSPECTION REPORTS LOADS LAZILY \u2014 opening the screen now makes ONE call for the runs-folder listing and draws collapsed batch cards (part \u2192 operation \u00b7 shop order, with run counts) parsed straight from the filenames; a batch\u2019s run files download only when its card is first tapped, with a per-batch progress note, then stay cached for the session. 500 stored runs no longer cost 500 downloads to glance at the screen \u2014 you pay only for what you open. Inside an opened batch: per-day efficiency lines, the full batch report (Rev-452) shown directly, then the individual run cards, still expandable, with taps stop-propagated so opening a run cannot collapse its batch. The Email-daily-results digest now covers the batches you have opened \u2014 the button already told you to load first. The 1500-file cap is gone; the screen scales with the folder, not against it. Run cards inside a batch drop the redundant OP/SO columns (the batch header carries them) in favour of S/N-first."] },
   { ts: "2026-07-16", rev: "App Rev-455", type: "App", changes: ["GAP ROWS TIGHTENED \u2014 the duration column in the LARGEST GAPS lists was sized like the break-boundary labels (44% of the width), leaving a dead field between \u20182m 16s\u2019 and its balloons; it is now a fixed 76px, so the balloon\u2192balloon text sits right beside the duration. Break-boundary rows keep the wider label they actually need. Both batch and per-run stats."] },
   { ts: "2026-07-16", rev: "App Rev-454", type: "App", changes: ["STATS SECTION HEADERS IN CAPS, DATA INDENTED \u2014 the three timing-statistics headers (LARGEST GAPS\u2026, LAST MEASUREMENT BEFORE, FIRST MEASUREMENT AFTER) render in capitals with letter-spacing in both the batch report and the per-run block, and the data rows beneath each are indented 12px right so the hierarchy reads at a glance. Cosmetic only."] },
@@ -9235,7 +9236,7 @@ function buildBatchReport(dayRuns){
     const half = x => { const m = String(x.val).split(' \u2014 '); return m.length === 2 ? ('<b>' + esc(m[0]) + '</b> (' + esc(m[1]) + ')') : esc(x.val); };
     out += '<div style="margin:8px 0 2px; font-weight:800; letter-spacing:.05em;">LARGEST GAPS ACROSS THE BATCH</div>';
     out += st.top5.length
-      ? st.top5.map(g => row('<b>' + fmtDur(g.ms) + '</b>', 'balloon ' + esc(g.a.bubble) + ' ' + fmtClock(g.a.t) + ' \u2192 balloon ' + esc(g.b.bubble) + ' ' + fmtClock(g.b.t), '76px')).join('')
+      ? st.top5.map(g => row('<b>' + fmtDur(g.ms) + '</b>', fmtClock(g.a.t) + ' \u2192 ' + fmtClock(g.b.t), '76px')).join('')
       : row('\u2014','');
     out += '<div style="margin:10px 0 2px; font-weight:800; letter-spacing:.05em;">LAST MEASUREMENT BEFORE</div>';
     out += st.before.map(x => row(x.label, half(x))).join('');
@@ -9421,7 +9422,7 @@ function renderBatchInner(runs){
           return '<div style="border:1px dashed var(--line-strong); border-radius:8px; padding:10px 12px; margin-bottom:10px; font-size:11px;">'
             + '<div style="font-weight:800; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:4px;">RUN TIMING STATISTICS</div>'
             + (st.top5.length ? '<div style="margin:6px 0 2px; font-weight:800; letter-spacing:.05em;">LARGEST GAPS BETWEEN MEASUREMENTS</div>'
-                + st.top5.map(g => row('<b>' + fmtDur(g.ms) + '</b>', 'balloon ' + esc(g.a.bubble) + ' ' + fmtClock(g.a.t) + ' \u2192 balloon ' + esc(g.b.bubble) + ' ' + fmtClock(g.b.t), '76px')).join('') : '')
+                + st.top5.map(g => row('<b>' + fmtDur(g.ms) + '</b>', fmtClock(g.a.t) + ' \u2192 ' + fmtClock(g.b.t), '76px')).join('') : '')
             + '<div style="margin:8px 0 2px; font-weight:800; letter-spacing:.05em;">LAST MEASUREMENT BEFORE</div>'
             + st.before.map(x => row(x.label, half(x))).join('')
             + '<div style="margin:8px 0 2px; font-weight:800; letter-spacing:.05em;">FIRST MEASUREMENT AFTER</div>'
