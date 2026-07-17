@@ -2422,7 +2422,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-450";
+const APP_REV = "Rev-451";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2436,6 +2436,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-451", type: "App", changes: ["REPORT RUN CARDS ACTUALLY EXPAND ON THE PHONE \u2014 the cards used inline onclick attributes, which proved unreliable on Android where a tap on text can be captured by the browser (touch-to-search) instead of reaching the handler. Cards now carry a data-rid and get REAL event listeners attached after render, text selection is suppressed on the card so taps stay taps, and a \u25b8/\u25be chevron on each card shows open/closed state so a tap always gives visible feedback. Same expand content \u2014 timing statistics, readings with IN/OUT and timestamps, frequency skips \u2014 just reachable now."] },
   { ts: "2026-07-16", rev: "App Rev-450", type: "App", changes: ["DAILY-EMAIL STATUS VISIBLE IN THE APP \u2014 the Inspection Reports screen now shows a colour chip for the nightly management email: green \u2713 \u2018Daily results emailed\u2019 with the time, or red \u2717 with the failure reason (most commonly the Office 365 Authenticated SMTP setting). Mechanism chosen to need ZERO new permissions: the nightly workflow now writes its own report card \u2014 email_status.json in the data repo \u2014 after every attempt, success or failure (the workflow was granted contents:write for exactly this), and the app simply reads that file with the GitHub settings it already holds. Nothing shows until the workflow has run at least once; a station without sync shows nothing rather than an error."] },
   { ts: "2026-07-16", rev: "App Rev-449", type: "App", changes: ["APP-SYNC SURVIVES GIT-DATA OUTAGES \u2014 kills the false \u2018Auto-sync didn\u2019t complete (older/unknown rev)\u2019 banner and \u2018No app code in repo yet\u2019 toast that appeared on 2026-07-16 while the tab was in fact fully current. Root cause: since Rev-424, reading the app file back from GitHub goes through the Git TREES/BLOBS service (required because the file outgrew the contents API\u2019s 1MB read limit) \u2014 and that service had a multi-hour outage (503s) while the ordinary contents API stayed healthy. A failed trees read returned null, which callers took to mean the repo was empty or stale. Fix: both ghGetAppFile and ghGetPagesFile now FALL BACK when git-data fails \u2014 blob SHA from the plain folder listing (size-independent), file text from the contents endpoint with the raw media type (reads fine to 100MB). Verification, auto-update checks, and website publishing all keep working through a git-data outage; the banner only appears when GitHub is truly unreachable or truly behind."] },
   { ts: "2026-07-16", rev: "App Rev-448", type: "App", changes: ["SCRAP PART + PAUSE ON THE INSPECTION SCREEN, ADMIN-MANAGED REASON LISTS, AND A DAILY RESULTS EMAIL. Inspection screen (real runs only \u2014 never edit/preview): a red \ud83d\uddd1 SCRAP PART button opens a reason dropdown; confirming stamps reason/time/operator on the run, ends it as completed, cloud-saves it, and the summary carries a PART SCRAPPED banner. An amber \u23f8 PAUSE button opens its own reason dropdown, then locks the screen behind a full-screen RESUME card with a running clock \u2014 paused time cannot collect readings \u2014 and on resume records {reason, start, end} on the run. Admin gains a SHOP FLOOR SETTINGS section: both reason lists (one per line, defaults provided) and a Management Email, stored in the shared browser storage the embedded inspection app reads directly. Reports: run cards show a SCRAPPED badge and pause count/duration; shift efficiency now EXCLUDES paused minutes from the window and counts only good (non-scrapped) parts as earned, noting both in the working. New \u2709 Email daily results button on Reports builds a per-part/operation/day digest of the loaded efficiency lines and opens a pre-addressed email to the management address \u2014 stated honestly: a web page cannot send scheduled mail by itself, so this is one tap in the mail app rather than an automatic nightly send. Embedded Machinist Validation app bumped to REV-110."] },
@@ -9266,8 +9267,9 @@ async function loadRunReports(){
                          : '<span style="background:rgba(30,122,52,.12); color:#1e7a34; border:1px solid #1e7a34; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:800;">ALL IN TOL</span>';
       const when = r.dateCompletedUtc ? new Date(r.dateCompletedUtc).toLocaleString() : '—';
       const rid = 'rrun_' + part.replace(/[^A-Za-z0-9]/g,'') + '_' + i;
-      htmlOut += '<div style="border:1px solid var(--line-strong); border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer;" onclick="var d=document.getElementById(\'' + rid + '\'); d.style.display = d.style.display===\'none\' ? \'block\' : \'none\';">'
+      htmlOut += '<div class="rrun-card" data-rid="' + rid + '" style="border:1px solid var(--line-strong); border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer; -webkit-user-select:none; user-select:none;">'
         + '<div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:13px;">'
+        + '<span id="' + rid + '_chev" style="flex:0 0 auto; font-weight:800;">\u25b8</span>'
         + '<b>' + esc(r.operation||'?') + '</b>'
         + '<span>SO <b>' + esc(r.shopOrder||'—') + '</b></span>'
         + '<span>S/N <b>' + esc(r.serialNumber||'—') + '</b></span>'
@@ -9301,7 +9303,20 @@ async function loadRunReports(){
     });
   });
   list.innerHTML = htmlOut;
-  status.textContent = runs.length + ' run(s) loaded from GitHub.';
+  // Rev-451: taps wired with real listeners (the old inline onclick was unreliable on
+  // Android, where taps on text can be captured by the browser). Chevron shows state.
+  list.querySelectorAll('.rrun-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const rid = card.getAttribute('data-rid');
+      const d = document.getElementById(rid);
+      const ch = document.getElementById(rid + '_chev');
+      if(!d) return;
+      const open = d.style.display !== 'none';
+      d.style.display = open ? 'none' : 'block';
+      if(ch) ch.textContent = open ? '\u25b8' : '\u25be';
+    });
+  });
+  status.textContent = runs.length + ' run(s) loaded from GitHub. Tap a run to open it.';
 }
 function showInspectionReports(){
   $('menuScreen').classList.add('hidden');
