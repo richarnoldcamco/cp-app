@@ -2422,7 +2422,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-454";
+const APP_REV = "Rev-455";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2436,6 +2436,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-455", type: "App", changes: ["GAP ROWS TIGHTENED \u2014 the duration column in the LARGEST GAPS lists was sized like the break-boundary labels (44% of the width), leaving a dead field between \u20182m 16s\u2019 and its balloons; it is now a fixed 76px, so the balloon\u2192balloon text sits right beside the duration. Break-boundary rows keep the wider label they actually need. Both batch and per-run stats."] },
   { ts: "2026-07-16", rev: "App Rev-454", type: "App", changes: ["STATS SECTION HEADERS IN CAPS, DATA INDENTED \u2014 the three timing-statistics headers (LARGEST GAPS\u2026, LAST MEASUREMENT BEFORE, FIRST MEASUREMENT AFTER) render in capitals with letter-spacing in both the batch report and the per-run block, and the data rows beneath each are indented 12px right so the hierarchy reads at a glance. Cosmetic only."] },
   { ts: "2026-07-16", rev: "App Rev-453", type: "App", changes: ["TIMING STATISTICS ARE READABLE \u2014 the largest-gaps and break-discipline blocks in BOTH the batch report and the per-run stats were dense run-on sentences that wrapped badly on a phone; they are now stacked two-column rows, one fact per line: gaps as \u2018duration \u2014 balloon A time \u2192 balloon B time\u2019, break boundaries as \u2018boundary \u2014 time (how long before/after)\u2019, with the duration or clock time bolded as the eye anchor. Trades vertical space for scannability per user preference. Same numbers, humane layout."] },
   { ts: "2026-07-16", rev: "App Rev-452", type: "App", changes: ["BATCH REPORTS \u2014 the per-day efficiency line on Inspection Reports is now a tappable card (same \u25b8/\u25be chevron) that expands into a report on the WHOLE batch, not serial-by-serial: shop orders, operators, run/good/scrap totals; the scrap list with reasons; the pause log with durations; every out-of-tolerance reading by serial and balloon; batch-wide timing statistics computed across ALL the day\u2019s readings \u2014 which means the largest-gaps list now catches idle time BETWEEN parts, not just within one \u2014 and the break-discipline before/after times for the day as a whole; and a per-feature rollup table (balloon, feature, N, MIN, MAX, OUT count, colour-coded) \u2014 the quick capability read a QE wants from a batch. Reports are built lazily on first open so loading 100+ runs stays fast. Individual run cards are unchanged beneath."] },
@@ -9229,11 +9230,11 @@ function buildBatchReport(dayRuns){
   if(pauses.length) out += '<div style="margin-bottom:8px;"><b>Pauses:</b> ' + pauses.map(p => 'S/N ' + esc(p.sn) + ' \u2014 ' + esc(p.reason) + ' (' + p.min + 'm)').join(' \u00b7 ') + '</div>';
   if(oot.length) out += '<div style="margin-bottom:8px; color:#a02020;"><b>Out of tolerance:</b> ' + oot.map(o => 'S/N ' + esc(o.sn) + ' balloon ' + esc(o.bubble) + ' = ' + esc(o.raw) + ' (tol ' + esc(o.tol) + ')').join(' \u00b7 ') + '</div>';
   if(st){
-    const row = (l, v) => '<div style="display:flex; gap:8px; padding:2px 0 2px 12px;"><span style="flex:0 0 44%; color:var(--ink-faint);">' + l + '</span><span style="flex:1;">' + v + '</span></div>';
+    const row = (l, v, w) => '<div style="display:flex; gap:8px; padding:2px 0 2px 12px;"><span style="flex:0 0 ' + (w||'44%') + '; color:var(--ink-faint);">' + l + '</span><span style="flex:1;">' + v + '</span></div>';
     const half = x => { const m = String(x.val).split(' \u2014 '); return m.length === 2 ? ('<b>' + esc(m[0]) + '</b> (' + esc(m[1]) + ')') : esc(x.val); };
     out += '<div style="margin:8px 0 2px; font-weight:800; letter-spacing:.05em;">LARGEST GAPS ACROSS THE BATCH</div>';
     out += st.top5.length
-      ? st.top5.map(g => row('<b>' + fmtDur(g.ms) + '</b>', 'balloon ' + esc(g.a.bubble) + ' ' + fmtClock(g.a.t) + ' \u2192 balloon ' + esc(g.b.bubble) + ' ' + fmtClock(g.b.t))).join('')
+      ? st.top5.map(g => row('<b>' + fmtDur(g.ms) + '</b>', 'balloon ' + esc(g.a.bubble) + ' ' + fmtClock(g.a.t) + ' \u2192 balloon ' + esc(g.b.bubble) + ' ' + fmtClock(g.b.t), '76px')).join('')
       : row('\u2014','');
     out += '<div style="margin:10px 0 2px; font-weight:800; letter-spacing:.05em;">LAST MEASUREMENT BEFORE</div>';
     out += st.before.map(x => row(x.label, half(x))).join('');
@@ -9366,12 +9367,12 @@ async function loadRunReports(){
         + (function(){
             const st = computeRunStats(reads);
             if(!st) return '';
-            const row = (l, v) => '<div style="display:flex; gap:8px; padding:2px 0 2px 12px;"><span style="flex:0 0 44%; color:var(--ink-faint);">' + l + '</span><span style="flex:1;">' + v + '</span></div>';
+            const row = (l, v, w) => '<div style="display:flex; gap:8px; padding:2px 0 2px 12px;"><span style="flex:0 0 ' + (w||'44%') + '; color:var(--ink-faint);">' + l + '</span><span style="flex:1;">' + v + '</span></div>';
             const half = x => { const m = String(x.val).split(' \u2014 '); return m.length === 2 ? ('<b>' + esc(m[0]) + '</b> (' + esc(m[1]) + ')') : esc(x.val); };
             return '<div style="border:1px dashed var(--line-strong); border-radius:8px; padding:10px 12px; margin-bottom:10px; font-size:11px;">'
               + '<div style="font-weight:800; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:4px;">RUN TIMING STATISTICS</div>'
               + (st.top5.length ? '<div style="margin:6px 0 2px; font-weight:800; letter-spacing:.05em;">LARGEST GAPS BETWEEN MEASUREMENTS</div>'
-                  + st.top5.map(g => row('<b>' + fmtDur(g.ms) + '</b>', 'balloon ' + esc(g.a.bubble) + ' ' + fmtClock(g.a.t) + ' \u2192 balloon ' + esc(g.b.bubble) + ' ' + fmtClock(g.b.t))).join('') : '')
+                  + st.top5.map(g => row('<b>' + fmtDur(g.ms) + '</b>', 'balloon ' + esc(g.a.bubble) + ' ' + fmtClock(g.a.t) + ' \u2192 balloon ' + esc(g.b.bubble) + ' ' + fmtClock(g.b.t), '76px')).join('') : '')
               + '<div style="margin:8px 0 2px; font-weight:800; letter-spacing:.05em;">LAST MEASUREMENT BEFORE</div>'
               + st.before.map(x => row(x.label, half(x))).join('')
               + '<div style="margin:8px 0 2px; font-weight:800; letter-spacing:.05em;">FIRST MEASUREMENT AFTER</div>'
