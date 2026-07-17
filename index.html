@@ -2422,7 +2422,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-451";
+const APP_REV = "Rev-452";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2436,6 +2436,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-452", type: "App", changes: ["BATCH REPORTS \u2014 the per-day efficiency line on Inspection Reports is now a tappable card (same \u25b8/\u25be chevron) that expands into a report on the WHOLE batch, not serial-by-serial: shop orders, operators, run/good/scrap totals; the scrap list with reasons; the pause log with durations; every out-of-tolerance reading by serial and balloon; batch-wide timing statistics computed across ALL the day\u2019s readings \u2014 which means the largest-gaps list now catches idle time BETWEEN parts, not just within one \u2014 and the break-discipline before/after times for the day as a whole; and a per-feature rollup table (balloon, feature, N, MIN, MAX, OUT count, colour-coded) \u2014 the quick capability read a QE wants from a batch. Reports are built lazily on first open so loading 100+ runs stays fast. Individual run cards are unchanged beneath."] },
   { ts: "2026-07-16", rev: "App Rev-451", type: "App", changes: ["REPORT RUN CARDS ACTUALLY EXPAND ON THE PHONE \u2014 the cards used inline onclick attributes, which proved unreliable on Android where a tap on text can be captured by the browser (touch-to-search) instead of reaching the handler. Cards now carry a data-rid and get REAL event listeners attached after render, text selection is suppressed on the card so taps stay taps, and a \u25b8/\u25be chevron on each card shows open/closed state so a tap always gives visible feedback. Same expand content \u2014 timing statistics, readings with IN/OUT and timestamps, frequency skips \u2014 just reachable now."] },
   { ts: "2026-07-16", rev: "App Rev-450", type: "App", changes: ["DAILY-EMAIL STATUS VISIBLE IN THE APP \u2014 the Inspection Reports screen now shows a colour chip for the nightly management email: green \u2713 \u2018Daily results emailed\u2019 with the time, or red \u2717 with the failure reason (most commonly the Office 365 Authenticated SMTP setting). Mechanism chosen to need ZERO new permissions: the nightly workflow now writes its own report card \u2014 email_status.json in the data repo \u2014 after every attempt, success or failure (the workflow was granted contents:write for exactly this), and the app simply reads that file with the GitHub settings it already holds. Nothing shows until the workflow has run at least once; a station without sync shows nothing rather than an error."] },
   { ts: "2026-07-16", rev: "App Rev-449", type: "App", changes: ["APP-SYNC SURVIVES GIT-DATA OUTAGES \u2014 kills the false \u2018Auto-sync didn\u2019t complete (older/unknown rev)\u2019 banner and \u2018No app code in repo yet\u2019 toast that appeared on 2026-07-16 while the tab was in fact fully current. Root cause: since Rev-424, reading the app file back from GitHub goes through the Git TREES/BLOBS service (required because the file outgrew the contents API\u2019s 1MB read limit) \u2014 and that service had a multi-hour outage (503s) while the ordinary contents API stayed healthy. A failed trees read returned null, which callers took to mean the repo was empty or stale. Fix: both ghGetAppFile and ghGetPagesFile now FALL BACK when git-data fails \u2014 blob SHA from the plain folder listing (size-independent), file text from the contents endpoint with the raw media type (reads fine to 100MB). Verification, auto-update checks, and website publishing all keep working through a git-data outage; the banner only appears when GitHub is truly unreachable or truly behind."] },
@@ -9179,6 +9180,73 @@ function computeRunStats(reads){
   return { top5: gaps.slice(0,5), before, after };
 }
 
+
+/* ---------- Rev-452: batch report ----------
+   The per-day efficiency line is now a tappable card that expands into a report on
+   the WHOLE batch (all runs for that part+operation+day): totals, scrap with
+   reasons, pauses, out-of-tolerance readings by balloon and serial, batch-wide
+   timing statistics (gaps measured across the whole day, so idle BETWEEN parts
+   shows), and a per-feature table with n / min / max / out-of-tol per balloon. */
+function buildBatchReport(dayRuns){
+  const esc = s => String(s==null?'':s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  const allReads = [];
+  const scrap = [], pauses = [], oot = [];
+  const ops = new Set(), sos = new Set(), operators = new Set();
+  dayRuns.forEach(p => {
+    const r = p.run || {};
+    ops.add(r.operation||'?'); sos.add(r.shopOrder||'?'); operators.add(r.operatorInitials||'?');
+    (p.readings||[]).forEach(x => {
+      allReads.push(x);
+      if(x.inTolerance === false) oot.push({ sn: r.serialNumber, bubble: x.bubble, raw: x.raw, tol: x.tolRaw });
+    });
+    if(r.scrapped) scrap.push({ sn: r.serialNumber, reason: r.scrapped.reason, by: r.scrapped.by });
+    (r.pauses||[]).forEach(pa => {
+      const ms = new Date(pa.endUtc) - new Date(pa.startUtc);
+      if(ms > 0) pauses.push({ sn: r.serialNumber, reason: pa.reason, min: Math.round(ms/60000) });
+    });
+  });
+  // per-feature rollup
+  const feats = {};
+  allReads.forEach(x => {
+    const k = String(x.bubble);
+    const f = feats[k] = feats[k] || { bubble:k, desc:x.characteristic||'', n:0, min:null, max:null, nOut:0, attr:0 };
+    f.n++;
+    if(x.inTolerance === false) f.nOut++;
+    if(typeof x.measuredValue === 'number'){
+      if(f.min === null || x.measuredValue < f.min) f.min = x.measuredValue;
+      if(f.max === null || x.measuredValue > f.max) f.max = x.measuredValue;
+    } else f.attr++;
+  });
+  const st = computeRunStats(allReads);   // batch-wide gaps + break discipline
+  const fmtv = v => v === null ? '\u2014' : String(v);
+  let out = '<div style="font-size:12px;">';
+  out += '<div style="margin-bottom:8px;"><b>Shop order(s):</b> ' + esc([...sos].join(', ')) + ' \u00b7 <b>Operator(s):</b> ' + esc([...operators].join(', '))
+       + ' \u00b7 <b>Runs:</b> ' + dayRuns.length + ' \u00b7 <b>Good:</b> ' + (dayRuns.length - scrap.length)
+       + ' \u00b7 <b>Scrapped:</b> ' + scrap.length + ' \u00b7 <b>Out-of-tol readings:</b> ' + oot.length + '</div>';
+  if(scrap.length) out += '<div style="margin-bottom:8px; color:#a02020;"><b>Scrap:</b> ' + scrap.map(s => 'S/N ' + esc(s.sn) + ' \u2014 ' + esc(s.reason)).join(' \u00b7 ') + '</div>';
+  if(pauses.length) out += '<div style="margin-bottom:8px;"><b>Pauses:</b> ' + pauses.map(p => 'S/N ' + esc(p.sn) + ' \u2014 ' + esc(p.reason) + ' (' + p.min + 'm)').join(' \u00b7 ') + '</div>';
+  if(oot.length) out += '<div style="margin-bottom:8px; color:#a02020;"><b>Out of tolerance:</b> ' + oot.map(o => 'S/N ' + esc(o.sn) + ' balloon ' + esc(o.bubble) + ' = ' + esc(o.raw) + ' (tol ' + esc(o.tol) + ')').join(' \u00b7 ') + '</div>';
+  if(st){
+    out += '<div style="margin-bottom:4px;"><b>Largest gaps across the batch:</b> ' + (st.top5.length ? st.top5.map(g => fmtDur(g.ms) + ' (' + esc(g.a.bubble) + ' ' + fmtClock(g.a.t) + ' \u2192 ' + esc(g.b.bubble) + ' ' + fmtClock(g.b.t) + ')').join(' \u00b7 ') : '\u2014') + '</div>';
+    out += '<div style="margin-bottom:4px;"><b>Last measurement before:</b> ' + st.before.map(x => x.label + ': ' + x.val).join(' \u00b7 ') + '</div>';
+    out += '<div style="margin-bottom:8px;"><b>First measurement after:</b> ' + st.after.map(x => x.label + ': ' + x.val).join(' \u00b7 ') + '</div>';
+  }
+  out += '<table style="border-collapse:collapse; width:100%; margin-top:4px;"><tr>'
+       + ['BALLOON','FEATURE','N','MIN','MAX','OUT'].map(hd => '<th style="background:#9DC3E6; color:#1c1c1c; border:1px solid #7fa9cc; padding:5px 6px; font-size:10px; text-align:center;">' + hd + '</th>').join('') + '</tr>';
+  Object.values(feats).sort((a,b) => (parseInt(a.bubble)||0) - (parseInt(b.bubble)||0)).forEach(f => {
+    out += '<tr>'
+      + '<td style="border:1px solid #d8d3ca; padding:4px 6px; text-align:center; font-weight:700;">' + esc(f.bubble) + '</td>'
+      + '<td style="border:1px solid #d8d3ca; padding:4px 6px;">' + esc(f.desc.slice(0,44)) + '</td>'
+      + '<td style="border:1px solid #d8d3ca; padding:4px 6px; text-align:center;">' + f.n + '</td>'
+      + '<td class="mono" style="border:1px solid #d8d3ca; padding:4px 6px; text-align:center;">' + (f.attr && f.min===null ? 'ACK' : fmtv(f.min)) + '</td>'
+      + '<td class="mono" style="border:1px solid #d8d3ca; padding:4px 6px; text-align:center;">' + (f.attr && f.max===null ? 'ACK' : fmtv(f.max)) + '</td>'
+      + '<td style="border:1px solid #d8d3ca; padding:4px 6px; text-align:center; font-weight:800; color:' + (f.nOut ? '#a02020' : '#1e7a34') + ';">' + f.nOut + '</td>'
+      + '</tr>';
+  });
+  out += '</table></div>';
+  return out;
+}
+
 async function loadRunReports(){
   const list = $('reportsList'), status = $('reportsStatus');
   if(!ghConfigured()){ status.textContent = 'GitHub sync is not set up on this device — reports read from the data repo.'; list.innerHTML=''; return; }
@@ -9249,11 +9317,17 @@ async function loadRunReports(){
       (byOpDay[k] = byOpDay[k] || []).push(p);
     });
     window._reportDigestLines = window._reportDigestLines || [];
+    let bidx = 0;
     Object.keys(byOpDay).sort().forEach(k => {
       const ef = computeShiftEfficiency(byOpDay[k]);
       window._reportDigestLines.push('PART ' + part + ' \u00b7 ' + k + ' \u2014 ' + (ef.pct===null ? ef.text : (ef.pct + '% \u2014 ' + ef.text)));
-      htmlOut += '<div style="font-size:12px; margin:0 0 6px; padding:6px 10px; border-left:3px solid ' + (ef.pct===null ? 'var(--line-strong)' : (ef.pct>=85 ? '#1e7a34' : (ef.pct>=60 ? '#b8860b' : '#a02020'))) + '; background:rgba(0,0,0,.03);">'
+      const bid = 'rbatch_' + part.replace(/[^A-Za-z0-9]/g,'') + '_' + (bidx++);
+      window._reportBatchData = window._reportBatchData || {};
+      window._reportBatchData[bid] = byOpDay[k];
+      htmlOut += '<div class="rrun-card" data-rid="' + bid + '" data-batch="1" style="font-size:12px; margin:0 0 6px; padding:6px 10px; border-left:3px solid ' + (ef.pct===null ? 'var(--line-strong)' : (ef.pct>=85 ? '#1e7a34' : (ef.pct>=60 ? '#b8860b' : '#a02020'))) + '; background:rgba(0,0,0,.03); cursor:pointer; -webkit-user-select:none; user-select:none;">'
+        + '<span id="' + bid + '_chev" style="font-weight:800; margin-right:6px;">\u25b8</span>'
         + '<b>' + esc(k) + '</b> — Shift efficiency: ' + (ef.pct===null ? '<span style="color:var(--ink-faint);">' + esc(ef.text) + '</span>' : '<b>' + ef.pct + '%</b> <span style="color:var(--ink-faint);">(' + esc(ef.text) + ')</span>')
+        + '<div id="' + bid + '" style="display:none; margin-top:10px; border-top:1px solid var(--line-strong); padding-top:8px;"></div>'
         + '</div>';
     });
     byPart[part].forEach((p, i) => {
@@ -9312,6 +9386,10 @@ async function loadRunReports(){
       const ch = document.getElementById(rid + '_chev');
       if(!d) return;
       const open = d.style.display !== 'none';
+      if(!open && card.getAttribute('data-batch') === '1' && !d.innerHTML){
+        try{ d.innerHTML = buildBatchReport((window._reportBatchData||{})[rid] || []); }
+        catch(e){ d.innerHTML = '<div style="color:#a02020;">Report failed: ' + e.message + '</div>'; }
+      }
       d.style.display = open ? 'none' : 'block';
       if(ch) ch.textContent = open ? '\u25b8' : '\u25be';
     });
