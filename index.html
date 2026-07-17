@@ -2195,6 +2195,10 @@ Rev-40
     <select id="reportsSortSel" style="height:38px; border:1px solid var(--line-strong); border-radius:8px; padding:0 8px; font-size:13px;">
       <option value="so_desc">Shop order — newest first</option>
       <option value="so_asc">Shop order — oldest first</option>
+      <option value="date_desc">Date — newest first</option>
+      <option value="date_asc">Date — oldest first</option>
+      <option value="part_asc">Part number — A to Z</option>
+      <option value="part_desc">Part number — Z to A</option>
       <option value="runs_desc">Run count — high to low</option>
       <option value="op">Operation</option>
     </select>
@@ -2431,7 +2435,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-459";
+const APP_REV = "Rev-460";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2445,6 +2449,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-460", type: "App", changes: ["SORT BY PART NUMBER AND BY DATE \u2014 the Reports sort dropdown gains Part number (A\u2192Z / Z\u2192A, reordering the part groups) and Date (newest / oldest first). Dates are not in the filenames, so the first time a date sort is chosen the app fetches exactly ONE run file per batch to learn each batch\u2019s date, remembers it for the session, and sorts both the batches and the part groups by it \u2014 a handful of small reads, never the whole folder."] },
   { ts: "2026-07-16", rev: "App Rev-459", type: "App", changes: ["SORT DROPDOWN ON INSPECTION REPORTS \u2014 batches can be ordered by shop order (newest or oldest first), run count, or operation. Re-sorting redraws from the cached index without a single refetch, and batches already loaded keep their downloaded runs across re-sorts (cache re-keyed from transient card ids to stable part+batch keys to make that true)."] },
   { ts: "2026-07-16", rev: "App Rev-458", type: "App", changes: ["EFFICIENCY LINE SIMPLIFIED \u2014 the per-day line inside a batch now reads just \u20187/10/2026 \u2014 Efficiency: 109% \u00b7 19 good part(s)\u2019; the full working (parts \u00d7 cycle = earned over window, paused minutes excluded, scrapped count) is tucked behind a tap on the line, chevron and all, matching the tap-for-detail pattern everywhere else on the screen. Efficiency lines with no cycle time or no timestamps still report their good-part count."] },
   { ts: "2026-07-16", rev: "App Rev-457", type: "App", changes: ["GAP ROWS SHOW TIMES ONLY \u2014 the balloon numbers were noise in the largest-gaps lists; rows now read \u201813m 55s \u00b7 7:19 AM \u2192 7:33 AM\u2019 in both the batch report and the per-run stats."] },
@@ -9342,12 +9347,23 @@ function renderRunIndex(){
   const sorter = {
     so_desc: (a,b) => b[1].so.localeCompare(a[1].so),
     so_asc:  (a,b) => a[1].so.localeCompare(b[1].so),
+    date_desc: (a,b) => String(b[1].date||'').localeCompare(String(a[1].date||'')) || b[1].so.localeCompare(a[1].so),
+    date_asc:  (a,b) => String(a[1].date||'').localeCompare(String(b[1].date||'')) || a[1].so.localeCompare(b[1].so),
+    part_asc:  (a,b) => b[1].so.localeCompare(a[1].so),
+    part_desc: (a,b) => b[1].so.localeCompare(a[1].so),
     runs_desc: (a,b) => b[1].files.length - a[1].files.length || b[1].so.localeCompare(a[1].so),
     op: (a,b) => a[1].op.localeCompare(b[1].op) || b[1].so.localeCompare(a[1].so)
   }[mode];
+  // part-group order: alphabetical normally, reversed for Z-to-A, by batch date for date sorts
+  let partKeys = Object.keys(byPart).sort();
+  if(mode === 'part_desc') partKeys.reverse();
+  if(mode === 'date_desc' || mode === 'date_asc'){
+    const pdate = p => Object.values(byPart[p]).map(b => String(b.date||'')).sort().pop() || '';
+    partKeys.sort((a,b) => mode === 'date_desc' ? pdate(b).localeCompare(pdate(a)) : pdate(a).localeCompare(pdate(b)));
+  }
   window._reportBatchFiles = {};
   let bi = 0, htmlOut = '';
-  Object.keys(byPart).sort().forEach(part => {
+  partKeys.forEach(part => {
     const total = Object.values(byPart[part]).reduce((a,b) => a + b.files.length, 0);
     htmlOut += '<div style="font-weight:800; font-size:14px; letter-spacing:.04em; margin:18px 0 8px;">PART ' + esc(part) + ' <span style="color:var(--ink-faint); font-weight:600;">\u00b7 ' + total + ' run(s)</span></div>';
     Object.entries(byPart[part]).sort(sorter).forEach(([bk, b]) => {
@@ -13018,7 +13034,28 @@ if($('mReports')) $('mReports').onclick = showInspectionReports;
 })();
 if($('reportsBack')) $('reportsBack').onclick = () => { $('reportsScreen').classList.add('hidden'); $('menuScreen').classList.remove('hidden'); setHeaderBackVisible(false); };
 if($('reportsRefreshBtn')) $('reportsRefreshBtn').onclick = loadRunReports;
-if($('reportsSortSel')) $('reportsSortSel').onchange = () => { if(window._reportIndex) renderRunIndex(); };
+if($('reportsSortSel')) $('reportsSortSel').onchange = async () => {
+  if(!window._reportIndex) return;
+  const mode = $('reportsSortSel').value;
+  if(mode === 'date_desc' || mode === 'date_asc'){
+    // Rev-460: dates aren't in filenames -- fetch ONE run per batch (once) to learn each batch's date
+    const c = ghConfig(), jobs = [];
+    Object.values(window._reportIndex).forEach(pk => Object.values(pk).forEach(b => {
+      if(!b.date && b.files.length) jobs.push((async () => {
+        try{
+          const r = await fetch(b.files[0].url, { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw' } });
+          if(r.ok){ const p = JSON.parse(await r.text()); b.date = (p.run && (p.run.dateCompletedUtc || p.run.createdUtc)) || ''; }
+        }catch(e){ b.date = ''; }
+      })());
+    }));
+    if(jobs.length){
+      const st = $('reportsStatus'); if(st) st.textContent = 'Fetching batch dates\u2026';
+      await Promise.all(jobs);
+      if(st) st.textContent = 'Sorted by date.';
+    }
+  }
+  renderRunIndex();
+};
 if($('reportsEmailBtn')) $('reportsEmailBtn').onclick = () => {
   const to = localStorage.getItem('mgmtEmail') || '';
   if(!to){ flash('Set the Management Email in Admin \u2192 Shop Floor Settings first', true); return; }
