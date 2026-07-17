@@ -1,1116 +1,13 @@
-<!--
-CAMCO CP GENERATOR — APP CHANGELOG
-═══════════════════════════════════════════════════════
-
-Rev-353 (July 11, 2026)
-- THE ROW ZOOM POP-UP IS NOW INTERACTIVE: mouse-wheel zooms (0.4x–6x), hold-and-drag pans — frame
-  the bubble number exactly how you want. New "✔ Set pin to center" button in the pop-up header:
-  pan the bubble under the red crosshair, click, and the saved pin moves to that exact point, so
-  zoom-to-bubble frames it just like the preview. Saves with the plan and syncs.
-
-Rev-348 (July 11, 2026)
-- NEW: 👻 GHOST ROWS — for balloons that don't exist on the drawing (e.g. bubble 7 skipped on the
-  print). The focused row has a small 👻 Ghost button under its Doc # (next to 🗑): one click
-  watermarks the whole row with translucent red "MISSING THIS BUBBLE NUMBER ON THE DRAWING" text.
-  Pin column shows 👻 for ghosted rows; pin-mode auto-advance skips them; same button un-ghosts.
-  Ghost state saves with the plan and syncs.
-
-Rev-347 (July 11, 2026)
-- CLICK A ROW → ZOOM INSET: clicking any builder row pops the green-framed zoom picture directly
-  under that row (for its pinned balloon); un-pinned rows show nothing.
-- DELETE ROW: the focused row shows a small red 🗑 button under its Doc # — confirm, delete,
-  auto-save.
-- ➕ NEW ROW toolbar button: asks for the bubble number (suggests next), adds a blank row carrying
-  over operation/workcenter/machine, focuses it.
-- FIXED PANNING: hold-and-drag barely worked because the browser's native image-drag was stealing
-  the gesture. Pan now blocks native drag and captures the pointer — smooth tracking even when the
-  mouse leaves the panel.
-
-Rev-346 (July 11, 2026)
-- PIN ZOOM PREVIEW MOVED INTO THE GRID. The preview window that floated in the bottom-right corner of
-  the ODS drawing now renders on the LEFT, as a green-bordered inset row directly UNDER the
-  control-plan row it corresponds to (pin balloon 8 → preview beneath row 8). Same framing as
-  zoom-to-bubble (35% viewport, red ring at center). Moves with each pin; the final preview lingers
-  ~3.5s after "all pinned"; row indexing (focus scroll, pin column) is unaffected by the inset.
-
-Rev-345 (July 11, 2026)
-- FIXED: 🎯 LOCATE BUBBLES (AI) STOPPED AROUND 15 BALLOONS. The whole sheet went to the AI as one
-  image, squeezing balloon digits too small to read — only prominent ones were found, and responses
-  sometimes failed to parse. Locate now runs a TILED SCAN: four overlapping quadrants, each at high
-  resolution (small tiles upscaled up to 2x), one AI call per tile, results mapped to whole-sheet
-  coordinates and merged (seam duplicates de-duplicated by number + proximity; 9A/9B/9C-style
-  suffixes included). Parsing hardened (stray prose tolerated; one bad tile doesn't sink the scan);
-  response limit raised to 8192. Overlay shows "section N of 4" progress. Pins and Spec/Tol rules
-  unchanged — hand-typed specs never overwritten.
-
-Rev-344 (July 11, 2026)
-- NEW: PERSISTENT YELLOW HUE ON ASSIGNED BUBBLES. Every balloon pinned to a control-plan row shows a
-  soft translucent yellow disc directly on the ODS drawing, so it's obvious at a glance which bubbles
-  are already assigned and which remain. Updates live as you pin; the focused balloon's red ring
-  draws on top; hover a disc to see its balloon number. Purely visual — never exported to the xlsx.
-
-Rev-343 (July 11, 2026)
-- PIN-MODE WORKFLOW: (1) the grid FOLLOWS the pinning — after every pin (and ↩ Back) the newly
-  focused row scrolls into the center of the table, so the working row is always on screen (big help
-  on the phone). (2) PIN ZOOM PREVIEW — a small green-bordered corner window shows the zoomed-in
-  region around each pin, framed exactly as zoom-to-bubble will show it on the plan (same 35%
-  viewport, red ring at center); verify the pin at a glance, clears when pinning stops. (3) build-date
-  label refreshed (Jul 9 → Jul 11).
-
-Rev-342 (July 11, 2026)
-- NEW: thin 📍 PIN-STATUS COLUMN in the Build Control Plan grid, right after Bubble #. Green dot (●)
-  = that balloon's position is pinned (zoom-to-bubble works); grey ring (○) = not pinned yet (hover
-  for the hint). Updates live as you pin, so it's obvious at a glance which rows still need a
-  position.
-
-Rev-341 (July 11, 2026)
-- ODS PANEL NAVIGATION: (1) MOUSE-WHEEL ZOOM — roll the wheel over the drawing to zoom 1x–8x,
-  centered on the cursor (the point under the pointer stays put). Takes over seamlessly from
-  Zoom-to-balloon; 🔍 Full view resets to fit-width. (2) HOLD-AND-DRAG PANNING — hold the mouse
-  button on the drawing and move any direction to pan; cursor becomes a grabbing hand. A drag is
-  never mistaken for a click: click-to-enlarge and pin-mode clicks only fire on a true click (under
-  ~4px of movement); the red-ring drag correction keeps its own handler.
-
-Rev-340 (July 11, 2026)
-- PIN-MODE UPGRADES: (1) YELLOW CONFIRMATION HUE — a soft yellow circle pulses at the exact click
-  point when a balloon is pinned, then fades out, confirming the pin registered and where. (2)
-  ↩ BACK A BALLOON — new button, visible only while pinning, steps focus back to the previous
-  balloon; clicking the drawing re-pins it (overwrites the old position), then pinning resumes with
-  the next unpinned balloon.
-
-Rev-339 (July 11, 2026)
-- NEW: 📍 PIN MANUALLY — place bubble locators by hand, no AI required. Green button next to
-  🎯 Locate Bubbles (AI) in the ODS panel. Click it (crosshair cursor), then click each bubble on the
-  drawing: one click pins the FOCUSED balloon (red ring appears; zoom-to-bubble works immediately) and
-  focus auto-advances to the next unpinned balloon — 15 balloons = 15 clicks. Announces completion and
-  turns itself off when every balloon is pinned; click the button again anytime to stop early. Pinned
-  positions save with the plan and sync across devices exactly like AI-located ones; the drag-the-ring
-  correction still works for fine-tuning.
-
-Rev-338 (July 10, 2026)
-- STORAGE UPGRADE — DRAWINGS MOVED TO INDEXEDDB. Drawings (full-res base64 PNGs) previously lived
-  inside localStorage, which browsers hard-cap at ~5-10MB total — that cap produced the "storage is
-  full" banner and cannot be raised. They now live in IndexedDB (hundreds of MB to GBs), keyed per
-  part. Only the images moved; plans, master list, and settings stay in localStorage as before.
-  Existing embedded drawings migrate automatically on first launch, freeing the old quota at once.
-  Drawings pulled from GitHub land in IndexedDB, so a fresh machine can pull every part's drawing
-  with no ceiling. drawings/<part>.b64 push/pull unchanged; falls back to old behavior if
-  IndexedDB is unavailable.
-
-Rev-337 (July 10, 2026)
-- FEATURE TYPE TALLY ROWS ARE NOW CLICKABLE FILTERS: click a Feature Type in the tally and the
-  Master List table below shows only that type's rows; click the same row again to clear. The active
-  row highlights blue with a ✔ and the tally header states what's being filtered. It drives the
-  normal Feature Type column filter, so the red-bold dropdown indicator and ✖ Clear Filters behave
-  exactly as if the value had been picked from the dropdown.
-
-Rev-336 (July 10, 2026)
-- FIXED: changing a plan's part number created a DUPLICATE plan (912993 stayed; a second 1000222892
-  appeared). Plans are keyed by part#+rev, so a changed part number looked like a brand-new plan.
-  The builder now remembers which saved plan it loaded (srcId), and BOTH save paths (the 1.2s
-  auto-save and Save to Project) rename that entry in place when the part#/rev changes — the old id
-  gets a tombstone so GitHub sync can't resurrect the old-name copy on another device.
-- NEW: ✏️ RENAME button on each saved-plan row in the Control Plans list. Prompts for the new part
-  number (and rev), renames IN PLACE (no duplicate), refuses if the target name already exists, logs
-  to history, and syncs.
-- To merge an existing duplicate pair from before this fix: keep the correctly-named plan and
-  🗑 Delete the stale one in the Control Plans list.
-
-Rev-335 (July 10, 2026)
-- MASTER LIST GRID STYLING: Workcenter column 50% narrower (180→90px); Control Type ID 25% shorter
-  (330→248px); all rows ~25% taller (cell padding 5→8px); the table now stretches to fill the entire
-  screen width (scrolls only when content is wider than the screen); and rows carry zebra shading
-  (alternating white / #f2f2f2, per the Camco UI standard).
-
-Rev-334 (July 10, 2026)
-- NEW: 3RD LEVEL added to the control-type hierarchy. A "3rd Level" column now sits right after
-  "2nd Level" in the Master List. It cascades under 2nd Level (Machine → Feature Type → 2nd Level →
-  3rd Level), is optional (blank OK), and its picker is CAPS + case-insensitive de-duped like the
-  other levels. When filled, it extends the Control Type ID (e.g. LATHE / CBORE / DIA / <3RD LEVEL>);
-  blank leaves the ID 3-part. It is a sortable column and shows as a 4th tier under each 2nd Level in
-  Edit Dropdown Values (rename applies within its branch). All four Control Type ID builders — add
-  form, inline editor, level-rederive, and Regenerate IDs — include it. Row-collapse still groups on
-  Feature Type + 2nd Level only, so the merged view is unchanged.
-
-Rev-333 (July 10, 2026)
-- FIXED: the value pickers in the Add/Edit Control Type form (Workcenter, Feature Type, 2nd Level,
-  methods, frequencies) were listing case-variants of the same value as two separate options — e.g.
-  LATHE and Lathe both showing in the Workcenter dropdown. Both the native datalist and the full-list
-  panel now uppercase and de-duplicate case-insensitively, so each value appears once, always in CAPS.
-  A LATHE/Lathe split can no longer appear in any picker.
-- NOTE: this cleans what the dropdowns DISPLAY. To also uppercase the stored rows and merge the tree
-  branches, run ⬆ CONVERT ALL TO CAPS & MERGE (Rev-332) in Edit Dropdown Values.
-
-Rev-332 (July 10, 2026)
-- NEW: ⬆ CONVERT ALL TO CAPS & MERGE button in Edit Dropdown Values. One click uppercases every data
-  field in every Master List row, then re-sorts into grouped order (Machine → Feature Type → 2nd Level
-  → H#). Values that differ only by casing/spacing become identical strings and therefore merge into a
-  single branch: the split LATHE (2 rows) + Lathe (57 rows) collapse into one LATHE; C'Bore/C'bore and
-  Cross-Hole/CROSS-HOLE merge too. Confirms before running; logs to history and syncs. Only the visible
-  data columns are touched — the internal row id and update-time are left alone.
-- Both rename paths in the level manager now store the new name in CAPS (inline edits already did since
-  Rev-318), so mixed case can't creep back in through a rename.
-
-Rev-331 (July 10, 2026)
-- NEW: 📊 FEATURE TYPE TALLY on the Master List (purple button next to Edit Dropdown Values). Opens a
-  live panel counting how many rows use each Feature Type value, sorted by count, and AUTO-REFRESHES
-  EVERY 60 SECONDS while open so background GitHub sync keeps the numbers current (the panel shows the
-  last-updated time). Case/space variants of the same value (C'Bore vs C'bore, Cross-Hole vs
-  CROSS-HOLE, etc.) are highlighted yellow with a note so you can spot and merge near-duplicates via
-  Edit Dropdown Values. Also updates instantly when you edit a row. View only — nothing changed or
-  deleted; the 60s timer stops when you leave the Master List.
-
-Rev-330 (July 10, 2026)
-- ROWS WITH A BLANK FEATURE TYPE no longer collapse together when Tolerance Bands are hidden — each
-  now shows on its own line. Before, several rows with an empty Feature Type (e.g. LENGTH-family rows
-  whose Feature Type field was never filled) all folded into one visible row, so deleting the visible
-  one just surfaced the next blank row — it looked like the blank "wouldn't go away," but each delete
-  was actually removing a different hidden row. A blank grouping key is not a real duplicate group, so
-  blank-Feature-Type rows are always shown individually now. Fix: fill in the Feature Type (e.g.
-  LENGTH) and the row will group normally again.
-
-Rev-329 (July 10, 2026)
-- MASTER LIST COLUMNS ARE NOW SORTABLE by clicking the column header. First click sorts ascending
-  (▲), second click descending (▼), third click clears. H# and # Recorded sort numerically; all other
-  columns sort alphabetically with blank cells last. A ▲/▼ arrow marks the active sort column. A
-  column sort overrides the ⇅ Sort button while active; clicking ⇅ Sort clears the column sort and
-  returns to default / Levels / H# mode. View only — stored order and sync are untouched. Works with
-  the tolerance-band row-collapse (the first row of each Feature Type + 2nd Level group is the one
-  that sorts first).
-
-Rev-328 (July 10, 2026)
-- TOLERANCE-BANDS ROW-COLLAPSE now groups by Feature Type + 2nd Level ONLY (Feature Description
-  dropped from the grouping key). Rows sharing Feature Type + 2nd Level but differing only in
-  description now collapse to one row: CHAMFER/ANGLE (OD + ID CHAMFER ANGLE), ID GROOVE/LENGTH
-  (WIDTH + LENGTH), OD THREAD/DIA (THREAD + MAJOR DIAMETER), ID THREAD/DIA (THREAD + MINOR DIAMETER),
-  SURFACE FINISH/FINISH (all three RA bands). Genuinely different features keep their own row because
-  their 2nd Level differs (CHAMFER/LENGTH, ID GROOVE/RADIUS, OD THREAD/RADIUS, etc.). View only —
-  Show Tolerance Bands brings every row back; nothing is deleted.
-
-Rev-327 (July 10, 2026)
-- FIXED: hiding Tolerance Bands collapsed the six band COLUMNS but left the band-duplicate ROWS
-  showing. E.g. H2–H5 (all C'BORE / DIA / COUNTERBORE DIA) stayed as four separate rows instead of
-  collapsing to one. Cause: the 👁️ Hide/Show button only re-applied the column-hide state and never
-  re-ran the Master List render, and the row-collapse pass (added Rev-325) lives inside that render.
-  toggleBandCols() now calls renderMasterList(), so the rows collapse/expand in sync with the columns
-  every time you hide or show the bands.
-
-Rev-326 (July 10, 2026)
-- MASTER LIST TOOLBAR: the ➕ Add Row button is now GREEN and sized to match the other toolbar
-  buttons (Edit Dropdown Values, Search, Clear Filters), sitting in that same button row instead
-  of the large maroon full-width bar on its own row above them.
-- REMOVED the grey "✓ H#s all unique" button. When the H# list is clean, no button shows at all.
-  The red "🔧 Fix duplicate H#s" button still appears automatically if duplicate or blank H#s ever
-  arise, so the fix tool is never lost — it's just hidden when there's nothing to fix.
-
-Rev-325 (July 9, 2026)
-- HIDING TOLERANCE BANDS NOW ALSO COLLAPSES BAND-DUPLICATE ROWS. When you hide the Tolerance Bands,
-  rows that share the same Feature Type + 2nd Level + Feature Description (they differed only by the
-  now-hidden tolerance band) collapse to a SINGLE row — the first row of each group is shown, the
-  rest are hidden. So instead of eight identical-looking OD/DIA/OD rows, you see one. The row-count
-  line shows how many were collapsed (e.g. "26 unique … — 37 band-duplicate rows collapsed"). Click
-  "Show Tolerance Bands" to bring every row back. Purely a view — no rows are deleted or changed.
-
-Rev-324 (July 9, 2026)
-- FIXED HEADER MISALIGNMENT WHEN TOLERANCE BANDS ARE HIDDEN (Rev-322 regression). Hiding the bands
-  via display:none broke the table's column math, so the MACHINIST / QUALITY ENGINEER / CMM
-  super-headers floated off to the right, detached from their data columns (the columns themselves
-  were fine — only the top header row was misaligned). The six band columns now collapse to ZERO
-  WIDTH (cells kept present but empty and 0-wide) instead of display:none, which preserves the
-  column count and colspan math so every super-header stays aligned over its real columns.
-
-Rev-323 (July 9, 2026)
-- FIXED THE GREEN "NEWER THAN GITHUB / PUSH NOW" BANNER SHOWING WHEN IT SHOULDN'T. The banner's own
-  style had TWO display rules (display:none then display:flex); the second won, so the banner was
-  effectively always visible on load regardless of sync state — which is why you kept seeing "Push
-  Now" even though the app auto-pushes in the background. The banner now correctly starts hidden.
-- AUTO-PUSH WHEN LOCAL IS NEWER THAN GITHUB is now guaranteed: App-sync is forced ON at boot (not
-  just when unset), so every device silently pushes its app up whenever it's newer than GitHub —
-  no manual Push Now needed. (The verified auto-push + 90s re-check from Rev-315/316 already did the
-  work; this makes sure the toggle can't be stuck off and the banner won't nag.)
-
-Rev-322 (July 9, 2026)
-- HIDE/SHOW TOLERANCE BANDS BUTTON MOVED INTO THE "TOLERANCE BANDS" HEADER. The 👁️ toggle now lives
-  right inside the TOLERANCE BANDS super-header cell, directly above the six band columns it controls
-  — so it's always aligned over them and scrolls sideways with the table. Label reads "👁️ Hide" when
-  shown and "👁️ Show" when collapsed; the header cell stays visible (and compact) when the bands are
-  hidden so you can always bring them back. Removed the toolbar-cluster copy of the button.
-
-Rev-321 (July 9, 2026)
-- MASTER LIST TOOLBAR TIDIED. The "👁️ Hide Tolerance Bands" button (and Sort / Regenerate IDs /
-  Remove duplicates) are now grouped in a right-aligned cluster on the toolbar row, so they sit
-  together on the right instead of the Hide-Bands button dropping down and overlapping the maroon
-  Add Row bar. The toolbar also wraps cleanly if the window is narrow. No functional change — just
-  layout.
-
-Rev-320 (July 9, 2026)
-- HIDE/SHOW TOLERANCE BANDS on the Master List. A new "👁️ Hide Tolerance Bands" button (next to
-  Sort) collapses the six Tolerance Band columns (Below .500, .500 or Greater, Below .0006,
-  .0006–.0014, .0015–.0029, Over .003) so you can focus on the grouping/identification columns
-  (H#, Control Type ID, Workcenter, Feature Type, 2nd Level, Feature Description) plus the method
-  columns. Click again to show them. The choice is remembered and re-applies every time you open
-  the Master List. Header, filter row, and all data rows hide together so nothing misaligns.
-
-Rev-319 (July 9, 2026)
-- "UNDER CONSTRUCTION" STATUS for a control plan (manual toggle, 2 states). A new 🚧 button in the
-  Build Control Plan header lets you flag a plan as in-progress. When ON: a yellow "🚧 UNDER
-  CONSTRUCTION — this control plan is still in progress" banner shows across the top of the build
-  screen, and the plan shows a yellow "🚧 UNDER CONSTRUCTION" badge in the Control Plans list
-  (replacing the green ✓ SAVED badge). Click the button again to mark it done and clear the flag.
-  The status is saved with the plan and syncs across devices like the rest of your data.
-
-Rev-318 (July 9, 2026)
-- MASTER LIST IS NOW ALL CAPS (display + entry). The whole Master List grid now DISPLAYS every cell
-  in uppercase, and all data ENTRY is forced to uppercase — both the click-to-edit inline row editor
-  and the Add/Edit modal show what you type in caps and store it in caps. This also fixes the
-  grouping problem: values that were split only by capitalization (e.g. "C'bore" vs "C'Bore",
-  "Run-out" vs "Run-Out") now read identically as C'BORE / RUN-OUT, so those rows group together.
-  NOTE: existing stored rows display in caps immediately; their stored value becomes caps the next
-  time that row is saved/edited (or you can re-save them to lock it in). New and edited rows are
-  always stored caps.
-
-Rev-317 (July 9, 2026)
-- NEW "⬇️ SYNC NOW" BUTTON IN THE HOME HEADER. A prominent, always-visible button (next to the
-  New Chat Prompt button) that in ONE TAP pulls the latest data from GitHub AND checks for a newer
-  app version. Shows "⏳ Syncing…" while it runs and the usual "✓ Pulled" confirmation when done.
-  No more digging into Admin to pull. (Auto-sync still runs on its own — this is for when you want
-  to force an immediate refresh. If GitHub isn't set up on the device yet, it tells you to add your
-  token in Admin first.) Data + app auto-sync remain ON by default so a configured copy stays
-  current with zero taps.
-
-Rev-316 (July 9, 2026)
-- FIXED A FALSE "Auto-sync didn't complete" BANNER. The Rev-315 verify-after-push checked GitHub
-  only 0.6s after pushing. GitHub's contents API is eventually-consistent, so a read-back that fast
-  can still return the OLD cached rev even though the push actually succeeded — producing a red
-  failure banner when nothing was wrong. Verification now (a) trusts the PUT's own success signal
-  (if GitHub returned OK, the push landed), and (b) polls the read-back up to 5 times over ~6
-  seconds. The red banner appears ONLY if the PUT was not accepted AND the rev never shows up on
-  GitHub — a genuine failure. This should clear the false alarm you were seeing on an otherwise
-  healthy sync (token confirmed to have Read+Write).
-
-Rev-315 (July 9, 2026)
-- SELF-VERIFYING AUTO-PUSH — no more manual "Push App" button or green "Newer than GitHub" banner.
-  The app now pushes itself to GitHub automatically (on open and on a ~90s timer), then RE-READS
-  GitHub to confirm the push actually landed. On success it stays completely silent — the persistent
-  "Push App" buttons (header + menu) and the old green "Push Now" banner are hidden, so nothing
-  clutters the screen or worries you. The ONLY thing that ever appears is a red failure banner —
-  "Auto-sync to GitHub didn't complete" with a Retry button — and only if an automatic push could
-  not be confirmed on GitHub. Your data is always safe locally regardless. Combined with the Rev-313
-  409-retry and the Rev-314 auto-update, app sync is now hands-free in both directions: newer code
-  pushes up automatically and verifies; newer code on GitHub pulls down and applies automatically.
-
-Rev-314 (July 9, 2026)
-- AUTOMATIC APP SELF-UPDATE (no tap needed, when it's safe). While the app is open, it now checks
-  GitHub about once a minute for a newer app rev and, if one is found, UPDATES ITSELF IN PLACE
-  automatically — the tab reloads as the new rev with your token and all data preserved. Safety:
-  it will NOT auto-swap while you're mid-task — if you're editing a Master List row, have the
-  Add/Edit or dropdown-values editor open, are in the balloon editor, or are on the New-CP or CP
-  Builder screens, it holds off and instead shows the one-tap "App update available" banner so you
-  apply it when you're ready. So it never yanks unsaved work out from under you. Turn App-sync off
-  in Settings to disable. Builds on the Rev-311 in-place update.
-
-Rev-313 (July 9, 2026)
-- FIXED "App push failed: 409 … does not match" WHEN PUSHING THE APP TO GITHUB. GitHub rejects a
-  file update whose version fingerprint (sha) doesn't match its current copy — this happens when a
-  second tab or device pushed in between (e.g. an old pinned tab and a new one both syncing). The
-  app used to fetch the sha once and give up if that PUT hit a 409. It now RETRIES on a 409:
-  re-fetches the latest sha from GitHub and pushes again (up to 3 attempts), so a routine sync
-  conflict resolves itself instead of erroring out. (Known follow-up: the data and changelog pushes
-  share the same pattern and will get the same retry in a later rev.)
-
-Rev-312 (July 9, 2026)
-- VERSION BUMP ONLY (test of the Rev-311 in-place auto-update). No functional or code-behavior
-  change — this rev exists so the Rev-311 auto-update path can be verified end to end: open Rev-312
-  once so it pushes to GitHub, then the pinned Rev-311 tab should show the one-tap "App update
-  available: Rev-311 → Rev-312" banner on its next open and update itself in place, keeping token
-  and data.
-
-Rev-311 (July 9, 2026)
-- TRUE IN-PLACE APP UPDATE (ends the "pinned tab stuck on an old rev" loop). When GitHub has a newer
-  app rev than the tab you're running, the app now UPDATES ITSELF IN PLACE instead of just
-  downloading a new file. On boot it detects a newer rev on GitHub and shows a one-tap
-  "App update available: Rev-A → Rev-B" banner; tapping "Update now" (or Admin → Check for App
-  Update) rewrites the current page with the new code in the SAME browser origin — so your GitHub
-  token and ALL your data (customers, projects, master list) are preserved. No re-download, no
-  re-pin, no re-paste. (If the in-place rewrite is ever blocked, it falls back to the old download.)
-- FIXED A SYNC BUG THAT KEPT STALE PINS STUCK. Boot app-sync used to push whenever the tab DIFFERED
-  from GitHub — so an OLDER pinned tab (e.g. Rev-307) would overwrite a NEWER Rev-310 sitting on
-  GitHub, dragging the repo backwards and making the stale pin sticky. It now pushes ONLY when the
-  tab is strictly newer than GitHub; when GitHub is newer it offers the update banner instead of
-  clobbering it. This also protects your newest rev on GitHub from being overwritten by an old device.
-
-Rev-310 (July 9, 2026)
-- ACTIVE COLUMN FILTERS NOW STAND OUT (RED BOLD). On the Master List grid, any column filter set to
-  a value other than "(all)" now shows its text in red and bold, so you can see at a glance which
-  columns are narrowing the grid. Filters left on "(all)" look normal. Applies to every column
-  filter (Feature Type, 2nd Level, Workcenter, Class, methods, bands — all of them) and updates the
-  moment you change a filter. Purely a visual cue; filtering behavior is unchanged.
-
-Rev-309 (July 9, 2026)
-- MASTER LIST INLINE EDITOR: the Feature Description dropdown is now scoped to the row's chosen
-  Feature Type AND 2nd Level. Before, on a row set to (e.g.) FACE / LENGTH, the Feature Description
-  list still showed descriptions from every branch (Counterbore, Cross-Drill, ID, OD, …). Now it
-  only offers descriptions that belong to the selected Feature Type + 2nd Level combination, so the
-  list matches the branch you're actually editing. You can still pick "➕ Add New…" to type a brand
-  new description — that path is unaffected. (Builds on the Rev-253 Feature-Type scoping by adding
-  the 2nd-Level filter.)
-
-Rev-308 (July 9, 2026)
-- FIXED THE STALE RED "GITHUB SYNC IS NOT SET UP" BAR. The red local-only warning bar was only
-  evaluated once at startup, so after you saved your GitHub settings and pulled data in the same
-  session it kept showing even though sync was clearly working. It now re-checks itself right after
-  you Save GitHub Settings and right after a successful Pull, so once GitHub is configured (or a
-  pull succeeds) the bar disappears on its own — no page reload needed. Purely a UI-state fix; no
-  change to how sync actually works.
-
-Rev-307 (July 9, 2026)
-- CONTROL TYPE ID IS NOW A SYSTEM-GENERATED FIELD in the Add/Edit Control Type modal. It's shown
-  in light blue and is read-only — you no longer type it. The app builds it automatically from
-  Workcenter / Feature Type / 2nd Level (e.g. Hardinge Lathe + Chamfer + ANGLE → "LATHE / CHAMFER /
-  ANGLE"). The field also moved 3 columns to the RIGHT so it sits after Feature Description, right
-  before the tolerance bands — matching the order you pick the levels in. (Fixed along the way: the
-  old green-tint styling on this field was a dead no-op and never actually showed; it's now a real
-  light-blue system field.) Note: a row with NO Feature Type — e.g. HARD-CUSTOM — has nothing to
-  derive from, so its ID stays blank in this modal; tell me if you want a hand-entry exception there.
-
-Rev-306 (July 9, 2026)
-- MASTER LIST KEYWORD SEARCH. Added a "🔍 Search all columns…" box to the Master List toolbar
-  (next to Clear Filters). Type a keyword and the grid instantly shows only the rows that contain
-  it, searching every column (H#, Control Type ID, Workcenter, Feature Type, 2nd Level, Feature
-  Description, methods, CMM, etc.). Multiple words are AND-matched — e.g. "lathe od" shows only rows
-  that contain BOTH words somewhere. It's case-insensitive and works together with the existing
-  per-column (all) dropdown filters and the row count ("N of M shown"). A "✖ Clear Search" button
-  appears while there's text (Esc also clears it), and "✖ Clear Filters" now clears the search too.
-
-Rev-305 (July 6, 2026)
-- REMOVED "DOWNLOAD THIS APP" FROM THE HOME MENU (clutter). That slim green bar is gone; the home menu is now just the two tile rows — workspace (Control Plans / Master List / Customer List / Instructions) and tools (Machinist Validation / Admin / Recent Changes / C# Conversion Plan). New app versions come from the chat and via GitHub app-sync, so the button wasn't needed. The underlying saveThisApp() function is kept in code (unused) in case a manual sideload/backup option is ever wanted again; its startup handler is guarded so the missing button can't error.
-
-Rev-304 (July 6, 2026)
-- "NEW CONTROL PLAN" MOVED INTO THE CONTROL PLANS SCREEN. The big top "New Control Plan" hero tile on the home menu is removed; in its place a green "＋ New Control Plan" button now sits at the top of the Control Plans list screen (above the table), calling the same showNewCP flow. The home-menu hero row is now just a slim "Download This App" bar. The home "Control Plans" tile keeps its ＋ New shortcut too, so you can start a plan from the menu or from inside the list. The list screen's header was also renamed from "Existing Control Plans" to "Control Plans" to match. The removed hero button's click handler is guarded so startup can't error on the missing element.
-
-Rev-303 (July 6, 2026)
-- "CONTROL PLANS" TILE + "＋ NEW" SUB-BUTTON. Renamed the "Existing Control Plans" home tile to "Control Plans". It now carries a green "＋ New" sub-button that launches the New-Control-Plan flow (showNewCP), while clicking the rest of the tile still opens the list of saved plans — so both actions live together under Control Plans. Implemented as a click-stopped sub-element inside the tile (no nested-button issue). The large top "New Control Plan" hero tile is left in place for now; if you want it removed to fully consolidate into Control Plans, that's a one-line follow-up.
-
-Rev-302 (July 6, 2026)
-- HOME MENU COMPRESSED — NO MORE VERTICAL SCROLL. The menu was capped at 920px wide and stacked its tiles in tall sections, so on a desktop it scrolled. It now uses the FULL monitor width and lays everything out in three wide rows: (1) hero row — New Control Plan (wide) + Download This App; (2) a four-across workspace row — Existing Control Plans / Master List / Customer List / Instructions; (3) a four-across tools row — Machinist Validation / Admin / Recent Changes / C# Conversion Plan. Padding and icon sizes were reduced so all tiles fit in the viewport height. All buttons and their counts/handlers are unchanged.
-
-Rev-301 (July 6, 2026)
-- BUILD DATE + TIME NEXT TO THE REV #. The REV badge on the home screen now shows the build date and time in small text beside it (e.g. "REV-301  Jul 6, 2026 · 6:01 PM ET"). Also corrected the build stamp itself: BUILD_DATE was set to new Date() at load time, so the "Built" line always showed TODAY's date rather than when the rev was actually built. It's now a fixed per-rev stamp, and it's used consistently in the badge, the header, and the footer. Each new rev I hand over will carry its own build timestamp.
-
-Rev-300 (July 6, 2026)
-- WHY PULL WAS BLOCKED (and a clearer message). GitHub sync needs three things — Username, Repository Name, and a Personal Access Token — and it only counts as configured when ALL THREE are present. The token is stored per-device and is never synced (it's a secret), so on a device where you have not pasted it, the token field is empty (it shows the grey "GITHUB_PAT_..." placeholder) and Pull/Push are disabled with a "Not configured" status. Now the status spells out exactly which field(s) are missing — e.g. "Not configured — enter your Personal Access Token, then tap Save GitHub Settings" — and the Pull button gives the same specific message instead of a generic "configure first". FIX FOR THE USER: paste your GitHub Personal Access Token into the Personal Access Token box, tap "Save GitHub Settings", then Pull Data from GitHub.
-
-Rev-299 (July 6, 2026)
-- DEVICE-MODE TOGGLE ADDED (Settings). Rev-298 only auto-detected phone vs desktop internally — there was no switch to see or set, which is what you were looking for. Settings now has a "🖥️/📱 Device mode" dropdown: Auto-detect (recommended) / Force Desktop / Force Phone. Auto uses your browser + touch + screen size; the two Force options override it. The note under it shows what the app is currently detecting (e.g. "Auto-detect — currently seeing this as a DESKTOP"). Right now the mode drives the phone-specific hints (like "run Locate on your desktop"); I can wire it to more phone-vs-desktop behavior if you want (e.g. hiding AI buttons on phones or a compact mobile layout).
-
-Rev-298 (July 5, 2026)
-- FIXED THE POP-UP COVERING THE AI BUTTON ON PHONES, + PHONE/DESKTOP DETECTION. The large red "Zoom needs the bubble positions…" flash overlapped the 🎯 Locate Bubbles (AI) button on mobile, so it couldn't be tapped. That one-time flash is removed (the small inline hint added in Rev-296 already says the same thing without covering anything), and the drawing-panel header now wraps (flex-wrap) so the hint sits beside/under the button instead of over it. The app now also detects whether it's running on a phone/tablet vs desktop (CP_IS_MOBILE, via user-agent + touch + screen size). On a phone, the locate hint changes to "run Locate on your DESKTOP (it syncs here); AI needs the API key set on this phone" — steering you to the reliable path, since the AI call needs the per-device API key and often can't run from a downloaded file on mobile.
-
-Rev-297 (July 5, 2026)
-- LOCATE BUBBLES: SHOW WHY IT FAILED. When Locate Bubbles doesn't produce the red rings, the panel now displays the actual reason, persistently, in red next to the button — no more guessing from a flash that vanishes on a phone. Reasons surfaced: no Anthropic API key on THIS device (the most common cause on mobile, since API keys are stored per-device and never synced); an AI/API error with its message; the AI finding no circled numbers; or a network/blocked-call failure (common when a phone browser blocks the direct API call from a downloaded file). Each message includes the fix. THE RECOMMENDED FIX for phones: run Locate Bubbles ONCE on your desktop (where the API key is set and the call works) — Rev-294 saves the located positions with the plan and syncs them, so the phone gets the balloon positions (and red rings) automatically on pull, with no AI call needed on the phone at all.
-
-Rev-296 (July 5, 2026)
-- WHY THERE'S NO RED LOCATOR RING (and a clearer hint). The pulsing red ring pins to a balloon using positions from Locate Bubbles (AI). Until you run that once for a plan, the app has no coordinates for any balloon, so no ring is drawn — and the 🎯 Locate Bubbles (AI) button shows for exactly that reason. Previously the only prompt was a one-time flash that was easy to miss on a phone. Now the drawing panel shows a PERSISTENT red hint right next to that button — "no red locator yet — tap this once to pin the balloons" — whenever the focused balloon has no stored position. Tap Locate Bubbles (AI) once, confirm the ITAR prompt, and every balloon (including 5) gets its red ring; with Rev-294 the result is saved, so you only do it once per plan.
-
-Rev-295 (July 5, 2026)
-- PINCH-TO-ZOOM ENABLED ON MOBILE. The page viewport was set to user-scalable=no / maximum-scale=1.0, which turned off native two-finger zoom everywhere — wrong for a data-heavy tool used on a phone. It's now user-scalable=yes (up to 6x), so you can pinch to zoom any screen: the wide Master List and builder tables, forms, and the drawing. The drawing's own Full-view (+/- zoom + drag pan) and the balloon-placement editor's pinch/drag still work independently via their touch-action handling, so this doesn't interfere with them. Tip: double-tap can also zoom a column on most mobile browsers now.
-
-Rev-294 (July 5, 2026)
-- AI RESULTS SAVE WITH THE PLAN (stop re-running the AI every time). The AI Locate step produces balloon positions + read dimensions (beFeatures), but they were only ever kept in the transient working copy — not saved into the project — so re-opening a plan lost them and the AI had to run again. Now the located balloons are written into the project's builder state the moment AI Locate finishes (and on every autosave), so they ride the GitHub sync with the plan and are restored automatically when you re-open it — including on another machine. Run AI Locate ONCE per plan; from then on it just loads. Opening a different plan correctly loads that plan's own balloons (or none, if it hasn't been located yet). NOTE: this saves results going forward — plans you open now will need one more AI run to capture and store their balloons, after which they're persistent.
-
-Rev-293 (July 5, 2026)
-- SAVE BUTTON REMOVED FROM INLINE EDIT + AUTO-SAVE NOTE. With auto-save (Rev-292) the 💾 button was redundant and confusing, so it's gone. The row you're editing now carries a green watermark note — "✓ EDITS AUTO-SAVE (press Enter, click another row, or ✕ to cancel)" — floating over the Feature Description area, plus a small "✓ auto-saves" caption under the ✕ in the Actions cell. The ✕ still cancels/discards the current row's changes. Nothing else changed about saving: edits commit when you move to another row, press Enter, or leave the screen.
-
-Rev-292 (July 5, 2026)
-- INLINE EDIT AUTO-SAVES (no more clicking 💾 after every row). Editing a Master List row now commits automatically in the natural moments: when you click into ANOTHER row to edit it, when you press Enter in any field, and when you hit BACK to leave the screen. The 💾 button still works for an explicit save, and ✕ still cancels/discards your changes. If a save can't complete (blank or duplicate H#), it keeps you on that row and shows why, so nothing is lost silently. Under the hood saveInlineEdit now reports success/failure so the row-switch and leave-screen paths only advance when the save actually took.
-
-Rev-291 (July 5, 2026)
-- EXISTING IDs AUTO-REFORMAT TO THE SLASH FORMAT. Rev-290 fixed how NEW IDs are built (WORKCENTER / FEATURE / 2ND with slashes), but rows already saved still showed the old underscore (e.g. "LATHE / CBORE_DIA"). Now, whenever the Master List renders, the app silently normalizes every ID to the derived slash format — so "LATHE / CBORE_DIA" becomes "LATHE / CBORE / DIA" automatically the moment you open the screen, with no Regenerate click. It's idempotent (only rewrites rows whose ID doesn't already match), skips rows with no Feature Type (HARD-CUSTOM stays), stamps edit time and bumps the rev so the change syncs to other machines. Because reformatting changes the IDs, any control plan that used an old-format ID shows the "control type edited" watermark until re-selected — the plans are not lost. The "🔄 Regenerate IDs from levels" button still exists for an explicit pass.
-
-Rev-290 (July 5, 2026)
-- CONTROL TYPE ID FORMAT: SLASH BETWEEN ALL GROUPINGS. The ID now reads WORKCENTER / FEATURE TYPE / 2ND LEVEL — a forward slash between each part. Previously the second separator was an underscore (WORKCENTER / FEATURETYPE_2NDLEVEL), e.g. "LATHE / CBORE_LENGTH"; it is now "LATHE / CBORE / LENGTH". Fixed in every place the ID is derived: the inline row editor, the Add/Edit modal, the level rename/delete helpers, and the bulk Regenerate. New/edited rows use the new format automatically; to reformat all EXISTING rows in one pass, open the Master List and click "🔄 Regenerate IDs from levels" (then Push).
-
-Rev-289 (July 5, 2026)
-- EDIT FEATURE TYPES FROM THE MASTER LIST (not just the Edit-Dropdown-Values tree). When editing a row, the Workcenter / Feature Type / 2nd Level dropdowns now show, next to each value, a ✏️ and a 🗑️. ✏️ renames that value everywhere it's used (across every row) and re-derives the Control Type IDs on the affected rows; 🗑️ clears that value from the rows that use it (the rows are kept, only the level field is emptied, and their IDs re-derive). Both prompt/confirm, bump the Master List rev, stamp per-row edit time so they sync, and log to history. The separate "Edit Dropdown Values" tree still works for rename/delete/reorder/merge as before — this just puts the common rename/clear right where you're picking the value.
-
-Rev-288 (July 5, 2026)
-- APP AUTO-PUSHES TO GITHUB ON OPEN (kills the manual "Push Now" banner). The app file syncs itself to GitHub automatically now: on startup, if App-sync is on (the default) and GitHub is configured, and the running app is a newer rev than the copy on GitHub, it silently pushes this app up and hides the push banner. The bug was that auto app-push required BOTH App-sync AND data-auto-sync to be enabled, so with either off it fell back to showing the manual banner every time you opened a new version. App-sync is now independent of data auto-sync. (Data — master list, plans, learning — already pushed automatically on save.) To go back to a manual push prompt, turn App-sync OFF in Settings. Note: this takes effect once you're running Rev-288 or later; from then on each new version you open pushes itself up without a click.
-
-Rev-287 (July 5, 2026)
-- REGENERATE ALL CONTROL TYPE IDs FROM LEVELS (button). New "🔄 Regenerate IDs from levels" button in the Master List toolbar rewrites every Control Type ID from its Workcenter / Feature Type / 2nd Level in one pass (same format as the live derivation: last word of workcenter + FEATURETYPE_2NDLEVEL). Rows with no Feature Type keep their hand-set ID (e.g. HARD-CUSTOM). It counts the changes and asks for confirmation, stamps each changed row's edit time so the change syncs, and bumps the Master List rev. Note: since plans reference the Control Type ID, any plan that used an ID that changed will show the "control type edited" watermark (Rev-272) until you re-select it on that plan — the plans are not lost. After running it, Push so the regenerated list becomes the shared copy.
-
-Rev-286 (July 5, 2026)
-- CONTROL TYPE ID = WORKCENTER / FEATURE TYPE / 2ND LEVEL, LIVE. The Control Type ID now derives automatically from those three identification fields and updates the moment you change any of them, in both the inline row editor and the Add/Edit modal (picking a value from a dropdown re-derives too). Format: the last word of the Workcenter, then FEATURETYPE_2NDLEVEL with non-alphanumerics stripped — e.g. Hardinge Lathe + Chamfer + ANGLE -> "LATHE / CHAMFER_ANGLE". A row with NO Feature Type is left alone, so a deliberately hand-set ID like HARD-CUSTOM stays put. IMPORTANT: because the ID now tracks the levels, editing a row's Workcenter / Feature Type / 2nd Level will CHANGE that row's Control Type ID. Control plans reference the Control Type ID, so any plan that used the old ID will show the "control type EDITED" watermark (Rev-272) prompting a re-select — the plan itself is not lost. Existing rows are not rewritten in bulk; each row's ID updates only when you edit its levels.
-
-Rev-285 (July 5, 2026)
-- DROPDOWNS NO LONGER RUN OFF THE BOTTOM OF THE SCREEN. When you edited a row near the bottom of the Master List, its value pick-list (Feature Type, 2nd Level, etc.) opened downward and the lower options were cut off below the viewport with no way to reach them. Both the Master List inline-edit pick-lists and the Builder's control-type dropdown now measure the space above and below the field: they open downward when there's room, flip UP when there isn't, and cap their height to the available on-screen space so the entire list is scrollable within view.
-
-Rev-284 (July 5, 2026)
-- FULL-WIDTH MASTER LIST + CLICK-TO-EDIT. (1) The Master List screen was capped at 2400px wide, leaving empty space on larger monitors; it now uses the full window width (like the Control Plan Builder), with a small margin. (2) Clicking ANY cell in a row now opens that row for editing in place (edit-in-place from Rev-282), so you no longer have to aim for the small ✏️ pencil — though the pencil still works. The Actions cell (pencil / trash) keeps its own behavior.
-
-Rev-283 (July 5, 2026)
-- WHY THE MASTER LIST BALLOONED (57 → 200+), AND THE FIX/RECOVERY. Cause: the Rev-280 per-row merge identifies rows by a stable id (uid). During the upgrade, the copy on GitHub (and briefly the local copy) had no uids yet, and the merge assigned every id-less row a UNIQUE throwaway key — so it treated the GitHub rows and the identical local rows as different and CONCATENATED the two lists instead of merging them. Each sync during the transition stacked another full copy, and the unique-H# pass renumbered the collisions so they didn't collapse — 57 became ~114 became ~228, every control type duplicated several times with different H#s. FIX: the merge now runs both sides through an identity pass first, giving id-less rows the SAME deterministic uid (derived from H# + Control Type ID) so identical rows merge; it can no longer concatenate. RECOVERY: when the Master List contains exact duplicates (rows identical in every field except H#), a orange "🧹 Remove N duplicate rows" button appears in the toolbar — clicking it collapses each duplicate group to one row (keeping the lowest H#), tombstones the removed uids so they don't come back on sync, and restores the list to its unique set. Genuinely-distinct rows (same Control Type ID but different tolerance bands, etc.) are NOT touched. Saved control plans are unaffected — they reference Control Type ID, not the master row. After running it, Push so the cleaned list becomes the shared copy.
-
-Rev-282 (July 5, 2026)
-- EDIT ROWS IN PLACE + SORT BY LEVELS on the Master List. (1) Clicking the ✏️ on a row now turns THAT row into the editable row right where it sits, with every other row still visible above and below — previously editing collapsed the grid to just the one row ("other rows hidden"), which was disorienting on a long list. Save/Cancel returns the row to normal; only one row edits at a time. (2) New "⇅ Sort" button in the toolbar cycles the display order: stored order → by LEVELS (Workcenter → Feature Type → 2nd Level → H#, which groups related control types together) → by H# ascending → back to stored order. The button label shows the current mode, and the choice persists. Sorting is a VIEW only — it does not reorder the stored list or affect sync, and row identities/H#'s are untouched.
-
-Rev-281 (July 5, 2026)
-- AUTOMATIC PULL (no more remembering to click Pull). Previously the app only pulled on startup, so a machine left open never saw another machine's edits mid-session. Now, when auto-sync is enabled, it pulls silently: on app open, whenever you land on the home screen or open the Master List, and on a background timer (~every 45s). Safeguards: it's throttled to at most once every 20 seconds; it never runs while you're mid-edit (the inline row editor is open, the Add/Edit modal is open, or the Edit-Dropdown-Values tree is open) so a merge + redraw can't wipe out an editor you're using; and it's silent (no flash spam) — only manual pulls announce themselves. After a pull, the visible Master List or Control Plan Builder re-renders so incoming changes show immediately. Combined with the Rev-280 per-row merge and existing push-on-save, editing the master list from multiple machines now stays in sync hands-free. The Settings label was updated to describe the new behavior.
-
-Rev-280 (July 5, 2026)
-- TRUE MULTI-MACHINE MASTER LIST EDITING (supersedes the Rev-279 controlled-document model). Each control type now has a STABLE identity (uid) that survives H# renumbering and is consistent across machines, plus a per-row last-edit time (ut); deletions are recorded as tombstones (deletedMasterUids). The GitHub sync now merges the master list PER ROW by uid: additions from any machine survive (unique uids), edits reconcile by newest ut per row, renumbering an H# follows the row (same uid, so no duplicate across machines), and deletions propagate via tombstones (and won't resurrect). After merge, H#'s are still forced unique (a collision from two independent adds renumbers one). Identity is backfilled onto existing rows automatically (deterministic from H# + Control Type ID so two machines seeding the same rows agree), and pushed in the sync bundle. Governance is now genuinely multi-writer: edit the master list from as many machines as you like; concurrent changes to different rows all survive, and concurrent edits to the SAME row resolve to the most recent. (Level-tree renames/moves/feature-deletes also stamp time / tombstone so they propagate too.)
-
-Rev-279 (July 5, 2026)
-- MASTER LIST SYNC → CONTROLLED-DOCUMENT MODEL (so you can renumber H#'s freely). The master list now syncs as a whole: whichever copy was edited most recently (higher masterRev) wins in full. This replaces the union-by-H# merge, which treated a renumbered H# as a brand-new row and produced duplicates across desktops. Now renumbering, editing, adding, or deleting on your main machine and pushing simply replaces the copy on any machine that pulls — clean, no duplicates. Safety: a pull only replaces the local list when the incoming copy is STRICTLY newer (higher masterRev) AND non-empty, so a stale or empty remote can never overwrite a fresher local list; and the winning list still runs through the unique-H# pass. This is safe to adopt now because no other machine holds data yet. Governance note: the master list is a controlled document — edit it on one machine and push; if two machines edit it independently, only the newer one's full version survives (locally, on a single machine, renumbering was already safe since plans/auto-fill/learning key on Control Type ID, not H#).
-
-Rev-278 (July 5, 2026)
-- H# CHECK/FIX BUTTON NOW ALWAYS VISIBLE. In Rev-277 the "Fix duplicate H#s" button only appeared when duplicates existed, so on a clean list (all H#'s already unique, as it should be) there was no button to see — which was confusing. The button is now always shown on the Master List toolbar: a muted grey "✓ H#s all unique" when there is nothing to fix, and a red "🔧 Fix duplicate H#s" when duplicate or blank H#'s are present (click to renumber them, keeping every row). No behavior change to the enforcement itself — this is purely about the control always being findable. Note: a clean list with 57 unique H#'s means there are no duplicates to recover; any control type you feel is missing was lost in an earlier build (before the Rev-275 reset fix and Rev-277 uniqueness enforcement) and simply needs to be re-added — it will now persist.
-
-Rev-277 (July 5, 2026)
-- H#'s ARE NOW ENFORCED UNIQUE (there should never be a duplicate). Three layers: (1) SAVE GUARD — adding or editing a control type with an H# that another row already uses is rejected with a message naming the conflicting type and the next free H#, in both the Add/Edit modal and the inline row editor. (2) MERGE SAFETY — when the GitHub sync brings together two distinct control types that ended up sharing an H# (e.g. added independently on two desktops), the merge keeps BOTH rows and renumbers the collision to the next free H# rather than dropping one or leaving a duplicate. (3) ONE-CLICK CLEANUP — if the Master List currently has duplicate or blank H#'s (from earlier builds), a red "🔧 Fix duplicate H#s" button appears next to the count; it renumbers the extras to unique H#'s, keeping every row. Renumbering an H# never affects saved control plans, because plans reference the Control Type ID, not the H#. Net effect: the count can no longer sit below the number of rows because of H# collisions, and duplicates can't be created going forward.
-
-Rev-276 (July 5, 2026)
-- COUNT LESS THAN ROWS (57 shown, 60 added). Two silent-loss paths behind it, both fixed. (1) The sync merge (Rev-271) keyed the master list purely by H#, so two DISTINCT control types that happened to share an H# collapsed into a single row on merge — even within your own list — dropping the count below what you added. The merge now keys by H# + Control Type ID, so distinct types both survive; only a genuine same-H#/same-ID pair de-duplicates (newer masterRev wins). (2) "Upload New" already drops any spreadsheet row whose H# cell is blank — unchanged, but now visible via the new warning. NEW: the Master List row-count line shows a red warning listing any duplicate H# values and any blank-H# rows ("⚠ duplicate H#: H56, H58 · 1 blank H# — fix to avoid sync loss"), so H# collisions are obvious. To recover any types already collapsed, re-add them with UNIQUE H#s (the badge fix in Rev-275 means they now persist). Going forward, distinct types are never silently merged away.
-
-Rev-275 (July 5, 2026)
-- THE REAL ROOT CAUSE of added control types vanishing. The home-screen badge updater (updateMenuBadges, which runs every time the menu renders) contained a hardcoded "Master List — ALWAYS 55 items" rule: if the stored list didn't have EXACTLY 55 rows, it called initDefaultMasterList() and reset it to the default 55. So every time you added H56–H60 and then returned to the home screen, the list was silently wiped back to 55. This is separate from — and downstream of — the Rev-271 sync-merge gate; even with the sync fixed, this reset fired on every menu load. Now it seeds the default set ONLY when the list is EMPTY; any additions (56, 60, …) are preserved. The boot-time check was likewise relaxed to only act on an empty list. ACTION: re-add your control types once on this build; they will now persist across navigation, and (with Rev-271) push/pull across desktops. All the other initDefaultMasterList callers were already correct (empty-only, or explicit user reset/factory-reset).
-
-Rev-274 (July 5, 2026)
-- FAIL-SAFE control-type dropdown (chasing the "H59 won't show" report). The builder's Control Type ID picker now guarantees every valid control type is reachable, and makes a mis-saved row visible instead of silently absent. It lists: (1) types matching the row's Size/Tol zone; (2) under an "OTHER TOLERANCE ZONES" divider, every other control type — so even if a zone filter would have hidden H59, it still appears; (3) under a "NEEDS A CONTROL TYPE ID — FIX IN MASTER LIST" divider, any Master List row that has an H# but a BLANK Control Type ID (greyed, non-selectable, showing its Machine / Feature / 2nd-Level) — so if H59 was saved without its ID deriving/persisting, you'll see "H59 (no Control Type ID — …)" and know exactly what to fix. If after this H59 appears under matching/other zones, it was a zone-filter artifact; if it appears greyed under NEEDS A CONTROL TYPE ID, its ID is blank in the Master List (re-open H59 and confirm the Control Type ID field is filled, then Save); if it appears in NEITHER, H59 is not actually in this device's Master List (a save/sync issue to chase next).
-
-Rev-273 (July 5, 2026)
-- NARROWER SMALL COLUMNS on the Master List grid so more fits on screen. Cut the width of the small-value columns by ~25% (via MASTER_COLS): H# 60→45, Class 70→53, and each of the six tolerance-band columns (Below .500, .500 or Greater, Below .0006, .0006 .0014, .0015 .0029, Over .003) 55→41, plus FREQ (Every) 90→68. The wide text columns (Control Type ID, Workcenter, Feature Type, 2nd Level, Feature Description, Measurement Method, CMM, QE Measuring Method, Future Improvement) are unchanged. Affects header, data rows, and the inline editor together (colgroup-driven, table-layout:fixed).
-
-Rev-272 (July 5, 2026)
-- GHOST + WATERMARK ON CONTROL-TYPE DELETE **AND** EDIT. Deleting or editing a Master List control type no longer risks the plans that used it — the plans are KEPT and the affected rows are ghosted (dimmed) with a diagonal watermark. DELETE (🗑 on a Master List row): rows show "H## CONTROL TYPE DELETED" in red; re-adding the control type clears the flag. EDIT: renaming a control type's ID shows "H## CONTROL TYPE EDITED → newID" (amber) on rows that used the old ID; a same-ID edit (methods/tolerance/etc. changed) flags dependent rows too, but ONLY those that haven't been re-synced since the change — re-selecting the control type on a plan row (which re-pulls the current master definition) clears that row's flag, so acknowledged rows stop showing it while un-reviewed plans keep the flag. New rows never flag; a no-op save doesn't flag. Events are stored in cpRetiredTypes and travel in the GitHub sync bundle (union-merged), so the flags appear on every desktop. The Feature-Type-tree delete watermark ("DELETED FEATURE", Rev-242) still works as before. Watermark colors: red = deleted, amber = edited.
-
-Rev-271 (July 5, 2026)
-- ROOT-CAUSE FIX: newly added control types vanished. The GitHub sync merge contained a hardcoded rule that only accepted an incoming master list if it had EXACTLY 55 rows ("authoritative"). Your master list is 55 rows, so adding a 56th (e.g. H59) made the local list 56 — and the moment the still-55-row GitHub copy merged back (on app open / sync), it overwrote the 56-row local list, deleting H59. It also meant the master list could never grow past 55 or share additions between desktops. Fixed by making the master list a proper mergeable entity: it now merges by H# (a union of both sides; on a same-H# conflict the side with the higher masterRev wins; the higher masterRev is kept), and masterRev now travels in the sync bundle. It only merges when the incoming list is non-empty, so an empty/corrupt remote can never wipe the local list. Result: added control types persist locally AND propagate across desktops. NOTE: master-row DELETIONS do not yet propagate (a row deleted on one device can reappear from another's copy) — tell me if you delete master rows across machines and I will add master-row tombstones. Also: H59 was already lost from this device, so re-add it once on this build; it will stick now.
-
-Rev-270 (July 5, 2026)
-- BUILDER CONTROL-TYPE PICKER REBUILT (custom dropdown). Replaced the native <select> in the Build screen's Control Type ID cell with a custom dropdown. Two wins: (1) it reads the control-type list FRESH from the Master List every time you open it, so a newly added control type (e.g. H59) always shows up immediately — this eliminates the render-timing staleness where a just-added type could be missing until a reload; (2) the H# now renders in small blue text to the left of each control type (and in the closed picker for the current selection), which the native dropdown could not do. Zone filtering (Size/Tol pickers) and the "(outside zone)" keeper are preserved, and the list panel is fixed-position so the builder's scroll area can't clip it. Selecting still routes through applyControlType (fills the methods band, records shop learning). Trade-off: native single-keystroke type-ahead is replaced by click / Enter-Space-Down to open. NOTE: a Master List row with a BLANK Control Type ID is intentionally not selectable and won't appear — if a new H# still doesn't show, confirm its Control Type ID field is filled.
-
-Rev-269 (July 5, 2026)
-- BUILDER CONTROL-TYPE DROPDOWN, two fixes. (1) Stale dropdown: adding/editing/deleting a control type in the Master List now refreshes the Build screen's control-type dropdowns immediately (every Master List change runs through bumpMasterRev, which re-renders the builder when it's visible; returning to the builder already rebuilds it), so a newly added control type shows up right away instead of being missing until a reload. (2) H# on options: every entry in the control-type dropdown is now prefixed with its Master List H# (e.g., "H44   LATHE / OD_CHAMFER_SIZE"), including the "outside zone" keeper, so you can see the H-value beside each control type while picking. NOTE: native browser dropdowns can't render mixed/smaller font sizes, so the H# shows at the same size to the left of the ID rather than as smaller grey text; if you want the true small-grey styling we'd swap this cell to a custom dropdown.
-
-Rev-268 (July 5, 2026)
-- LEARNED BEHAVIOR REPORT (auditable document). New "📄 Export Learned Behavior" button under Settings → Shop Learning downloads a self-contained, printable HTML document that details exactly how the app proposes control types and what it has learned. It includes: the proposal priority (AI Propose 🤖 > shop-learned mapping 📌 > local text match) and that proposals are never auto-applied; how the shop memory is learned (deliberate operator choices only, newest-wins, shop-wide via GitHub, a lookup + in-context guidance rather than model training); the deterministic local-matcher rules (synonym list, distinctive feature words, the two-word/one-key-word threshold); and the full learned mapping table — every feature→control-type mapping with its times-confirmed count, last-updated date, and an "in Master List?" flag that surfaces orphaned mappings. Ends with a reviewed-by / date / rev sign-off block. Generated live from the current shop memory, so it is always up to date; open it and print to PDF for a controlled record. Nothing in the app's behavior changed — this only documents it.
-
-Rev-267 (July 5, 2026)
-- BOOTSTRAP THE SHOP MEMORY FROM YOUR HISTORY. New "📚 Learn from all saved plans" button under Settings → Shop Learning. One click scans every saved project's rows, and for each row that has a feature description + a chosen control type (that still exists in the Master List) it records a feature→control-type mapping into the shop-wide correction memory. This turns your entire control-plan history into learned examples in one pass, so the 📌 local proposals and the 🤖 AI Propose (which is seeded from these mappings) are sharp immediately instead of only after months of live corrections. Conflicts resolve to the newest plan (by project timestamp), and any corrections you've already made are kept. The result syncs to GitHub like the rest of the shop memory, so every desktop benefits. The Settings card shows the current learned-mapping count; the button is safe to re-run anytime (idempotent).
-
-Rev-266 (July 5, 2026)
-- SHOP-WIDE LEARNING FROM YOUR CORRECTIONS. The app now learns as you work: every time you deliberately set a control type on a row that has feature text — by clicking ✓ Use or picking from the dropdown — it records a mapping of that feature's signature → the control type you chose. Those learned mappings do two things: they bias the on-device matcher (so the Proposed column starts suggesting your shop's actual choices, tagged 📌), and they're injected into the AI Propose prompt as confirmed examples the model is told to strongly prefer. The memory is SHOP-WIDE and rides your GitHub data sync (bundled in cp_data.json, merged newest-entry-wins per feature), so once one desktop learns a mapping every desktop that pulls gets it. Conflicts resolve to the latest human decision. Note: this is a learned lookup + in-context guidance to the model, NOT model training — Claude itself isn't being retrained, so nothing about your parts leaves via the model. Bulk 🎯 Auto-fill applies the machine's own guesses and does NOT record learning; only your individual accept/override choices teach it. Proposal priority in the column is now: explicit AI run (🤖) > shop-learned mapping (📌) > local text match.
-
-Rev-265 (July 5, 2026)
-- AI PROPOSE TYPES (reads the drawing). New 🤖 AI Propose Types button in the Build Control Plan toolbar: Claude looks at the ODS drawing, locates each balloon, identifies the feature it calls out, and picks the best-matching control type from your Master List — filling the Proposed column for every balloon at once (including rows that have no feature text, which the local matcher can't handle). It POPULATES proposals only; nothing is auto-applied — you still ✓ Use each (or 🎯 Auto-fill Proposed) and can override. The AI must choose from your actual Master List IDs and every returned ID is validated against it, so it can't invent a control type. AI proposals take priority over the local text match in the Proposed column and are tagged 🤖. IMPORTANT: this sends the drawing to the Anthropic API, so it runs behind the same ITAR confirm gate as the other AI actions and requires your Anthropic API key in Settings — do not use it for export-controlled/CUI drawings unless that path is approved for your data. Always verify each proposal against the print; treat it as a first draft, not gospel. Uses claude-sonnet-4-6.
-
-Rev-264 (July 5, 2026)
-- PROPOSED CONTROL TYPE column in the Build Control Plan grid. For each balloon row the app now takes its best shot at the right control type by matching the row's feature text against the Master List, and shows that guess in a new "Proposed" column beside Control Type ID. On the focused row a ✓ Use button accepts it (fills the methods band exactly as picking from the dropdown does); if it's wrong, just pick another from the dropdown. Rows already set show "✓ using this". A 🎯 Auto-fill Proposed button in the top bar fills every UNSET row with its best match in one click (never overwrites a type you chose). The matcher is entirely LOCAL — feature text and the drawing never leave the device — so it's safe for controlled data and instant, and it respects the size/tolerance zone pickers when set. The proposal is a working aid only; the accepted value flows to the .xlsx through Control Type ID as before (no new .xlsx column).
-
-Rev-263 (July 5, 2026)
-- DRAWINGS NOW SYNC ACROSS COMPUTERS. Previously the ODS drawing (a large base64 image) was stored on each device only — GitHub sync stripped it to stay under the API's ~1MB inline limit — so plans pulled onto another computer opened with no drawing. Now each PART's drawing is pushed to GitHub as its own file (drawings/<part>.b64), mirroring the existing per-project xlsx files, and PULL fetches the drawing for any part this device doesn't already have. Details: drawings are keyed per part (reused across control-plan revisions); a per-device change signature makes unchanged drawings a true no-op on silent auto-sync (no redundant uploads/commits); drawings larger than 1MB are read back through the git blobs API so size is never a problem; the main cp_data.json stays small. Note the storage reality — a fresh computer that pulls many large drawings can exceed the browser's localStorage quota; if that happens the app warns you and you can free space (or open the desktop app) and pull again. Master List, customers, drafts, projects, xlsx data, and change history already synced; this closes the drawing gap so ALL plan data travels with the app.
-
-Rev-262 (July 5, 2026)
-- FIX: ODS drawing blank when opening an existing Control Plan (had to Back out one step and re-click EDIT to make it show). The drawing is a large base64 image stored on THIS device only — GitHub sync strips it to stay under the 1MB API limit — so a project pulled from GitHub can open with no odsImage in its builder state. The ODS panel now recovers the drawing on open from any local source that still has it (the auto-saved working copy, a saved draft for the same part, or a sibling project/revision), and re-syncs the app-wide drawing + balloon positions so zoom-to-bubble works immediately. Applies to every open path (Edit Existing, the Rev-260 gate's "Open existing", draft resume). If no local copy of the drawing exists anywhere, the panel still shows the "paste one" hint.
-
-Rev-261 (July 5, 2026)
-- BALLOON LOCATE RING restyled. The red pulsing ring that highlights the focused balloon on the ODS drawing is now thinner and less bold (outline 4px → 2px, softened red), and its pulse is more pronounced: the halo expands to a noticeably bigger radius with a slight scale-up and a slightly quicker cycle (1.1s → 1.0s). Still draggable to correct a bubble's saved position.
-
-Rev-260 (July 5, 2026)
-- SAFETY GATE on GENERATE NEW CONTROL PLAN. Generating a plan for a Part # + Revision that already has a saved project used to silently overwrite it the moment you started editing (autosave keys on Part #::Rev). Now, if a matching saved plan exists, a modal stops you first with three explicit choices: "Open the existing plan" (resumes it in the Builder), "Start new — overwrite it" (proceeds with the blank skeleton), or "Cancel". A blank Part # skips the gate since it gets a fresh auto-TestN name that can't collide. No change to the generated skeleton itself.
-
-Rev-259 (July 5, 2026)
-- FIX "can't edit the Feature Type column" (and every other text cell) in the ✏️ Master List inline editor. Rev-257 had made a single click on a cell toggle the value pick-list, which meant clicking into the text never placed a caret — so the field looked focused but wouldn't take typed edits, worst on Feature Type. Clicking a text cell now behaves like a normal input: caret in, type to edit. The existing-value list moved to a dedicated ▾ button at the right of each cell (or press ↓), and it now renders as a fixed-position panel anchored to the box so the table's own scroll area can no longer clip it off-screen. Band boxes are unchanged (click to toggle X).
-
-Rev-258 (July 5, 2026)
-- FIX "Pull failed: updateHomeScreen is not defined": the old home-screen badge refresher was removed in the redesign, but the GitHub PULL (and the draft-delete path) still called it — so every pull crashed at the finish line. The function is restored as a safe refresher (re-renders the Existing Control Plans list when visible). Pulls complete normally again; the merged data was never at risk, the crash hit only the final screen refresh.
-
-Rev-257 (July 4, 2026)
-- INLINE EDITOR: CLICK = FULL LIST. Clicking any text box in the ✏️ row editor now opens the same full-height pick list the Add form uses — every existing value for that column, hover-highlight, one click to set. Second click (or clicking elsewhere) closes it. Typing over the text still works; the six band boxes stay click-to-toggle X.
-
-Rev-256 (July 4, 2026)
-- Master List grid: Workcenter column moved LEFT of Feature Type — grid order now H# · Control Type ID · Workcenter · Feature Type · 2nd Level · Feature Description · Class · bands …, matching the machine-first tree hierarchy. Data rows, filter dropdowns, and the inline ✏️ editor all follow automatically; the downloaded .xlsx keeps its established column layout for compatibility.
-
-Rev-255 (July 4, 2026)
-- Add form order matches the tree hierarchy: H# · Workcenter (machine, 1st) · Control Type ID (auto, 2nd) · Feature Type (3rd) · 2nd Level · Feature Description · bands · methods. Reference strip in the band chain follows the same order. (Renaming the machine value itself — e.g. Hardinge Lathe → Lathe — is done in ✏️ Edit Dropdown Values by clicking the machine row; it renames every row at once.)
-
-Rev-254 (July 4, 2026)
-- INLINE ROW EDITOR GETS DROPDOWNS: editing a Master List row via its ✏️ pencil now offers a dropdown of existing values on every field (Feature Type, 2nd Level, Feature Description, Workcenter, methods, frequencies, Class …) — click the box or press the ↓ arrow key to pick; typing still works. The six band boxes are click-to-toggle red X, matching the Add form.
-
-Rev-253 (July 4, 2026)
-- FEATURE DESCRIPTION IN THE ADD FLOW: the field now sits right after 2nd Level (matching the Master List column order) with the full-list dropdown — click to see every description already used under the chosen Machine + Feature Type, pick one or type a new one freely (descriptions are not typo-gated). The band-completion chain carries the description into the follow-up row, and the prior-row reference strip aligns to the new layout.
-
-Rev-252 (July 4, 2026)
-- BAND CHAIN CHECKS THE WHOLE FAMILY: completion is now judged across ALL rows sharing the same Machine + Feature Type + 2nd Level — if sibling rows together cover the six bands, saving ends the chain. Previously it only looked at the row just saved, so a two-row split (e.g. H61 five bands + H62 the sixth) kept re-opening the Add form and looked like Save was failing.
-
-Rev-251 (July 4, 2026)
-- FIX silent loss of a typed level: the Rev-247 typo-gate CLEARED unknown typed values on leaving the box without asking — so a 2nd Level typed without ➕ Add New… vanished, the row saved blank, and the band-completion chain then had no 2nd Level to carry into the next row. The gate now ASKS: OK adds the typed value as a deliberate new level, Cancel clears it with a message. Chain carry-over works once the level actually saves.
-
-Rev-250 (July 4, 2026)
-- SIX BAND BOXES ARE CLICK-TOGGLES: click any of Below .500 / .500 or Greater / Below .0006 / .0006-.0014 / .0015-.0029 / Over .003 and a RED X appears; click again to clear. Typing and dropdowns removed from these six — a band box is only ever blank or X. Chain pre-fills still land correctly; the X shows red in the form (stored value unchanged, so the Master List grid and lookups behave exactly as before).
-
-Rev-249 (July 4, 2026)
-- PRIOR ROW SHOWN IN THE CHAIN: when saving a partial-band control type auto-opens the follow-up row, the row you JUST SAVED now appears above the inputs as a greyed read-only strip in the same 19-column layout (hover a cell for full text) — reference its methods/frequencies while defining the remaining bands. Strip clears when the form opens normally.
-
-Rev-248 (July 4, 2026)
-- BAND-FAMILY COMPLETION: saving a NEW control type with fewer than all six band X marks automatically opens the next Add row — same Machine / Feature Type / 2nd Level, with the LEFTOVER (unchecked) bands pre-marked and the Control Type ID deriving — so a tolerance family cannot be left half-covered. Chains until all six bands are accounted for; Cancel exits if the remaining bands genuinely do not apply. Editing an existing row never triggers it.
-
-Rev-247 (July 4, 2026)
-- LEVELS LOCKED TO THE TREE: Workcenter, Feature Type, and 2nd Level no longer accept a free-typed value that doesn't exist — leaving the box clears it with a message pointing to ➕ Add New…. Choosing ➕ Add New… arms the box for exactly one new value; picking an existing entry disarms it. Creating a level is now always a deliberate act, never an accidental typo.
-
-Rev-246 (July 4, 2026)
-- Add/Edit row rebalanced: the six tolerance-band columns, # Recorded, FREQ (Every), and Class are now SKINNY (they hold an X or a short value, shown centered and bold), and the freed width raises text size everywhere — inputs 11px → 13.5px, labels 9px → 10.5px. Wide fields (Control Type ID, Meas Method, Feature Description) got the biggest share. Still one row.
-
-Rev-245 (July 4, 2026)
-- FROZEN HEADER in Edit Dropdown Values: the title row (with the ✕ close), the instructions line, and the ▲/▼ move bar are now one pinned block that stays at the top while the level tree scrolls beneath — the ✕ and the move buttons are always reachable no matter how deep you scroll.
-
-Rev-244 (July 4, 2026)
-- Add/Edit Control Type is now a TRUE single row: fixed 19-column grid fits every field (H# through Future Improvement) on one line — Class, Feature Description, and Future Improvement no longer wrap to a second row. Labels compact with hover tooltip for the full name; inputs slightly slimmer. All behaviors unchanged.
-
-Rev-243 (July 4, 2026)
-- ADD FROM THE TREE: the machine row carries "➕ add" (new Master List row under that machine) and every Feature Type row carries "➕" (new row under that machine AND feature). Both open the Add form with those levels pre-filled — cascade, Control Type ID derivation, and next-free H# all fire immediately.
-
-Rev-242 (July 4, 2026)
-- DELETE A FEATURE TYPE: each feature row in the level tree has a 🗑 — deleting removes its rows from the Master List (confirm shows the count, rev bumps, History logs). CONTROL PLANS KEEP THEIR ROWS: any plan row whose control type belonged to the deleted feature stays in the grid, ghosted (faded, grey) with a red "DELETED FEATURE" watermark stamped across its Control Type cell. Re-adding a control type with the same ID lifts the mark automatically.
-
-Rev-241 (July 4, 2026)
-- FIXED-POSITION MOVE BAR (cursor never travels): click a Feature Type once to select it (maroon outline), then use the big ▲ Up / ▼ Down buttons in the bar PINNED at the top of the window — the bar never moves, so repeated clicks need zero cursor travel while the feature walks the list. ✕ Done deselects. Renaming a feature now uses the underlined "rename" text on its right (row click = select). Per-row arrows removed; drag-to-merge unchanged.
-
-Rev-240 (July 4, 2026)
-- Reorder arrows stay under your cursor: after each ▲/▼ click the list auto-scrolls so the feature YOU are moving holds its screen position while the rest of the list flows around it — click repeatedly without hunting for the arrows after every move.
-
-Rev-239 (July 4, 2026)
-- FEATURE TYPES NUMBERED + RE-ORDERABLE: each machine's Feature Types show as 1. 2. 3. … with ▲▼ arrows to move them up/down (drag stays reserved for merging). The order is saved per machine, survives reopening, and the Add Row Feature Type dropdown follows the same order — so "like" features sit next to each other everywhere. 2nd Levels are unaffected.
-
-Rev-238 (July 4, 2026)
-- DRAG-DROP in the level tree: drag a Feature Type onto another Feature Type to MERGE the branches (all its rows move — e.g. drag the stray C'bore onto C'Bore); drag a 2nd Level onto any Feature Type to MOVE it there (works across machines too). A confirmation states exactly what moves and how many rows before anything changes; every move bumps the Master List rev and logs to History. Click-to-rename unchanged.
-
-Rev-237 (July 4, 2026)
-- Edit Dropdown Values is now a LEVEL TREE: 🏭 Machines at the top, each expanding to 🔧 its OWN Feature Types, each to their own 2nd Levels — a Mill branch carries completely different features than the Lathe branch. Renames are branch-scoped (renaming DIA under Lathe/C'Bore touches only those rows). Methods, frequencies, and Class remain flat per-column lists below the tree.
-
-Rev-236 (July 4, 2026)
-- EDIT DROPDOWN VALUES: new "✏️ Edit Dropdown Values" button next to Add Row opens a manager — pick a column (Workcenter, Feature Type, 2nd Level, methods, frequencies, Class), see every value with how many rows use it, click one and type the new name: the rename applies to ALL rows using that value, bumps the Master List rev, and logs to History. Perfect for unifying spellings (C'bore vs C'Bore).
-
-Rev-235 (July 4, 2026)
-- FIX Master List opening in a stuck one-row edit view ("Editing H58 — other rows hidden"): entering the screen now always clears any leftover inline-edit mode and shows the full grid of all control types. The single-row focus still happens while you're actively editing (pencil icon), and Save/✕ return you to the full grid as designed.
-
-Rev-234 (July 4, 2026)
-- The five methods/frequency columns (Meas Method Machinist, # Recorded, FREQ Every, FREQ QE, Meas Method CMM) get the same full-list dropdown as the levels: click the box, see EVERY existing value at once with ➕ Add New… pinned on top; picking Add New clears the box for typing a new method/frequency. Values shown are those used under the chosen Machine.
-
-Rev-233 (July 4, 2026)
-- FULL-LIST DROPDOWNS for Workcenter / Feature Type / 2nd Level: replaced the browser's tiny 4-5 row scroller with the app's own dropdown panel that shows EVERY option at once (➕ Add New… pinned on top, cascade-filtered values below, hover highlight, click to pick). Only scrolls if a list ever exceeds ~70% of the screen. Typing still filters/derives as before.
-
-Rev-232 (July 4, 2026)
-- The three level dropdowns (Workcenter, Feature Type, 2nd Level) now carry an explicit "➕ Add New…" option at the top: choose it and the box clears with a "Type the new value…" prompt so creating a level is an obvious action, not a hidden type-over. Cascade and ID derivation unchanged.
-
-Rev-231 (July 4, 2026)
-- Add/Edit row field order matches the requested layout: H# (auto-numbered, green tint) and Control Type ID (auto-derived, green tint) stay 1st/2nd, followed by Workcenter, Feature Type, 2nd Level, the six tolerance-band columns, Meas Method (Machinist), # Recorded, FREQ (Every), then FREQ (QE), CMM, Class, Feature Description, Future Improvement. Green tint marks the two self-filling fields (both remain editable).
-
-Rev-230 (July 4, 2026)
-- CONTROL TYPE ID DERIVES FROM THE LEVELS: in Add/Edit Row, the Control Type ID composes itself live from Machine / Feature Type / 2nd Level (last word of the machine + FEATURETYPE_2NDLEVEL, e.g. Hardinge Lathe + Chamfer + ANGLE -> LATHE / CHAMFER_ANGLE). It updates as you change levels, stays fully editable, and never overwrites an ID you typed by hand.
-
-Rev-229 (July 4, 2026)
-- Add/Edit Control Type is now a HORIZONTAL row: the dialog spans nearly the full screen and all fields sit side by side (wrapping on smaller screens), each with its pick-from-existing dropdown and the cascading Machine -> Feature Type -> 2nd Level behavior. Reads like adding a spreadsheet row instead of filling a tall form.
-
-Rev-228 (July 4, 2026)
-- LEVEL HIERARCHY in Add/Edit Row: Machine (Workcenter, 1st level) -> Feature Type -> 2nd Level now cascade — pick the Machine and the Feature Type dropdown narrows to types existing under it; pick the Feature Type and 2nd Level narrows likewise. Typing a NEW value at any level creates that level (new machine, new feature type, new 2nd level). Clearing a parent widens the children again.
-
-Rev-227 (July 4, 2026)
-- ADD ROW USES EXISTING LEVELS: every field in the Master List Add/Edit form now offers a dropdown of the distinct values already used in that column (Feature Type, 2nd Level, Feature Description, Workcenter, Class, band X marks, measuring methods, frequencies, QE/CMM methods) — click the box or press ↓ to pick; typing a brand-new value still works. New rows pre-fill H# with the next free number (e.g. H59).
-
-Rev-226 (July 4, 2026)
-- Master List columns 40% narrower: Feature Description 300→180, Meas Method (Machinist) 330→198, FREQ (Every) 150→90 — more of the table fits without horizontal scrolling.
-
-Rev-225 (July 4, 2026)
-- Master List Add Row: the "Add New Control Type" form now scrolls into view when opened (it could open off-screen if you clicked + Add Row while scrolled deep in the table, looking like nothing happened). The add flow itself was already complete: fill the fields (H# required), Save — the row joins the list, the Master List rev bumps, and the change is logged.
-
-Rev-224 (July 4, 2026)
-- ONE PLAN, ONE RECORD: the Builder auto-saves every change into the plan's project entry (1.2s after you stop typing/clicking) — rows, zones, specs, positions. No Save step needed; a plan is never "draft vs saved", it is simply always current. Save to Project still works (adds the built xlsx to the record); Existing Control Plans no longer shows a duplicate DRAFT row when the same part already has a plan entry.
-
-Rev-223 (July 4, 2026)
-- DRAG-TO-CORRECT: the red ring is now grabbable — drag it onto the true bubble location right on the Build screen and release; the corrected position saves immediately (working copy + drafts/projects) and shows a confirmation. Works with mouse or touch; clicking the ring no longer opens the full-screen viewer. If a row had NO known position, dragging the ring (once visible via another row) can also create one.
-
-Rev-222 (July 4, 2026)
-- FIX old drawing showing on a NEW plan: fresh mode cleared the drawing in memory but never refreshed the on-screen thumbnail or its buttons, so the previous drawing (and its Make Clearer / Revisions buttons) stayed visible. + New Control Plan now fully clears the picture, hides those buttons, and wipes the prior drawing's revision history. Resume last session still brings everything back by choice.
-
-Rev-221 (July 4, 2026)
-- Zone pickers self-heal: on every grid redraw, an empty Spec cell pulls the dimension stored with its bubble (if one was read), and any row with a spec but pickers still on "any" gets its Size/Tolerance zone computed. Fixes zones not picking when bubbles were located by an older rev that read positions but not dimensions — re-run 🎯 Locate Bubbles (AI) once on such drawings to load the dims.
-
-Rev-220 (July 4, 2026)
-- FIX "EDIT EXISTING does nothing": when the match was a DRAFT, the button only re-loaded the form already on screen — an invisible action. It now loads the draft and opens the BUILDER directly (saved projects with an editable grid already did).
-
-Rev-219 (July 4, 2026)
-- TOLERANCE MATH: the app now reads the two limits in a Spec/Tol cell (e.g. ".750/.749") and computes upper − lower. The difference shows as a small blue "Δ .0010" readout under the focused row's Spec cell, and it AUTO-SELECTS the Size band (from the upper limit vs .500) and the Tolerance band (Below .0006 / .0006–.0014 / .0015–.0029 / Over .003) — which in turn filters the Control Type list. Manual picker choices are never overridden; runs on typing a spec and on the AI dimension fill.
-
-Rev-218 (July 4, 2026)
-- PRE-BALLOONED WORKFLOW LOCKED IN: drawings always arrive with bubbles already printed, so the "Add Balloons with AI" button (which drew balloons + leader arrows onto the drawing) and "View Ballooned Drawing" are hidden app-wide via a CSS kill-switch no code path can override. AI's only drawing job now is 🎯 Locate Bubbles — a detect-only pass that learns where each printed bubble sits (for zoom + red-ring highlight) and reads its dimension, changing nothing on the drawing. All ballooning code remains dormant underneath in case the workflow ever changes.
-
-Rev-217 (July 4, 2026)
-- When a row is focused but the drawing has no learned bubble positions, the app now TELLS you why it didn't zoom (one-time message pointing at 🎯 Locate Bubbles (AI)) instead of silently showing the full view.
-
-Rev-216 (July 4, 2026)
-- Renamed "My Projects" to "EXISTING CONTROL PLANS" — home-screen button and the screen title (matches the EDIT EXISTING CONTROL PLAN terminology).
-
-Rev-215 (July 4, 2026)
-- Cursor-in-row zoom: putting the cursor into ANY field of a row (clicking a box or Tabbing into it) now zooms the drawing to that row's bubble with the red ring — previously only a click on the row fired it. Requires bubble positions (🎯 Locate Bubbles (AI) once per pre-ballooned drawing).
-
-Rev-214 (July 4, 2026)
-- TOLERANCES AUTO-FILL: 🎯 Locate Bubbles (AI) now also READS the dimension each balloon points to (upper/lower limits transcribed exactly as printed) in the same single pass, and fills the Product/Process Spec/Tol column for every row whose cell is empty — cells you already typed are never overwritten. The read dimension rides with each bubble (saved with drafts/projects). Always verify AI-read values against the print; classification is NOT auto-set (CP-6 stays yours).
-
-Rev-213 (July 4, 2026)
-- ODS preview image on the New Control Plan form is MUCH larger: max height 120px → 480px and it now fills the column width (drawing stays proportional, click-to-enlarge unchanged). Applies to the Setup Sheet preview row too.
-
-Rev-212 (July 4, 2026)
-- PDF flow is fully hands-off from every entry point: Browse, drag-drop onto the zone, and Paste all route a PDF straight into the automatic page-1 conversion and preview — no extra steps. The zone now shows "⏳ Converting PDF…" during the 1–3 second conversion so it never looks stalled.
-
-Rev-211 (July 4, 2026)
-- PDF UPLOAD for the ODS drawing: dropping/choosing a .pdf now converts its FIRST PAGE into a crisp picture automatically (2.5x scale) and proceeds exactly like an image upload — preview, revisions, balloons, Make Clearer, AI all work. Uses the pdf.js converter fetched from the internet on first use (cached after); if offline or conversion fails, a clear message asks for an image/screenshot instead of showing a broken preview. File picker now accepts image/* and application/pdf.
-
-Rev-210 (July 4, 2026)
-- BUBBLE HIGHLIGHT: the focused row's bubble is now marked on the print with a red pulsing ring (white halo so it reads over dense linework) — in both the zoomed view and full view. Ring tracks Prev/Next and row clicks. Requires bubble positions (run 🎯 Locate Bubbles (AI) once per pre-ballooned drawing, or use Add Balloons with AI). Internals: the zoom now scales a positioned holder around the image so the ring's percent coordinates stay glued to the drawing at any zoom.
-
-Rev-209 (July 4, 2026)
-- Third safety layer for the missing-drawing case: the Build screen also adopts the app's current drawing at the moment it opens if the build state arrived without one (joins the Rev-198 generate-time thumb sync and the Rev-208 panel fallback). If the little thumbnail on the form shows a drawing, the Build screen now shows it — three independent guards enforce that.
-
-Rev-208 (July 4, 2026)
-- FIX empty drawing panel in the Builder: if the build state has no drawing but the app currently holds one (e.g. a project saved without its image, or any path that dropped it), the panel now adopts the current drawing instead of showing "No ODS image". Note: a brand-new plan from the blank form still starts with no drawing by design — upload/paste one or tap "↩ Resume last session".
-
-Rev-207 (July 4, 2026)
-- Builder grid slimmed: the Process Step, Operation ID#, Machine/Device/Jig/Tools, and Process columns are removed FROM THE SCREEN (they repeated the same form values on every row). Their values still live on each row and still fill the built .xlsx exactly per Instructions Rev-92 CP-2 — the deliverable is unchanged. (Removing them from the xlsx too would be a CP-2 change requiring an Instructions revision — awaiting explicit confirmation.)
-
-Rev-206 (July 4, 2026)
-- TEST-SITE MODE for the New CP form: the top fields are no longer mandatory — Part Number, Revision, Operation ID#, Process Owner, and Customer are all optional (yellow required styling drops off automatically). If Part Number is left blank, Generate/Save Draft auto-name it with the next free Test number (Test1, Test2, …) so test plans never overwrite each other; the name is written back into the field and announced.
-
-Rev-205 (July 4, 2026)
-- TOLERANCE ZONE per row: the focused builder row now carries two small pickers above the Control Type dropdown — SIZE (Below .500 / .500 or Greater) and TOLERANCE BAND (Below .0006 / .0006–.0014 / .0015–.0029 / Over .003), matching the Master List's band columns. Choosing a zone FILTERS the Control Type list to only the master rows marked X for that zone, so you can't pick a control type that doesn't apply. "Any" shows the full list; a type chosen before narrowing stays visible tagged "(outside zone)". The chosen zones are saved with the row (drafts/projects keep them).
-
-Rev-204 (July 4, 2026)
-- Terminology: "Workcenter" renamed to "Operation ID#" across the app screens — the New CP form field label, the Builder grid column header, the EDIT EXISTING tooltips, and the required-fields message. Deliberately UNCHANGED: the generated Control Plan .xlsx keeps its "WORKCENTER" column per Instructions Rev-92 CP-2, and the Master List screen/editor keep "Workcenter" to mirror the Master List document. (Say the word if the xlsx column should change too — that requires an Instructions edit, which needs your confirmation first.)
-
-Rev-203 (July 4, 2026)
-- ODS input now has two clearly separate buttons: 📁 UPLOAD FILE (opens the file picker, as before) and 📋 PASTE (CTRL+V). The Paste button is now ONE-CLICK: it reads the image straight off the clipboard when the browser permits (Chrome/Edge ask once), routes it through the normal upload path (working copy saved, drawing Rev 1 seeded). If the browser blocks clipboard reading or there's no image on it, it falls back to the old behavior: arms the target and prompts you to press Ctrl+V.
-
-Rev-202 (July 4, 2026)
-- FIX deleted plans coming back after closing/reopening: deleting a DRAFT never recorded a "stays deleted" marker (tombstone), so the GitHub sync on reopen merged the old drafts right back in. Drafts now get tombstones exactly like projects: deletions are pushed to GitHub, honored on every pull, and win over stale copies on other devices. A draft re-saved AFTER its deletion survives (newer save beats older delete).
-- Companion fix both ways: SAVING a plan or draft now clears any old deletion marker for the same name — so a plan you re-create after deleting one doesn't get wiped again by the next sync.
-- After pulling this rev: your existing deletes will stick once you delete them one more time and Push (older deletions happened before markers existed, so GitHub still holds those drafts until this one cleanup).
-
-Rev-201 (July 4, 2026)
-- EDIT EXISTING CONTROL PLAN is now scoped to the Part # + Workcenter (op) typed on the form — a Control Plan exists per Part #/Op # combination. The blue button is GREYED OUT (disabled) until a saved CP matches what you typed; typing updates it live. When enabled, clicking opens THAT plan directly in the Builder (or its draft) — it never shows a list of other parts' Control Plans. Tooltip names exactly which plan will open. Newest matching rev wins when several exist.
-
-Rev-200 (July 4, 2026)
-- FIX "an old plan appeared when creating a new one": pressing + New Control Plan on the home screen now opens a truly BLANK form — no auto-restored working copy, no sample data (test auto-fill disabled app-wide). If a previous session exists, a small "↩ Resume last session" button appears next to the title so restoring is YOUR choice, not a takeover. Coming Back from the builder still restores your in-progress work exactly as before, and drafts/EDIT EXISTING are unchanged.
-
-Rev-199 (July 4, 2026)
-- ZOOM-TO-BUBBLE ON EVERY ROW CLICK: clicking a row (including re-clicking the already-focused one) now always re-zooms the drawing panel to that row's bubble; entering the builder zooms to bubble 1 immediately.
-- NEW 🎯 Locate Bubbles (AI): pre-ballooned CAMCO drawings have printed bubbles the app never knew the positions of — so zoom had nothing to aim at. This one-time, ITAR-gated AI call reads every circled number off the drawing and stores its position (nothing is drawn or changed). The button appears on the panel title whenever the focused bubble's position is unknown; after running it, zoom-to-bubble works on the whole drawing.
-- Drafts now SAVE and RESTORE balloon positions, so zoom keeps working after Save Draft / Resume.
-
-Rev-198 (July 4, 2026)
-- FIX "Generate uses the OLD ODS image": two-layer fix.
-  • Root cause closed: loading a draft restored its image on screen but never saved it to the working copy, so the app's memory and the screen could disagree — and later restores snapped back to a stale image. loadDraft now persists immediately.
-  • Hard guarantee added: GENERATE NEW CONTROL PLAN re-syncs from the VISIBLE thumbnail right before building — whatever drawing you can see on the form is the drawing that generates, no matter which path put it there.
-
-Rev-197 (July 4, 2026)
-- New Control Plan form bottom row is now three buttons: 💾 Save Draft · 📂 EDIT EXISTING CONTROL PLAN (opens My Projects — every saved CP stays editable) · GENERATE NEW CONTROL PLAN (renamed from "Generate Control Plan", stays the primary red action).
-
-Rev-196 (July 4, 2026)
-- ZOOM TO BALLOON: focusing a row now auto-zooms the drawing panel to a window ≈35% of the drawing width (about 1/8 of its area) centered on that balloon — the bubble number and its dimension are clearly readable. Works whenever the drawing was ballooned with AI (that's where the positions come from). Pan by scrolling inside the panel; Prev/Next re-centers on each balloon; a small 🔍 button on the panel title toggles Zoom-to-balloon / Full view (click-to-enlarge full-screen unchanged). Rows without a known balloon position show the full drawing as before.
-
-Rev-195 (July 4, 2026)
-- New Control Plan screen gets its own ← Back button (top-left, next to the title, returns to the home menu). It previously relied on the removed global top bar's Back and had no way home.
-
-Rev-194 (July 4, 2026)
-- Green "Newer than GitHub / Push Now" banner is HIDDEN on the Build screen (its prior state is remembered and restored when you go Back) — pushing to GitHub isn't needed from there.
-- Drawing fills its panel edge-to-edge: the image now stretches to the panel's full width (scroll vertically if the drawing is taller) instead of being letterboxed with white space above/below. Click-to-enlarge unchanged.
-- Panes absorb the banner height on this screen: calc(100vh-66px) → calc(100vh-40px).
-
-Rev-193 (July 4, 2026)
-- Build screen top bar compacted to a single left-aligned row: the project-info line and the "Click a row to focus…" hint sentence are DELETED (elements kept invisible so code writing to them stays safe); 💾 Save to Project and 📥 Build .xlsx now sit LEFT, right after the title. Freed height goes to the panes: calc(100vh-84px) → calc(100vh-66px) — the drawing is taller.
-
-Rev-192 (July 4, 2026)
-- FIX top bar still showing: setHeaderBackVisible() was re-showing the header inline (style.display='flex') on every sub-screen, overriding the Rev-191 CSS hide. The restore line is removed and the CSS hide is now !important — the dark top bar cannot come back.
-
-Rev-191 (July 4, 2026)
-- GLOBAL TOP BAR REMOVED (the dark "CONTROL PLAN GENERATOR / Push App / BACK" strip): hidden app-wide via CSS so all existing code keeps working. Its functions live elsewhere — Push App on the home screen + the green "Newer than GitHub" banner, and every screen has its own ← Back. Builder panes absorb the freed height (calc(100vh-130px) → calc(100vh-84px)) — table and drawing are taller still.
-
-Rev-190 (July 4, 2026)
-- Build screen locked to the preferred layout: drawing panel now a full 50% of the screen with NO width cap (grows with the monitor; min 520px), panel padding slimmed 10px→6px, and screen side padding 20px→8px so the drawing reaches nearly to the screen edge.
-
-Rev-189 (July 4, 2026)
-- BUILD SCREEN SPACE RECLAIM: 💾 Save to Project and 📥 Build .xlsx moved into the TOP bar (next to Back/title); the full-width bottom button row and the standalone hint line are gone. Both panes now use the recovered height (calc(100vh - 40px), was -230px).
-- ODS DRAWING MUCH BIGGER: side panel grows from a fixed 360px to 44% of the screen width (min 520px, max 1100px) and full height; the image now scales to fill the panel height too (object-fit:contain). Click-to-enlarge still available.
-
-Rev-188 (July 4, 2026)
-- New home-screen button "🔷 C# Conversion Plan": opens a plain-language document recording the entire C#/Blazor effort — what was built July 4 (CamcoCP starter project, ClosedXML Excel builder, five working screens), every setup bump on the shop desktop and its fix (SDK install, stale PATH, net8→net6 retarget, the two ClosedXML build errors, the three-duplicate-folders trap), the decision of record (finish HTML first ~60 days, convert once at the end; C# starter parked), a 9-step checklist for the final conversion, and where everything lives. Ensures the plan survives outside chat history.
-
-Rev-187 (July 4, 2026)
-- FIX "text changes not saved": the working copy stored the full drawing PNG TWICE (odsImage + cleanOdsImage) and now competed with up to 8 full-res revision PNGs for the same localStorage. When that overflowed quota, saveWorkingCopy's setItem threw and was silently swallowed — so an applied Make Clearer / Retype change never persisted. Fixes:
-  • Working copy no longer duplicates the clean original when it equals the current drawing (restore already falls back) — roughly halves its size.
-  • saveWorkingCopy now has PRIORITY: on quota it evicts the saved revision history, then (last resort) the clean-original copy, and only then warns you loudly that storage is full — your drawing change always saves if there's any room.
-  • Finish & Apply saves the working copy BEFORE recording the revision, so the change persists first.
-  • Revision-history cap lowered 8 → 5.
-
-Rev-186 (July 4, 2026)
-- SINGLE-PANE Make Clearer: the dual CURRENT / SUGGESTED panes are collapsed into one full-width working image, giving far more room to place text, stretch the erase box, and pan/zoom. The before/after comparison view is gone; you now work directly on the one drawing. (Original still recoverable via 🕐 Revisions / Restore.)
-
-Rev-185 (July 4, 2026)
-- FIX text still truncating in the zoomed retype view: entering the fine-place step now fits the zoom to the FULL text span (the box PLUS the rendered text width / erase band), instead of centering a fixed 300% window on the box. Wide text and its band are now fully in view (no left/right cutoff). Pan/scroll still available to reframe.
-
-Rev-184 (July 4, 2026)
-- PAN & ZOOM in the retype CURRENT/SUGGESTED panes: scroll wheel = zoom to cursor; drag on an empty area = pan; both panes stay in lock-step so you can center the text to be redone. To MOVE the text you now grab it directly (drag on the red preview); to move the erase box drag inside it / its handles. Arrows and A−/A+ still work.
-- DRAWING REVISIONS: every "Finish & Apply" now creates a numbered revision of the drawing (the original upload is Rev 1). A new "🕐 Revisions (N)" button next to the ODS drawing opens a gallery of all revisions (thumbnail, number, timestamp, note) — View any revision full-screen (pan/zoom) or Restore it as the current drawing. Revisions persist in localStorage (capped to the last 8 to protect quota).
-- After Finish & Apply the ODS tile + thumbnail update and a "Drawing Rev N applied" confirmation shows; clicking the drawing opens the updated image.
-
-Rev-183 (July 4, 2026)
-- FIX erase-box right edge hidden: the 300% zoom was locked on the TEXT (phase 1), but the seeded erase box is wider than the text, so its right edge/handles fell outside the view. Entering the adjust step (and after each box drag, and on Back into it) now re-fits a square zoom viewport around the WHOLE erase box + 40% margin, so all 8 handles stay on-screen.
-- FIX wrong corner grabbed: handle hit-testing now measures distance in on-screen (viewport-fraction) space and picks the CLOSEST handle within a 6%-of-viewport grab radius, instead of returning the first handle inside a fixed tolerance. The nearest corner is now selected on the first try at any zoom.
-
-Rev-182 (July 4, 2026)
-- FIX "Finish & Apply didn't update the changes": the retyped section was only captured into the accepted-sections map by "Accept & Next". Now (a) finishing the retype stepper records the retyped tile as accepted for that section automatically, and (b) Finish & Apply also captures the currently-shown section's pending change — so what you see in SUGGESTED actually gets composited onto the drawing.
-- THINNER crosshair: the yellow placement cross is now very thin (≈1/4 the old width) with a larger center gap, so it barely obscures the drawing behind it.
-- PLACEMENT is now a 4-step process per string, with a 300% zoom for precise work and a final approval:
-  1) Approx-place the text (full view) → "Zoom & Refine →"
-  2) 300% ZOOM on that spot → fine-place the text (drag / arrows / A−/A+) → "Set Erase Box →"
-  3) Adjust the resizable erase box (drag edges/corners) → "Preview →"
-  4) APPROVE the clean final look → "✓ Confirm & Next" bakes it (or "‹ Back a step" to fix).
-  The bake always composites at full resolution; only the on-screen preview is zoomed.
-
-Rev-181 (July 4, 2026)
-- FIX first-click retype placement: the drag mapper read img.naturalWidth live, which is 0 until the freshly-set proposal image decodes — so on the FIRST 🤖 AI Retype Text run you couldn't place text (worked the 2nd time once the image was cached). The tile's natural size is now cached when the stepper starts (rtLoadDims), so drag-to-place works on the first run.
-- NEW two-phase retype flow with a resizable ERASE BOX:
-  • Phase 1 (Place Text →): drag to place, arrows nudge, A−/A+ size the text, edit the text field.
-  • Click "Place Text →" and Phase 2 opens: the text is shown placed with a dashed YELLOW erase box + 8 drag handles around it. Stretch it wider/taller by dragging any edge/corner handle; drag the box interior to move it; arrows move it; A−/A+ scale it. The dashed box is exactly what gets erased.
-  • "✓ Confirm & Next" bakes the erase (whatever you stretched it to) + the text, then advances. "‹ Back" in Phase 2 returns to positioning that same string (does not undo a bake).
-
-Rev-180 (July 4, 2026)
-- RETYPE SWAP FIXES (per marked-up screenshot):
-  • WYSIWYG preview: the red proposal text is now drawn at the EXACT baseline/position Swap will use (box vertical center), instead of floating above the box. The old mismatch made you align the box below the real text, which (a) left the old text un-erased on top [yellow] and (b) wiped a tall empty band underneath [green]. Fixed at the root.
-  • Erase band now HUGS the glyph line (centered on the cross-out line) rather than erasing the full box height — no more over-erase under short text. Band width covers BOTH the old text (box width) and the new text, so no old text survives to either side.
-  • New hollow-center YELLOW placement crosshair on the cross-out line: 4 ticks with a clear central gap so it can be centered exactly on the target without hiding the spot. Strikethrough is also split with a center gap.
-
-Rev-179 (July 4, 2026)
-- 3D BUTTONS: global raised bevel treatment on all buttons (top highlight + bottom lip + drop shadow) with a press-down :active; .btn-primary now a maroon gradient with a solid bottom lip; .btn-ghost a light gradient with a lip; home menu tiles (.menu-btn) get a deeper raised lip and press
-- BACK BUTTONS: vertical height reduced 20% (.ob-back 12px→9.6px top/bottom; validation "← Back to Control Plan" 8px→6.4px)
-- ONE BACK BUTTON PER PAGE: removed the redundant bottom "← Back to Form" on the Build Control Plan screen (it was an exact duplicate of the top ← Back — same hide→showNewCP handler); bottom row is now 2 columns (Save / Build .xlsx)
-- UI-Standards audit performed against UI_STANDARDS.docx (see chat notes); design-level deviations flagged for confirmation, not silently restyled
-
-Rev-178 (July 4, 2026)
-- New "💬 New Chat Prompt" button on the home screen: opens a modal with the exact handoff text to paste into a fresh Claude chat (standing instructions, app stack summary, quick commands, current CP-RevNNN filename auto-filled) plus a one-tap Copy button — for starting new sessions cheaply instead of continuing giant chats
-- FIX massive white border around swapped text: erase padding reduced from 18% to 4% of box height — the red outline box you position is now exactly (WYSIWYG) what gets erased, since drag/nudge/A+ let you size the box precisely; the big pad was wiping out neighboring lines
-
-Rev-177 (July 3, 2026)
-- Retype box can now OVERHANG section edges (drag/nudge/resize clamps loosened to allow up to 90% overhang), so text near a tile boundary is reachable; content past the boundary clips at the section edge. Known limit: text STRADDLING two sections still can't be fully retyped in either tile — the clean fix is region-based retype in the full-screen viewer (drag a box anywhere on the whole drawing), available on request
-
-Rev-176 (July 3, 2026)
-- Retype stepper: DRAG-TO-PLACE — grab the proposal box directly on the SUGGESTED image and drag it where you want (contain-aware coordinate mapping, throttled live re-render, move cursor while active). Nudge arrows remain for fine-tuning
-- FIX "old text isn't deleting": the swap's white-out padded the box by a fixed 2px, written before the 3x upscale — invisible on a 2400px canvas, so old text survived around an undersized AI box. Erase padding is now proportional (~18% of text height)
-- Nudge arrows and A−/A+ now HOLD-TO-REPEAT: fire once on press, then repeat every ~110ms after 350ms held
-
-Rev-175 (July 3, 2026)
-- Retype stepper gains A− / A+ size buttons: the rendered text size comes from the AI's reported box height, and when the AI under/over-measures the box the swapped text comes out the wrong size — A−/A+ scale the box (and therefore the text) ±8% per tap around its center, with live proposal re-render, so you match the original size by eye before swapping. Back restores size along with position
-
-Rev-174 (July 3, 2026)
-- AI Retype rebuilt as a PER-STRING stepper (String 1/N): each detected string is verified individually — proposal shows a red strikethrough + red replacement + a faint box outline for JUST that string. NUDGE ARROWS (◀▲▼▶, 0.5% steps) move the box onto the actual old text when the AI's position is off, fixing the "didn't delete the old text / new text in wrong spot" failure. ✓ Swap This bakes that one string into the working tile; Skip moves on; ‹ BACK undoes one step (both the image and the box position are restored from history); ✗ Cancel discards all. The editable text field updates the proposal live. The batch all-at-once list flow is retired
-
-Rev-173 (July 3, 2026)
-- Retyped text now matches the ORIGINAL character height: font size computed as boxHeight/0.72 (Arial capitals occupy ~72% of the em size, so the old 0.85x sizing rendered characters ~40% shorter than the originals). Width-capped so a loose AI bounding box can't overflow the original footprint. Applied to both the red proposal text and the final swapped black text
-
-Rev-172 (July 3, 2026)
-- FIX fuzzy proposal text: the retype proposal and swap were rendered at the section tile's native (small) resolution and then browser-stretched to fill the large SUGGESTED pane, blurring the red strikethroughs/text. Both now render on a 3x-upscaled canvas (2400px target, same as the enhancer) so the marks and swapped-in text display crisp; Finish & Apply cleanly downsamples the tile back into the drawing
-
-Rev-171 (July 3, 2026)
-- AI Retype is now a two-stage propose/swap: after per-string confirmation, the SUGGESTED pane shows a PROPOSAL — old text crossed out with a light red strikethrough at its detected position, the confirmed new text drawn in red just above it — with nothing destroyed. A "Does the crossed-out proposal look right?" bar offers ✓ Swap Text / ✗ Cancel Proposal. Only Swap white-outs the old text and draws the new text black in the SAME position; Cancel restores the normal suggestion untouched. Proposal images can never be Accepted/baked (pending flag cleared), and a stale proposal bar auto-hides when changing sections
-
-Rev-170 (July 3, 2026)
-- FIX: 🤖 AI Retype Text appeared dead — the ITAR export-control modal (z-index 10040) was opening BEHIND the Make Clearer section modal (10045), so the confirmation the flow was waiting for was invisible and the button seemed to do nothing. ITAR modal raised to z-index 10070, above every modal that can invoke it
-
-Rev-169 (July 3, 2026)
-- AI Retype Text (per-string confirmation): in the Make Clearer section view, 🤖 AI Retype Text sends the CURRENT section to the Anthropic API (behind the ITAR gate) which reads each text string + location; a confirmation list shows every string in an EDITABLE field with a checkbox — verify/correct each against the drawing, then Apply renders only confirmed strings as crisp type (white-out + redraw) into the SUGGESTED preview. Nothing touches the drawing without (1) per-string confirmation and (2) Accept & Next and (3) Finish & Apply. Automatic unconfirmed replacement remains deliberately unsupported
-- CURRENT / SUGGESTED labels enlarged to bold 20px badges (grey / green) for instant orientation
-
-Rev-168 (July 3, 2026)
-- Make Clearer sections: Before/After panes renamed to CURRENT and SUGGESTED (bolder labels) and both images now render at identical size (fill pane, object-fit:contain) — previously the upscaled Suggested image displayed much larger than the Current one, making comparison hard
-
-Rev-167 (July 3, 2026)
-- Make Clearer redesigned as a SECTIONED confirmation flow: the drawing splits into ~10 sections (5x2 grid landscape / 2x5 portrait) and steps through one at a time with LARGE near-fullscreen Before/After previews of just that section. Accept & Next / Skip / Prev per section; Finish & Apply composites only the accepted sections onto the original (counter shows how many accepted). Cancel All discards everything
-- 🔧 Make Clearer button added to the thumbnail zoom viewer (the scroll-zoom/drag-pan drawing display), launching the same sectioned flow
-
-Rev-166 (July 3, 2026)
-- Make Clearer tuned for text DEFINITION instead of bolding: enhancement now upscales up to 3x (2400px target), sharpens harder (1.2 unsharp), uses a stricter ink threshold (local mean −14) so strokes stay thin, and composites back down with high-quality smoothing — binarize-at-high-res-then-downscale yields crisp, defined characters rather than thick blobs. NOTE: automatic OCR text replacement deliberately NOT implemented — misread dimensions would be silently baked into an ITAR deliverable; an OCR-assist with per-string user confirmation is available on request
-
-Rev-165 (July 3, 2026)
-- Ballooned-drawing viewer upgraded: plain scroll wheel now zooms anchored to the cursor (0.5x–8x) and click-drag pans the drawing — matching the thumbnail viewer. Both are disabled while Make Clearer select mode is active so box-drawing doesn't fight panning. Drag-pan no longer accidentally closes the viewer. Toolbar now wraps instead of overflowing off the right edge; hint text updated
-
-Rev-164 (July 3, 2026)
-- FIX: Review One-by-One buttons stopped responding after the Rev-161 header docking — the stage's pan handler was pointer-capturing clicks on the header buttons (they're now inside the stage). Pan/pinch now ignore anything inside the docked header, so Prev/Next/Review/Confirm all work again
-- FIX: the review callout now FLOATS WITH THE DRAWING — its position is recomputed from the reviewed balloon's image coordinates on every pan/zoom (beApplyView), instead of being placed once at screen center. It flips sides and avoids the header automatically
-
-Rev-163 (July 3, 2026)
-- Make Clearer is now available inside the full-screen drawing viewer as a region tool: click "🔧 Make Clearer (select area)", drag a box over a faint area, and only that region is sharpened/cleaned and composited back onto the drawing. Regions stack cumulatively (repeat as needed), so a bad result only affects the box you drew — not the whole drawing. Still 100% local (no AI/network), no dimensions redrawn. Enhanced result updates the ODS + working copy
-
-Rev-162 (July 3, 2026)
-- New "🔧 Make Clearer" button on the ODS drawing: runs a local image-enhancement pass (grayscale → contrast stretch → unsharp mask → optional adaptive black/white threshold, with light upscaling) to sharpen faint copy/paste scans. Shows a Before/After preview; Accept applies the clearer image (and makes it the clean source for analysis), Cancel discards. 100% client-side — no AI, nothing sent to any server, and no dimension values are altered/redrawn
-
-Rev-161 (July 3, 2026)
-- Placement editor header is now DOCKED as an overlay pinned to the top of the drawing stage itself (Option A) instead of being a separate bar above it. The controls float on the top edge of the editing area and stay there no matter how the drawing is zoomed/panned or how much browser chrome is at the top of the window. Drawing auto-fits below the docked header
-
-Rev-160 (July 3, 2026)
-- Analyze overlay: "ANALYZING DRAWING WITH AI" heading 25% bigger; recent-times history box no longer clipped at the right edge (panel widened, box constrained); analyze times and average now show whole seconds (no decimals). Timer stays left, history right
-
-Rev-159 (July 3, 2026)
-- Baked balloons now sit ON the dimension (at the arrow-tip point you aimed), not out in space. Leader lines are gone by default; a thin, faded-red leader only draws if you deliberately pulled the circle-anchor far from the tip. The tip dot is now the placement target — drag it onto the dimension and the numbered balloon lands there. Editor leader preview is faded/thin to match
-
-Rev-158 (July 3, 2026)
-- Placement editor now anchors the drawing to the TOP of the stage (small gap under the toolbar) instead of vertically centering it, so the controls sit right at the editing area with no large black gap. Fit also uses the full width. (During one-by-one review the view still centers on the balloon being reviewed.)
-
-Rev-157 (July 3, 2026)
-- Placement editor header ("Place Balloons" toolbar) is now pinned above the drawing on its own stacking layer (z-index) — it stays on top no matter how the drawing is zoomed or panned; the stage is capped below it
-
-Rev-156 (July 3, 2026)
-- Auto-saved working copy: the app now silently persists the most recent ballooned drawing (ballooned image + clean original + balloon positions/descriptions + header fields) every time balloons are placed or a new ODS is loaded — no manual Save needed. On opening New Control Plan it silently restores this working copy so nothing is lost on reload/close. Resuming a saved draft still takes precedence.
-
-Rev-155 (July 3, 2026)
-- Review mode: the AI's description now also floats in a yellow-bordered callout right next to the balloon being reviewed (no more looking across to the sidebar), and the reviewed balloon gets a bright YELLOW halo ring so it's instantly findable
-
-Rev-154 (July 3, 2026)
-- ITAR export-control warning is now a styled in-app modal (maroon header, warning callout, Cancel / Proceed–Non-ITAR buttons) instead of the browser's native confirm() popup — more professional and centered over the page near the action
-
-Rev-153 (July 3, 2026)
-- One-by-one balloon Review mode in the placement editor: 🔍 Review button + Prev/Next stepper. While reviewing, all OTHER balloons go ghost grey (faded), the reviewed balloon + its arrow are drawn bold RED, the view centers/zooms on it, and the review panel shows the AI's description for that balloon in bold red ("AI thinks this balloon is: ..."). Note: the printed number inside the scanned drawing itself can't be recolored (it's baked image pixels) — the bold-red indication is the AI's mapped description plus the red balloon/arrow on the drawing
-
-Rev-152 (July 3, 2026)
-- Analyzing overlay: current timer moved to the LEFT, recent-times history + average moved to the RIGHT (side by side)
-- Clean (unballooned) ODS is now preserved and saved with the draft (cleanOdsImage). Re-analyzing (🎯 Re-Balloon) always sends the ORIGINAL clean drawing to the API instead of the already-ballooned image, so you can redo a placement you didn't like and get a proper fresh pass. Clean image is stripped from the GitHub bundle (kept local) like the other large images
-
-Rev-151 (July 3, 2026)
-- Analyzing overlay now shows a live count-up timer of the current API call, plus the last 10 analyze times and their average (persisted in localStorage, recorded only on successful runs)
-- Arrowheads made much smaller and the leader line stops just short of the tip, so the arrow points at the dimension without covering it
-
-Rev-150 (July 3, 2026)
-- Balloon markers reworked: circle fill is now transparent (drawing shows through), the number is 30% smaller, and each balloon has a leader arrow. In the placement editor, drag the circle to position the number and drag a second small dot handle to aim the arrowhead at the exact dimension. Bake draws transparent circle + leader line + arrowhead
-
-Rev-149 (July 3, 2026)
-- Manual balloon placement: after AI analysis, a Placement Editor opens with the drawing and the AI's first-pass balloons as DRAGGABLE handles. Drag each balloon onto its actual dimension; scroll/pinch to zoom, drag empty space to pan; a feature legend on the right lists number → description and centers a balloon when tapped. Confirm & Apply bakes the corrected positions onto the image and sets Data Rows. This fixes AI balloons landing far from their dimensions on dense drawings
-
-Rev-148 (July 3, 2026)
-- Input Files section redesigned (Option B): each of ODS / Setup / Checksheet now has a slim drop zone above a compact, equal-width icon-button toolbar (Browse · Paste · View · Reload · Remove) instead of the old full-height colored button wall. All three columns now match. Every capability preserved; buttons kept the same IDs so all wiring is intact
-
-Rev-147 (July 3, 2026)
-- AI analyze overlay now has a "■ Force Stop" button — it truly aborts the in-flight API request via AbortController (not just hides the overlay) and resets the button, so a slow or hung call can be cancelled without closing the app
-
-Rev-146 (July 3, 2026)
-- AI analyze is now unmistakable: a full-screen overlay with a large animated spinner, "ANALYZING DRAWING WITH AI" heading, and a live status line (Sending → Reading response → Drawing N balloons) appears the moment the drawing is sent to the API and clears on success, error, or parse failure
-
-Rev-145 (July 3, 2026)
-- Setup Sheet section now mirrors the ODS section: pasted/uploaded setup images show a live inline thumbnail that opens the full zoom/pan viewer (scroll-zoom to cursor, drag pan); xlsx/pdf files keep the VIEW button
-
-Rev-144 (July 3, 2026)
-- AI balloon circles reduced to ~45% of previous size with thinner outline — no longer covers dimensions on dense drawings
-
-Rev-143 (July 3, 2026)
-- Viewer rebuilt with transform-based pan/zoom: cursor-anchored zoom now works at every zoom level (not just when zoomed far in); drag-pan works at all levels; added two-finger pinch zoom + one-finger pan for phone; image auto-fits and centers on open
-
-Rev-142 (July 3, 2026)
-- Viewer zoom now anchors exactly to the mouse cursor position; click-drag panning fixed (works in all directions once zoomed)
-- 🎯 Add Balloons with AI button now always visible whenever an ODS image is loaded (API key prompt on click if unset)
-
-Rev-141 (July 3, 2026)
-- ODS full-screen viewer: mouse scroll wheel zooms in/out (25%-800%), click-and-drag pans the image in any direction; hint label added; zoom resets on each open
-
-Rev-140 (July 3, 2026)
-- Customer delete now animates: the card slides left, fades out, and collapses before removal
-
-Rev-139 (July 3, 2026)
-- ODS VIEW IMAGE button replaced with a live inline thumbnail of the drawing; clicking the thumbnail pops it up 4x larger
-
-Rev-138 (July 3, 2026)
-- Ballooned drawing now opens full-screen for viewing immediately after AI ballooning (pinch/zoom in lightbox) — button changed from ⬇️ Download to 👁️ View Ballooned Drawing
-
-Rev-137 (July 3, 2026)
-- Auto-KC per CP-6: entering a clean limit pair with band < .0011" auto-sets Classification = KC (only if empty; never overwrites manual entries) with FFF2CC highlight and a "per CP-6" note; warns if a tight band is left unclassified. Angular, MAX-only, radius, GD&T, and compound entries are skipped
-
-Rev-136 (July 3, 2026)
-- 🎯 Add Balloons with AI button now also appears when an ODS is loaded from a draft (was only showing on fresh uploads)
-
-Rev-135 (July 3, 2026)
-- Save Customer button changed from maroon to green
-
-Rev-134 (July 3, 2026)
-- Removed the Resume Saved Draft box from the New Control Plan form — drafts are opened from My Projects (Resume button); New CP is for starting fresh only
-
-Rev-133 (June 28, 2026)
-- App-file sync toggle now defaults ON (like auto-sync) — the app pushes itself to GitHub automatically on open, so the "Push Now" banner should rarely appear once the token is set
-
-Rev-132 (June 28, 2026)
-- GitHub username (richarnoldcamco) and repo (cp-generator-data) now pre-fill automatically on any fresh device/download — only the Personal Access Token needs to be pasted in to get GitHub sync working
-
-Rev-131 (June 28, 2026)
-- New Control Plan + icon changed from emoji (uncontrollable color) to plain white text symbol
-
-Rev-130 (June 28, 2026)
-- Condensed sync/version banners to single compact lines (was 2-3 lines each) — saves vertical space on phone
-
-Rev-129 (June 28, 2026)
-- Fixed home screen Projects count — now includes drafts, not just saved projects (matches the unified My Projects list)
-
-Rev-128 (June 28, 2026)
-- Merged Drafts and Saved Projects into ONE unified table in My Projects, sorted by most recently updated, with a Status badge (📝 DRAFT / ✓ SAVED) instead of two separate sections
-
-Rev-127 (June 28, 2026)
-- Drafts now shown in My Projects screen above Saved Projects, with ▶️ Resume and 🗑️ Delete buttons — no longer hidden inside the New CP form only
-
-Rev-126 (June 28, 2026)
-- Fixed deleted projects reappearing after GitHub sync: added a tombstone system that tracks deletions and propagates them across all devices, so a project deleted on one device stays deleted everywhere
-
-Rev-125 (June 28, 2026)
-- Rev number now shown as a bold visible chip/badge on home screen instead of tiny gray text — easy to read on phone
-
-Rev-124 (June 28, 2026)
-- Fixed false "Sync is OFF" banner: Auto-sync now defaults to ON once GitHub is configured, instead of requiring the user to manually toggle and save the checkbox first
-
-Rev-123 (June 28, 2026)
-- Project xlsx data now stored as individual files on GitHub (projects/ folder) — avoids the main data file size limit
-- Download Project now auto-fetches from GitHub if not cached locally, then caches it for next time
-
-Rev-122 (June 28, 2026)
-- Download Project now shows a clear warning when xlsx data is missing (happens when a project synced from GitHub, which strips large files) instead of silently failing
-
-Rev-121 (June 28, 2026)
-- Added 🗑️ Delete button to each project row in My Projects — confirms before deleting, syncs to GitHub
-
-Rev-120 (June 28, 2026)
-- Home screen card numbers (Projects, Control Types, Customers, Instructions) now display number-left/label-right inline instead of stacked
-
-Rev-119 (June 28, 2026)
-- Removed duplicate header on home screen — Push App button now lives in the brand card; slim top header only shows on sub-screens with Back button
-
-Rev-118 (June 28, 2026)
-- Fixed crash: ghDeleteDataFile was referenced but never defined
-
-Rev-117 (June 28, 2026)
-- Rev number now hard-baked into header HTML — always visible on load
-
-Rev-116 (June 28, 2026)
-- Fixed customer count badge not updating after GitHub pull
-
-Rev-116 (June 28, 2026)
-- Home screen badges now refresh after GitHub pull — customer and project counts update immediately
-- Pull always shows success/failure message
-
-Rev-116 (June 28, 2026)
-- Fixed home screen badges not updating after GitHub pull (updateMenuCounts was undefined — fixed to updateHomeScreen)
-
-Rev-115 (June 28, 2026)
-- Added 🗑️ Reset GitHub Data File button to recover from corrupted GitHub data
-- ghPush now handles corrupted/missing SHA gracefully — creates fresh file if needed
-
-Rev-115 (June 28, 2026)
-- Fixed GitHub push: strips large base64 ODS images/xlsx data from sync bundle (was causing silent failures due to file size limit)
-- Push now always shows success/failure message
-
-Rev-114 (June 28, 2026)
-- Added 🔍 Debug Project Sync button in Admin to show exactly what is local vs GitHub
-
-Rev-113 (June 28, 2026)
-- Fixed project sync: now uses full union merge with created timestamp in key — all projects from all devices preserved, GitHub is source of truth
-
-Rev-112 (June 28, 2026)
-- Fixed GitHub sync bug: all projects were merging into 1 due to missing id field — now each project has a unique id (partNum+rev) and merges correctly across devices
-
-Rev-111 (June 28, 2026)
-- Data now always pulled from GitHub on boot when configured — desktop stays in sync automatically without needing to manually pull
-
-Rev-110 (June 28, 2026)
-- Added 📋 Ctrl+V buttons for desktop use alongside 📁 Browse buttons for mobile
-
-Rev-109 (June 28, 2026)
-- AI Balloon Insertion: upload unballooned drawing → 🎯 Add Balloons with AI → Claude identifies every dimension/feature, overlays numbered circles, auto-fills Data Rows
-- ⬇️ Download Ballooned Drawing button appears after balloons are added
-
-Rev-108 (June 28, 2026)
-- No changes — delivery only
-
-Rev-107 (June 28, 2026)
-- Paste/Browse buttons now open file picker directly — works on Android phone
-
-Rev-106 (June 28, 2026)
-- Fixed duplicate Push App buttons — header button hides when green banner is showing
-
-Rev-105 (June 28, 2026)
-- Customer names always displayed and saved in UPPERCASE
-
-Rev-104 (June 28, 2026)
-- Added ✏️ Edit button per customer row — opens modal to change name and quality level cleanly
-
-Rev-104 (June 28, 2026)
-- Customer list redesigned as mobile-friendly cards — ✏️ Edit button is now large and clearly visible on phone
-
-Rev-103 (June 28, 2026)
-- Changelog now live from GitHub: fetched on boot when configured, Refresh button on changelog screen
-- Each app push also pushes cp_changelog.json to GitHub so changelog stays current across devices
-- Changelog screen shows source (GitHub vs local) and entry count
-
-Rev-102 (June 28, 2026)
-- Added build date next to rev label in header
-
-Rev-101 (June 28, 2026)
-- Removed false "Sync is OFF" warning for Samsung Android — Samsung always uses content:// for HTML files but GitHub API calls work fine; warning was incorrect
-- Sync warning now only shows when GitHub is not configured or auto-sync is off
-
-Rev-100 (June 28, 2026)
-- Fixed duplicate GitHub commits on boot — app now only auto-pushes once per session using a session flag
-
-Rev-99 (June 28, 2026)
-- Replaced confusing "different version" confirm() dialog with clear green banner
-- When phone is ahead of GitHub: green banner with inline "Push App Now" button — no dialog
-- When GitHub is ahead: cleaner confirm dialog (says "newer version" not "different version")
-- Files app tip: added to sync warning banner
-
-Rev-98 (June 28, 2026)
-- Added "Push App" button to header — visible when GitHub is configured, pushes app HTML to GitHub in one tap from any screen (phone-friendly)
-
-Rev-45 (June 22, 2026)
-- Fixed Master List script error (column mismatch)
-- Simplified Master List to 8 core columns
-- Fixed duplicate closing brace syntax error
-- Correct app rev bump
-
-Rev-44 (June 22, 2026)
-- Ctrl+V paste: ODS screenshots, Setup (Excel/PDF), Checksheet
-- Mobile-first redesign: stacked menus, bigger buttons
-- Menu scrollable on mobile
-- App Instructions screen added
-- Master List force-reinit if count != 55
-
-Rev-43 (June 21, 2026)
-- Menu redesigned as card-based dashboard grid
-- New Control Plan button: GREEN (#3d9a4a)
-- APP_REV in header and footer
-
-Rev-42
-- Setup Sheet & Checksheet zones with clipboard support
-
-Rev-41
-- Global Ctrl+V paste listener for all zones
-
-Rev-40
-- PASTE buttons use Clipboard API
-
-═══════════════════════════════════════════════════════
--->
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
 <title>CONTROL PLAN GENERATOR - REV_305</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
@@ -1444,10 +341,10 @@ Rev-40
 </head>
 <body>
 
-<header id="header">
+<header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;"></span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-467 · Jul 15, 2026</span>
   <button id="headerPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-right:8px;">⬆️ Push App</button>
   <button class="ob-back hidden" id="headerBack">← Back</button>
 </header>
@@ -1457,7 +354,7 @@ Rev-40
   <button onclick="ghPushApp(false); document.getElementById('newerVersionBanner').style.display='none'; updateHeaderPushBtn();" style="background:#fff; color:#2c6e49; border:none; border-radius:4px; padding:3px 10px; font-size:12px; font-weight:700; cursor:pointer;">Push Now</button>
   <button id="nvbDismiss" style="background:rgba(255,255,255,0.2); color:#fff; border:none; border-radius:4px; padding:3px 8px; font-size:11px; cursor:pointer;">✕</button>
 </div>
-<div id="syncWarnBanner" style="display:none; background:#c0392b; color:#fff; padding:6px 12px; font-size:12px; line-height:1.3; display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
+<div id="syncWarnBanner" style="background: rgb(192, 57, 43); color: rgb(255, 255, 255); padding: 6px 12px; font-size: 12px; line-height: 1.3; display: none; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
   <span id="syncWarnDetail">⚠️ GitHub sync not configured — changes saved on this device only.</span>
   <button id="syncWarnDismiss" style="background:#fff; color:#c0392b; border:none; border-radius:4px; padding:3px 8px; font-size:11px; font-weight:700; cursor:pointer;">✕</button>
 </div>
@@ -1469,7 +366,7 @@ Rev-40
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-258</div>
+        <div class="brand-sub" id="brandRev">REV-467 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">Jul 15, 2026</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1483,26 +380,26 @@ Rev-40
         <div class="mi" style="font-size:24px; margin-bottom:4px;">📁</div>
         <b style="font-size:13px;">Control Plans</b>
         <small style="font-size:10px;">Open a saved plan</small>
-        <div class="menu-badge" id="badgeProjects" style="position:static; margin-top:4px; font-size:16px; font-weight:700; color:var(--signal);"></div>
+        <div class="menu-badge" id="badgeProjects" style="position:static; margin-top:4px; font-size:16px; font-weight:700; color:var(--signal);">5<span class="bsub">Projects</span></div>
         <div id="mProjectsNew" onclick="event.stopPropagation(); showNewCP(true);" style="margin-top:6px; background:var(--signal); color:#fff; border-radius:6px; padding:5px 18px; font-size:12px; font-weight:800; cursor:pointer;" title="Start a new control plan">＋ New</div>
       </button>
       <button class="menu-btn" id="mMasterList" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
         <div class="mi" style="font-size:24px; margin-bottom:4px;">📚</div>
         <b style="font-size:13px;">Master List</b>
         <small style="font-size:10px;">Control Types</small>
-        <div class="menu-badge" id="badgeMaster" style="position:static; margin-top:4px; font-size:16px; font-weight:700; color:var(--signal);"></div>
+        <div class="menu-badge" id="badgeMaster" style="position:static; margin-top:4px; font-size:16px; font-weight:700; color:var(--signal);">64<span class="bsub">Control Types</span></div>
       </button>
       <button class="menu-btn" id="mCustomers" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
         <div class="mi" style="font-size:24px; margin-bottom:4px;">🏢</div>
         <b style="font-size:13px;">Customer List</b>
-        <small style="font-size:10px;">Customers & Levels</small>
-        <div class="menu-badge" id="badgeCustomers" style="position:static; margin-top:4px; font-size:16px; font-weight:700; color:var(--signal);"></div>
+        <small style="font-size:10px;">Customers &amp; Levels</small>
+        <div class="menu-badge" id="badgeCustomers" style="position:static; margin-top:4px; font-size:16px; font-weight:700; color:var(--signal);">11<span class="bsub">Customers</span></div>
       </button>
       <button class="menu-btn" id="mInstructions" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
         <div class="mi" style="font-size:24px; margin-bottom:4px;">📄</div>
         <b style="font-size:13px;">Instructions</b>
-        <small style="font-size:10px;">Upload & Download</small>
-        <div class="menu-badge" id="badgeInstructions" style="position:static; margin-top:4px; font-size:12px; font-weight:600; color:var(--ink-dim);"></div>
+        <small style="font-size:10px;">Upload &amp; Download</small>
+        <div class="menu-badge" id="badgeInstructions" style="position:static; margin-top:4px; font-size:12px; font-weight:600; color:var(--ink-dim);">Rev-92<span class="bsub">Instructions</span></div>
       </button>
     </div>
 
@@ -1521,7 +418,7 @@ Rev-40
       <button class="menu-btn" id="mRecentChanges" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
         <span style="font-size:24px; margin-bottom:4px;">📋</span>
         <b style="font-size:13px;">Recent Changes</b>
-        <small style="font-size:10px; color:var(--ink-dim);">App & document change log</small>
+        <small style="font-size:10px; color:var(--ink-dim);">App &amp; document change log</small>
       </button>
       <button class="menu-btn" id="mReports" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
         <span style="font-size:24px; margin-bottom:4px;">📊</span>
@@ -1531,13 +428,13 @@ Rev-40
       <button class="menu-btn" id="mCsharpPlan" onclick="openCsharpPlan()" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
         <span style="font-size:24px; margin-bottom:4px;">🔷</span>
         <b style="font-size:13px;">C# Conversion Plan</b>
-        <small style="font-size:10px; color:var(--ink-dim);">Build notes & final conversion</small>
+        <small style="font-size:10px; color:var(--ink-dim);">Build notes &amp; final conversion</small>
       </button>
     </div>
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter"></span>
+    <span id="revFooter">App Rev-467 · Built Jul 15, 2026</span>
   </div>
 </div>
 
@@ -1578,7 +475,7 @@ Rev-40
     </div>
     <div class="field tight">
       <label>Quality Level</label>
-      <input type="text" id="cpQualityLevel" placeholder="(from customer)" readonly style="background: var(--panel-2);">
+      <input type="text" id="cpQualityLevel" placeholder="(from customer)" readonly="" style="background: var(--panel-2);">
     </div>
   </div>
 
@@ -1670,7 +567,7 @@ Rev-40
 
   <div style="display:grid; grid-template-columns:1fr 1fr 1.4fr; gap:12px;">
     <button class="btn-ghost" id="cpSaveDraftBtn" style="min-height:52px; font-weight:600; background:#5a6c7d; border:1px solid #4a5a68; color:#fff;">💾 Save Draft</button>
-    <button class="btn-ghost" id="cpEditExistingBtn" onclick="cpEditExisting()" disabled style="min-height:52px; font-weight:700; background:#9aa4ad; border:1px solid #8a949d; color:#eef2f5; opacity:0.65; cursor:not-allowed;" title="No saved Control Plan matches this Part # + Operation ID# yet">📂 EDIT EXISTING CONTROL PLAN</button>
+    <button class="btn-ghost" id="cpEditExistingBtn" onclick="cpEditExisting()" disabled="" style="min-height:52px; font-weight:700; background:#9aa4ad; border:1px solid #8a949d; color:#eef2f5; opacity:0.65; cursor:not-allowed;" title="No saved Control Plan matches this Part # + Operation ID# yet">📂 EDIT EXISTING CONTROL PLAN</button>
     <button class="btn-primary" id="cpGenerateBtn" style="min-height:52px;">GENERATE NEW CONTROL PLAN</button>
   </div>
 </div>
@@ -1786,7 +683,7 @@ Rev-40
           <button type="button" id="beNext" style="padding:7px 12px; font-weight:700; background:#2a323c; color:#fff; border:none; border-radius:6px; cursor:pointer;">Next ›</button>
           <button type="button" id="beReviewDone" style="padding:7px 12px; font-weight:700; background:#2c6e49; color:#fff; border:none; border-radius:6px; cursor:pointer;">Done reviewing</button>
         </div>
-        <button type="button" id="beConfirm" style="padding:7px 16px; font-weight:700; font-size:13px; background:#2c6e49; color:#fff; border:none; border-radius:6px; cursor:pointer;">✓ Confirm & Apply</button>
+        <button type="button" id="beConfirm" style="padding:7px 16px; font-weight:700; font-size:13px; background:#2c6e49; color:#fff; border:none; border-radius:6px; cursor:pointer;">✓ Confirm &amp; Apply</button>
         <button type="button" id="beCancel" style="padding:7px 14px; font-weight:700; font-size:13px; background:#c0392b; color:#fff; border:none; border-radius:6px; cursor:pointer;">✕ Cancel</button>
       </div>
       <div id="beCanvasWrap" style="position:absolute; top:0; left:0; transform-origin:0 0;">
@@ -2076,7 +973,7 @@ Rev-40
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size:12px; color:var(--ink-dim); padding:10px; background:var(--panel-2); border-radius:6px;">Not configured</p>
+    <p id="ghStatus" style="font-size: 12px; color: rgb(198, 40, 40); padding: 10px; background: var(--panel-2); border-radius: 6px;">Pull failed: Failed to fetch</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -2124,12 +1021,12 @@ Rev-40
 <div id="adminScreen" class="setup hidden">
   <button class="ob-back" id="adminBack">← Back</button>
   <h1>Admin Settings</h1>
-  <p class="sub">Data management, backup, sync & API</p>
+  <p class="sub">Data management, backup, sync &amp; API</p>
 
   <div style="margin-bottom: 24px;">
-    <h3 style="font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px;">API Key & GitHub Sync</h3>
-    <button class="btn-primary" onclick="showSettings()" style="width:100%; margin-bottom:8px;">⚙️ API Key & GitHub Sync Settings</button>
-    <button class="btn-secondary" onclick="showAppInstructions()" style="width:100%;">ℹ️ App Instructions & Changelog</button>
+    <h3 style="font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px;">API Key &amp; GitHub Sync</h3>
+    <button class="btn-primary" onclick="showSettings()" style="width:100%; margin-bottom:8px;">⚙️ API Key &amp; GitHub Sync Settings</button>
+    <button class="btn-secondary" onclick="showAppInstructions()" style="width:100%;">ℹ️ App Instructions &amp; Changelog</button>
   </div>
 
   <div style="margin-bottom: 24px; padding-top: 24px; border-top: 1px solid var(--line);">
@@ -2193,7 +1090,7 @@ Rev-40
   <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
     <label style="font-size:12px; font-weight:700; color:var(--ink-dim);">Sort batches by</label>
     <select id="reportsSortSel" style="height:38px; border:1px solid var(--line-strong); border-radius:8px; padding:0 8px; font-size:13px;">
-      <option value="date_desc" selected>Date — newest first</option>
+      <option value="date_desc" selected="">Date — newest first</option>
       <option value="date_asc">Date — oldest first</option>
       <option value="so_desc">Shop order — newest first</option>
       <option value="so_asc">Shop order — oldest first</option>
@@ -2210,7 +1107,7 @@ Rev-40
 <div id="appInstructionsScreen" class="setup hidden">
   <button class="ob-back" id="appInstructionsBack">← Back</button>
   <h1>App Instructions</h1>
-  <p class="sub">Changelog & usage guide</p>
+  <p class="sub">Changelog &amp; usage guide</p>
 
   <pre style="background: var(--panel-2); padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 11px; overflow-x: auto; color: var(--ink); line-height: 1.5;">CAMCO CP GENERATOR — CHANGELOG
 ═══════════════════════════════════════════════════════
@@ -2235,7 +1132,7 @@ Rev-43 (June 21, 2026)
 - APP_REV in header and footer
 
 Rev-42
-- Setup Sheet & Checksheet zones with clipboard support
+- Setup Sheet &amp; Checksheet zones with clipboard support
 
 Rev-41
 - Global Ctrl+V paste listener for all zones
@@ -2312,7 +1209,7 @@ KEYBOARD SHORTCUTS
       <span style="color:#9fb0c0; font-size:12px;">Accept or skip each section. Only accepted sections are applied. Local only — no dimensions altered.</span>
       <span style="flex:1;"></span>
       <label style="color:#9fb0c0; font-size:12px; display:flex; align-items:center; gap:6px;">
-        <input type="checkbox" id="enhanceThresholdChk" checked> Pure black &amp; white
+        <input type="checkbox" id="enhanceThresholdChk" checked=""> Pure black &amp; white
       </label>
     </div>
     <div style="flex:1; overflow:hidden; padding:12px; display:flex; flex-direction:column; background:#0b0e11; min-height:0;">
@@ -2375,7 +1272,7 @@ KEYBOARD SHORTCUTS
       Copy the text below into the FIRST message of a new chat, and <strong>attach the current CP-RevNNN.html file to that same message</strong> (new chats can't see this chat's files). Replace the "First task" line with what you want done.
     </div>
     <div id="newChatSrc" style="padding:0 20px 4px; font-size:12px; font-weight:700; color:#8a8a8a;">Loading shared prompt…</div>
-    <textarea id="newChatText" readonly style="flex:1; margin:8px 20px; min-height:300px; font-family:monospace; font-size:12px; line-height:1.5; border:1px solid #ccc; border-radius:8px; padding:12px; resize:vertical; white-space:pre-wrap;"></textarea>
+    <textarea id="newChatText" readonly="" style="flex:1; margin:8px 20px; min-height:300px; font-family:monospace; font-size:12px; line-height:1.5; border:1px solid #ccc; border-radius:8px; padding:12px; resize:vertical; white-space:pre-wrap;"></textarea>
     <div style="display:flex; gap:10px; padding:12px 20px 18px; justify-content:flex-end;">
       <span id="newChatCopied" style="margin-right:auto; color:#2c6e49; font-weight:700; font-size:13px; display:none;">✓ Copied to clipboard</span>
       <button type="button" onclick="copyNewChatPrompt()" style="padding:10px 20px; font-size:14px; font-weight:700; background:#2c6e49; color:#fff; border:none; border-radius:8px; cursor:pointer;">📋 Copy</button>
@@ -2414,7 +1311,7 @@ KEYBOARD SHORTCUTS
     <div style="font-size:33px; font-weight:800; letter-spacing:1px; margin-bottom:10px; text-shadow:0 2px 8px rgba(0,0,0,0.5);">ANALYZING DRAWING WITH AI</div>
     <div id="aiAnalyzeStatus" style="font-size:16px; font-weight:600; color:#ffd24d; margin-bottom:6px; min-height:22px;">Sending drawing to Anthropic API…</div>
     <div id="aiAnalyzeDots" style="font-size:15px; color:rgba(255,255,255,0.75); letter-spacing:3px;">● ● ●</div>
-    <div style="font-size:12px; color:rgba(255,255,255,0.55); margin:10px 0 14px;">Detecting dimensions & features — this can take 10–30 seconds.</div>
+    <div style="font-size:12px; color:rgba(255,255,255,0.55); margin:10px 0 14px;">Detecting dimensions &amp; features — this can take 10–30 seconds.</div>
     <div style="display:flex; gap:18px; align-items:stretch; justify-content:center; flex-wrap:wrap; width:100%; max-width:100%; margin:0 auto; box-sizing:border-box;">
       <div style="flex:0 0 150px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:12px 14px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
         <div style="font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:rgba(255,255,255,0.55); font-weight:700; margin-bottom:6px;">Elapsed</div>
@@ -2431,7 +1328,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- FLASH MESSAGE -->
-<div id="flash" class="flash hidden"></div>
+<div id="flash" class="flash hidden">✓ Data pushed to GitHub</div>
 
 <!-- BOOT -->
 <script>
@@ -13777,5 +12674,6 @@ if(ghConfigured()){
     </div>
   </div>
 </div>
-</body>
-</html>
+
+
+</body></html>
