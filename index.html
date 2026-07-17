@@ -2435,7 +2435,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-463";
+const APP_REV = "Rev-464";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2449,6 +2449,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-464", type: "App", changes: ["DURATIONS IN WHOLE MINUTES \u2014 every gap and before/after-boundary duration in the timing statistics rounds to the nearest minute (14m 3s \u2192 14m, 2m 30s \u2192 3m, 3m 15s after \u2192 3m after); hours keep the h m form. One shared formatter, so batch and per-run views change together."] },
   { ts: "2026-07-16", rev: "App Rev-463", type: "App", changes: ["SHOP-FLOOR LANGUAGE: RUNS \u2192 PCS \u2014 batch cards, part headers, the index status line, and the batch-report totals now count pc(s); a run of one serial IS a piece. Efficiency lines already said good part(s)."] },
   { ts: "2026-07-16", rev: "App Rev-462", type: "App", changes: ["DATE \u2014 NEWEST FIRST IS THE DEFAULT SORT on Inspection Reports. The index draws immediately (briefly in shop-order fallback while the per-batch dates load), then snaps into true date order the moment they arrive \u2014 the existing post-fetch re-render already handled that."] },
   { ts: "2026-07-16", rev: "App Rev-461", type: "App", changes: ["EVERY BATCH CARD SHOWS ITS DATE \u2014 the one-run-per-batch date fetch (Rev-460) now runs automatically right after the index draws, and each batch card displays its date between the shop order and the run count. The index still appears instantly; dates pop in a moment later when the handful of small reads complete. Date sorting reuses the same shared fetcher instead of its own copy."] },
@@ -9139,11 +9140,11 @@ const SHIFT_MARKS = {
   after:  [ ['7:00 AM start', 7, 0], ['9:40 AM back from break', 9, 40], ['12:15 PM back from lunch', 12, 15] ]
 };
 function fmtDur(ms){
+  // Rev-464: whole minutes only, rounded to nearest (no seconds anywhere)
   if(ms < 0) ms = 0;
-  const m = Math.floor(ms / 60000), hh = Math.floor(m / 60), mm = m % 60, ss = Math.floor((ms % 60000) / 1000);
+  const m = Math.round(ms / 60000), hh = Math.floor(m / 60), mm = m % 60;
   if(hh) return hh + 'h ' + mm + 'm';
-  if(m)  return mm + 'm ' + ss + 's';
-  return ss + 's';
+  return m + 'm';
 }
 function fmtClock(d){ return d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
 
