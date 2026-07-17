@@ -2422,7 +2422,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-455";
+const APP_REV = "Rev-456";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2436,6 +2436,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-456", type: "App", changes: ["INSPECTION REPORTS LOADS LAZILY \u2014 opening the screen now makes ONE call for the runs-folder listing and draws collapsed batch cards (part \u2192 operation \u00b7 shop order, with run counts) parsed straight from the filenames; a batch\u2019s run files download only when its card is first tapped, with a per-batch progress note, then stay cached for the session. 500 stored runs no longer cost 500 downloads to glance at the screen \u2014 you pay only for what you open. Inside an opened batch: per-day efficiency lines, the full batch report (Rev-452) shown directly, then the individual run cards, still expandable, with taps stop-propagated so opening a run cannot collapse its batch. The Email-daily-results digest now covers the batches you have opened \u2014 the button already told you to load first. The 1500-file cap is gone; the screen scales with the folder, not against it. Run cards inside a batch drop the redundant OP/SO columns (the batch header carries them) in favour of S/N-first."] },
   { ts: "2026-07-16", rev: "App Rev-455", type: "App", changes: ["GAP ROWS TIGHTENED \u2014 the duration column in the LARGEST GAPS lists was sized like the break-boundary labels (44% of the width), leaving a dead field between \u20182m 16s\u2019 and its balloons; it is now a fixed 76px, so the balloon\u2192balloon text sits right beside the duration. Break-boundary rows keep the wider label they actually need. Both batch and per-run stats."] },
   { ts: "2026-07-16", rev: "App Rev-454", type: "App", changes: ["STATS SECTION HEADERS IN CAPS, DATA INDENTED \u2014 the three timing-statistics headers (LARGEST GAPS\u2026, LAST MEASUREMENT BEFORE, FIRST MEASUREMENT AFTER) render in capitals with letter-spacing in both the batch report and the per-run block, and the data rows beneath each are indented 12px right so the hierarchy reads at a glance. Cosmetic only."] },
   { ts: "2026-07-16", rev: "App Rev-453", type: "App", changes: ["TIMING STATISTICS ARE READABLE \u2014 the largest-gaps and break-discipline blocks in BOTH the batch report and the per-run stats were dense run-on sentences that wrapped badly on a phone; they are now stacked two-column rows, one fact per line: gaps as \u2018duration \u2014 balloon A time \u2192 balloon B time\u2019, break boundaries as \u2018boundary \u2014 time (how long before/after)\u2019, with the duration or clock time bolded as the eye anchor. Trades vertical space for scannability per user preference. Same numbers, humane layout."] },
@@ -9259,20 +9260,23 @@ function buildBatchReport(dayRuns){
 }
 
 async function loadRunReports(){
+  /* Rev-456: LAZY BATCHES. Opening the screen fetches ONLY the runs/ folder listing
+     (one call) -- the filenames already carry part, operation and shop order
+     (PART_OP_SO_SN_runid.json), which is enough to draw collapsed batch cards with
+     counts. A batch's run files download only when its card is first tapped, then
+     stay cached for the session. 500 stored runs no longer cost 500 downloads to
+     glance at the screen. */
   const list = $('reportsList'), status = $('reportsStatus');
   if(!ghConfigured()){ status.textContent = 'GitHub sync is not set up on this device — reports read from the data repo.'; list.innerHTML=''; return; }
-  status.textContent = 'Loading runs from GitHub…';
-  list.innerHTML = '';
   const c = ghConfig();
-  // Rev-450: daily-email status chip -- the nightly workflow writes email_status.json
-  // after every attempt; this just reads and shows it. No extra permissions involved.
+  // daily-email status chip (Rev-450) -- one tiny fetch, unchanged
   (async () => {
     const chip = $('emailStatusChip');
     if(!chip) return;
     try{
       const r = await fetch('https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/email_status.json',
         { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw' }, cache: 'no-store' });
-      if(!r.ok){ chip.style.display = 'none'; return; }   // no runs recorded yet
+      if(!r.ok){ chip.style.display = 'none'; return; }
       const s = JSON.parse(await r.text());
       const when = s.utc ? new Date(s.utc).toLocaleString() : '';
       chip.style.display = 'block';
@@ -9285,131 +9289,172 @@ async function loadRunReports(){
       }
     }catch(e){ chip.style.display = 'none'; }
   })();
-  const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+
+  status.textContent = 'Loading run index\u2026';
+  list.innerHTML = '';
+  window._reportDigestLines = [];
   let files = [];
   try{
-    const resp = await fetch('https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/runs', { headers: hdrs });
+    const resp = await fetch('https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/runs', { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' }, cache: 'no-store' });
     if(resp.status === 404){ status.textContent = 'No runs saved yet — complete an inspection on any synced station and it will appear here.'; return; }
     if(!resp.ok){ status.textContent = 'Could not list runs (' + resp.status + ').'; return; }
     files = (await resp.json()).filter(f => f.name.endsWith('.json'));
   }catch(err){ status.textContent = 'Could not reach GitHub: ' + err.message; return; }
   if(!files.length){ status.textContent = 'No runs saved yet.'; return; }
 
-  status.textContent = 'Loading ' + files.length + ' run(s)…';
-  const runs = [];
-  // Rev-447: fetch in chunks of 50 so hundreds of runs load reliably (cap 1500)
-  const queue = files.slice(0, 1500);
-  for(let i = 0; i < queue.length; i += 50){
-    await Promise.all(queue.slice(i, i + 50).map(async f => {
-      try{
-        const r = await fetch(f.url, { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw+json' } });
-        if(r.ok) runs.push(JSON.parse(await r.text()));
-      }catch(e){}
-    }));
-    status.textContent = 'Loading runs… ' + Math.min(i + 50, queue.length) + ' / ' + queue.length;
-  }
-  if(!runs.length){ status.textContent = 'Runs exist but none could be read.'; return; }
-  runs.sort((a,b) => String((b.run&&b.run.dateCompletedUtc)||'').localeCompare(String((a.run&&a.run.dateCompletedUtc)||'')));
-
   const esc = s => String(s==null?'':s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  // filename -> part / op / shop order (PART_OP_SO_SN_RID.json)
   const byPart = {};
-  runs.forEach(p => { const k = (p.run && p.run.partNumber) || '?'; (byPart[k] = byPart[k] || []).push(p); });
+  files.forEach(f => {
+    const t = f.name.replace(/\.json$/,'').split('_');
+    const part = t[0] || '?', op = t[1] || '?', so = t[2] || '?';
+    const pk = byPart[part] = byPart[part] || {};
+    const bk = op + ' \u00b7 ' + so;
+    (pk[bk] = pk[bk] || { op: op, so: so, files: [] }).files.push(f);
+  });
 
-  let htmlOut = '';
-  window._reportDigestLines = [];
+  window._reportBatchFiles = {};
+  window._reportBatchCache = {};
+  let bi = 0, htmlOut = '';
   Object.keys(byPart).sort().forEach(part => {
-    htmlOut += '<div style="font-weight:800; font-size:14px; letter-spacing:.04em; margin:18px 0 8px;">PART ' + esc(part) + ' <span style="color:var(--ink-faint); font-weight:600;">· ' + byPart[part].length + ' run(s)</span></div>';
-    // Rev-446: efficiency per operation per day
-    const byOpDay = {};
-    byPart[part].forEach(p => {
-      const r = p.run || {};
-      const d = r.dateCompletedUtc ? new Date(r.dateCompletedUtc).toLocaleDateString() : '?';
-      const k = (r.operation || '?') + ' · ' + d;
-      (byOpDay[k] = byOpDay[k] || []).push(p);
-    });
-    window._reportDigestLines = window._reportDigestLines || [];
-    let bidx = 0;
-    Object.keys(byOpDay).sort().forEach(k => {
-      const ef = computeShiftEfficiency(byOpDay[k]);
-      window._reportDigestLines.push('PART ' + part + ' \u00b7 ' + k + ' \u2014 ' + (ef.pct===null ? ef.text : (ef.pct + '% \u2014 ' + ef.text)));
-      const bid = 'rbatch_' + part.replace(/[^A-Za-z0-9]/g,'') + '_' + (bidx++);
-      window._reportBatchData = window._reportBatchData || {};
-      window._reportBatchData[bid] = byOpDay[k];
-      htmlOut += '<div class="rrun-card" data-rid="' + bid + '" data-batch="1" style="font-size:12px; margin:0 0 6px; padding:6px 10px; border-left:3px solid ' + (ef.pct===null ? 'var(--line-strong)' : (ef.pct>=85 ? '#1e7a34' : (ef.pct>=60 ? '#b8860b' : '#a02020'))) + '; background:rgba(0,0,0,.03); cursor:pointer; -webkit-user-select:none; user-select:none;">'
-        + '<span id="' + bid + '_chev" style="font-weight:800; margin-right:6px;">\u25b8</span>'
-        + '<b>' + esc(k) + '</b> — Shift efficiency: ' + (ef.pct===null ? '<span style="color:var(--ink-faint);">' + esc(ef.text) + '</span>' : '<b>' + ef.pct + '%</b> <span style="color:var(--ink-faint);">(' + esc(ef.text) + ')</span>')
+    const total = Object.values(byPart[part]).reduce((a,b) => a + b.files.length, 0);
+    htmlOut += '<div style="font-weight:800; font-size:14px; letter-spacing:.04em; margin:18px 0 8px;">PART ' + esc(part) + ' <span style="color:var(--ink-faint); font-weight:600;">\u00b7 ' + total + ' run(s)</span></div>';
+    Object.keys(byPart[part]).sort().forEach(bk => {
+      const b = byPart[part][bk];
+      const bid = 'rbatch_' + (bi++);
+      window._reportBatchFiles[bid] = b.files;
+      htmlOut += '<div class="rbatch-card" data-bid="' + bid + '" style="border:1px solid var(--line-strong); border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer; -webkit-user-select:none; user-select:none;">'
+        + '<div style="display:flex; gap:10px; align-items:center; font-size:13px;">'
+        + '<span id="' + bid + '_chev" style="font-weight:800;">\u25b8</span>'
+        + '<b>' + esc(b.op) + '</b><span>SO <b>' + esc(b.so) + '</b></span>'
+        + '<span style="color:var(--ink-faint);">' + b.files.length + ' run(s)</span>'
+        + '<span id="' + bid + '_note" style="margin-left:auto; color:var(--ink-faint); font-size:11px;">tap to load</span>'
+        + '</div>'
         + '<div id="' + bid + '" style="display:none; margin-top:10px; border-top:1px solid var(--line-strong); padding-top:8px;"></div>'
         + '</div>';
     });
-    byPart[part].forEach((p, i) => {
-      const r = p.run || {};
-      const reads = p.readings || [];
-      const nOut = reads.filter(x => x.inTolerance === false).length;
-      const nSkip = (r.freqSkipped || []).length;
-      const scrapBadge = r.scrapped ? '<span style="background:#a02020; color:#fff; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:800;">SCRAPPED — ' + esc(r.scrapped.reason||'') + '</span>' : '';
-      const pauseNote = (r.pauses && r.pauses.length) ? '<span style="color:var(--ink-faint); font-size:11px;">⏸ ' + r.pauses.length + ' pause(s), ' + fmtDur(r.pauses.reduce((a,p)=>a+(new Date(p.endUtc)-new Date(p.startUtc)),0)) + '</span>' : '';
-      const badge = nOut ? '<span style="background:rgba(200,40,40,.12); color:#a02020; border:1px solid #a02020; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:800;">' + nOut + ' OUT OF TOL</span>'
-                         : '<span style="background:rgba(30,122,52,.12); color:#1e7a34; border:1px solid #1e7a34; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:800;">ALL IN TOL</span>';
-      const when = r.dateCompletedUtc ? new Date(r.dateCompletedUtc).toLocaleString() : '—';
-      const rid = 'rrun_' + part.replace(/[^A-Za-z0-9]/g,'') + '_' + i;
-      htmlOut += '<div class="rrun-card" data-rid="' + rid + '" style="border:1px solid var(--line-strong); border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer; -webkit-user-select:none; user-select:none;">'
-        + '<div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:13px;">'
-        + '<span id="' + rid + '_chev" style="flex:0 0 auto; font-weight:800;">\u25b8</span>'
-        + '<b>' + esc(r.operation||'?') + '</b>'
-        + '<span>SO <b>' + esc(r.shopOrder||'—') + '</b></span>'
-        + '<span>S/N <b>' + esc(r.serialNumber||'—') + '</b></span>'
-        + '<span>OP INITIALS <b>' + esc(r.operatorInitials||'—') + '</b></span>'
-        + badge + scrapBadge + pauseNote
-        + (nSkip ? '<span style="color:var(--ink-faint); font-size:11px;">' + nSkip + ' skipped by freq</span>' : '')
-        + '<span style="margin-left:auto; color:var(--ink-faint); font-size:11px;">' + esc(when) + '</span>'
-        + '</div>'
-        + '<div id="' + rid + '" style="display:none; margin-top:10px; border-top:1px solid var(--line-strong); padding-top:8px;">'
-        + (function(){
-            const st = computeRunStats(reads);
-            if(!st) return '';
-            const row = (l, v, w) => '<div style="display:flex; gap:8px; padding:2px 0 2px 12px;"><span style="flex:0 0 ' + (w||'44%') + '; color:var(--ink-faint);">' + l + '</span><span style="flex:1;">' + v + '</span></div>';
-            const half = x => { const m = String(x.val).split(' \u2014 '); return m.length === 2 ? ('<b>' + esc(m[0]) + '</b> (' + esc(m[1]) + ')') : esc(x.val); };
-            return '<div style="border:1px dashed var(--line-strong); border-radius:8px; padding:10px 12px; margin-bottom:10px; font-size:11px;">'
-              + '<div style="font-weight:800; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:4px;">RUN TIMING STATISTICS</div>'
-              + (st.top5.length ? '<div style="margin:6px 0 2px; font-weight:800; letter-spacing:.05em;">LARGEST GAPS BETWEEN MEASUREMENTS</div>'
-                  + st.top5.map(g => row('<b>' + fmtDur(g.ms) + '</b>', 'balloon ' + esc(g.a.bubble) + ' ' + fmtClock(g.a.t) + ' \u2192 balloon ' + esc(g.b.bubble) + ' ' + fmtClock(g.b.t), '76px')).join('') : '')
-              + '<div style="margin:8px 0 2px; font-weight:800; letter-spacing:.05em;">LAST MEASUREMENT BEFORE</div>'
-              + st.before.map(x => row(x.label, half(x))).join('')
-              + '<div style="margin:8px 0 2px; font-weight:800; letter-spacing:.05em;">FIRST MEASUREMENT AFTER</div>'
-              + st.after.map(x => row(x.label, half(x))).join('')
-              + '</div>';
-          })()
-        + reads.map(x => '<div style="display:flex; gap:10px; padding:4px 0; font-size:12px; align-items:center;">'
-            + '<b style="flex:0 0 34px;">' + esc(x.bubble) + '</b>'
-            + '<span style="flex:1;">' + esc(x.characteristic||x.desc||'') + '</span>'
-            + '<span style="flex:0 0 auto; color:var(--ink-faint); font-size:10px;">' + esc((x.updatedUtc||x.createdUtc) ? new Date(x.updatedUtc||x.createdUtc).toLocaleString([], {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '') + '</span>'
-            + '<span class="mono" style="flex:0 0 auto; font-weight:700;">' + esc(x.raw==null?'—':x.raw) + '</span>'
-            + '<span style="flex:0 0 70px; text-align:right; font-weight:800; color:' + (x.inTolerance===false ? '#a02020' : (x.inTolerance===true ? '#1e7a34' : 'var(--ink-faint)')) + ';">' + (x.inTolerance===false ? 'OUT' : (x.inTolerance===true ? 'IN' : 'n/a')) + '</span>'
-            + '</div>').join('')
-        + ((r.freqSkipped||[]).length ? '<div style="margin-top:8px; font-size:11px; color:var(--ink-faint);"><b>Skipped by frequency:</b> '
-            + r.freqSkipped.map(s => esc(s.bubble) + ' (' + esc(s.freq||'') + ')').join(', ') + '</div>' : '')
-        + '</div></div>';
-    });
   });
   list.innerHTML = htmlOut;
-  // Rev-451: taps wired with real listeners (the old inline onclick was unreliable on
-  // Android, where taps on text can be captured by the browser). Chevron shows state.
-  list.querySelectorAll('.rrun-card').forEach(card => {
-    card.addEventListener('click', () => {
+  list.querySelectorAll('.rbatch-card').forEach(card => {
+    card.addEventListener('click', async (e) => {
+      if(e.target.closest('.rrun-card')) return;   // taps inside loaded content have their own handlers
+      const bid = card.getAttribute('data-bid');
+      const d = document.getElementById(bid);
+      const ch = document.getElementById(bid + '_chev');
+      if(!d) return;
+      const open = d.style.display !== 'none';
+      if(open){ d.style.display = 'none'; if(ch) ch.textContent = '\u25b8'; return; }
+      if(!window._reportBatchCache[bid]){
+        const note = document.getElementById(bid + '_note');
+        const fl = window._reportBatchFiles[bid] || [];
+        const runs = [];
+        for(let i = 0; i < fl.length; i += 25){
+          await Promise.all(fl.slice(i, i + 25).map(async f => {
+            try{
+              const r = await fetch(f.url, { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw' } });
+              if(r.ok) runs.push(JSON.parse(await r.text()));
+            }catch(err){}
+          }));
+          if(note) note.textContent = 'loading ' + Math.min(i + 25, fl.length) + ' / ' + fl.length + '\u2026';
+        }
+        runs.sort((a,b) => String((a.run&&a.run.dateCompletedUtc)||'').localeCompare(String((b.run&&b.run.dateCompletedUtc)||'')));
+        window._reportBatchCache[bid] = runs;
+        d.innerHTML = renderBatchInner(runs);
+        wireRunCards(d);
+        if(note) note.textContent = runs.length + ' loaded';
+      }
+      d.style.display = 'block';
+      if(ch) ch.textContent = '\u25be';
+    });
+  });
+  status.textContent = files.length + ' run(s) indexed across ' + bi + ' batch(es). Tap a batch to load it.';
+}
+
+// Rev-456: everything shown inside a loaded batch: per-day efficiency lines, the
+// full batch report, then the individual run cards (expandable as before).
+function renderBatchInner(runs){
+  const esc = s => String(s==null?'':s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  let out = '';
+  const byDay = {};
+  runs.forEach(p => {
+    const r = p.run || {};
+    const d = r.dateCompletedUtc ? new Date(r.dateCompletedUtc).toLocaleDateString() : '?';
+    (byDay[d] = byDay[d] || []).push(p);
+  });
+  Object.keys(byDay).sort().forEach(day => {
+    const ef = computeShiftEfficiency(byDay[day]);
+    window._reportDigestLines = window._reportDigestLines || [];
+    const r0 = (byDay[day][0].run || {});
+    window._reportDigestLines.push('PART ' + (r0.partNumber||'?') + ' \u00b7 ' + (r0.operation||'?') + ' \u00b7 ' + day + ' \u2014 ' + (ef.pct===null ? ef.text : (ef.pct + '% \u2014 ' + ef.text)));
+    out += '<div style="font-size:12px; margin:0 0 6px; padding:6px 10px; border-left:3px solid ' + (ef.pct===null ? 'var(--line-strong)' : (ef.pct>=85 ? '#1e7a34' : (ef.pct>=60 ? '#b8860b' : '#a02020'))) + '; background:rgba(0,0,0,.03);">'
+      + '<b>' + esc(day) + '</b> — Shift efficiency: ' + (ef.pct===null ? '<span style="color:var(--ink-faint);">' + esc(ef.text) + '</span>' : '<b>' + ef.pct + '%</b> <span style="color:var(--ink-faint);">(' + esc(ef.text) + ')</span>')
+      + '</div>';
+  });
+  out += buildBatchReport(runs);
+  out += '<div style="margin:12px 0 6px; font-weight:800; font-size:12px; letter-spacing:.05em; color:var(--ink-faint);">INDIVIDUAL RUNS</div>';
+  runs.slice().reverse().forEach((p, i) => {
+    const r = p.run || {};
+    const reads = p.readings || [];
+    const nOut = reads.filter(x => x.inTolerance === false).length;
+    const nSkip = (r.freqSkipped || []).length;
+    const scrapBadge = r.scrapped ? '<span style="background:#a02020; color:#fff; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:800;">SCRAPPED — ' + esc(r.scrapped.reason||'') + '</span>' : '';
+    const pauseNote = (r.pauses && r.pauses.length) ? '<span style="color:var(--ink-faint); font-size:11px;">⏸ ' + r.pauses.length + ' pause(s), ' + fmtDur(r.pauses.reduce((a,pa)=>a+(new Date(pa.endUtc)-new Date(pa.startUtc)),0)) + '</span>' : '';
+    const badge = nOut ? '<span style="background:rgba(200,40,40,.12); color:#a02020; border:1px solid #a02020; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:800;">' + nOut + ' OUT OF TOL</span>'
+                       : '<span style="background:rgba(30,122,52,.12); color:#1e7a34; border:1px solid #1e7a34; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:800;">ALL IN TOL</span>';
+    const when = r.dateCompletedUtc ? new Date(r.dateCompletedUtc).toLocaleString() : '—';
+    const rid = 'rrun_' + Math.random().toString(36).slice(2, 9);
+    out += '<div class="rrun-card" data-rid="' + rid + '" style="border:1px solid var(--line-strong); border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer; -webkit-user-select:none; user-select:none;">'
+      + '<div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:13px;">'
+      + '<span id="' + rid + '_chev" style="flex:0 0 auto; font-weight:800;">\u25b8</span>'
+      + '<span>S/N <b>' + esc(r.serialNumber||'—') + '</b></span>'
+      + '<span>OP INITIALS <b>' + esc(r.operatorInitials||'—') + '</b></span>'
+      + badge + scrapBadge + pauseNote
+      + (nSkip ? '<span style="color:var(--ink-faint); font-size:11px;">' + nSkip + ' skipped by freq</span>' : '')
+      + '<span style="margin-left:auto; color:var(--ink-faint); font-size:11px;">' + esc(when) + '</span>'
+      + '</div>'
+      + '<div id="' + rid + '" style="display:none; margin-top:10px; border-top:1px solid var(--line-strong); padding-top:8px;">'
+      + (function(){
+          const st = computeRunStats(reads);
+          if(!st) return '';
+          const row = (l, v, w) => '<div style="display:flex; gap:8px; padding:2px 0 2px 12px;"><span style="flex:0 0 ' + (w||'44%') + '; color:var(--ink-faint);">' + l + '</span><span style="flex:1;">' + v + '</span></div>';
+          const half = x => { const m = String(x.val).split(' \u2014 '); return m.length === 2 ? ('<b>' + esc(m[0]) + '</b> (' + esc(m[1]) + ')') : esc(x.val); };
+          return '<div style="border:1px dashed var(--line-strong); border-radius:8px; padding:10px 12px; margin-bottom:10px; font-size:11px;">'
+            + '<div style="font-weight:800; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:4px;">RUN TIMING STATISTICS</div>'
+            + (st.top5.length ? '<div style="margin:6px 0 2px; font-weight:800; letter-spacing:.05em;">LARGEST GAPS BETWEEN MEASUREMENTS</div>'
+                + st.top5.map(g => row('<b>' + fmtDur(g.ms) + '</b>', 'balloon ' + esc(g.a.bubble) + ' ' + fmtClock(g.a.t) + ' \u2192 balloon ' + esc(g.b.bubble) + ' ' + fmtClock(g.b.t), '76px')).join('') : '')
+            + '<div style="margin:8px 0 2px; font-weight:800; letter-spacing:.05em;">LAST MEASUREMENT BEFORE</div>'
+            + st.before.map(x => row(x.label, half(x))).join('')
+            + '<div style="margin:8px 0 2px; font-weight:800; letter-spacing:.05em;">FIRST MEASUREMENT AFTER</div>'
+            + st.after.map(x => row(x.label, half(x))).join('')
+            + '</div>';
+        })()
+      + reads.map(x => '<div style="display:flex; gap:10px; padding:4px 0; font-size:12px; align-items:center;">'
+          + '<b style="flex:0 0 34px;">' + esc(x.bubble) + '</b>'
+          + '<span style="flex:1;">' + esc(x.characteristic||x.desc||'') + '</span>'
+          + '<span style="flex:0 0 auto; color:var(--ink-faint); font-size:10px;">' + esc((x.updatedUtc||x.createdUtc) ? new Date(x.updatedUtc||x.createdUtc).toLocaleString([], {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '') + '</span>'
+          + '<span class="mono" style="flex:0 0 auto; font-weight:700;">' + esc(x.raw==null?'—':x.raw) + '</span>'
+          + '<span style="flex:0 0 70px; text-align:right; font-weight:800; color:' + (x.inTolerance===false ? '#a02020' : (x.inTolerance===true ? '#1e7a34' : 'var(--ink-faint)')) + ';">' + (x.inTolerance===false ? 'OUT' : (x.inTolerance===true ? 'IN' : 'n/a')) + '</span>'
+          + '</div>').join('')
+      + ((r.freqSkipped||[]).length ? '<div style="margin-top:8px; font-size:11px; color:var(--ink-faint);"><b>Skipped by frequency:</b> '
+          + r.freqSkipped.map(s => esc(s.bubble) + ' (' + esc(s.freq||'') + ')').join(', ') + '</div>' : '')
+      + '</div></div>';
+  });
+  return out;
+}
+
+function wireRunCards(scope){
+  scope.querySelectorAll('.rrun-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();   // don't collapse the batch when tapping a run
       const rid = card.getAttribute('data-rid');
       const d = document.getElementById(rid);
       const ch = document.getElementById(rid + '_chev');
       if(!d) return;
       const open = d.style.display !== 'none';
-      if(!open && card.getAttribute('data-batch') === '1' && !d.innerHTML){
-        try{ d.innerHTML = buildBatchReport((window._reportBatchData||{})[rid] || []); }
-        catch(e){ d.innerHTML = '<div style="color:#a02020;">Report failed: ' + e.message + '</div>'; }
-      }
       d.style.display = open ? 'none' : 'block';
       if(ch) ch.textContent = open ? '\u25b8' : '\u25be';
     });
   });
-  status.textContent = runs.length + ' run(s) loaded from GitHub. Tap a run to open it.';
 }
 function showInspectionReports(){
   $('menuScreen').classList.add('hidden');
