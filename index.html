@@ -1332,7 +1332,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-476";
+const APP_REV = "Rev-477";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1346,6 +1346,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-17", rev: "App Rev-477", type: "App", changes: ["AUTO-UPDATE AT PAGE OPEN \u2014 the boot check used to only SHOW the update banner when GitHub had a newer rev, so every fresh open of the site sat one tap behind until you noticed it. The 60-second background check already self-applied when idle; now the boot check does the same \u2014 opening the page lands you straight on the newest rev, in place, token and data kept. The banner still appears in the one case it should: when an update arrives while you are mid-task in an editor, so nothing ever yanks the screen out from under you."] },
   { ts: "2026-07-17", rev: "App Rev-476", type: "App", changes: ["IN-APP NUMERIC KEYPAD (embedded validation REV-113 \u2192 REV-114) \u2014 on any touch device the reading box no longer opens the Android keyboard at all (no symbol rows, no autofill icons, no auto-zoom jolting the layout). The app draws its own pad right under the reading: digits 1-9 and 0, a red \u232b backspace, and a green \u2713 that saves & advances exactly like the Enter/Next button. Whole-number keying is unchanged \u2014 tap 2-5-0 and the box shows .250 per the feature\u2019s decimal places. Desktops with real keyboards type exactly as before."] },
   { ts: "2026-07-17", rev: "App Rev-475", type: "App", changes: ["COMPACT MODE MADE STICKY + READING SCREEN TIGHTENED (embedded validation REV-112 \u2192 REV-113) \u2014 tapping the reading box popped the keyboard, which fires a resize that briefly makes the window wider than tall, and that was stripping the phone layout the instant data entry began (exactly the giant half-off-screen LOW/HIGH cards in the screenshot). Compact is now decided at load and on ROTATION only \u2014 the keyboard can no longer knock it off. Also tightened the reading screen under compact: smaller LOW/HIGH limit cards, reading input 34\u219228px, smaller decimal-places chips, and a hard rule that nothing on the stage may exceed the screen width."] },
   { ts: "2026-07-17", rev: "App Rev-474", type: "App", changes: ["PHONE-COMPACT EDITING SCREENS (embedded validation app REV-111 \u2192 REV-112) \u2014 the three-column inspection/editing layout was rendering side-by-side on the phone with giant squeezed text and dead whitespace. Root cause: the browser was laying the page out desktop-wide, so the existing narrow-screen media query never fired \u2014 width-based queries cannot be trusted when \u2018Desktop site\u2019 mode fakes the viewport. The validation app now DETECTS the device directly: a touch screen held in portrait (or any window \u2264700px) gets a forced compact class \u2014 ONE column with the measurement panel FIRST, then photo / reference / ODS panels below, with much smaller feature text (30\u219219px), reading input (52\u219234px), buttons, bubbles, and padding. Re-evaluated on rotation, so turning the phone sideways restores the wide layout; landscape shop tablets and desktops are untouched."] },
@@ -9881,8 +9882,9 @@ function ghAutoPushAppOnBoot(){
     if(localNum > remoteNum){
       ghAutoPushVerified();   // push THIS newer app up, then confirm it landed
     } else {
-      // GitHub is NEWER — offer the one-tap in-place update instead of clobbering it
-      showAppUpdateAvailable(remoteRev);
+      // Rev-477: GitHub is NEWER — at boot nothing is mid-task, so APPLY it immediately
+      // (in-place, token + data kept) instead of stopping to ask with a banner.
+      ghPullApp(true, true);
     }
   }).catch(()=>{});
 }
