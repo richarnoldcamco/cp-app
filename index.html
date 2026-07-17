@@ -1332,7 +1332,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-472";
+const APP_REV = "Rev-473";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1346,6 +1346,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-17", rev: "App Rev-473", type: "App", changes: ["SHOP ORDER OFF THE BATCH CARDS \u2014 cards now read date \u00b7 part \u00b7 op \u00b7 operator initials \u00b7 pcs. The shop order still appears inside the opened batch on the Shop order(s) line, so nothing is lost \u2014 the card just stops repeating it. Both layouts (flat date stream and grouped)."] },
   { ts: "2026-07-17", rev: "App Rev-472", type: "App", changes: ["SAMPLE DATA HIDDEN \u2014 the generated test runs (part 1000222892, SO-7701 through SO-7705, 100 pcs) no longer appear in Inspection Reports. The files stay in the repo untouched; the index just filters them. The pc/batch count line reflects only what is shown, and a faint line at the bottom of the list \u2014 \u2018100 sample pc(s) in 5 batch(es) hidden \u2014 tap to show\u2019 \u2014 toggles them back any time (remembered per device). Say \u2018delete sample data\u2019 when you want them gone from the repo for good."] },
   { ts: "2026-07-17", rev: "App Rev-471", type: "App", changes: ["BATCH CARDS TIGHTENED \u2014 (1) dates on the Inspection Reports cards use the short M/D/YY form (7/16/26, not 7/16/2026); (2) the redundant SO label is gone \u2014 the value already starts with SO-; (3) each card now shows the OPERATOR INITIALS. Initials ride on the same one-tiny-read-per-batch that already fetched missing dates \u2014 the index still draws instantly and initials pop in a moment later. Both card layouts (flat date stream and grouped) changed together."] },
   { ts: "2026-07-17", rev: "App Rev-470", type: "App", changes: ["NEVER-DOWNGRADE GUARD ON EVERY APP PUSH \u2014 found because the user updated to a newer rev and the tab \u2018returned to 467\u2019: a stale tab holding the token was pushing ITSELF back over the newly-imported rev, then Update pulled the old code right back down. The two push functions (ghPushApp for cp_app.html and ghPublishPages for the website) pushed this tab\u2019s code with NO check against what GitHub already held \u2014 the rev comparisons lived only in some callers (boot, 60s tick), so unguarded paths like push-on-connect could drag the repo backwards. Both functions now read the remote rev FIRST and refuse to overwrite a newer one: silent pushes skip and show the one-tap update banner so the stale tab upgrades itself; a manual push demands explicit confirmation before erasing newer code. IMPORTANT: tabs running revs OLDER than 470 don\u2019t carry this guard \u2014 close them; from 470 on, no tab can ever resurrect a dead rev again."] },
@@ -8354,7 +8355,6 @@ function renderRunIndex(){
         + '<span id="' + bid + '_chev" style="font-weight:800;">\u25b8</span>'
         + (b.date ? '<span style="font-weight:800;">' + esc(fmtShortDate(b.date)) + '</span>' : '')
         + '<b>' + esc(part) + '</b><span>' + esc(b.op) + '</span>'
-        + '<span style="color:var(--ink-dim);"><b>' + esc(b.so) + '</b></span>'
         + (b.oper ? '<span style="color:var(--ink-dim);">' + esc(b.oper) + '</span>' : '')
         + '<span style="color:var(--ink-faint);">' + b.files.length + ' pc(s)</span>'
         + '<span id="' + bid + '_note" style="margin-left:auto; color:var(--ink-faint); font-size:11px;">tap to load</span>'
@@ -8381,7 +8381,6 @@ function renderRunIndex(){
         + '<span id="' + bid + '_chev" style="font-weight:800;">\u25b8</span>'
         + '<b>' + esc(b.op) + '</b>'
         + (b.date ? '<span style="font-weight:800;">' + esc(fmtShortDate(b.date)) + '</span>' : '')
-        + '<span style="color:var(--ink-dim);"><b>' + esc(b.so) + '</b></span>'
         + (b.oper ? '<span style="color:var(--ink-dim);">' + esc(b.oper) + '</span>' : '')
         + '<span style="color:var(--ink-faint);">' + b.files.length + ' pc(s)</span>'
         + '<span id="' + bid + '_note" style="margin-left:auto; color:var(--ink-faint); font-size:11px;">tap to load</span>'
