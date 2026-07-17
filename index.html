@@ -1332,7 +1332,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-470";
+const APP_REV = "Rev-471";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1346,6 +1346,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-17", rev: "App Rev-471", type: "App", changes: ["BATCH CARDS TIGHTENED \u2014 (1) dates on the Inspection Reports cards use the short M/D/YY form (7/16/26, not 7/16/2026); (2) the redundant SO label is gone \u2014 the value already starts with SO-; (3) each card now shows the OPERATOR INITIALS. Initials ride on the same one-tiny-read-per-batch that already fetched missing dates \u2014 the index still draws instantly and initials pop in a moment later. Both card layouts (flat date stream and grouped) changed together."] },
   { ts: "2026-07-17", rev: "App Rev-470", type: "App", changes: ["NEVER-DOWNGRADE GUARD ON EVERY APP PUSH \u2014 found because the user updated to a newer rev and the tab \u2018returned to 467\u2019: a stale tab holding the token was pushing ITSELF back over the newly-imported rev, then Update pulled the old code right back down. The two push functions (ghPushApp for cp_app.html and ghPublishPages for the website) pushed this tab\u2019s code with NO check against what GitHub already held \u2014 the rev comparisons lived only in some callers (boot, 60s tick), so unguarded paths like push-on-connect could drag the repo backwards. Both functions now read the remote rev FIRST and refuse to overwrite a newer one: silent pushes skip and show the one-tap update banner so the stale tab upgrades itself; a manual push demands explicit confirmation before erasing newer code. IMPORTANT: tabs running revs OLDER than 470 don\u2019t carry this guard \u2014 close them; from 470 on, no tab can ever resurrect a dead rev again."] },
   { ts: "2026-07-17", rev: "App Rev-469", type: "App", changes: ["DUPLICATE DATE REMOVED \u2014 since Rev-466 every batch is exactly one day, so the per-day efficiency line inside a batch was repeating the same date the batch card already shows. The line now reads just \u2018Efficiency: 55% \u00b7 19 good part(s)\u2019. The nightly email digest keeps its date \u2014 that line stands alone in an inbox and still needs it."] },
   { ts: "2026-07-17", rev: "App Rev-468", type: "App", changes: ["BATCH VIEW DECLUTTERED \u2014 the timing statistics (largest gaps, last-measurement-before, first-measurement-after) no longer fill the screen by default. In the batch report they collapse behind one tap line, TIMING DETAILS \u2014 gaps & break discipline; in each expanded run the RUN TIMING STATISTICS block collapses the same way. Opening a batch now goes straight to the data sets: the summary line, the balloon/feature table, and the individual runs. Nothing was removed \u2014 one tap brings the timing analysis back."] },
@@ -8269,14 +8270,26 @@ async function loadRunReports(){
   ensureBatchDates().then(() => renderRunIndex());
 }
 
+// Rev-471: M/D/YY short form for batch cards (7/16/26, not 7/16/2026)
+function fmtShortDate(d){
+  const dt = new Date(d);
+  return dt.getMonth()+1 + '/' + dt.getDate() + '/' + String(dt.getFullYear()).slice(-2);
+}
 async function ensureBatchDates(){
+  // Rev-471: the same one-tiny-read-per-batch that used to learn missing dates now also
+  // learns the OPERATOR INITIALS for every card (stored on b.oper), so it runs for any
+  // batch still missing either piece. Still a handful of small reads, cached for the session.
   const c = ghConfig(), jobs = [];
   Object.values(window._reportIndex || {}).forEach(pk => Object.values(pk).forEach(b => {
-    if(!b.date && b.files.length) jobs.push((async () => {
+    if((!b.date || !b.oper) && b.files.length) jobs.push((async () => {
       try{
         const r = await fetch(b.files[0].url, { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw' } });
-        if(r.ok){ const p = JSON.parse(await r.text()); b.date = (p.run && (p.run.dateCompletedUtc || p.run.createdUtc)) || ''; }
-      }catch(e){ b.date = ''; }
+        if(r.ok){
+          const p = JSON.parse(await r.text());
+          if(!b.date) b.date = (p.run && (p.run.dateCompletedUtc || p.run.createdUtc)) || '';
+          b.oper = (p.run && p.run.operatorInitials) || '';
+        }
+      }catch(e){ if(!b.date) b.date = ''; b.oper = b.oper || ''; }
     })());
   }));
   if(jobs.length) await Promise.all(jobs);
@@ -8318,9 +8331,10 @@ function renderRunIndex(){
       htmlOut += '<div class="rbatch-card" data-bid="' + bid + '" style="border:1px solid var(--line-strong); border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer; -webkit-user-select:none; user-select:none;">'
         + '<div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:13px;">'
         + '<span id="' + bid + '_chev" style="font-weight:800;">\u25b8</span>'
-        + (b.date ? '<span style="font-weight:800;">' + esc(new Date(b.date).toLocaleDateString()) + '</span>' : '')
+        + (b.date ? '<span style="font-weight:800;">' + esc(fmtShortDate(b.date)) + '</span>' : '')
         + '<b>' + esc(part) + '</b><span>' + esc(b.op) + '</span>'
-        + '<span style="color:var(--ink-dim);">SO <b>' + esc(b.so) + '</b></span>'
+        + '<span style="color:var(--ink-dim);"><b>' + esc(b.so) + '</b></span>'
+        + (b.oper ? '<span style="color:var(--ink-dim);">' + esc(b.oper) + '</span>' : '')
         + '<span style="color:var(--ink-faint);">' + b.files.length + ' pc(s)</span>'
         + '<span id="' + bid + '_note" style="margin-left:auto; color:var(--ink-faint); font-size:11px;">tap to load</span>'
         + '</div>'
@@ -8344,8 +8358,9 @@ function renderRunIndex(){
         + '<div style="display:flex; gap:10px; align-items:center; font-size:13px;">'
         + '<span id="' + bid + '_chev" style="font-weight:800;">\u25b8</span>'
         + '<b>' + esc(b.op) + '</b>'
-        + (b.date ? '<span style="font-weight:800;">' + esc(new Date(b.date).toLocaleDateString()) + '</span>' : '')
-        + '<span style="color:var(--ink-dim);">SO <b>' + esc(b.so) + '</b></span>'
+        + (b.date ? '<span style="font-weight:800;">' + esc(fmtShortDate(b.date)) + '</span>' : '')
+        + '<span style="color:var(--ink-dim);"><b>' + esc(b.so) + '</b></span>'
+        + (b.oper ? '<span style="color:var(--ink-dim);">' + esc(b.oper) + '</span>' : '')
         + '<span style="color:var(--ink-faint);">' + b.files.length + ' pc(s)</span>'
         + '<span id="' + bid + '_note" style="margin-left:auto; color:var(--ink-faint); font-size:11px;">tap to load</span>'
         + '</div>'
