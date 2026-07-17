@@ -2435,7 +2435,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-462";
+const APP_REV = "Rev-463";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2449,6 +2449,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-463", type: "App", changes: ["SHOP-FLOOR LANGUAGE: RUNS \u2192 PCS \u2014 batch cards, part headers, the index status line, and the batch-report totals now count pc(s); a run of one serial IS a piece. Efficiency lines already said good part(s)."] },
   { ts: "2026-07-16", rev: "App Rev-462", type: "App", changes: ["DATE \u2014 NEWEST FIRST IS THE DEFAULT SORT on Inspection Reports. The index draws immediately (briefly in shop-order fallback while the per-batch dates load), then snaps into true date order the moment they arrive \u2014 the existing post-fetch re-render already handled that."] },
   { ts: "2026-07-16", rev: "App Rev-461", type: "App", changes: ["EVERY BATCH CARD SHOWS ITS DATE \u2014 the one-run-per-batch date fetch (Rev-460) now runs automatically right after the index draws, and each batch card displays its date between the shop order and the run count. The index still appears instantly; dates pop in a moment later when the handful of small reads complete. Date sorting reuses the same shared fetcher instead of its own copy."] },
   { ts: "2026-07-16", rev: "App Rev-460", type: "App", changes: ["SORT BY PART NUMBER AND BY DATE \u2014 the Reports sort dropdown gains Part number (A\u2192Z / Z\u2192A, reordering the part groups) and Date (newest / oldest first). Dates are not in the filenames, so the first time a date sort is chosen the app fetches exactly ONE run file per batch to learn each batch\u2019s date, remembers it for the session, and sorts both the batches and the part groups by it \u2014 a handful of small reads, never the whole folder."] },
@@ -9244,7 +9245,7 @@ function buildBatchReport(dayRuns){
   const fmtv = v => v === null ? '\u2014' : String(v);
   let out = '<div style="font-size:12px;">';
   out += '<div style="margin-bottom:8px;"><b>Shop order(s):</b> ' + esc([...sos].join(', ')) + ' \u00b7 <b>Operator(s):</b> ' + esc([...operators].join(', '))
-       + ' \u00b7 <b>Runs:</b> ' + dayRuns.length + ' \u00b7 <b>Good:</b> ' + (dayRuns.length - scrap.length)
+       + ' \u00b7 <b>Pcs:</b> ' + dayRuns.length + ' \u00b7 <b>Good:</b> ' + (dayRuns.length - scrap.length)
        + ' \u00b7 <b>Scrapped:</b> ' + scrap.length + ' \u00b7 <b>Out-of-tol readings:</b> ' + oot.length + '</div>';
   if(scrap.length) out += '<div style="margin-bottom:8px; color:#a02020;"><b>Scrap:</b> ' + scrap.map(s => 'S/N ' + esc(s.sn) + ' \u2014 ' + esc(s.reason)).join(' \u00b7 ') + '</div>';
   if(pauses.length) out += '<div style="margin-bottom:8px;"><b>Pauses:</b> ' + pauses.map(p => 'S/N ' + esc(p.sn) + ' \u2014 ' + esc(p.reason) + ' (' + p.min + 'm)').join(' \u00b7 ') + '</div>';
@@ -9335,7 +9336,7 @@ async function loadRunReports(){
   window._reportIndex = byPart;
   window._reportBatchCache = window._reportBatchCache || {};
   renderRunIndex();
-  status.textContent = files.length + ' run(s) indexed across ' + Object.values(byPart).reduce((a,p) => a + Object.keys(p).length, 0) + ' batch(es). Tap a batch to load it.';
+  status.textContent = files.length + ' pc(s) indexed across ' + Object.values(byPart).reduce((a,p) => a + Object.keys(p).length, 0) + ' batch(es). Tap a batch to load it.';
   // Rev-461: fetch one run per batch so every card can show its date (a handful of tiny reads)
   ensureBatchDates().then(() => renderRunIndex());
 }
@@ -9382,7 +9383,7 @@ function renderRunIndex(){
   let bi = 0, htmlOut = '';
   partKeys.forEach(part => {
     const total = Object.values(byPart[part]).reduce((a,b) => a + b.files.length, 0);
-    htmlOut += '<div style="font-weight:800; font-size:14px; letter-spacing:.04em; margin:18px 0 8px;">PART ' + esc(part) + ' <span style="color:var(--ink-faint); font-weight:600;">\u00b7 ' + total + ' run(s)</span></div>';
+    htmlOut += '<div style="font-weight:800; font-size:14px; letter-spacing:.04em; margin:18px 0 8px;">PART ' + esc(part) + ' <span style="color:var(--ink-faint); font-weight:600;">\u00b7 ' + total + ' pc(s)</span></div>';
     Object.entries(byPart[part]).sort(sorter).forEach(([bk, b]) => {
       const bid = 'rbatch_' + (bi++);
       window._reportBatchFiles[bid] = b.files;
@@ -9392,7 +9393,7 @@ function renderRunIndex(){
         + '<span id="' + bid + '_chev" style="font-weight:800;">\u25b8</span>'
         + '<b>' + esc(b.op) + '</b><span>SO <b>' + esc(b.so) + '</b></span>'
         + (b.date ? '<span style="color:var(--ink-dim); font-weight:700;">' + esc(new Date(b.date).toLocaleDateString()) + '</span>' : '')
-        + '<span style="color:var(--ink-faint);">' + b.files.length + ' run(s)</span>'
+        + '<span style="color:var(--ink-faint);">' + b.files.length + ' pc(s)</span>'
         + '<span id="' + bid + '_note" style="margin-left:auto; color:var(--ink-faint); font-size:11px;">tap to load</span>'
         + '</div>'
         + '<div id="' + bid + '" style="display:none; margin-top:10px; border-top:1px solid var(--line-strong); padding-top:8px;"></div>'
