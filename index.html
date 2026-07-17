@@ -1332,7 +1332,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-477";
+const APP_REV = "Rev-478";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1346,6 +1346,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-17", rev: "App Rev-478", type: "App", changes: ["UPDATE CHECK ON EVERY TAP AND ON RETURNING TO THE TAB \u2014 Android throttles the 60-second timer while the tab is backgrounded, so a rev pushed while you were away could sit unapplied until well after you came back. Now any tap anywhere in the app, and every return to the tab, also fire the update check. It stays cheap: the check\u2019s built-in guards (busy flag, once-a-minute throttle, never mid-task) mean at most one GitHub read per minute, and the screen is never yanked while you\u2019re in an editor."] },
   { ts: "2026-07-17", rev: "App Rev-477", type: "App", changes: ["AUTO-UPDATE AT PAGE OPEN \u2014 the boot check used to only SHOW the update banner when GitHub had a newer rev, so every fresh open of the site sat one tap behind until you noticed it. The 60-second background check already self-applied when idle; now the boot check does the same \u2014 opening the page lands you straight on the newest rev, in place, token and data kept. The banner still appears in the one case it should: when an update arrives while you are mid-task in an editor, so nothing ever yanks the screen out from under you."] },
   { ts: "2026-07-17", rev: "App Rev-476", type: "App", changes: ["IN-APP NUMERIC KEYPAD (embedded validation REV-113 \u2192 REV-114) \u2014 on any touch device the reading box no longer opens the Android keyboard at all (no symbol rows, no autofill icons, no auto-zoom jolting the layout). The app draws its own pad right under the reading: digits 1-9 and 0, a red \u232b backspace, and a green \u2713 that saves & advances exactly like the Enter/Next button. Whole-number keying is unchanged \u2014 tap 2-5-0 and the box shows .250 per the feature\u2019s decimal places. Desktops with real keyboards type exactly as before."] },
   { ts: "2026-07-17", rev: "App Rev-475", type: "App", changes: ["COMPACT MODE MADE STICKY + READING SCREEN TIGHTENED (embedded validation REV-112 \u2192 REV-113) \u2014 tapping the reading box popped the keyboard, which fires a resize that briefly makes the window wider than tall, and that was stripping the phone layout the instant data entry began (exactly the giant half-off-screen LOW/HIGH cards in the screenshot). Compact is now decided at load and on ROTATION only \u2014 the keyboard can no longer knock it off. Also tightened the reading screen under compact: smaller LOW/HIGH limit cards, reading input 34\u219228px, smaller decimal-places chips, and a hard rule that nothing on the stage may exceed the screen width."] },
@@ -12553,6 +12554,12 @@ if(ghConfigured()){
   ghPull(true); // always silently merge DATA on startup — ensures desktop stays current
   setInterval(ghAutoPull, 45000);   // Rev-281: keep pulling other machines' changes automatically
   setInterval(ghAutoUpdateApp, 60000);
+  // Rev-478: the 60s timer sleeps when Android backgrounds the tab, so pushes that land
+  // while you're away used to wait for the next tick after return. Now ANY tap and every
+  // return to the tab also fire the check. ghAutoUpdateApp's own guards make this cheap
+  // and safe: busy-flag, once-a-minute throttle, and never updating mid-task in an editor.
+  document.addEventListener('click', () => ghAutoUpdateApp(), true);
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') ghAutoUpdateApp(); });
   setInterval(ghAutoPublishPages, 60000);
   cpRequestPersistentStorage();
   // Rev-420: safety net — when you leave/close/background the app, flush a silent data push so
