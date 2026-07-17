@@ -2190,6 +2190,15 @@ Rev-40
   <p class="sub" style="margin-bottom:8px;">Every completed run saved to GitHub by any station, newest first. Tap a run to see its readings.</p>
   <p id="reportsStatus" style="font-size:12px; color:var(--ink-faint); margin-bottom:12px;"></p>
   <div id="emailStatusChip" style="display:none; margin-bottom:12px; padding:8px 12px; border-radius:8px; font-size:12px; font-weight:700;"></div>
+  <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+    <label style="font-size:12px; font-weight:700; color:var(--ink-dim);">Sort batches by</label>
+    <select id="reportsSortSel" style="height:38px; border:1px solid var(--line-strong); border-radius:8px; padding:0 8px; font-size:13px;">
+      <option value="so_desc">Shop order — newest first</option>
+      <option value="so_asc">Shop order — oldest first</option>
+      <option value="runs_desc">Run count — high to low</option>
+      <option value="op">Operation</option>
+    </select>
+  </div>
   <div id="reportsList"></div>
 </div>
 
@@ -2422,7 +2431,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-458";
+const APP_REV = "Rev-459";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2436,6 +2445,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-16", rev: "App Rev-459", type: "App", changes: ["SORT DROPDOWN ON INSPECTION REPORTS \u2014 batches can be ordered by shop order (newest or oldest first), run count, or operation. Re-sorting redraws from the cached index without a single refetch, and batches already loaded keep their downloaded runs across re-sorts (cache re-keyed from transient card ids to stable part+batch keys to make that true)."] },
   { ts: "2026-07-16", rev: "App Rev-458", type: "App", changes: ["EFFICIENCY LINE SIMPLIFIED \u2014 the per-day line inside a batch now reads just \u20187/10/2026 \u2014 Efficiency: 109% \u00b7 19 good part(s)\u2019; the full working (parts \u00d7 cycle = earned over window, paused minutes excluded, scrapped count) is tucked behind a tap on the line, chevron and all, matching the tap-for-detail pattern everywhere else on the screen. Efficiency lines with no cycle time or no timestamps still report their good-part count."] },
   { ts: "2026-07-16", rev: "App Rev-457", type: "App", changes: ["GAP ROWS SHOW TIMES ONLY \u2014 the balloon numbers were noise in the largest-gaps lists; rows now read \u201813m 55s \u00b7 7:19 AM \u2192 7:33 AM\u2019 in both the batch report and the per-run stats."] },
   { ts: "2026-07-16", rev: "App Rev-456", type: "App", changes: ["INSPECTION REPORTS LOADS LAZILY \u2014 opening the screen now makes ONE call for the runs-folder listing and draws collapsed batch cards (part \u2192 operation \u00b7 shop order, with run counts) parsed straight from the filenames; a batch\u2019s run files download only when its card is first tapped, with a per-batch progress note, then stay cached for the session. 500 stored runs no longer cost 500 downloads to glance at the screen \u2014 you pay only for what you open. Inside an opened batch: per-day efficiency lines, the full batch report (Rev-452) shown directly, then the individual run cards, still expandable, with taps stop-propagated so opening a run cannot collapse its batch. The Email-daily-results digest now covers the batches you have opened \u2014 the button already told you to load first. The 1500-file cap is gone; the screen scales with the folder, not against it. Run cards inside a batch drop the redundant OP/SO columns (the batch header carries them) in favour of S/N-first."] },
@@ -9315,16 +9325,35 @@ async function loadRunReports(){
     (pk[bk] = pk[bk] || { op: op, so: so, files: [] }).files.push(f);
   });
 
+  window._reportIndex = byPart;
+  window._reportBatchCache = window._reportBatchCache || {};
+  renderRunIndex();
+  status.textContent = files.length + ' run(s) indexed across ' + Object.values(byPart).reduce((a,p) => a + Object.keys(p).length, 0) + ' batch(es). Tap a batch to load it.';
+}
+
+// Rev-459: draws the batch index from the cached listing using the chosen sort --
+// changing the sort never refetches anything.
+function renderRunIndex(){
+  const list = $('reportsList');
+  const byPart = window._reportIndex || {};
+  const c = ghConfig();
+  const esc = s => String(s==null?'':s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  const mode = ($('reportsSortSel') && $('reportsSortSel').value) || 'so_desc';
+  const sorter = {
+    so_desc: (a,b) => b[1].so.localeCompare(a[1].so),
+    so_asc:  (a,b) => a[1].so.localeCompare(b[1].so),
+    runs_desc: (a,b) => b[1].files.length - a[1].files.length || b[1].so.localeCompare(a[1].so),
+    op: (a,b) => a[1].op.localeCompare(b[1].op) || b[1].so.localeCompare(a[1].so)
+  }[mode];
   window._reportBatchFiles = {};
-  window._reportBatchCache = {};
   let bi = 0, htmlOut = '';
   Object.keys(byPart).sort().forEach(part => {
     const total = Object.values(byPart[part]).reduce((a,b) => a + b.files.length, 0);
     htmlOut += '<div style="font-weight:800; font-size:14px; letter-spacing:.04em; margin:18px 0 8px;">PART ' + esc(part) + ' <span style="color:var(--ink-faint); font-weight:600;">\u00b7 ' + total + ' run(s)</span></div>';
-    Object.keys(byPart[part]).sort().forEach(bk => {
-      const b = byPart[part][bk];
+    Object.entries(byPart[part]).sort(sorter).forEach(([bk, b]) => {
       const bid = 'rbatch_' + (bi++);
       window._reportBatchFiles[bid] = b.files;
+      window._reportBatchFiles[bid]._ck = part + '|' + bk;   // stable cache key across re-sorts
       htmlOut += '<div class="rbatch-card" data-bid="' + bid + '" style="border:1px solid var(--line-strong); border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer; -webkit-user-select:none; user-select:none;">'
         + '<div style="display:flex; gap:10px; align-items:center; font-size:13px;">'
         + '<span id="' + bid + '_chev" style="font-weight:800;">\u25b8</span>'
@@ -9346,9 +9375,16 @@ async function loadRunReports(){
       if(!d) return;
       const open = d.style.display !== 'none';
       if(open){ d.style.display = 'none'; if(ch) ch.textContent = '\u25b8'; return; }
-      if(!window._reportBatchCache[bid]){
+      const fl = window._reportBatchFiles[bid] || [];
+      const ck = fl._ck || bid;
+      if(window._reportBatchCache[ck] && !d.innerHTML){
+        d.innerHTML = renderBatchInner(window._reportBatchCache[ck]);
+        wireRunCards(d);
+        const n0 = document.getElementById(bid + '_note');
+        if(n0) n0.textContent = window._reportBatchCache[ck].length + ' loaded';
+      }
+      if(!window._reportBatchCache[ck]){
         const note = document.getElementById(bid + '_note');
-        const fl = window._reportBatchFiles[bid] || [];
         const runs = [];
         for(let i = 0; i < fl.length; i += 25){
           await Promise.all(fl.slice(i, i + 25).map(async f => {
@@ -9360,7 +9396,7 @@ async function loadRunReports(){
           if(note) note.textContent = 'loading ' + Math.min(i + 25, fl.length) + ' / ' + fl.length + '\u2026';
         }
         runs.sort((a,b) => String((a.run&&a.run.dateCompletedUtc)||'').localeCompare(String((b.run&&b.run.dateCompletedUtc)||'')));
-        window._reportBatchCache[bid] = runs;
+        window._reportBatchCache[ck] = runs;
         d.innerHTML = renderBatchInner(runs);
         wireRunCards(d);
         if(note) note.textContent = runs.length + ' loaded';
@@ -9369,7 +9405,6 @@ async function loadRunReports(){
       if(ch) ch.textContent = '\u25be';
     });
   });
-  status.textContent = files.length + ' run(s) indexed across ' + bi + ' batch(es). Tap a batch to load it.';
 }
 
 // Rev-456: everything shown inside a loaded batch: per-day efficiency lines, the
@@ -12983,6 +13018,7 @@ if($('mReports')) $('mReports').onclick = showInspectionReports;
 })();
 if($('reportsBack')) $('reportsBack').onclick = () => { $('reportsScreen').classList.add('hidden'); $('menuScreen').classList.remove('hidden'); setHeaderBackVisible(false); };
 if($('reportsRefreshBtn')) $('reportsRefreshBtn').onclick = loadRunReports;
+if($('reportsSortSel')) $('reportsSortSel').onchange = () => { if(window._reportIndex) renderRunIndex(); };
 if($('reportsEmailBtn')) $('reportsEmailBtn').onclick = () => {
   const to = localStorage.getItem('mgmtEmail') || '';
   if(!to){ flash('Set the Management Email in Admin \u2192 Shop Floor Settings first', true); return; }
