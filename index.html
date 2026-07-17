@@ -1332,7 +1332,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-482";
+const APP_REV = "Rev-483";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1346,6 +1346,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-17", rev: "App Rev-483", type: "App", changes: ["\u25b6 INSPECT BUTTON \u2014 PERFORM INSPECTIONS BY MACHINIST. Every saved plan on the Control Plans screen now carries a green \u25b6 Inspect button (first in the row) that opens the validation app straight into the REAL Start Inspection flow for that part \u2014 shop order, serial number, operator initials, readings SAVED to GitHub \u2014 never the editing screens. Single-operation plans jump directly to the operation; multi-op plans land on the operation picker. The purple Create/Edit button keeps its editing behavior unchanged; the two paths are now cleanly separated: purple = set up, green = inspect."] },
   { ts: "2026-07-17", rev: "App Rev-482", type: "App", changes: ["LIMIT VALUES TO 64PX (embedded validation REV-117 \u2192 REV-118) \u2014 the LOW/HIGH numbers on the phone reading screen doubled again, 32px \u2192 64px, per user request."] },
   { ts: "2026-07-17", rev: "App Rev-481", type: "App", changes: ["LIMIT VALUES ENLARGED (embedded validation REV-116 \u2192 REV-117) \u2014 the LOW/HIGH numbers on the phone reading screen went 21px \u2192 32px, with slightly larger LOW/HIGH labels, matching the big-keypad scale."] },
   { ts: "2026-07-17", rev: "App Rev-480", type: "App", changes: ["KEYPAD DOUBLED, LIMITS CENTERED (embedded validation REV-115 \u2192 REV-116) \u2014 phone keypad keys are now 96px tall with 44px digits, spanning nearly the full screen width. The LOW/HIGH limit strip pulls in to 88% width (max 380px) centered on the page with 21px values, so the limits sit in the middle of the screen right above the reading instead of stretching edge to edge."] },
@@ -2193,6 +2194,15 @@ function renderProjects(){
       valBtn.style.cssText = 'margin-left:6px; background:#5b3a86; color:#fff; border:1px solid #472d69;';
       valBtn.onclick = () => createMachinistValidation(i);
       if(!p.builderState){ valBtn.disabled = true; valBtn.style.opacity = '0.45'; valBtn.title = 'No plan data to build a validation from'; }
+      // Rev-483: PERFORM INSPECTION — machinist's one-tap entry into a real saved run
+      const inspBtn = document.createElement('button');
+      inspBtn.className = 'btn-ghost';
+      inspBtn.textContent = '\u25b6 Inspect';
+      inspBtn.title = 'Machinist: start a real inspection run for this plan (readings are saved)';
+      inspBtn.style.cssText = 'background:#1f8a3b; color:#fff; border:1px solid #186e2f; font-weight:800;';
+      inspBtn.onclick = () => inspectMachinistValidation(i);
+      if(!p.builderState){ inspBtn.disabled = true; inspBtn.style.opacity = '0.45'; inspBtn.title = 'No plan data to inspect'; }
+      tdActions.appendChild(inspBtn);
       tdActions.appendChild(editBtn);
       tdActions.appendChild(dlBtn);
       tdActions.appendChild(renBtn);
@@ -2589,7 +2599,7 @@ async function mvPreviewRow(idx){
 }
 
 // Fetch the live validation app and open it in-panel, pre-loaded with the given part blocks.
-async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart){
+async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpenMode){
   if(!partBlocks || !partBlocks.length){ flash('No control plans with features to validate.', true); return; }
 
   flash('Loading Machinist Validation…');
@@ -2642,9 +2652,18 @@ async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart){
   // autoOpenPart is empty so the menu shows as before.
   const cpAutoOpenFn =
     'var __cpAutoOpenPart = ' + JSON.stringify(autoOpenPart || null) + ';\n' +
+    'var __cpAutoOpenMode = ' + JSON.stringify(autoOpenMode || 'edit') + ';\n' +
     'function cpAutoOpen(){ try{ if(!__cpAutoOpenPart) return; ' +
       'var idx = PARTS.findIndex(function(p){ return p.partNumber === __cpAutoOpenPart; }); ' +
       'if(idx<0) return; var __pt = PARTS[idx]; ' +
+    /* Rev-483: INSPECT mode — land the machinist in the real Start Inspection flow
+       (shop order / serial / initials, readings SAVED), never the editing screens. */
+    'if(__cpAutoOpenMode==="inspect"){ ' +
+      'if(typeof manageMode!=="undefined") manageMode=false; ' +
+      'if(__pt && __pt.ops && __pt.ops.length===1 && typeof selectOp==="function"){ selectOp(idx, 0); } ' +
+      'else if(typeof showOpPicker==="function"){ showOpPicker(idx); } ' +
+      'return; ' +
+    '} ' +
     'if(__pt && __pt.ops && __pt.ops.length===1){ ' +
       'if(typeof _showOpBuilder==="function"){ _showOpBuilder(idx, 0); } else if(typeof showOpBuilder==="function"){ showOpBuilder(idx, 0); } ' +
       'setTimeout(function(){ try{ if(typeof startPreviewRun==="function") startPreviewRun(); }catch(e){ console.error("preview launch failed", e); } }, 40); ' +
@@ -2692,6 +2711,18 @@ function mvIsCreated(p){ try{ const m=JSON.parse(localStorage.getItem('cpMvCreat
 function mvMarkCreated(p){ try{ const m=JSON.parse(localStorage.getItem('cpMvCreated')||'{}'); m[mvCreatedKey(p)]=true; localStorage.setItem('cpMvCreated', JSON.stringify(m)); }catch(e){} }
 
 // Per-row button: open validation for a SINGLE control plan (kept as a quick shortcut).
+// Rev-483: one-tap real inspection for a saved plan — same build as Create/Edit
+// Machinist Validation, but boots straight into the Start Inspection flow.
+async function inspectMachinistValidation(idx){
+  const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+  const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
+  flash('Opening inspection…');
+  const built = await mvBuildPartForProject(p);
+  if(!built){ flash('This plan has no features to inspect.', true); return; }
+  mvMarkCreated(p);
+  await mvOpenPanelWithParts([built.partBlock], String(p.partNum || 'PART') + (p.rev ? ' ' + p.rev : ''), built.partBlock.partNumber, 'inspect');
+}
+
 async function createMachinistValidation(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
