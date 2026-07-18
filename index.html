@@ -954,18 +954,23 @@
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
       <button class="btn-ghost" id="ghPushBtn" style="min-height:48px;">⬆️ Push Data to GitHub</button>
       <button class="btn-ghost" id="ghPullBtn" style="min-height:48px;">⬇️ Pull Data from GitHub</button>
-      <button class="btn-ghost" id="ghResetDataBtn" style="min-height:48px; color:#c0392b; border-color:#c0392b;">🗑️ Reset GitHub Data File</button>
     </div>
 
-    <div style="font-size:11px; color:var(--ink-dim); margin:4px 0 6px;">App code sync (pushes/updates the whole app HTML across devices):</div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-      <button class="btn-ghost" id="ghPushAppBtn" style="min-height:48px; background:#2c6e49; color:#fff; border:1px solid #215236;">⬆️ Push App Code</button>
-      <button class="btn-ghost" id="ghPublishPagesBtn" title="Upload this app to the cp-app repo as index.html so the website serves it" style="min-height:48px; background:#1d4e89; color:#fff; border:1px solid #14375f;">🌐 Publish to Website</button>
-      <button class="btn-ghost" id="ghPullAppBtn" style="min-height:48px;">⬇️ Check for App Update</button>
-      <button class="btn-ghost" id="cpImportAppBtn" title="Pick a newer CP-RevNNN.html from your device and publish it to GitHub + the website in one step" style="min-height:48px; background:#6b3fa0; color:#fff; border:1px solid #4d2d75;">📂 Import App Code</button>
-    </div>
+    <!-- Rev-488: settings decluttered. Updates & app publishing are fully automatic now
+         (auto-update at open / every 60s / every tap; app-sync pushes newer revs; Claude
+         pushes releases). The manual/emergency tools live in this collapsed section. -->
+    <details style="margin-bottom:10px; border:1px solid var(--line); border-radius:10px; padding:8px 12px;">
+      <summary style="cursor:pointer; font-size:13px; font-weight:700; color:var(--ink-dim); padding:4px 0;">🛠️ Advanced — rarely needed (emergency app publishing &amp; data reset)</summary>
+      <div style="font-size:11px; color:var(--ink-dim); margin:8px 0 6px;">Everything here happens automatically in normal use. Use only if directed during troubleshooting.</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px;">
+        <button class="btn-ghost" id="ghPushAppBtn" style="min-height:48px; background:#2c6e49; color:#fff; border:1px solid #215236;">⬆️ Push App Code</button>
+        <button class="btn-ghost" id="ghPublishPagesBtn" title="Upload this app to the cp-app repo as index.html so the website serves it" style="min-height:48px; background:#1d4e89; color:#fff; border:1px solid #14375f;">🌐 Publish to Website</button>
+        <button class="btn-ghost" id="cpImportAppBtn" title="Pick a newer CP-RevNNN.html from your device and publish it to GitHub + the website in one step" style="min-height:48px; background:#6b3fa0; color:#fff; border:1px solid #4d2d75;">📂 Import App Code</button>
+        <button class="btn-ghost" id="ghResetDataBtn" style="min-height:48px; color:#c0392b; border-color:#c0392b;">🗑️ Reset GitHub Data File</button>
+      </div>
+      <div style="font-size:11px; color:var(--ink-dim); margin:0 0 4px;">Import: pick a newer CP-RevNNN.html from Downloads — it is pushed to GitHub and the website using this tab's token.</div>
+    </details>
     <input type="file" id="cpImportAppFile" accept=".html,text/html" style="display:none">
-    <div style="font-size:11px; color:var(--ink-dim); margin:-4px 0 10px;">Import: pick a newer CP-RevNNN.html from Downloads — it is pushed to GitHub and the website using this tab's token. No need to open the file or re-enter the token.</div>
 
     <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:10px; cursor:pointer;">
       <input type="checkbox" id="ghAutoSync" style="width:18px; height:18px;">
@@ -1336,7 +1341,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-487";
+const APP_REV = "Rev-488";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1350,6 +1355,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-18", rev: "App Rev-488", type: "App", changes: ["SETTINGS DECLUTTERED \u2014 the GitHub section now shows only what a person actually uses: Save, Push Data, Pull Data, the two sync checkboxes, connection status, and Test Connection. \u2018Check for App Update\u2019 is DELETED \u2014 updates check themselves at open, every 60 seconds, on every tap, and on returning to the tab. The manual/emergency tools (Push App Code, Publish to Website, Import App Code, Reset GitHub Data File) moved into a collapsed \u2018Advanced \u2014 rarely needed\u2019 section; they still work when troubleshooting demands them, but they no longer invite the kind of manual pushing that resurrected Rev-467."] },
   { ts: "2026-07-18", rev: "App Rev-487", type: "App", changes: ["REAL APP ICON \u2014 the app now has its own icon: a CAMCO-red rounded square with a white CP monogram, wired in as favicon, home-screen icon, and installed-app icon (icon files + web manifest pushed to the website repo). Browser tabs, Windows taskbar pins, installed-app windows, and Android home-screen shortcuts all show the CP tile instead of a generic letter."] },
   { ts: "2026-07-17", rev: "App Rev-486", type: "App", changes: ["PASS / REJECT DOUBLED (embedded validation REV-120 \u2192 REV-121) \u2014 on the phone, the attribute-check buttons (PASS / REJECT on visual-touch features like SHARP EDGE) are now twice the size: 104px tall with 32px bold text, and the button row is hard-capped to screen width so REJECT no longer hangs off the right edge."] },
   { ts: "2026-07-17", rev: "App Rev-485", type: "App", changes: ["KEYPAD 30% TALLER, READING 2\u00d7 (embedded validation REV-119 \u2192 REV-120) \u2014 phone keypad keys 96\u2192125px tall with digits scaled to match (44\u219257px); the reading box doubled: the value 28\u219256px, and the IN TOLERANCE verdict and inch unit 11\u219222px."] },
@@ -12313,7 +12319,7 @@ if($('ghPublishPagesBtn')) $('ghPublishPagesBtn').onclick = async () => {
   await ghPublishPages(false);
   localStorage.setItem('ghPagesSync', '1');
 };
-if($('ghPullAppBtn')) $('ghPullAppBtn').onclick = () => ghPullApp(false);
+if($('ghPullAppBtn')) (function(){ const b=$('ghPullAppBtn'); if(b) b.onclick=()=>ghPullApp(false,true); })();
 $('ghTestBtn').onclick = ghTestConnection;
 $('adminRestoreFile').onchange = function(e){
   const file = e.target.files[0];
