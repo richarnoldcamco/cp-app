@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
+<link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#7a1a1c">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
 <title>CONTROL PLAN GENERATOR - REV_305</title>
@@ -1332,7 +1336,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-486";
+const APP_REV = "Rev-487";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1346,6 +1350,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-18", rev: "App Rev-487", type: "App", changes: ["REAL APP ICON \u2014 the app now has its own icon: a CAMCO-red rounded square with a white CP monogram, wired in as favicon, home-screen icon, and installed-app icon (icon files + web manifest pushed to the website repo). Browser tabs, Windows taskbar pins, installed-app windows, and Android home-screen shortcuts all show the CP tile instead of a generic letter."] },
   { ts: "2026-07-17", rev: "App Rev-486", type: "App", changes: ["PASS / REJECT DOUBLED (embedded validation REV-120 \u2192 REV-121) \u2014 on the phone, the attribute-check buttons (PASS / REJECT on visual-touch features like SHARP EDGE) are now twice the size: 104px tall with 32px bold text, and the button row is hard-capped to screen width so REJECT no longer hangs off the right edge."] },
   { ts: "2026-07-17", rev: "App Rev-485", type: "App", changes: ["KEYPAD 30% TALLER, READING 2\u00d7 (embedded validation REV-119 \u2192 REV-120) \u2014 phone keypad keys 96\u2192125px tall with digits scaled to match (44\u219257px); the reading box doubled: the value 28\u219256px, and the IN TOLERANCE verdict and inch unit 11\u219222px."] },
   { ts: "2026-07-17", rev: "App Rev-484", type: "App", changes: ["LOW/HIGH CARDS SEPARATED + READABLE HEADER (embedded validation REV-118 \u2192 REV-119) \u2014 the two limit values were jammed into one strip and read as a single number (.6035.6040); they are now two separate bordered cards with a 14px gap, bolder LOW/HIGH labels, values at 54px so both fit with the gap. The text above them is readable now too: feature name 19\u219226px, the Tolerance line 16px bold, freq line 12px."] },
