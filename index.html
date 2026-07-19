@@ -629,6 +629,7 @@
         <span>ODS Drawing — Balloon <span id="cpFocusBubble">1</span></span>
         <button type="button" id="cpPanelZoomBtn" onclick="cpPanelZoomToggle(event)" style="display:none; background:#1a5276; color:#fff; border:none; border-radius:5px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer;">🔍 Full view</button>
         <button type="button" id="cpPinBackBtn" onclick="cpPinStepBack(event)" style="display:none; background:#8a5a00; color:#fff; border:none; border-radius:5px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer;" title="Step back to the previous balloon to re-pin it">↩ Back a balloon</button>
+        <button type="button" id="cpOdsMinBtn" onclick="cpOdsToggleMin()" style="background:#444; color:#fff; border:none; border-radius:5px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; margin-left:auto;" title="Collapse the drawing so the Control Plan grid gets the full width">▬ Minimize drawing</button>
         <span id="cpLocateHint" style="display:none; font-size:11px; font-weight:700; color:#c0392b;">← no pin yet — tap 📍 Pin Manually, then click this balloon on the drawing</span>
       </div>
       <div style="flex:1; overflow:auto; border:1px solid var(--line); border-radius:6px; background:#fff; cursor:zoom-in; touch-action:none;" id="cpOdsPanelImgWrap" title="Click to enlarge">
@@ -1341,7 +1342,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-496";
+const APP_REV = "Rev-497";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1355,6 +1356,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-18", rev: "App Rev-497", type: "App", changes: ["MINIMIZE DRAWING IN BUILD CONTROL PLAN \u2014 a \u25ac Minimize drawing button now sits in the ODS pane toolbar; tapping it collapses the drawing so the Control Plan grid takes the full screen width, and a floating \ud83d\uddfa Show drawing chip in the top-right corner brings it back. The choice is remembered per device, and reopening the builder keeps the drawing minimized if that is how you left it."] },
   { ts: "2026-07-18", rev: "App Rev-496", type: "App", changes: ["CONTROL PLANS ROW BUTTONS REORDERED per user spec: Edit Control Plan \u00b7 Edit Machinist Validation \u00b7 Inspect Validation \u00b7 Rename \u00b7 Delete \u00b7 Download. Labels clarified to match (\u2018Edit\u2019 \u2192 \u2018Edit Control Plan\u2019, \u2018Inspect\u2019 \u2192 \u2018Inspect Validation\u2019, and the purple button reads \u2018Edit Machinist Validation\u2019 always instead of switching between Create/Edit)."] },
   { ts: "2026-07-18", rev: "App Rev-495", type: "App", changes: ["P / F KEYS ON PASS-REJECT SCREENS (embedded validation REV-127 \u2192 REV-128) \u2014 on attribute checks the operator can press P (or Y) for PASS and F (or R / N) for REJECT; the choice registers and auto-advances exactly like tapping the button. The buttons show their key hint: PASS (P) \u00b7 REJECT (F)."] },
   { ts: "2026-07-18", rev: "App Rev-494", type: "App", changes: ["ANIMATED SKIPPED-FEATURE SPLASH (embedded validation REV-126 \u2192 REV-127) \u2014 frequency-gated features are no longer silently dropped from the inspection walk. Every feature stays in sequence; when the walk reaches one that is not due (FREQ 1-IN-5, SHIFT, WEEK\u2026), its screen appears with a big red rotated SKIPPED FEATURE stamp that slams in, shows why (\u2018part 3 of run \u2014 due every 5th\u2019), then slides away and auto-advances after about a second. Works in both directions of travel; a run ending on skipped features finishes cleanly. The summary list tags those rows \u2018skipped\u2019, and the freqSkipped section stays as before."] },
@@ -12637,6 +12639,39 @@ if(ghConfigured()){
       flash('Reference image saved to the plan — syncing to all devices');
     }catch(e){ console.error('cpValRefImage failed', e); }
   });
+  // Rev-497: collapse/restore the ODS drawing pane in Build Control Plan so the grid
+  // can use the whole screen. Choice remembered per device.
+  window.cpOdsToggleMin = function(){
+    const panel = $('cpOdsPanel'); if(!panel) return;
+    const min = panel.style.display !== 'none';
+    panel.style.display = min ? 'none' : 'flex';
+    let chip = $('cpOdsRestoreChip');
+    if(min){
+      if(!chip){
+        chip = document.createElement('button');
+        chip.id = 'cpOdsRestoreChip';
+        chip.textContent = '🗺️ Show drawing';
+        chip.style.cssText = 'position:fixed; right:14px; top:60px; z-index:60; background:#1a5276; color:#fff; border:none; border-radius:8px; padding:10px 14px; font-size:13px; font-weight:800; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.25);';
+        chip.onclick = window.cpOdsToggleMin;
+        document.body.appendChild(chip);
+      }
+      chip.style.display = 'block';
+    } else if(chip){ chip.style.display = 'none'; }
+    try{ localStorage.setItem('cpOdsPanelMin', min ? '1' : '0'); }catch(e){}
+  };
+  // re-apply the remembered state whenever the builder opens
+  try{
+    if(localStorage.getItem('cpOdsPanelMin') === '1'){
+      const ob = new MutationObserver(() => {
+        const scr = $('cpBuilderScreen'), panel = $('cpOdsPanel');
+        if(scr && !scr.classList.contains('hidden') && panel && panel.style.display !== 'none'){
+          window.cpOdsToggleMin();
+        }
+      });
+      const scr = $('cpBuilderScreen');
+      if(scr) ob.observe(scr, { attributes:true, attributeFilter:['class'] });
+    }
+  }catch(e){}
   setInterval(ghAutoUpdateApp, 60000);
   // Rev-478: the 60s timer sleeps when Android backgrounds the tab, so pushes that land
   // while you're away used to wait for the next tick after return. Now ANY tap and every
