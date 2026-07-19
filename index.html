@@ -1341,7 +1341,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-495";
+const APP_REV = "Rev-496";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1355,6 +1355,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-18", rev: "App Rev-496", type: "App", changes: ["CONTROL PLANS ROW BUTTONS REORDERED per user spec: Edit Control Plan \u00b7 Edit Machinist Validation \u00b7 Inspect Validation \u00b7 Rename \u00b7 Delete \u00b7 Download. Labels clarified to match (\u2018Edit\u2019 \u2192 \u2018Edit Control Plan\u2019, \u2018Inspect\u2019 \u2192 \u2018Inspect Validation\u2019, and the purple button reads \u2018Edit Machinist Validation\u2019 always instead of switching between Create/Edit)."] },
   { ts: "2026-07-18", rev: "App Rev-495", type: "App", changes: ["P / F KEYS ON PASS-REJECT SCREENS (embedded validation REV-127 \u2192 REV-128) \u2014 on attribute checks the operator can press P (or Y) for PASS and F (or R / N) for REJECT; the choice registers and auto-advances exactly like tapping the button. The buttons show their key hint: PASS (P) \u00b7 REJECT (F)."] },
   { ts: "2026-07-18", rev: "App Rev-494", type: "App", changes: ["ANIMATED SKIPPED-FEATURE SPLASH (embedded validation REV-126 \u2192 REV-127) \u2014 frequency-gated features are no longer silently dropped from the inspection walk. Every feature stays in sequence; when the walk reaches one that is not due (FREQ 1-IN-5, SHIFT, WEEK\u2026), its screen appears with a big red rotated SKIPPED FEATURE stamp that slams in, shows why (\u2018part 3 of run \u2014 due every 5th\u2019), then slides away and auto-advances after about a second. Works in both directions of travel; a run ending on skipped features finishes cleanly. The summary list tags those rows \u2018skipped\u2019, and the freqSkipped section stays as before."] },
   { ts: "2026-07-18", rev: "App Rev-493", type: "App", changes: ["MEASUREMENT METHOD FRONT AND CENTER (embedded validation REV-125 \u2192 REV-126) \u2014 the machinist measurement method from the Control Plan (BOWERS GAGE, 1-2\u2033 MICS, DROP INDICATOR\u2026) was buried in the tiny faint frequency line at the top of the reading screen; it now gets its own bold line directly under the feature name \u2014 \ud83d\udccf BOWERS GAGE \u2014 17px on desktop, 22px in phone mode. The frequency line keeps only the frequency."] },
@@ -2187,7 +2188,7 @@ function renderProjects(){
       const i = item.idx;
       const editBtn = document.createElement('button');
       editBtn.className = 'btn-ghost';
-      editBtn.textContent = '✏️ Edit';
+      editBtn.textContent = '✏️ Edit Control Plan';
       editBtn.style.cssText = 'margin-right:6px; background:#2c6e49; color:#fff; border:1px solid #215236;';
       editBtn.onclick = () => editProject(i);
       if(!p.builderState){ editBtn.disabled = true; editBtn.style.opacity = '0.45'; editBtn.title = 'Saved before editing was supported'; }
@@ -2210,7 +2211,7 @@ function renderProjects(){
       const valBtn = document.createElement('button');
       valBtn.className = 'btn-ghost';
       const __mvMade = mvIsCreated(p);
-      valBtn.textContent = __mvMade ? '🔧 Edit Machinist Validation' : '🔧 Create Machinist Validation';
+      valBtn.textContent = '🔧 Edit Machinist Validation';   // Rev-496: one fixed label
       valBtn.title = __mvMade ? 'Open / edit the Machinist Validation for this Control Plan' : 'Create a Machinist Validation inspection from this Control Plan';
       valBtn.style.cssText = 'margin-left:6px; background:#5b3a86; color:#fff; border:1px solid #472d69;';
       valBtn.onclick = () => createMachinistValidation(i);
@@ -2218,17 +2219,18 @@ function renderProjects(){
       // Rev-483: PERFORM INSPECTION — machinist's one-tap entry into a real saved run
       const inspBtn = document.createElement('button');
       inspBtn.className = 'btn-ghost';
-      inspBtn.textContent = '\u25b6 Inspect';
+      inspBtn.textContent = '\u25b6 Inspect Validation';
       inspBtn.title = 'Machinist: start a real inspection run for this plan (readings are saved)';
       inspBtn.style.cssText = 'background:#1f8a3b; color:#fff; border:1px solid #186e2f; font-weight:800;';
       inspBtn.onclick = () => inspectMachinistValidation(i);
       if(!p.builderState){ inspBtn.disabled = true; inspBtn.style.opacity = '0.45'; inspBtn.title = 'No plan data to inspect'; }
-      tdActions.appendChild(inspBtn);
+      // Rev-496: user-specified order
       tdActions.appendChild(editBtn);
-      tdActions.appendChild(dlBtn);
+      tdActions.appendChild(valBtn);
+      tdActions.appendChild(inspBtn);
       tdActions.appendChild(renBtn);
       tdActions.appendChild(delBtn);
-      tdActions.appendChild(valBtn);
+      tdActions.appendChild(dlBtn);
     }
     tr.appendChild(tdPart); tr.appendChild(tdRev); tr.appendChild(tdStatus); tr.appendChild(tdDate); tr.appendChild(tdActions);
     tbody.appendChild(tr);
