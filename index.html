@@ -1342,7 +1342,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-499";
+const APP_REV = "Rev-500";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1356,6 +1356,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-18", rev: "App Rev-500", type: "App", changes: ["UPDATE APPLY HARDENED (and rev 500!) \u2014 when the in-place code swap is blocked (typical in installed-app windows, which is why one desktop sat stuck on an old rev until a manual Ctrl+Shift+R), the updater now automatically does what Ctrl+Shift+R does: a cache-skipping reload of the site with a fresh ?v= tag that also busts the website cache. Same address, so token and data are untouched. The download-the-file fallback remains as the last resort."] },
   { ts: "2026-07-18", rev: "App Rev-499", type: "App", changes: ["FREQ OVERRIDES WITH A LOUD MARKER \u2014 the FREQ (Every) and FREQ (QE) cells in the builder are now editable. A value that differs from the Master List marks the cell as an OVERRIDE: orange fill with an orange outline, bold text, and a chip reading \u2018OVERRIDE \u2014 master: 10 \u21ba\u2019; clicking the chip snaps back to the master value. Typing the master value back in also clears the flag. Re-applying a control type keeps the override in place while refreshing the remembered master value beneath it, and collapsed rows show the same orange tint. Per CP-2C the Master List still governs \u2014 the marker exists precisely so an intentional deviation can never hide."] },
   { ts: "2026-07-18", rev: "App Rev-498", type: "App", changes: ["ONE-CLICK CELL ENTRY IN THE BUILDER GRID \u2014 clicking a cell on a collapsed row used to take two clicks: the first expanded the row (the re-render destroyed the clicked cell before it could take the cursor) and a second click was needed to actually get into the field. The click now remembers which cell it hit and, the moment the expanded row is drawn, drops the cursor into that same cell with its text selected \u2014 one click, type immediately."] },
   { ts: "2026-07-18", rev: "App Rev-497", type: "App", changes: ["MINIMIZE DRAWING IN BUILD CONTROL PLAN \u2014 a \u25ac Minimize drawing button now sits in the ODS pane toolbar; tapping it collapses the drawing so the Control Plan grid takes the full screen width, and a floating \ud83d\uddfa Show drawing chip in the top-right corner brings it back. The choice is remembered per device, and reopening the builder keeps the drawing minimized if that is how you left it."] },
@@ -9738,13 +9739,21 @@ async function ghPullApp(silent, autoApply){
       document.close();
       return;
     } catch(e){
-      // Fallback to the old download path if in-place rewrite is blocked for any reason
-      const blob = new Blob([ex.html], {type:'text/html'});
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'Control_Plan_Generator_' + remoteRev + '.html';
-      link.click();
-      if(!silent) flash('✓ Downloaded app ' + remoteRev + ' — open it to update (in-place update was blocked: ' + e.message + ')');
+      // Rev-500: if the in-place rewrite is blocked (installed-app windows are the usual
+      // culprit), do what Ctrl+Shift+R does — force a cache-skipping reload of the site.
+      // The ?v= tag makes the browser AND the website's cache fetch the page fresh.
+      // Same address, so the GitHub token and all data are untouched.
+      try{
+        location.replace(location.pathname + '?v=' + Date.now());
+        return;
+      }catch(e2){
+        const blob = new Blob([ex.html], {type:'text/html'});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Control_Plan_Generator_' + remoteRev + '.html';
+        link.click();
+        if(!silent) flash('✓ Downloaded app ' + remoteRev + ' — open it to update (in-place update was blocked: ' + e.message + ')');
+      }
     }
   } catch(err){
     ghSetStatus('App pull failed: ' + err.message, true);
