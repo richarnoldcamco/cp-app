@@ -1342,7 +1342,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-505";
+const APP_REV = "Rev-506";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1356,6 +1356,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-19", rev: "App Rev-506", type: "App", changes: ["DRAWING SYNC \u2014 ODS drawings now travel between devices. Each part\u2019s drawing is pushed to GitHub as its own file (drawings/PART.json, original + cleaned image together) whenever it is saved on any device \u2014 session-guarded so unchanged drawings never re-upload. Any device that opens a plan or starts an inspection WITHOUT the drawing pulls it automatically: the validation injection waits for it (balloon crops and the ODS panel appear as always), and the builder fetches in the background and redraws when it lands. Built after the desktop showed \u2018No ODS drawing\u2019 on a real run \u2014 the drawing had only ever existed on the phone."] },
   { ts: "2026-07-19", rev: "App Rev-505", type: "App", changes: ["BUILD TIME ON THE BADGE (redone safely) \u2014 the red rev badge, header, and footer now show a 24-hour build time beside the date (e.g. REV-505 2026-07-19 12:53), small and subtle next to the rev number. This re-implements what the broken Rev-503 attempted, as a plain BUILD_TIME constant set alongside BUILD_DATE on every build \u2014 three display lines changed, nothing near boot logic."] },
   { ts: "2026-07-19", rev: "App Rev-504", type: "App", changes: ["ROLLBACK OF REV-502/503 \u2014 those two revs (built in a parallel chat; they added a build-time stamp beside the date on the rev badge) shipped with a boot-time crash that killed every button on the home screen and could not push or repair themselves. Rev-504 is the proven Rev-501 codebase re-issued above them so every device\u2019s never-downgrade guard accepts it. The badge date is refreshed; the build-TIME feature can be redone later, carefully. Lesson recorded: one chat pushes revs at a time."] },
   { ts: "2026-07-18", rev: "App Rev-501", type: "App", changes: ["START INSPECTION PICKER OVERHAULED (embedded validation REV-128 \u2192 REV-129) \u2014 rows are half their old height; each part row now shows its LAST shop order (bold) and operator initials learned from this device\u2019s runs alongside op count and customer; a filter box matches part number, shop order, operator, or customer as you type; and a sort dropdown offers PART # A\u2013Z (the default), RECENT ACTIVITY, and SHOP ORDER."] },
@@ -1734,7 +1735,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-19";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:53";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "18:16";   // Rev-505: 24-hour build time, shown beside the date
 let currentODSImage = null; // Store current ODS image for viewer
 let currentCleanODSImage = null; // Unballooned original — preserved so re-analysis always uses the clean drawing
 let cpPinScale = (() => { try{ const v = parseFloat(localStorage.getItem('cpPinScale')); return (v && v > 0) ? v : 1; }catch(_){ return 1; } })();   // Rev-380: adjustable pin-highlight size
@@ -2486,6 +2487,10 @@ async function mvBuildPartForProject(p){
 
   let odsImage = '';
   try{ const found = _findLocalOdsImage(part); if(found && found.odsImage) odsImage = found.odsImage; }catch(_){ }
+  // Rev-506: this device has no drawing for the part — pull it from GitHub before building
+  if(!odsImage){
+    try{ if(await ghPullDrawing(part)){ const f2 = _findLocalOdsImage(part); if(f2 && f2.odsImage) odsImage = f2.odsImage; } }catch(_){ }
+  }
   if(odsImage){
     try{
       const baseImg = await mvLoadImage(odsImage);
@@ -3735,6 +3740,9 @@ function _idbPutDrawing(partNum, odsImage, cleanOdsImage){
   const P = String(partNum||'').trim().toUpperCase();
   if(!P || !odsImage) return;
   _idbDrawCache[P] = { odsImage, cleanOdsImage: cleanOdsImage || null };
+  // Rev-506: every drawing save also syncs it to GitHub (session-guarded, so boot-time
+  // migrations only push each part once and unchanged drawings never re-upload)
+  setTimeout(() => { try{ ghPushDrawing(P); }catch(e){} }, 1500);
   if(!_idbDb) return;
   try {
     const tx = _idbDb.transaction('drawings', 'readwrite');
@@ -3745,6 +3753,54 @@ function _idbGetDrawing(partNum){
   const P = String(partNum||'').trim().toUpperCase();
   return _idbDrawCache[P] || null;
 }
+// ===== Rev-506: DRAWING SYNC =====================================================
+// Each part's ODS drawing lives in its own repo file drawings/{PART}.json. Saving a
+// drawing pushes it (once per version, session-guarded); any device that lacks a
+// drawing pulls it automatically when the plan opens or is injected for inspection.
+function ghDrawUrl(P){
+  const c = ghConfig();
+  return 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/drawings/' + encodeURIComponent(P) + '.json';
+}
+function _drawSig(d){ return String((d.odsImage||'').length) + ':' + String((d.cleanOdsImage||'').length); }
+async function ghPushDrawing(partNum){
+  try{
+    if(!ghConfigured()) return false;
+    const P = String(partNum||'').trim().toUpperCase(); if(!P) return false;
+    const d = _idbGetDrawing(P); if(!d || !d.odsImage) return false;
+    const key = 'ghDrawSync_' + P, sig = _drawSig(d);
+    if(localStorage.getItem(key) === sig) return true;   // this version already up
+    const c = ghConfig(), url = ghDrawUrl(P);
+    const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+    let sha = null;
+    try{ const g = await fetch(url, { headers: hdrs, cache: 'no-store' });
+      if(g.ok){ const j = await g.json(); sha = j.sha || null; } }catch(e){}
+    const payload = JSON.stringify({ partNum: P, odsImage: d.odsImage, cleanOdsImage: d.cleanOdsImage || null, ut: new Date().toISOString() });
+    const body = { message: 'Drawing sync ' + P + ' ' + new Date().toISOString(), content: btoa(unescape(encodeURIComponent(payload))) };
+    if(sha) body.sha = sha;
+    const r = await fetch(url, { method: 'PUT', headers: { ...hdrs, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if(r.ok){ localStorage.setItem(key, sig); return true; }
+    return false;
+  }catch(e){ return false; }
+}
+const _drawPullTried = {};
+async function ghPullDrawing(partNum){
+  try{
+    if(!ghConfigured()) return false;
+    const P = String(partNum||'').trim().toUpperCase(); if(!P) return false;
+    if(_idbGetDrawing(P)) return true;                 // already have it
+    if(_drawPullTried[P]) return false;                // one network try per session
+    _drawPullTried[P] = 1;
+    const c = ghConfig();
+    const r = await fetch(ghDrawUrl(P), { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw' }, cache: 'no-store' });
+    if(!r.ok) return false;
+    const j = JSON.parse(await r.text());
+    if(!j || !j.odsImage) return false;
+    _idbPutDrawing(P, j.odsImage, j.cleanOdsImage || null);
+    localStorage.setItem('ghDrawSync_' + P, _drawSig({ odsImage: j.odsImage, cleanOdsImage: j.cleanOdsImage }));
+    return true;
+  }catch(e){ return false; }
+}
+// ===== end Rev-506 drawing sync ==================================================
 async function _idbInit(){
   _idbDb = await _idbOpen();
   if(!_idbDb) return;   // IndexedDB unavailable — app behaves exactly as before (no stripping)
@@ -3803,6 +3859,12 @@ function _findLocalOdsImage(partNum){
 }
 function updateOdsPanel(){
   if(!cpBuildState) return;
+  // Rev-506: builder open with no drawing on this device — fetch it and redraw when it lands
+  try{
+    if(!cpBuildState.odsImage && cpBuildState.partNum && !_idbGetDrawing(cpBuildState.partNum)){
+      ghPullDrawing(cpBuildState.partNum).then(ok => { if(ok) updateOdsPanel(); });
+    }
+  }catch(e){}
   // Rev-208: if the build state has no drawing but the app does (older saved project,
   // or any path that dropped it), adopt the current drawing so the panel isn't empty.
   if(!cpBuildState.odsImage && currentODSImage) cpBuildState.odsImage = currentODSImage;
