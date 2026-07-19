@@ -1342,7 +1342,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-498";
+const APP_REV = "Rev-499";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1356,6 +1356,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-18", rev: "App Rev-499", type: "App", changes: ["FREQ OVERRIDES WITH A LOUD MARKER \u2014 the FREQ (Every) and FREQ (QE) cells in the builder are now editable. A value that differs from the Master List marks the cell as an OVERRIDE: orange fill with an orange outline, bold text, and a chip reading \u2018OVERRIDE \u2014 master: 10 \u21ba\u2019; clicking the chip snaps back to the master value. Typing the master value back in also clears the flag. Re-applying a control type keeps the override in place while refreshing the remembered master value beneath it, and collapsed rows show the same orange tint. Per CP-2C the Master List still governs \u2014 the marker exists precisely so an intentional deviation can never hide."] },
   { ts: "2026-07-18", rev: "App Rev-498", type: "App", changes: ["ONE-CLICK CELL ENTRY IN THE BUILDER GRID \u2014 clicking a cell on a collapsed row used to take two clicks: the first expanded the row (the re-render destroyed the clicked cell before it could take the cursor) and a second click was needed to actually get into the field. The click now remembers which cell it hit and, the moment the expanded row is drawn, drops the cursor into that same cell with its text selected \u2014 one click, type immediately."] },
   { ts: "2026-07-18", rev: "App Rev-497", type: "App", changes: ["MINIMIZE DRAWING IN BUILD CONTROL PLAN \u2014 a \u25ac Minimize drawing button now sits in the ODS pane toolbar; tapping it collapses the drawing so the Control Plan grid takes the full screen width, and a floating \ud83d\uddfa Show drawing chip in the top-right corner brings it back. The choice is remembered per device, and reopening the builder keeps the drawing minimized if that is how you left it."] },
   { ts: "2026-07-18", rev: "App Rev-496", type: "App", changes: ["CONTROL PLANS ROW BUTTONS REORDERED per user spec: Edit Control Plan \u00b7 Edit Machinist Validation \u00b7 Inspect Validation \u00b7 Rename \u00b7 Delete \u00b7 Download. Labels clarified to match (\u2018Edit\u2019 \u2192 \u2018Edit Control Plan\u2019, \u2018Inspect\u2019 \u2192 \u2018Inspect Validation\u2019, and the purple button reads \u2018Edit Machinist Validation\u2019 always instead of switching between Create/Edit)."] },
@@ -3585,6 +3586,41 @@ function renderCPBuilder(){
       [['measMethod','left'],['numRecorded','center'],['freqEvery','center'],['freqQE','center'],['measMethodCMM','left']].forEach(([key, align]) => {
         const td = document.createElement('td');
         const empty = !row[key];
+        // Rev-499: the two FREQ cells are editable. An edit that differs from the master
+        // value marks the cell as an OVERRIDE — orange fill, OVR chip with the master's
+        // original value in the tooltip, and a ↺ that snaps back to the master.
+        if(key === 'freqEvery' || key === 'freqQE'){
+          const ov = row._freqOvr && row._freqOvr[key] !== undefined;
+          td.style.cssText = 'padding:6px; border:1px solid var(--line); font-size:13px; text-align:center;'
+            + (ov ? 'background:#ffe8cc; border:2px solid #e67e22;' : (empty ? 'background:#fdecea;' : ''));
+          const inp = document.createElement('input');
+          inp.value = row[key] || '';
+          inp.style.cssText = 'width:100%; border:none; background:transparent; font-size:13px; text-align:center; font-weight:' + (ov ? '800' : '400') + ';';
+          inp.onchange = () => {
+            const v = inp.value.trim().toUpperCase();
+            row._freqOvr = row._freqOvr || {};
+            const masterVal = row._freqOvr[key] !== undefined ? row._freqOvr[key] : (row[key] || '');
+            if(v === String(masterVal).toUpperCase()){
+              delete row._freqOvr[key];        // typed the master value back — not an override
+              row[key] = masterVal;
+            } else {
+              if(row._freqOvr[key] === undefined) row._freqOvr[key] = row[key] || '';   // remember master
+              row[key] = v;
+            }
+            renderCPBuilder(); cpAutoSaveProject();
+          };
+          td.appendChild(inp);
+          if(ov){
+            const chip = document.createElement('div');
+            chip.style.cssText = 'font-size:9px; font-weight:800; color:#a35400; letter-spacing:.05em; margin-top:2px; cursor:pointer;';
+            chip.textContent = 'OVERRIDE — master: ' + (row._freqOvr[key] || '(blank)') + ' ↺';
+            chip.title = 'Master List value is ' + (row._freqOvr[key] || '(blank)') + '. Click to restore it.';
+            chip.onclick = () => { row[key] = row._freqOvr[key] || ''; delete row._freqOvr[key]; renderCPBuilder(); cpAutoSaveProject(); };
+            td.appendChild(chip);
+          }
+          tr.appendChild(td);
+          return;
+        }
         td.style.cssText = 'padding:10px; border:1px solid var(--line); font-size:13px; text-align:' + align + ';' + (empty ? 'background:#fdecea;' : '');
         td.textContent = row[key] || '';
         td.title = row[key] || '';
@@ -3618,7 +3654,9 @@ function renderCPBuilder(){
       tr.appendChild(compactCell(row.classification, 'center'));
       tr.appendChild(compactCell(row.measMethod, 'left'));
       tr.appendChild(compactCell(row.numRecorded, 'center'));
-      tr.appendChild(compactCell(row.freqEvery, 'center'));
+      (function(){ const td = compactCell(row.freqEvery, 'center');
+        if(row._freqOvr && row._freqOvr.freqEvery !== undefined){ td.style.background = '#ffe8cc'; td.style.fontWeight = '800'; td.title = 'OVERRIDE — master: ' + (row._freqOvr.freqEvery || '(blank)'); }
+        tr.appendChild(td); })();
       tr.appendChild(compactCell(row.freqQE, 'center'));
       tr.appendChild(compactCell(row.measMethodCMM, 'left'));
       tr.appendChild(compactCell(row.reactionPlan, 'left'));
@@ -5487,8 +5525,11 @@ function applyControlType(idx, controlTypeId){
   if(match){
     row.measMethod = match.measMethod || '';
     row.numRecorded = match.numRecorded || '';
-    row.freqEvery = match.freqEvery || '';
-    row.freqQE = match.freqQE || '';
+    // Rev-499: keep a user override in place; refresh the remembered master value under it
+    if(row._freqOvr && row._freqOvr.freqEvery !== undefined) row._freqOvr.freqEvery = match.freqEvery || '';
+    else row.freqEvery = match.freqEvery || '';
+    if(row._freqOvr && row._freqOvr.freqQE !== undefined) row._freqOvr.freqQE = match.freqQE || '';
+    else row.freqQE = match.freqQE || '';
     row.measMethodCMM = match.measMethodCMM || '';
     // Classification comes from master only if it carries one (KC/CC/CI); else leave as-is per CP-6
     if(match.classification) row.classification = match.classification;
