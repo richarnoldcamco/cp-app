@@ -961,6 +961,7 @@
          (auto-update at open / every 60s / every tap; app-sync pushes newer revs; Claude
          pushes releases). The manual/emergency tools live in this collapsed section. -->
     <button class="btn-ghost" id="cpArchBtn" style="min-height:48px; width:100%; margin-bottom:10px;">📐 How This App Works — architecture &amp; storage</button>
+    <button class="btn-ghost" id="cpRecipeBtn" style="min-height:48px; width:100%; margin-bottom:10px;">📋 New-App Recipe — copy &amp; paste into a new chat</button>
     <details style="margin-bottom:10px; border:1px solid var(--line); border-radius:10px; padding:8px 12px;">
       <summary style="cursor:pointer; font-size:13px; font-weight:700; color:var(--ink-dim); padding:4px 0;">🛠️ Advanced — rarely needed (emergency app publishing &amp; data reset)</summary>
       <div style="font-size:11px; color:var(--ink-dim); margin:8px 0 6px;">Everything here happens automatically in normal use. Use only if directed during troubleshooting.</div>
@@ -1343,7 +1344,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-507";
+const APP_REV = "Rev-508";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1357,6 +1358,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-22", rev: "App Rev-508", type: "App", changes: ["NEW-APP RECIPE BUTTON \u2014 Admin gained \ud83d\udccb \u2018New-App Recipe \u2014 copy & paste into a new chat\u2019: it opens the complete 10-section architecture document (single-file design, Pages hosting + icon, data layout with tombstones and per-item file sync, token rules, auto-sync, rev/changelog/push lifecycle, auto-update with the never-downgrade guard, Admin layout, assistant working rules, and the first-build checklist) in a big text box with a one-tap \ud83d\udccb Copy all button, so any future app \u2014 quoting or otherwise \u2014 can be started from any device by pasting it into a fresh chat."] },
   { ts: "2026-07-22", rev: "App Rev-507", type: "App", changes: ["ARCHITECTURE REFERENCE IN ADMIN \u2014 a \ud83d\udcd0 \u2018How This App Works\u2019 button above the Advanced section opens a plain-language overlay describing the whole design: the single-file app, the GitHub Pages website and installable icon, where every piece of data lives (cp_data.json, runs/, drawings/, tombstones, localStorage vs IndexedDB), the scoped token and regeneration rule, automatic data + drawing sync, how new revs ship and self-update on every device, the never-downgrade guard, and the house rules."] },
   { ts: "2026-07-19", rev: "App Rev-506", type: "App", changes: ["DRAWING SYNC \u2014 ODS drawings now travel between devices. Each part\u2019s drawing is pushed to GitHub as its own file (drawings/PART.json, original + cleaned image together) whenever it is saved on any device \u2014 session-guarded so unchanged drawings never re-upload. Any device that opens a plan or starts an inspection WITHOUT the drawing pulls it automatically: the validation injection waits for it (balloon crops and the ODS panel appear as always), and the builder fetches in the background and redraws when it lands. Built after the desktop showed \u2018No ODS drawing\u2019 on a real run \u2014 the drawing had only ever existed on the phone."] },
   { ts: "2026-07-19", rev: "App Rev-505", type: "App", changes: ["BUILD TIME ON THE BADGE (redone safely) \u2014 the red rev badge, header, and footer now show a 24-hour build time beside the date (e.g. REV-505 2026-07-19 12:53), small and subtle next to the rev number. This re-implements what the broken Rev-503 attempted, as a plain BUILD_TIME constant set alongside BUILD_DATE on every build \u2014 three display lines changed, nothing near boot logic."] },
@@ -1737,7 +1739,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-22";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "20:37";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "21:58";   // Rev-505: 24-hour build time, shown beside the date
 let currentODSImage = null; // Store current ODS image for viewer
 let currentCleanODSImage = null; // Unballooned original — preserved so re-analysis always uses the clean drawing
 let cpPinScale = (() => { try{ const v = parseFloat(localStorage.getItem('cpPinScale')); return (v && v > 0) ? v : 1; }catch(_){ return 1; } })();   // Rev-380: adjustable pin-highlight size
@@ -12842,6 +12844,97 @@ if(ghConfigured()){
         document.body.appendChild(ov);
         ov.addEventListener('click', (e) => { if(e.target === ov) ov.style.display = 'none'; });
         ov.querySelector('#cpArchClose').onclick = () => { ov.style.display = 'none'; };
+      }
+      ov.style.display = 'flex';
+    };
+  })();
+  // Rev-508: the full architecture recipe, copyable, for starting a new app in a new chat
+  const CP_RECIPE_TEXT = `# HOW TO BUILD THE QUOTING APP EXACTLY LIKE THE CP APP
+Paste this whole document into the new chat. It describes the working architecture of the CAMCO Control Plan Generator so the Quoting app is built the same way. The user (Rich) is NOT a programmer — the assistant does all coding, explains in plain language, and follows every rule below.
+
+## 1. WHAT THE APP IS
+- ONE single-file HTML app (everything — HTML, CSS, JavaScript, embedded images — in one .html file, ~1–2MB). No server, no installer, no build tools, no frameworks.
+- Two inline <script> blocks; the big one holds all app logic and starts with \`const CHANGE_LOG = [...]\` (most-recent-first history) plus \`APP_REV\`, \`BUILD_DATE\`, \`BUILD_TIME\` constants.
+- Filename form: QT-RevNNN.html (short name only — long names truncate in chat).
+
+## 2. HOSTING & THE ICON (how "I have an icon" works)
+- Create a PUBLIC repo \`quote-app\` under github.com/richarnoldcamco with GitHub Pages enabled on main. The app is served as \`index.html\` at https://richarnoldcamco.github.io/quote-app/ .
+- Because the address never changes, each device's browser storage persists — the token and data survive refreshes and updates. NEVER work from downloaded files (on Android, every downloaded copy gets its own empty isolated storage).
+- Icon: push \`icon-192.png\`, \`icon-512.png\`, \`favicon.png\`, \`manifest.json\` to the repo root, and put in <head>:
+  \`<link rel="icon" href="favicon.png">\` · \`<link rel="apple-touch-icon" href="icon-192.png">\` · \`<link rel="manifest" href="manifest.json">\` · \`<meta name="theme-color" content="#7a1a1c">\`
+- manifest.json: name, short_name, start_url "./", display "standalone", icons 192+512. Then "Install this site as an app" (Edge/Chrome) and "Add to Home screen" (Android) give a real desktop/home icon, own window, protected storage.
+- Make the icon a colored rounded square with a 2-letter monogram (CP app uses dark red #7a1a1c with white "CP"; quoting app can use e.g. "QT").
+
+## 3. WHERE DATA LIVES
+- A PRIVATE repo \`quote-data\` holds: \`quote_app.html\` (a second copy of the app code, used by the in-app update check), \`quote_data.json\` (all user data), and per-record JSON files in subfolders if needed (CP app uses \`runs/\` and \`drawings/\`).
+- On each device: settings and data in localStorage; large images/documents in IndexedDB. Deleted records use TOMBSTONES (a deletedKeys list with timestamps) so a delete on one device isn't resurrected by another device's push.
+- Large per-item blobs (drawings, PDFs) are NOT inside quote_data.json — each gets its own repo file (e.g. \`drawings/PART.json\`), pushed on save (session-guarded so unchanged items never re-upload) and pulled automatically by any device that lacks one. This is the CP app's Rev-506 "drawing sync" pattern.
+
+## 4. GITHUB ACCESS (the token)
+- One fine-grained personal access token named for the assistant (e.g. \`claude-push\`), scoped to ONLY these two repos, permission Contents: Read & write. Stored in localStorage per device via the app's Admin screen; also pasted into the chat so the assistant can push code.
+- Regenerating the token KILLS every older copy everywhere (all devices + all chats) — after regenerating, re-enter it in each device's Admin and re-paste to the active chat.
+- API rules (hard-won): every GitHub fetch uses \`cache: 'no-store'\` (Chrome caches API responses ~60s → stale-sha 409s). Refetch the file's sha immediately before each PUT and retry on 409. Contents API PUT works to ~100MB; GET of files >1MB must use \`Accept: application/vnd.github.raw\`. Directory listings >1000 files need the Git Trees API (\`/git/trees/main?recursive=1\`).
+
+## 5. DATA SYNC (automatic)
+- Auto-sync ON by default: PUSH quote_data.json on every save; PULL on page open, on navigation, and every ~45s, merging so other machines' changes appear alone. Manual "Push Data"/"Pull Data" buttons stay as recovery levers; everything else lives in a collapsed "Advanced — rarely needed" section.
+- The status line under the buttons always shows the last sync result with a timestamp.
+
+## 6. APP-CODE LIFECYCLE (how new versions ship)
+- EVERY code change: bump APP_REV by 1, set BUILD_DATE + BUILD_TIME (24h, shown small beside the rev on the badge/header/footer), add a CHANGE_LOG entry (most-recent-first, plain-language, says WHY), validate the largest inline <script> with \`node --check\`, then the assistant pushes the file to BOTH targets — \`quote-data/quote_app.html\` and \`quote-app/index.html\` — via Contents API with the token, and VERIFIES by reading both back and printing the rev.
+- The user never handles files; they just refresh. Only deliver the .html into chat when explicitly asked (DL QT) or when a push fails.
+- Multi-line code edits use a Python splice with \`assert old in html\` (never regex on HTML, never trust str_replace on lines containing literal \\n).
+
+## 7. AUTO-UPDATE ON EVERY DEVICE
+- The running app checks the data-repo copy's APP_REV: at page open, every 60 seconds, on every tap anywhere, and whenever the tab becomes visible again (all through one guarded function: busy-flag, once-a-minute throttle, never mid-task in an editor).
+- If GitHub is NEWER: apply in place (fetch + document.write; token and data survive). If the in-place swap is blocked (installed-app windows), automatically do a cache-skipping reload: \`location.replace(location.pathname + '?v=' + Date.now())\`. If an editor is open, show a banner and wait.
+- If GitHub is OLDER: NEVER-DOWNGRADE GUARD — every push function reads the remote rev FIRST and refuses to overwrite a newer one (silent pushes skip; manual pushes demand a typed confirmation). This guard prevented endless "zombie rev" resurrection wars; do not omit it.
+- Boot: if this device is newer than GitHub, push up; if older, auto-apply the newer one.
+
+## 8. ADMIN SCREEN (exact contents)
+Username / Repository / Personal Access Token boxes → "Save GitHub Settings" → "Push Data to GitHub" + "Pull Data from GitHub" → collapsed "🛠️ Advanced — rarely needed" (Push App Code, Publish to Website, Import App Code file-picker fallback, Reset Data) → Auto-sync and App-sync checkboxes → status line → Test Connection.
+
+## 9. WORKING RULES FOR THE ASSISTANT
+- Read the CHANGE_LOG first — it is the authoritative feature history; don't rediscover features from code.
+- One chat pushes revs at a time. If told another chat is active, stand down. (Two chats pushing forked revs simultaneously broke the CP app once.)
+- If a rev ships broken: roll FORWARD — re-issue the last good codebase under a HIGHER rev number so every device's guard accepts it; never try to go backwards.
+- End every response with "Current: Rev-NNN — live on GitHub" plus a token estimate line.
+- User is phone-first, terse, all-caps; resolve intent from minimal input; click-by-click instructions; define jargon in one plain sentence. ITAR context: part/drawing data stays on-device; any AI feature sits behind a confirm gate.
+
+## 10. FIRST-BUILD CHECKLIST FOR THE QUOTING APP
+1) User creates repos \`quote-app\` (public, Pages on) and \`quote-data\` (private), and a fine-grained token scoped to both (Contents R/W), pasted into chat.
+2) Assistant builds QT-Rev1.html with: header (name, REV badge with date+time, Sync Now), home tiles, Admin screen per §8, all sync/update machinery per §5–§7, CHANGE_LOG seeded with Rev-1.
+3) Assistant pushes app to both targets + icon/manifest files to quote-app, verifies, gives the user the website address and the one-time per-device setup (open site → Admin → enter username/repo/token → Save → Pull).
+`;
+  (function(){
+    const b = $('cpRecipeBtn'); if(!b) return;
+    b.onclick = () => {
+      let ov = $('cpRecipeOverlay');
+      if(!ov){
+        ov = document.createElement('div');
+        ov.id = 'cpRecipeOverlay';
+        ov.style.cssText = 'position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; padding:16px;';
+        ov.innerHTML = '<div style="background:var(--panel,#fff); color:var(--ink,#222); width:min(860px,96vw); max-height:90vh; display:flex; flex-direction:column; border-radius:14px; padding:18px 20px; box-shadow:0 10px 40px rgba(0,0,0,.35);">'
+          + '<div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">'
+          + '<b style="font-size:15px;">New-App Recipe</b>'
+          + '<span style="font-size:12px; color:#777;">Copy all of this into the FIRST message of a new chat, then add: BUILD THE [NAME] APP PER THIS DOCUMENT.</span>'
+          + '<button id="cpRecipeCopy" style="margin-left:auto; border:1px solid #186e2f; background:#1f8a3b; color:#fff; border-radius:8px; padding:8px 16px; font-weight:800; cursor:pointer;">📋 Copy all</button>'
+          + '<button id="cpRecipeClose" style="border:1px solid #999; background:transparent; border-radius:8px; padding:8px 14px; font-weight:800; cursor:pointer;">✕</button>'
+          + '</div>'
+          + '<textarea id="cpRecipeTa" readonly style="flex:1; min-height:50vh; width:100%; box-sizing:border-box; font-family:monospace; font-size:11px; line-height:1.45; border:1px solid #ccc; border-radius:8px; padding:10px; resize:none;"></textarea>'
+          + '</div>';
+        document.body.appendChild(ov);
+        ov.querySelector('#cpRecipeTa').value = CP_RECIPE_TEXT;
+        ov.addEventListener('click', (e) => { if(e.target === ov) ov.style.display = 'none'; });
+        ov.querySelector('#cpRecipeClose').onclick = () => { ov.style.display = 'none'; };
+        ov.querySelector('#cpRecipeCopy').onclick = async () => {
+          const ta = ov.querySelector('#cpRecipeTa');
+          ta.select(); ta.setSelectionRange(0, 9999999);
+          let ok = false;
+          try{ await navigator.clipboard.writeText(CP_RECIPE_TEXT); ok = true; }catch(e){ try{ ok = document.execCommand('copy'); }catch(e2){} }
+          const btn = ov.querySelector('#cpRecipeCopy');
+          btn.textContent = ok ? '✓ Copied' : 'Select + Ctrl+C';
+          setTimeout(() => { btn.textContent = '📋 Copy all'; }, 2500);
+        };
       }
       ov.style.display = 'flex';
     };
