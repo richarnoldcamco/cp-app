@@ -1344,7 +1344,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-508";
+const APP_REV = "Rev-509";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1358,6 +1358,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-22", rev: "App Rev-509", type: "App", changes: ["PIN-TO-TASKBAR RECIPE ADDED \u2014 the \ud83d\udccb New-App Recipe now carries a PART 2 written from the quoting-app build: the exact GitHub Pages \u2192 install \u2192 pin procedure for Windows (with the three approaches that were tried and DO NOT work listed so nobody retries them), the manifest template, the verify-it\u2019s-a-real-install check, phone home-screen note, and the current live apps list (CP + QT). One Copy-all now hands a new chat the full architecture AND the pinning procedure."] },
   { ts: "2026-07-22", rev: "App Rev-508", type: "App", changes: ["NEW-APP RECIPE BUTTON \u2014 Admin gained \ud83d\udccb \u2018New-App Recipe \u2014 copy & paste into a new chat\u2019: it opens the complete 10-section architecture document (single-file design, Pages hosting + icon, data layout with tombstones and per-item file sync, token rules, auto-sync, rev/changelog/push lifecycle, auto-update with the never-downgrade guard, Admin layout, assistant working rules, and the first-build checklist) in a big text box with a one-tap \ud83d\udccb Copy all button, so any future app \u2014 quoting or otherwise \u2014 can be started from any device by pasting it into a fresh chat."] },
   { ts: "2026-07-22", rev: "App Rev-507", type: "App", changes: ["ARCHITECTURE REFERENCE IN ADMIN \u2014 a \ud83d\udcd0 \u2018How This App Works\u2019 button above the Advanced section opens a plain-language overlay describing the whole design: the single-file app, the GitHub Pages website and installable icon, where every piece of data lives (cp_data.json, runs/, drawings/, tombstones, localStorage vs IndexedDB), the scoped token and regeneration rule, automatic data + drawing sync, how new revs ship and self-update on every device, the never-downgrade guard, and the house rules."] },
   { ts: "2026-07-19", rev: "App Rev-506", type: "App", changes: ["DRAWING SYNC \u2014 ODS drawings now travel between devices. Each part\u2019s drawing is pushed to GitHub as its own file (drawings/PART.json, original + cleaned image together) whenever it is saved on any device \u2014 session-guarded so unchanged drawings never re-upload. Any device that opens a plan or starts an inspection WITHOUT the drawing pulls it automatically: the validation injection waits for it (balloon crops and the ODS panel appear as always), and the builder fetches in the background and redraws when it lands. Built after the desktop showed \u2018No ODS drawing\u2019 on a real run \u2014 the drawing had only ever existed on the phone."] },
@@ -1739,7 +1740,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-22";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "21:58";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "22:03";   // Rev-505: 24-hour build time, shown beside the date
 let currentODSImage = null; // Store current ODS image for viewer
 let currentCleanODSImage = null; // Unballooned original — preserved so re-analysis always uses the clean drawing
 let cpPinScale = (() => { try{ const v = parseFloat(localStorage.getItem('cpPinScale')); return (v && v > 0) ? v : 1; }catch(_){ return 1; } })();   // Rev-380: adjustable pin-highlight size
@@ -12904,6 +12905,72 @@ Username / Repository / Personal Access Token boxes → "Save GitHub Settings" �
 1) User creates repos \`quote-app\` (public, Pages on) and \`quote-data\` (private), and a fine-grained token scoped to both (Contents R/W), pasted into chat.
 2) Assistant builds QT-Rev1.html with: header (name, REV badge with date+time, Sync Now), home tiles, Admin screen per §8, all sync/update machinery per §5–§7, CHANGE_LOG seeded with Rev-1.
 3) Assistant pushes app to both targets + icon/manifest files to quote-app, verifies, gives the user the website address and the one-time per-device setup (open site → Admin → enter username/repo/token → Save → Pull).
+
+============================================================
+PART 2 — HOW TO PIN A NEW APP TO THE WINDOWS TASKBAR
+============================================================
+Paste this into a new chat when creating a pinned app. Follows the CAMCO CP/QT architecture. Rich is NOT a programmer — assistant does all coding, click-by-click instructions, one step at a time.
+
+THE RULE
+Never pin from a local file. Host on GitHub Pages first, then install from the live URL.
+This is not a preference. Chrome refuses "Install page as app" for file:// addresses, and Windows refuses to pin any shortcut whose target is .html. Both are hard blocks.
+
+WHAT DOES NOT WORK — DO NOT RETRY THESE (all three tried and failed 2026-07-22):
+1. Right-click the HTML file → Send to → Desktop → Pin to taskbar. "Pin to taskbar" does not appear for .html targets.
+2. Retarget the shortcut to chrome.exe --app="file:///...". App launches but cannot be pinned — Windows merges the window into the pinned Chrome icon.
+3. Paste the shortcut into shell:User Pinned\\TaskBar and restart Explorer. Windows silently discards it.
+If any of these look promising, they are not. Skip to GitHub Pages.
+
+THE WORKING PATTERN
+- Public app repo: <NAME>-APP — e.g. QT-APP, cp-app
+- Main file: must be renamed index.html in the repo
+- Companions: manifest.json, icon-192.png, icon-512.png, favicon.png — repo root, same folder
+- Pages source: Settings → Pages → Branch main, folder / (root)
+- Live URL: richarnoldcamco.github.io/<NAME>-APP/
+- Private data repo: <Name>-Data — e.g. Quote-Data, cp-generator-data
+
+STEPS
+1. Create repo — github.com → + → New repository → name <NAME>-APP → Public (required; Pages needs it on free accounts) → no README → Create.
+2. Upload — "uploading an existing file" → drag in all 5 files → Commit changes.
+3. Rename main file — click the .html file → pencil icon → change filename to index.html → Commit.
+4. Enable Pages — Settings → Pages → Branch: main, folder / (root) → Save. Wait ~60 seconds.
+5. Test — open richarnoldcamco.github.io/<NAME>-APP/. If 404, wait and reload. Confirm the app icon appears in the browser tab — that proves manifest.json loaded. If the tab shows a blank page icon, the manifest or icon files are wrong; fix before continuing.
+6. Install — ⋮ menu → Cast, save, and share → Install <app name>... → Install. Must not be greyed out. If it is, you're on a file:// address, not the live URL.
+7. Pin — right-click the app's icon at the far right of the taskbar → Pin to taskbar.
+
+VERIFY IT'S A REAL INSTALL
+Right-click the pinned icon. A properly installed app shows Uninstall in the menu. If Uninstall is missing, it's just a shortcut and the pin will not survive. Redo step 6.
+
+manifest.json TEMPLATE
+{
+  "name": "<Full App Name>",
+  "short_name": "<Short Name>",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#eceae4",
+  "theme_color": "#7a1a1c",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
+
+Required in <head> of the app:
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7a1a1c">
+Icon: colored rounded square, 2-letter white monogram, dark red #7a1a1c. (CP = "CP", QT = "QT".)
+
+AFTER PINNING
+- Updates need no re-pinning. Replace index.html in the repo; the pinned icon picks it up on next open.
+- Phone gets the same URL. Open it in mobile Chrome/Safari → Add to Home Screen. Same icon, same app.
+- Delete stale desktop shortcuts pointing at the old local file — they drift out of date silently.
+- Never work from downloaded copies. Each download gets isolated browser storage; the fixed URL is what makes storage persist.
+
+CURRENT LIVE APPS
+- CP: richarnoldcamco.github.io/cp-app/ — data in cp-generator-data (private)
+- QT: richarnoldcamco.github.io/QT-APP/ — data in Quote-Data (private)
 `;
   (function(){
     const b = $('cpRecipeBtn'); if(!b) return;
