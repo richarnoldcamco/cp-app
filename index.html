@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-520</title>
+<title>CONTROL PLAN GENERATOR - Rev-521</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-520 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-25 16:12 ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-521 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-25 16:52 ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1344,6 +1344,16 @@ KEYBOARD SHORTCUTS
 <script>
 // Rev-513: BOOT-ERROR CATCHER — if anything crashes during startup, say so in plain
 // sight instead of silently leaving a half-dead screen.
+window.addEventListener('unhandledrejection', function(ev){
+  try{
+    if(document.getElementById('bootErrBar2')) return;
+    const d = document.createElement('div');
+    d.id = 'bootErrBar2';
+    d.style.cssText = 'position:fixed;top:34px;left:0;right:0;z-index:9999;background:#a04000;color:#fff;padding:10px 14px;font:700 13px system-ui;';
+    d.textContent = '⚠️ ASYNC ERROR — screenshot for Claude: ' + String((ev.reason && (ev.reason.message||ev.reason)) || 'unknown').slice(0,300);
+    document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
+  }catch(e){}
+});
 window.addEventListener('error', function(ev){
   try{
     if(document.getElementById('bootErrBar')) return;
@@ -1354,7 +1364,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-520";
+const APP_REV = "Rev-521";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1368,6 +1378,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-25", rev: "App Rev-521", type: "App", changes: ["SILENT BOOT DEATH MADE LOUD + PULL BUTTON MADE CRASH-PROOF \u2014 one desktop\u2019s startup was dying partway (stale footer, dead PULL button) with an error type the red bar missed. Three fixes: async promise failures now paint an orange bar; the whole boot tail runs inside a guard that paints a dark-red bar with the exact message and line if anything fails; and PULL CODE & DATA is defined at the very top of the script (with a plain-language alert when GitHub isn\u2019t set up) so it works no matter what happens later in boot."] },
   { ts: "2026-07-25", rev: "App Rev-520", type: "App", changes: ["PIN DRIFT ROOT-CAUSED AND SEALED \u2014 closing the freeze view auto-advances to the next balloon, and a backdrop-click close could FALL THROUGH to the drawing and silently pin that freshly-advanced balloon at the dismiss point: the systematic off-by-one the user caught (bubble 3\u2019s pin on balloon 11, bubble 11\u2019s on balloon 5). The drawing now ignores pin-clicks for half a second after the freeze view closes, so a dismiss can never plant a pin. Fix existing drifted pins by clicking each wrong row and dragging its red ring onto the true balloon."] },
   { ts: "2026-07-25", rev: "App Rev-519", type: "App", changes: ["LOADED TIME + PULL CODE & DATA BUTTON \u2014 the badge and home card now show when THIS page LOADED, taken from the device\u2019s own clock so it is always the user\u2019s local (Eastern) time, matching the Quote app\u2019s style; the build moment stays in the footer marked ET. And the home card gained \u21bb PULL CODE & DATA under Admin: one tap pulls the data AND checks GitHub for newer app code immediately, applying it if found \u2014 no waiting for the timer."] },
   { ts: "2026-07-25", rev: "App Rev-518", type: "App", changes: ["FREEZE-VIEW TOOLBAR TIDIED \u2014 the \u2018\u2714 Save readable view\u2019 button now just says \u2714 Save, and the \ud83d\udd34\u2212 / \ud83d\udd34+ ring-size pair carries a tiny BUBBLE SIZE caption above it so its purpose is obvious at a glance."] },
@@ -1761,7 +1772,21 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-25";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "16:12";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "16:52";   // Rev-505: 24-hour build time, shown beside the date
+// Rev-521: defined EARLY so the home-card button works even if later boot code fails
+window.cpPullCodeAndData = async function(){
+  try{
+    if(typeof ghConfigured !== 'function' || !ghConfigured()){ alert('Set up GitHub first: Admin → GitHub Sync → username richarnoldcamco · repo cp-generator-data · paste the token → Save.'); return; }
+    if(typeof flash === 'function') flash('↻ Pulling data…');
+    try{ await ghPull(false); }catch(e){}
+    const ex = await ghGetAppFile();
+    const mm = ex && /const APP_REV = "([^"]+)"/.exec(ex.html);
+    const rNum = mm ? parseInt((mm[1].match(/\d+/)||['0'])[0]) : 0;
+    const lNum = parseInt((APP_REV.match(/\d+/)||['0'])[0]);
+    if(rNum > lNum){ if(typeof flash==='function') flash('↻ Newer app found (' + mm[1] + ') — applying…'); ghPullApp(true, true); }
+    else if(typeof flash==='function') flash('✓ App already newest (' + APP_REV + ') — data pulled');
+  }catch(e){ alert('Pull failed: ' + (e && e.message || e)); }
+};
 // Rev-516: paint the true rev EVERYWHERE immediately — never let a stale placeholder show
 try{
   document.title = 'CONTROL PLAN GENERATOR - ' + APP_REV;
@@ -12348,6 +12373,7 @@ if($('cpPartNum')) $('cpPartNum').addEventListener('input', updateEditExistingBt
 if($('cpWorkcenter')) $('cpWorkcenter').addEventListener('input', updateEditExistingBtn);
 
 if($('mSaveApp')) $('mSaveApp').onclick = saveThisApp;
+try{   // Rev-521: boot-tail guard — any failure below REPORTS itself instead of silently dying
 $('mProjects').onclick = showProjects;
 $('mMasterList').onclick = showMasterList;
 $('mValidation').onclick = openAllMachinistValidations;
@@ -13132,20 +13158,7 @@ CURRENT LIVE APPS
       rd.readAsDataURL(file);
     };
   })();
-  // Rev-519: one-tap PULL CODE & DATA from the home card
-  window.cpPullCodeAndData = async function(){
-    if(!ghConfigured()){ flash('Set up GitHub in Admin first (username, repo, token)', true); return; }
-    flash('↻ Pulling data…');
-    try{ await ghPull(false); }catch(e){}
-    try{
-      const ex = await ghGetAppFile();
-      const m = ex && /const APP_REV = "([^"]+)"/.exec(ex.html);
-      const rNum = m ? parseInt((m[1].match(/\d+/)||['0'])[0]) : 0;
-      const lNum = parseInt((APP_REV.match(/\d+/)||['0'])[0]);
-      if(rNum > lNum){ flash('↻ Newer app found (' + m[1] + ') — applying…'); ghPullApp(true, true); }
-      else flash('✓ App already newest (' + APP_REV + ') — data pulled');
-    }catch(e){ flash('App check failed: ' + e.message, true); }
-  };
+  // Rev-521: cpPullCodeAndData now defined early (top of script)
   setInterval(ghAutoUpdateApp, 60000);
   // Rev-478: the 60s timer sleeps when Android backgrounds the tab, so pushes that land
   // while you're away used to wait for the next tick after return. Now ANY tap and every
@@ -13178,6 +13191,8 @@ CURRENT LIVE APPS
     }).catch(()=>{});
   }
 }
+
+}catch(__bootErr){ try{ const d=document.createElement('div'); d.style.cssText='position:fixed;top:68px;left:0;right:0;z-index:9999;background:#7a1a1c;color:#fff;padding:10px 14px;font:700 13px system-ui;'; d.textContent='⚠️ BOOT-TAIL ERROR — screenshot for Claude: '+(__bootErr.message||__bootErr)+' | '+String(__bootErr.stack||'').split('\n')[1]; document.body.appendChild(d); }catch(e){} }
 </script>
 
 <!-- Master List File Viewer Modal -->
