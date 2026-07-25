@@ -377,63 +377,35 @@
     <button id="headerSyncNowBtn" title="Pull the latest data from GitHub and check for a newer app version" onclick="headerSyncNow()" style="background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-left:8px;">⬇️ Sync Now</button>
     <button id="newChatPromptBtn" title="Show the exact text to paste into a new Claude chat" onclick="showNewChatPrompt()" style="background:#1a5276; color:#fff; border:1px solid #154360; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-left:8px;">💬 New Chat Prompt</button>
   </div>
-  <div class="menu-inner" style="display:flex; flex-direction:column; gap:10px; padding:12px 16px;">
-    <!-- WORKSPACE: four tiles across -->
-    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px;">
-      <button class="menu-btn" id="mProjects" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
-        <div class="mi" style="font-size:24px; margin-bottom:4px;">📁</div>
-        <b style="font-size:13px;">Control Plans</b>
-        <small style="font-size:10px;">Open a saved plan</small>
-        <div class="menu-badge" id="badgeProjects" style="position:static; margin-top:4px; font-size:16px; font-weight:700; color:var(--signal);">5<span class="bsub">Projects</span></div>
-        <div id="mProjectsNew" onclick="event.stopPropagation(); showNewCP(true);" style="margin-top:6px; background:var(--signal); color:#fff; border-radius:6px; padding:5px 18px; font-size:12px; font-weight:800; cursor:pointer;" title="Start a new control plan">＋ New</div>
-      </button>
-      <button class="menu-btn" id="mMasterList" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
-        <div class="mi" style="font-size:24px; margin-bottom:4px;">📚</div>
-        <b style="font-size:13px;">Master List</b>
-        <small style="font-size:10px;">Control Types</small>
-        <div class="menu-badge" id="badgeMaster" style="position:static; margin-top:4px; font-size:16px; font-weight:700; color:var(--signal);">64<span class="bsub">Control Types</span></div>
-      </button>
-      <button class="menu-btn" id="mCustomers" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
-        <div class="mi" style="font-size:24px; margin-bottom:4px;">🏢</div>
-        <b style="font-size:13px;">Customer List</b>
-        <small style="font-size:10px;">Customers &amp; Levels</small>
-        <div class="menu-badge" id="badgeCustomers" style="position:static; margin-top:4px; font-size:16px; font-weight:700; color:var(--signal);">11<span class="bsub">Customers</span></div>
-      </button>
-      <button class="menu-btn" id="mInstructions" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
-        <div class="mi" style="font-size:24px; margin-bottom:4px;">📄</div>
-        <b style="font-size:13px;">Instructions</b>
-        <small style="font-size:10px;">Upload &amp; Download</small>
-        <div class="menu-badge" id="badgeInstructions" style="position:static; margin-top:4px; font-size:12px; font-weight:600; color:var(--ink-dim);">Rev-92<span class="bsub">Instructions</span></div>
-      </button>
-    </div>
+  <div class="menu-inner" style="display:flex; justify-content:center; padding:26px 16px;">
+    <div style="background:var(--panel,#fff); border-radius:16px; box-shadow:0 6px 30px rgba(0,0,0,.12); padding:28px 26px; width:min(560px,96vw); text-align:center;">
+      <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:8px 13px; margin-bottom:10px;">CP</div>
+      <div style="font-size:24px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:2px;">CONTROL PLAN GENERATOR</div>
+      <div style="font-size:12px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:20px;">AEROSPACE QUALITY DOCUMENTATION</div>
 
-    <!-- TOOLS: four across -->
-    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px;">
-      <button class="menu-btn" id="mValidation" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center; background:#2c6e49; border-color:#215236; color:#fff;">
-        <span style="font-size:24px; margin-bottom:4px;">🔬</span>
-        <b style="font-size:13px;">Machinist Validation</b>
-        <small style="font-size:10px; opacity:0.9;">All plans, ready to inspect</small>
+      <button class="menu-btn" id="mNewPlan" onclick="showNewCP(true)" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
+        <b style="font-size:15px;">🆕 NEW CONTROL PLAN</b><br>
+        <small style="font-size:11px; color:var(--ink-dim);">UPLOAD AN ODS AND BUILD A NEW PLAN</small>
       </button>
-      <button class="menu-btn" id="mAdmin" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
-        <div class="mi" style="font-size:24px; margin-bottom:4px;">🛠️</div>
-        <b style="font-size:13px;">Admin</b>
-        <small style="font-size:10px;">Settings, Sync, Backup</small>
+      <button class="menu-btn" id="mProjects" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
+        <b style="font-size:15px;">📁 CONTROL PLANS <span id="badgeProjects" style="color:var(--signal); font-size:14px;">0</span></b><br>
+        <small style="font-size:11px; color:var(--ink-dim);">OPEN, EDIT, INSPECT OR DOWNLOAD ANY SAVED PLAN</small>
       </button>
-      <button class="menu-btn" id="mRecentChanges" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
-        <span style="font-size:24px; margin-bottom:4px;">📋</span>
-        <b style="font-size:13px;">Recent Changes</b>
-        <small style="font-size:10px; color:var(--ink-dim);">App &amp; document change log</small>
+      <button class="menu-btn" id="mValidation" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block; background:#2c6e49; border-color:#215236; color:#fff;">
+        <b style="font-size:15px;">🔬 MACHINIST VALIDATION</b><br>
+        <small style="font-size:11px; opacity:.9;">ALL PLANS, READY TO INSPECT</small>
       </button>
-      <button class="menu-btn" id="mReports" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
-        <span style="font-size:24px; margin-bottom:4px;">📊</span>
-        <b style="font-size:13px;">Inspection Reports</b>
-        <small style="font-size:10px; color:var(--ink-dim);">All runs, every station</small>
+      <button class="menu-btn" id="mReports" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
+        <b style="font-size:15px;">📊 REPORTS</b><br>
+        <small style="font-size:11px; color:var(--ink-dim);">EVERY INSPECTION RUN, EVERY STATION</small>
       </button>
-      <button class="menu-btn" id="mCsharpPlan" onclick="openCsharpPlan()" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
-        <span style="font-size:24px; margin-bottom:4px;">🔷</span>
-        <b style="font-size:13px;">C# Conversion Plan</b>
-        <small style="font-size:10px; color:var(--ink-dim);">Build notes &amp; final conversion</small>
+      <button class="menu-btn" id="mAdmin" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; display:block;">
+        <b style="font-size:15px;">⚙️ ADMIN</b><br>
+        <small style="font-size:11px; color:var(--ink-dim);">MASTER LIST · CUSTOMERS · INSTRUCTIONS · CHANGES · SYNC · SETTINGS</small>
       </button>
+      <div style="display:none">
+        <span id="badgeMaster"></span><span id="badgeCustomers"></span><span id="badgeInstructions"></span>
+      </div>
     </div>
   </div>
   <div class="menu-foot">
@@ -1037,6 +1009,25 @@
   <h1>Admin Settings</h1>
   <p class="sub">Data management, backup, sync &amp; API</p>
 
+  <!-- Rev-511: reference screens moved off the home menu into Admin -->
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:24px;">
+    <button class="menu-btn" id="mMasterList" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
+      <div style="font-size:22px;">📚</div><b style="font-size:13px;">Master List</b><small style="font-size:10px; color:var(--ink-dim);">Control Types</small>
+    </button>
+    <button class="menu-btn" id="mCustomers" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
+      <div style="font-size:22px;">🏢</div><b style="font-size:13px;">Customer List</b><small style="font-size:10px; color:var(--ink-dim);">Customers &amp; Levels</small>
+    </button>
+    <button class="menu-btn" id="mInstructions" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
+      <div style="font-size:22px;">📄</div><b style="font-size:13px;">Instructions</b><small style="font-size:10px; color:var(--ink-dim);">Upload &amp; Download</small>
+    </button>
+    <button class="menu-btn" id="mRecentChanges" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
+      <div style="font-size:22px;">📋</div><b style="font-size:13px;">Recent Changes</b><small style="font-size:10px; color:var(--ink-dim);">App &amp; document change log</small>
+    </button>
+    <button class="menu-btn" id="mCsharpPlan" onclick="openCsharpPlan()" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
+      <div style="font-size:22px;">🔷</div><b style="font-size:13px;">C# Conversion Plan</b><small style="font-size:10px; color:var(--ink-dim);">Build notes &amp; conversion</small>
+    </button>
+  </div>
+
   <div style="margin-bottom: 24px;">
     <h3 style="font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px;">API Key &amp; GitHub Sync</h3>
     <button class="btn-primary" onclick="showSettings()" style="width:100%; margin-bottom:8px;">⚙️ API Key &amp; GitHub Sync Settings</button>
@@ -1346,7 +1337,7 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-510";
+const APP_REV = "Rev-511";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1360,6 +1351,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-25", rev: "App Rev-511", type: "App", changes: ["HOME SCREEN REDESIGNED to match the Quote app\u2019s centered menu: a single card with the CP mark, title, and five stacked full-width buttons \u2014 NEW CONTROL PLAN, CONTROL PLANS (with live project count), MACHINIST VALIDATION (green), REPORTS, and ADMIN. Master List, Customer List, Instructions, Recent Changes, and the C# Conversion Plan moved INTO the Admin screen as a tile row at the top \u2014 same buttons, same behavior, just off the home screen. All element IDs preserved so every existing wiring and badge count still works; the project-count badge now sits inline on the CONTROL PLANS button."] },
   { ts: "2026-07-25", rev: "App Rev-510", type: "App", changes: ["UPLOAD / REPLACE DRAWING IN THE BUILDER \u2014 the ODS pane toolbar gained a blue \ud83d\udcc4 Upload / Replace drawing button: pick a PNG/JPG and it becomes the plan\u2019s ODS immediately \u2014 stored on the device, saved to the project, and pushed through Rev-506 drawing sync so every device gets it. Replacing an existing drawing asks first and keeps balloon pin positions (with a reminder to re-check pins if the new file is a different scan). PDFs get a friendly \u2018screenshot the page first\u2019 message."] },
   { ts: "2026-07-22", rev: "App Rev-509", type: "App", changes: ["PIN-TO-TASKBAR RECIPE ADDED \u2014 the \ud83d\udccb New-App Recipe now carries a PART 2 written from the quoting-app build: the exact GitHub Pages \u2192 install \u2192 pin procedure for Windows (with the three approaches that were tried and DO NOT work listed so nobody retries them), the manifest template, the verify-it\u2019s-a-real-install check, phone home-screen note, and the current live apps list (CP + QT). One Copy-all now hands a new chat the full architecture AND the pinning procedure."] },
   { ts: "2026-07-22", rev: "App Rev-508", type: "App", changes: ["NEW-APP RECIPE BUTTON \u2014 Admin gained \ud83d\udccb \u2018New-App Recipe \u2014 copy & paste into a new chat\u2019: it opens the complete 10-section architecture document (single-file design, Pages hosting + icon, data layout with tombstones and per-item file sync, token rules, auto-sync, rev/changelog/push lifecycle, auto-update with the never-downgrade guard, Admin layout, assistant working rules, and the first-build checklist) in a big text box with a one-tap \ud83d\udccb Copy all button, so any future app \u2014 quoting or otherwise \u2014 can be started from any device by pasting it into a fresh chat."] },
@@ -1743,7 +1735,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-25";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:11";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:24";   // Rev-505: 24-hour build time, shown beside the date
 let currentODSImage = null; // Store current ODS image for viewer
 let currentCleanODSImage = null; // Unballooned original — preserved so re-analysis always uses the clean drawing
 let cpPinScale = (() => { try{ const v = parseFloat(localStorage.getItem('cpPinScale')); return (v && v > 0) ? v : 1; }catch(_){ return 1; } })();   // Rev-380: adjustable pin-highlight size
