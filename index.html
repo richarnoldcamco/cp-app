@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-525</title>
+<title>CONTROL PLAN GENERATOR - Rev-526</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-525 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-25 17:31 ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-526 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-25 17:41 ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1364,7 +1364,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-525";
+const APP_REV = "Rev-526";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1378,6 +1378,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-25", rev: "App Rev-526", type: "App", changes: ["THE REV-467 GHOST EXORCISED FOR REAL \u2014 root cause finally pinned: the auto-updater applied new code with an in-place page rewrite (document.write), and in installed-app windows that loads the new page\u2019s MARKUP but silently never runs its JAVASCRIPT \u2014 producing the half-dead pages the user kept seeing (new badge, Rev-467 footer, blinking dead buttons, no error bars) until a manual Ctrl+Shift+R did a real reload. The in-place rewrite is now BANNED: every auto-update applies exactly the way Ctrl+Shift+R does \u2014 a cache-skipping reload of the site with a fresh ?v= tag. Token and data untouched, and no more ritual."] },
   { ts: "2026-07-25", rev: "App Rev-525", type: "App", changes: ["\u270f\ufe0f EDIT VIEW ON REFERENCE IMAGES (embedded validation REV-129 \u2192 REV-130) \u2014 the editing screens\u2019 reference panel gained a blue Edit view button beside Save/Delete: it reopens the grab-from-ODS tool so an existing reference can be RE-FRAMED (drag a new box around exactly what should show \u2014 that box is the pan-and-zoom). Saving routes through the same pipeline as before, including the write-back that syncs reference images to the plan and every device."] },
   { ts: "2026-07-25", rev: "App Rev-524", type: "App", changes: ["SMART BACK FROM THE BUILDER \u2014 leaving the builder used to ALWAYS land on the New Control Plan form, even when the session came from editing a saved plan (the \u2018why am I back on this screen\u2019 complaint). Back now returns to the Control Plans list when the session came from a saved plan, and to the New Control Plan form only when you were building one from scratch."] },
   { ts: "2026-07-25", rev: "App Rev-523", type: "App", changes: ["Revision field joins Rev-522\u2019s cleanup \u2014 it was under a different internal name and kept its dark pre-typed Rev-1; now a light-grey E.G., REV-1 example like the rest, with the same silent fallback to Rev-1 when left blank."] },
@@ -1776,7 +1777,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-25";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "17:31";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "17:41";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -9891,7 +9892,13 @@ async function ghPullApp(silent, autoApply){
       // lets a pinned tab move to a new rev with no re-download, no re-pin, no re-paste.
       ghSetStatus('Updating to ' + remoteRev + '…');
       document.open();
-      document.write(ex.html);
+      // Rev-526: in-place rewrite (document.write) is BANNED — in installed-app windows it
+      // loads the new markup but silently never runs its JavaScript, leaving a half-dead page
+      // (new badge, dead buttons, stale footer). Every update now applies the way
+      // Ctrl+Shift+R does: a cache-skipping reload of the site. Token and data untouched.
+      localStorage.setItem('cpJustUpdatedTo', remoteRev);
+      location.replace(location.pathname + '?v=' + Date.now());
+      return;
       document.close();
       return;
     } catch(e){
