@@ -1350,7 +1350,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-513";
+const APP_REV = "Rev-514";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1364,6 +1364,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-25", rev: "App Rev-514", type: "App", changes: ["NEW CHAT PROMPT MADE LIVE \u2014 the \ud83d\udcac New Chat Prompt button now GENERATES its handoff fresh each press instead of showing months-old text: current rev + build stamp + embedded validation rev, both repos and their file layout, the exact ship-a-change procedure (bump/changelog/validate/push both/verify, never-downgrade, roll-forward recovery), the one-chat-pushes rule, the token rule (paste current token; never stored in the text), user working style and quick commands, the controlling document, the saved plans ON THIS DEVICE by name, and the last 8 CHANGE_LOG entries pulled live \u2014 so a brand-new chat picks up exactly where the old one left off."] },
   { ts: "2026-07-25", rev: "App Rev-513", type: "App", changes: ["BOOT-ERROR CATCHER + HARDENED STARTUP \u2014 after a window showed the redesigned home with placeholder rev text and zero counts (a silent boot failure on an empty-storage profile), any uncaught startup error now paints a red bar across the top with the exact message and line to screenshot for Claude, and the rev-display block is wrapped so a hiccup there can never kill the rest of boot."] },
   { ts: "2026-07-25", rev: "App Rev-512", type: "App", changes: ["HOME CARD CENTERED + REV STAMP ON THE CARD \u2014 the menu card now sits centered in the page both ways (not hugging the top), and directly under the subtitle it carries its own rev line \u2014 REV-512 \u00b7 date \u00b7 24-hour time \u2014 matching the header badge and footer."] },
   { ts: "2026-07-25", rev: "App Rev-511", type: "App", changes: ["HOME SCREEN REDESIGNED to match the Quote app\u2019s centered menu: a single card with the CP mark, title, and five stacked full-width buttons \u2014 NEW CONTROL PLAN, CONTROL PLANS (with live project count), MACHINIST VALIDATION (green), REPORTS, and ADMIN. Master List, Customer List, Instructions, Recent Changes, and the C# Conversion Plan moved INTO the Admin screen as a tile row at the top \u2014 same buttons, same behavior, just off the home screen. All element IDs preserved so every existing wiring and badge count still works; the project-count badge now sits inline on the CONTROL PLANS button."] },
@@ -1750,7 +1751,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-25";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:39";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:43";   // Rev-505: 24-hour build time, shown beside the date
 let currentODSImage = null; // Store current ODS image for viewer
 let currentCleanODSImage = null; // Unballooned original — preserved so re-analysis always uses the clean drawing
 let cpPinScale = (() => { try{ const v = parseFloat(localStorage.getItem('cpPinScale')); return (v && v > 0) ? v : 1; }catch(_){ return 1; } })();   // Rev-380: adjustable pin-highlight size
@@ -11957,21 +11958,33 @@ const NEWCHAT_COMMON_FALLBACK =
 
 // The CP-specific section — always local, appended under the common block.
 function buildCpSpecific(){
-  const fn = 'CP-' + APP_REV.replace('Rev-','Rev') + '.html';
-  return (
-'THIS APP: Control Plan Generator \u00B7 filename form CP-RevNNN.html (currently ' + fn + ') \u00B7 rev token APP_REV integer, +1 each code change.\n' +
-'Controlling document: CAMCO Control Plan Instructions Rev-92 (in project Files) \u2014 governs all Control Plan content; never edit it without asking me first.\n' +
-'GitHub: richarnoldcamco/cp-generator-data (app code + per-project xlsx, tombstone deletes) \u00B7 richarnoldcamco/machinist-validation-app (live inspection app) \u00B7 richarnoldcamco/shared-prompts (the shared common prompt above).\n' +
-'Quick commands: DL CP, DL INST, DL PFMEA, dl both, up both, AUDIT, VIEW.\n' +
-'Stack & quirks: single-file HTML (~1.6MB, two inline scripts), localStorage + GitHub sync. AI balloon insertion and AI Retype via Anthropic API (Sonnet), each behind an ITAR confirm gate. Manual balloon placement editor (drag/zoom/review one-by-one, red pin ring), sectioned Make Clearer with per-string retype stepper, box/line/tri/brush erase tools, auto-saved working copy (cpWorkingCopy). Build Control Plan grid feeds the .xlsx (manual Upper Limit / Lower Limit columns).\n' +
-'Machinist Validation (in-app inspection tool): fetches the LIVE inspection app from richarnoldcamco/machinist-validation-app (raw.githubusercontent.com + cache-buster; *.github.io blocked), injects each Control Plan as a "part" (features, tolerances, ODS drawing, per-balloon reference crops incl. erases), strips the built-in demo parts (PART-001/PART-002), and opens it in a same-origin iframe via a boot-hook (re-adds CP parts after its loadParts/loadCustomOps). Home-screen tile loads ALL saved plans; each builder row has a \ud83d\udd2c button for a lightweight LOCAL preview of just that row.\n' +
-'\n' +
-'First task: [describe what you want]\n' +
-'\n' +
-'(Attach ' + fn + ' to this first message \u2014 new chats cannot see files from old chats.)'
-  );
+  // Rev-514: LIVE handoff — everything a brand-new chat needs to pick up exactly where
+  // this one left off, generated fresh every time the button is pressed.
+  const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+  const projLines = projects.map(p => '- ' + p.partNum + ' ' + (p.rev||'') + (p.customerName? ' · ' + p.customerName : '') + (p.updatedAt? ' · updated ' + String(p.updatedAt).slice(0,10) : '')).join('\n') || '- (none on this device — Pull Data first)';
+  let valRev = '?';
+  try{ const m = /const APP_REV\s*=\s*(\d+)/.exec(decodeURIComponent(escape(atob(VALIDATION_APP_B64.slice(0, 400000))))); if(m) valRev = m[1]; }catch(e){}
+  const logs = (typeof CHANGE_LOG !== 'undefined' ? CHANGE_LOG : []).slice(0, 8)
+    .map(e => '- ' + e.rev + ' (' + e.ts + '): ' + String((e.changes&&e.changes[0])||'').slice(0, 220) + '…').join('\n');
+  return [
+'THIS APP: Control Plan Generator · CURRENT ' + APP_REV + ' · built ' + BUILD_DATE + ' ' + BUILD_TIME + ' · embedded Machinist Validation REV-' + valRev,
+'LIVE SITE: https://richarnoldcamco.github.io/cp-app/ (index.html) · data repo: richarnoldcamco/cp-generator-data (cp_app.html app copy · cp_data.json data · runs/ inspection pieces · drawings/ ODS images)',
+'',
+'HOW CLAUDE SHIPS CHANGES: read the CHANGE_LOG at the top of the main script FIRST (authoritative feature history). On any change: bump APP_REV +1, set BUILD_DATE/BUILD_TIME, add a most-recent-first CHANGE_LOG entry, node --check the largest script block, push the file to BOTH targets (cp-generator-data/cp_app.html AND cp-app/index.html) via GitHub Contents API with the claude-push token, then read both back and confirm the rev. Devices self-update (open / 60s / every tap / tab-return) with a never-downgrade guard. NEVER hand the user files unless a push fails or they say DL.',
+'TOKEN: the user must paste the CURRENT claude-push fine-grained token into the new chat (never stored in this text). Regenerating it kills all older copies everywhere. ONE CHAT PUSHES REVS AT A TIME.',
+'BROKEN REV RECOVERY: roll FORWARD — re-issue the last good codebase under a HIGHER rev number.',
+'',
+'USER: Rich Arnold, quality engineer, CAMCO Manufacturing (Sayre PA). NOT a programmer — plain language, click-by-click, define jargon in one sentence. Terse all-caps input; resolve intent without over-asking. ITAR work: part/drawing data stays on-device; AI calls sit behind confirm gates. End every response with the current rev line + a token estimate.',
+'QUICK COMMANDS: DL CP · DL INST · DL PFMEA · dl both · up both · AUDIT · VIEW · DL (app file)',
+'CONTROLLING DOCUMENT: CAMCO Control Plan Instructions Rev-92 (project files) governs all Control Plan content — never edit it without asking first.',
+'',
+'SAVED PLANS ON THIS DEVICE (' + projects.length + '):',
+projLines,
+'',
+'LAST 8 REVS (from the live CHANGE_LOG — full history inside the app):',
+logs
+  ].join('\n');
 }
-// Assemble full prompt from whatever common text we have (fetched or fallback).
 function assembleNewChatPrompt(commonText){
   return String(commonText || NEWCHAT_COMMON_FALLBACK).trim() + '\n\n' + buildCpSpecific();
 }
