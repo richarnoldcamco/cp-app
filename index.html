@@ -602,8 +602,8 @@
         <span>ODS Drawing — Balloon <span id="cpFocusBubble">1</span></span>
         <button type="button" id="cpPanelZoomBtn" onclick="cpPanelZoomToggle(event)" style="display:none; background:#1a5276; color:#fff; border:none; border-radius:5px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer;">🔍 Full view</button>
         <button type="button" id="cpPinBackBtn" onclick="cpPinStepBack(event)" style="display:none; background:#8a5a00; color:#fff; border:none; border-radius:5px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer;" title="Step back to the previous balloon to re-pin it">↩ Back a balloon</button>
-        <button type="button" id="cpOdsUploadBtn" style="background:#1d4e89; color:#fff; border:none; border-radius:5px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; margin-left:auto;" title="Upload or replace this plan's ODS drawing (PNG/JPG image)">📄 Upload / Replace drawing</button>
-        <input type="file" id="cpOdsUploadFile" accept="image/*" style="display:none">
+        <button type="button" id="cpOdsUploadBtn" style="background:#1d4e89; color:#fff; border:none; border-radius:5px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; margin-left:auto;" title="Upload or replace this plan's ODS drawing (PDF, PNG, or JPG)">📄 Upload / Replace drawing</button>
+        <input type="file" id="cpOdsUploadFile" accept="image/*,application/pdf" style="display:none">
         <button type="button" id="cpOdsMinBtn" onclick="cpOdsToggleMin()" style="background:#444; color:#fff; border:none; border-radius:5px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer;" title="Collapse the drawing so the Control Plan grid gets the full width">▬ Minimize drawing</button>
         <span id="cpLocateHint" style="display:none; font-size:11px; font-weight:700; color:#c0392b;">← no pin yet — tap 📍 Pin Manually, then click this balloon on the drawing</span>
       </div>
@@ -1350,7 +1350,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-514";
+const APP_REV = "Rev-515";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1364,6 +1364,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-25", rev: "App Rev-515", type: "App", changes: ["PDF DRAWINGS ACCEPTED \u2014 the Upload / Replace drawing button now takes a PDF directly: the app loads pdf.js on demand, asks which page holds the ODS when the PDF has several, renders that page to a sharp PNG (up to ~2400px wide so balloon zooms stay crisp), and feeds it through the same save + sync pipeline as an image. PNG/JPG unchanged. Needs the device online the first time (pdf.js comes from the cdnjs library site)."] },
   { ts: "2026-07-25", rev: "App Rev-514", type: "App", changes: ["NEW CHAT PROMPT MADE LIVE \u2014 the \ud83d\udcac New Chat Prompt button now GENERATES its handoff fresh each press instead of showing months-old text: current rev + build stamp + embedded validation rev, both repos and their file layout, the exact ship-a-change procedure (bump/changelog/validate/push both/verify, never-downgrade, roll-forward recovery), the one-chat-pushes rule, the token rule (paste current token; never stored in the text), user working style and quick commands, the controlling document, the saved plans ON THIS DEVICE by name, and the last 8 CHANGE_LOG entries pulled live \u2014 so a brand-new chat picks up exactly where the old one left off."] },
   { ts: "2026-07-25", rev: "App Rev-513", type: "App", changes: ["BOOT-ERROR CATCHER + HARDENED STARTUP \u2014 after a window showed the redesigned home with placeholder rev text and zero counts (a silent boot failure on an empty-storage profile), any uncaught startup error now paints a red bar across the top with the exact message and line to screenshot for Claude, and the rev-display block is wrapped so a hiccup there can never kill the rest of boot."] },
   { ts: "2026-07-25", rev: "App Rev-512", type: "App", changes: ["HOME CARD CENTERED + REV STAMP ON THE CARD \u2014 the menu card now sits centered in the page both ways (not hugging the top), and directly under the subtitle it carries its own rev line \u2014 REV-512 \u00b7 date \u00b7 24-hour time \u2014 matching the header badge and footer."] },
@@ -1751,7 +1752,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-25";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:43";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:57";   // Rev-505: 24-hour build time, shown beside the date
 let currentODSImage = null; // Store current ODS image for viewer
 let currentCleanODSImage = null; // Unballooned original — preserved so re-analysis always uses the clean drawing
 let cpPinScale = (() => { try{ const v = parseFloat(localStorage.getItem('cpPinScale')); return (v && v > 0) ? v : 1; }catch(_){ return 1; } })();   // Rev-380: adjustable pin-highlight size
@@ -13039,18 +13040,51 @@ CURRENT LIVE APPS
       if(cpBuildState.odsImage && !confirm('Replace the current ODS drawing for ' + cpBuildState.partNum + '?\n\nBalloon pin positions are KEPT — if the new file is a different scan or scale, step through the pins afterward to re-check them.')) return;
       f.value = ''; f.click();
     };
-    f.onchange = () => {
+    const applyDrawing = (dataUrl) => {
+      cpBuildState.odsImage = dataUrl;
+      try{ _idbPutDrawing(cpBuildState.partNum, dataUrl, null); }catch(e){}   // stores locally + Rev-506 sync pushes it to GitHub for every device
+      try{ cpAutoSaveProject(); }catch(e){}
+      updateOdsPanel();
+      flash('✓ Drawing saved to ' + cpBuildState.partNum + ' — syncing to all devices');
+    };
+    // Rev-515: PDFs accepted — rendered to a high-resolution image inside the app via pdf.js
+    const loadPdfJs = () => new Promise((res, rej) => {
+      if(window.pdfjsLib){ res(); return; }
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      s.onload = () => { try{ window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; res(); }catch(e){ rej(e); } };
+      s.onerror = () => rej(new Error('pdf.js failed to load — is this device online?'));
+      document.head.appendChild(s);
+    });
+    const pdfToImage = async (file) => {
+      await loadPdfJs();
+      const buf = await file.arrayBuffer();
+      const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
+      let pageNo = 1;
+      if(pdf.numPages > 1){
+        const ans = prompt('This PDF has ' + pdf.numPages + ' pages. Which page is the ODS drawing? (1-' + pdf.numPages + ')', '1');
+        pageNo = Math.min(Math.max(parseInt(ans || '1', 10) || 1, 1), pdf.numPages);
+      }
+      const page = await pdf.getPage(pageNo);
+      const base = page.getViewport({ scale: 1 });
+      const scale = Math.min(2400 / base.width, 4);   // sharp enough to zoom balloons, capped for memory
+      const vp = page.getViewport({ scale });
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(vp.width); canvas.height = Math.round(vp.height);
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+      return canvas.toDataURL('image/png');
+    };
+    f.onchange = async () => {
       const file = f.files && f.files[0]; if(!file) return;
-      if(!/^image\//.test(file.type)){ flash('Pick a PNG or JPG image — for a PDF, screenshot the ODS page first', true); return; }
+      if(file.type === 'application/pdf' || /\.pdf$/i.test(file.name)){
+        flash('Converting PDF page to an image…');
+        try{ applyDrawing(await pdfToImage(file)); }
+        catch(e){ flash('PDF conversion failed: ' + e.message, true); }
+        return;
+      }
+      if(!/^image\//.test(file.type)){ flash('Pick a PDF, PNG, or JPG', true); return; }
       const rd = new FileReader();
-      rd.onload = () => {
-        const dataUrl = rd.result;
-        cpBuildState.odsImage = dataUrl;
-        try{ _idbPutDrawing(cpBuildState.partNum, dataUrl, null); }catch(e){}   // stores locally + Rev-506 sync pushes it to GitHub for every device
-        try{ cpAutoSaveProject(); }catch(e){}
-        updateOdsPanel();
-        flash('✓ Drawing saved to ' + cpBuildState.partNum + ' — syncing to all devices');
-      };
+      rd.onload = () => applyDrawing(rd.result);
       rd.readAsDataURL(file);
     };
   })();
