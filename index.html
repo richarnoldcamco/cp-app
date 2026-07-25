@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-523</title>
+<title>CONTROL PLAN GENERATOR - Rev-524</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-523 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-25 17:00 ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-524 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-25 17:05 ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1364,7 +1364,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-523";
+const APP_REV = "Rev-524";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1378,6 +1378,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-25", rev: "App Rev-524", type: "App", changes: ["SMART BACK FROM THE BUILDER \u2014 leaving the builder used to ALWAYS land on the New Control Plan form, even when the session came from editing a saved plan (the \u2018why am I back on this screen\u2019 complaint). Back now returns to the Control Plans list when the session came from a saved plan, and to the New Control Plan form only when you were building one from scratch."] },
   { ts: "2026-07-25", rev: "App Rev-523", type: "App", changes: ["Revision field joins Rev-522\u2019s cleanup \u2014 it was under a different internal name and kept its dark pre-typed Rev-1; now a light-grey E.G., REV-1 example like the rest, with the same silent fallback to Rev-1 when left blank."] },
   { ts: "2026-07-25", rev: "App Rev-522", type: "App", changes: ["NEW CONTROL PLAN FORM: EXAMPLES, NOT PREFILLS \u2014 Revision, Operation, Machine Type, and Data Rows no longer arrive pre-typed in dark text; they show light-grey E.G. examples like every other field. Leaving any of them blank still behaves exactly as before \u2014 the old defaults (REV-1, LATHE, HARDINGE QUEST, 15) are applied quietly at generate time."] },
   { ts: "2026-07-25", rev: "App Rev-521", type: "App", changes: ["SILENT BOOT DEATH MADE LOUD + PULL BUTTON MADE CRASH-PROOF \u2014 one desktop\u2019s startup was dying partway (stale footer, dead PULL button) with an error type the red bar missed. Three fixes: async promise failures now paint an orange bar; the whole boot tail runs inside a guard that paints a dark-red bar with the exact message and line if anything fails; and PULL CODE & DATA is defined at the very top of the script (with a plain-language alert when GitHub isn\u2019t set up) so it works no matter what happens later in boot."] },
@@ -1774,7 +1775,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-25";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "17:00";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "17:05";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -12511,7 +12512,14 @@ if($('odsLightboxScroll')) $('odsLightboxScroll').addEventListener('wheel', (e) 
   sc.addEventListener('pointerup', endPan);
   sc.addEventListener('pointercancel', () => { pan = null; });
 })();
-if($('cpBuilderBack')) $('cpBuilderBack').onclick = () => { $('cpBuilderScreen').classList.add('hidden'); const nvb=$('newerVersionBanner'); if(nvb && window._nvbWasVisible) nvb.style.display='flex'; showNewCP(); };
+// Rev-524: SMART BACK — a builder session opened from a SAVED plan returns to the
+// Control Plans list; only a brand-new build returns to the New Control Plan form.
+if($('cpBuilderBack')) $('cpBuilderBack').onclick = () => {
+  $('cpBuilderScreen').classList.add('hidden');
+  const nvb=$('newerVersionBanner'); if(nvb && window._nvbWasVisible) nvb.style.display='flex';
+  if(cpBuildState && cpBuildState.srcId && typeof showProjects === 'function') showProjects();
+  else showNewCP();
+};
 // Rev-306: Master List keyword search — filter rows live as you type
 if($('masterSearchBox')){
   $('masterSearchBox').oninput = function(){
