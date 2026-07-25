@@ -1338,7 +1338,19 @@ KEYBOARD SHORTCUTS
 
 <!-- BOOT -->
 <script>
-const APP_REV = "Rev-512";
+// Rev-513: BOOT-ERROR CATCHER — if anything crashes during startup, say so in plain
+// sight instead of silently leaving a half-dead screen.
+window.addEventListener('error', function(ev){
+  try{
+    if(document.getElementById('bootErrBar')) return;
+    const d = document.createElement('div');
+    d.id = 'bootErrBar';
+    d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#c0392b;color:#fff;padding:10px 14px;font:700 13px system-ui;';
+    d.textContent = '⚠️ APP ERROR — screenshot this line for Claude: ' + (ev.message||'unknown') + ' @ ' + (ev.filename||'') + ':' + (ev.lineno||'');
+    document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
+  }catch(e){}
+});
+const APP_REV = "Rev-513";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1352,6 +1364,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-25", rev: "App Rev-513", type: "App", changes: ["BOOT-ERROR CATCHER + HARDENED STARTUP \u2014 after a window showed the redesigned home with placeholder rev text and zero counts (a silent boot failure on an empty-storage profile), any uncaught startup error now paints a red bar across the top with the exact message and line to screenshot for Claude, and the rev-display block is wrapped so a hiccup there can never kill the rest of boot."] },
   { ts: "2026-07-25", rev: "App Rev-512", type: "App", changes: ["HOME CARD CENTERED + REV STAMP ON THE CARD \u2014 the menu card now sits centered in the page both ways (not hugging the top), and directly under the subtitle it carries its own rev line \u2014 REV-512 \u00b7 date \u00b7 24-hour time \u2014 matching the header badge and footer."] },
   { ts: "2026-07-25", rev: "App Rev-511", type: "App", changes: ["HOME SCREEN REDESIGNED to match the Quote app\u2019s centered menu: a single card with the CP mark, title, and five stacked full-width buttons \u2014 NEW CONTROL PLAN, CONTROL PLANS (with live project count), MACHINIST VALIDATION (green), REPORTS, and ADMIN. Master List, Customer List, Instructions, Recent Changes, and the C# Conversion Plan moved INTO the Admin screen as a tile row at the top \u2014 same buttons, same behavior, just off the home screen. All element IDs preserved so every existing wiring and badge count still works; the project-count badge now sits inline on the CONTROL PLANS button."] },
   { ts: "2026-07-25", rev: "App Rev-510", type: "App", changes: ["UPLOAD / REPLACE DRAWING IN THE BUILDER \u2014 the ODS pane toolbar gained a blue \ud83d\udcc4 Upload / Replace drawing button: pick a PNG/JPG and it becomes the plan\u2019s ODS immediately \u2014 stored on the device, saved to the project, and pushed through Rev-506 drawing sync so every device gets it. Replacing an existing drawing asks first and keeps balloon pin positions (with a reminder to re-check pins if the new file is a different scan). PDFs get a friendly \u2018screenshot the page first\u2019 message."] },
@@ -1737,7 +1750,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-25";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:34";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:39";   // Rev-505: 24-hour build time, shown beside the date
 let currentODSImage = null; // Store current ODS image for viewer
 let currentCleanODSImage = null; // Unballooned original — preserved so re-analysis always uses the clean drawing
 let cpPinScale = (() => { try{ const v = parseFloat(localStorage.getItem('cpPinScale')); return (v && v > 0) ? v : 1; }catch(_){ return 1; } })();   // Rev-380: adjustable pin-highlight size
@@ -12684,9 +12697,9 @@ instUploadFile.addEventListener('change', e => {
 
 
 
-$('revFooter').textContent = `App ${APP_REV} · Built ${BUILD_DATE} ${BUILD_TIME}`;
+try{ $('revFooter').textContent = `App ${APP_REV} · Built ${BUILD_DATE} ${BUILD_TIME}`; }catch(e){}
 if($('cpCardRev')) $('cpCardRev').textContent = APP_REV.toUpperCase() + ' · ' + BUILD_DATE + ' ' + BUILD_TIME;
-$('brandRev').innerHTML = APP_REV.toUpperCase() + ' <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">' + BUILD_DATE + ' ' + BUILD_TIME + '</span>';
+try{ $('brandRev').innerHTML = APP_REV.toUpperCase() + ' <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">' + BUILD_DATE + ' ' + BUILD_TIME + '</span>';}catch(e){}
 $('headerTitle').textContent = `CONTROL PLAN GENERATOR`;
 if($('headerRev')) $('headerRev').textContent = APP_REV + ' · ' + BUILD_DATE + ' ' + BUILD_TIME;
 
