@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-526</title>
+<title>CONTROL PLAN GENERATOR - Rev-527</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-526 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-25 17:41 ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-527 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-25 19:03 ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1364,7 +1364,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-526";
+const APP_REV = "Rev-527";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1378,6 +1378,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-25", rev: "App Rev-527", type: "App", changes: ["APP-BUILD PLAYBOOK ADDED AS RECIPE PART 3 \u2014 the playbook learned during the PFMEA build (two-repo pattern, per-app scoped tokens, Pages install route, manifest/icon rules incl. maskable PNGs and the pin-caches-its-birth-icon gotcha, Documents-not-Downloads hygiene, ITAR confirm gates) joins the \ud83d\udccb New-App Recipe \u2014 WITH one correction applied: its \u2018in-place document.write update\u2019 advice is struck and replaced by the Rev-526 rule (cache-skipping reload), since document.write half-loads in installed windows."] },
   { ts: "2026-07-25", rev: "App Rev-526", type: "App", changes: ["THE REV-467 GHOST EXORCISED FOR REAL \u2014 root cause finally pinned: the auto-updater applied new code with an in-place page rewrite (document.write), and in installed-app windows that loads the new page\u2019s MARKUP but silently never runs its JAVASCRIPT \u2014 producing the half-dead pages the user kept seeing (new badge, Rev-467 footer, blinking dead buttons, no error bars) until a manual Ctrl+Shift+R did a real reload. The in-place rewrite is now BANNED: every auto-update applies exactly the way Ctrl+Shift+R does \u2014 a cache-skipping reload of the site with a fresh ?v= tag. Token and data untouched, and no more ritual."] },
   { ts: "2026-07-25", rev: "App Rev-525", type: "App", changes: ["\u270f\ufe0f EDIT VIEW ON REFERENCE IMAGES (embedded validation REV-129 \u2192 REV-130) \u2014 the editing screens\u2019 reference panel gained a blue Edit view button beside Save/Delete: it reopens the grab-from-ODS tool so an existing reference can be RE-FRAMED (drag a new box around exactly what should show \u2014 that box is the pan-and-zoom). Saving routes through the same pipeline as before, including the write-back that syncs reference images to the plan and every device."] },
   { ts: "2026-07-25", rev: "App Rev-524", type: "App", changes: ["SMART BACK FROM THE BUILDER \u2014 leaving the builder used to ALWAYS land on the New Control Plan form, even when the session came from editing a saved plan (the \u2018why am I back on this screen\u2019 complaint). Back now returns to the Control Plans list when the session came from a saved plan, and to the New Control Plan form only when you were building one from scratch."] },
@@ -1777,7 +1778,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-25";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "17:41";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "19:03";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -13084,6 +13085,24 @@ AFTER PINNING
 CURRENT LIVE APPS
 - CP: richarnoldcamco.github.io/cp-app/ — data in cp-generator-data (private)
 - QT: richarnoldcamco.github.io/QT-APP/ — data in Quote-Data (private)
+
+============================================================
+PART 3 — APP-BUILD PLAYBOOK (learned 2026-07-25, PFMEA build)
+============================================================
+Follow for every new app.
+
+· ARCHITECTURE (CP pattern, mandatory): two repos per app — <NAME>-APP (code, public only if GitHub Pages is used) + <NAME>-DATA (plans/data, ALWAYS private, images withheld by default). One fine-grained token per app, scoped to ONLY that app's two repos, Contents read/write, 90-day expiry.
+
+· SELF-UPDATE (copy from CP-Rev526 or newer — NOT older revs): app auto-pushes itself, auto-pulls newer revs, mid-task banner guard, push-then-verify, never-downgrade guard on publish. Reads via git trees/blobs API (contents API refuses >1MB reads).
+  ⚠ CORRECTION (2026-07-25, CP Rev-526): do NOT use in-place document.write to apply updates. In installed-app windows it loads the new page's markup but silently never runs its JavaScript — half-dead pages (new badge, dead buttons, stale footer) until a manual hard refresh. Apply updates with a cache-skipping reload instead: location.replace(location.pathname + '?v=' + Date.now()). Token and data survive (same address).
+
+· WEBSITE INSTALL (the ONLY way to a real taskbar pin): Chrome greys "Create shortcut" on file:// — do not fight it. Route: repo public → Settings→Pages→ deploy main /(root) → app publishes index.html → install from https://richarnoldcamco.github.io/<APP>/ via ⋮ → Cast, save and share → "Install page as app". file:// and https are DIFFERENT origins: token, API key, and save-folder permission must be re-entered once at the https address.
+
+· ICON + NAME: installed apps IGNORE SVG favicons (generic-letter icon results). Must ship a web-app manifest (data: URI is fine, keeps single-file) with PNG icons 192+512 "any" AND 192+512 "maskable" (10% safe zone), short_name = the taskbar label. Pins cache their birth icon — icon/name changes require uninstall (chrome://apps → Remove) + reinstall + re-pin.
+
+· LOCAL FILE HYGIENE: master copy lives in Documents as "<APP NAME>.html" (never Downloads), rev shown in-app not in filename; Claude-delivered file is the source of truth, auto-push is a mirror.
+
+· ITAR GATES: every off-device action (AI calls, GitHub push, Pages publish) behind a per-action confirm gate listing exactly what will be sent, to which service, before anything leaves the device.
 `;
   (function(){
     const b = $('cpRecipeBtn'); if(!b) return;
