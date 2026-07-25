@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>Control Plan Generator</title>
+<title>CONTROL PLAN GENERATOR - Rev-516</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-467 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">Jul 15, 2026</span></div>
+        <div class="brand-sub" id="brandRev">REV-516 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-25 12:00</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1350,7 +1350,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-515";
+const APP_REV = "Rev-516";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1364,6 +1364,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-25", rev: "App Rev-516", type: "App", changes: ["THE PHANTOM REV-467 KILLED \u2014 the page\u2019s static header text had said \u2018REV-467 Jul 15\u2019 since that build, and the true rev only replaced it near the END of startup, so any slow or interrupted boot showed the ancient label (the \u2018reverts to 467 until Ctrl+Shift+R\u2019 mystery \u2014 the running code was current all along). Two fixes: the static text is now STAMPED with the real rev/date/time on every build, and the badge/title/footer repaint runs as the FIRST thing in boot instead of the last."] },
   { ts: "2026-07-25", rev: "App Rev-515", type: "App", changes: ["PDF DRAWINGS ACCEPTED \u2014 the Upload / Replace drawing button now takes a PDF directly: the app loads pdf.js on demand, asks which page holds the ODS when the PDF has several, renders that page to a sharp PNG (up to ~2400px wide so balloon zooms stay crisp), and feeds it through the same save + sync pipeline as an image. PNG/JPG unchanged. Needs the device online the first time (pdf.js comes from the cdnjs library site)."] },
   { ts: "2026-07-25", rev: "App Rev-514", type: "App", changes: ["NEW CHAT PROMPT MADE LIVE \u2014 the \ud83d\udcac New Chat Prompt button now GENERATES its handoff fresh each press instead of showing months-old text: current rev + build stamp + embedded validation rev, both repos and their file layout, the exact ship-a-change procedure (bump/changelog/validate/push both/verify, never-downgrade, roll-forward recovery), the one-chat-pushes rule, the token rule (paste current token; never stored in the text), user working style and quick commands, the controlling document, the saved plans ON THIS DEVICE by name, and the last 8 CHANGE_LOG entries pulled live \u2014 so a brand-new chat picks up exactly where the old one left off."] },
   { ts: "2026-07-25", rev: "App Rev-513", type: "App", changes: ["BOOT-ERROR CATCHER + HARDENED STARTUP \u2014 after a window showed the redesigned home with placeholder rev text and zero counts (a silent boot failure on an empty-storage profile), any uncaught startup error now paints a red bar across the top with the exact message and line to screenshot for Claude, and the rev-display block is wrapped so a hiccup there can never kill the rest of boot."] },
@@ -1752,7 +1753,17 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-25";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:57";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:00";   // Rev-505: 24-hour build time, shown beside the date
+// Rev-516: paint the true rev EVERYWHERE immediately — never let a stale placeholder show
+try{
+  document.title = 'CONTROL PLAN GENERATOR - ' + APP_REV;
+  const _br = document.getElementById('brandRev');
+  if(_br) _br.innerHTML = APP_REV.toUpperCase() + ' <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">' + BUILD_DATE + ' ' + BUILD_TIME + '</span>';
+  const _cr = document.getElementById('cpCardRev');
+  if(_cr) _cr.textContent = APP_REV.toUpperCase() + ' · ' + BUILD_DATE + ' ' + BUILD_TIME;
+  const _rf = document.getElementById('revFooter');
+  if(_rf) _rf.textContent = 'App ' + APP_REV + ' · Built ' + BUILD_DATE + ' ' + BUILD_TIME;
+}catch(e){}
 let currentODSImage = null; // Store current ODS image for viewer
 let currentCleanODSImage = null; // Unballooned original — preserved so re-analysis always uses the clean drawing
 let cpPinScale = (() => { try{ const v = parseFloat(localStorage.getItem('cpPinScale')); return (v && v > 0) ? v : 1; }catch(_){ return 1; } })();   // Rev-380: adjustable pin-highlight size
