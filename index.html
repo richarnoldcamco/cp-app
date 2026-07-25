@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-519</title>
+<title>CONTROL PLAN GENERATOR - Rev-520</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-519 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-25 15:50 ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-520 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-25 16:12 ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1354,7 +1354,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-519";
+const APP_REV = "Rev-520";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1368,6 +1368,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-25", rev: "App Rev-520", type: "App", changes: ["PIN DRIFT ROOT-CAUSED AND SEALED \u2014 closing the freeze view auto-advances to the next balloon, and a backdrop-click close could FALL THROUGH to the drawing and silently pin that freshly-advanced balloon at the dismiss point: the systematic off-by-one the user caught (bubble 3\u2019s pin on balloon 11, bubble 11\u2019s on balloon 5). The drawing now ignores pin-clicks for half a second after the freeze view closes, so a dismiss can never plant a pin. Fix existing drifted pins by clicking each wrong row and dragging its red ring onto the true balloon."] },
   { ts: "2026-07-25", rev: "App Rev-519", type: "App", changes: ["LOADED TIME + PULL CODE & DATA BUTTON \u2014 the badge and home card now show when THIS page LOADED, taken from the device\u2019s own clock so it is always the user\u2019s local (Eastern) time, matching the Quote app\u2019s style; the build moment stays in the footer marked ET. And the home card gained \u21bb PULL CODE & DATA under Admin: one tap pulls the data AND checks GitHub for newer app code immediately, applying it if found \u2014 no waiting for the timer."] },
   { ts: "2026-07-25", rev: "App Rev-518", type: "App", changes: ["FREEZE-VIEW TOOLBAR TIDIED \u2014 the \u2018\u2714 Save readable view\u2019 button now just says \u2714 Save, and the \ud83d\udd34\u2212 / \ud83d\udd34+ ring-size pair carries a tiny BUBBLE SIZE caption above it so its purpose is obvious at a glance."] },
   { ts: "2026-07-25", rev: "App Rev-517", type: "App", changes: ["STRAY-CLICK PIN GUARD \u2014 a balloon that already has a saved pin can no longer be silently re-pinned by a click on the drawing: the app asks \u2018Balloon N is already pinned \u2014 move it here?\u2019 first (dragging the red ring stays instant, since dragging is always deliberate). First-time pinning of an unpinned balloon is unchanged \u2014 click once, frame it, done. This is how bubble 3\u2019s highlight ended up on balloon 11: one stray click, silently saved."] },
@@ -1760,7 +1761,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-25";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "15:50";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "16:12";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-516: paint the true rev EVERYWHERE immediately — never let a stale placeholder show
 try{
   document.title = 'CONTROL PLAN GENERATOR - ' + APP_REV;
@@ -4267,6 +4268,10 @@ function cpManualPinClick(e){
   e.stopPropagation(); e.preventDefault();
   const x = Math.max(0, Math.min(100, (e.clientX - r.left) / r.width  * 100));
   const y = Math.max(0, Math.min(100, (e.clientY - r.top)  / r.height * 100));
+  // Rev-520: swallow the click that just closed the freeze view (it advanced focus,
+  // and letting it through pinned the NEXT balloon wherever the dismiss-click landed —
+  // the exact off-by-one drift the user caught: 3's pin on 11, 11's pin on 5).
+  if(window._cpPinSuppressUntil && Date.now() < window._cpPinSuppressUntil) return true;
   const row = cpBuildState.rows[cpBuildState.focusIdx || 0]; if(!row) return true;
   let f = cpFeatureForBubble(row.bubble);
   // Rev-517: STRAY-CLICK GUARD — a balloon that already HAS a pin only moves after a
@@ -4957,6 +4962,7 @@ function cpPinFreezeModal(x, y, bubble){
   let _committed = false;
   const commit = () => {
     if(_committed) return; _committed = true;
+    window._cpPinSuppressUntil = Date.now() + 500;   // Rev-520: the click that closes this view must never fall through and pin the NEXT balloon
     document.removeEventListener('keydown', onKey);
     const iw = baseW * z, ih = iw * (nh / nw);
     const f = cpFeatureForBubble(bubble);
