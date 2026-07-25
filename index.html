@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-517</title>
+<title>CONTROL PLAN GENERATOR - Rev-518</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-517 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-25 12:19</span></div>
+        <div class="brand-sub" id="brandRev">REV-518 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-25 15:44</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1350,7 +1350,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-517";
+const APP_REV = "Rev-518";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1364,6 +1364,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-25", rev: "App Rev-518", type: "App", changes: ["FREEZE-VIEW TOOLBAR TIDIED \u2014 the \u2018\u2714 Save readable view\u2019 button now just says \u2714 Save, and the \ud83d\udd34\u2212 / \ud83d\udd34+ ring-size pair carries a tiny BUBBLE SIZE caption above it so its purpose is obvious at a glance."] },
   { ts: "2026-07-25", rev: "App Rev-517", type: "App", changes: ["STRAY-CLICK PIN GUARD \u2014 a balloon that already has a saved pin can no longer be silently re-pinned by a click on the drawing: the app asks \u2018Balloon N is already pinned \u2014 move it here?\u2019 first (dragging the red ring stays instant, since dragging is always deliberate). First-time pinning of an unpinned balloon is unchanged \u2014 click once, frame it, done. This is how bubble 3\u2019s highlight ended up on balloon 11: one stray click, silently saved."] },
   { ts: "2026-07-25", rev: "App Rev-516", type: "App", changes: ["THE PHANTOM REV-467 KILLED \u2014 the page\u2019s static header text had said \u2018REV-467 Jul 15\u2019 since that build, and the true rev only replaced it near the END of startup, so any slow or interrupted boot showed the ancient label (the \u2018reverts to 467 until Ctrl+Shift+R\u2019 mystery \u2014 the running code was current all along). Two fixes: the static text is now STAMPED with the real rev/date/time on every build, and the badge/title/footer repaint runs as the FIRST thing in boot instead of the last."] },
   { ts: "2026-07-25", rev: "App Rev-515", type: "App", changes: ["PDF DRAWINGS ACCEPTED \u2014 the Upload / Replace drawing button now takes a PDF directly: the app loads pdf.js on demand, asks which page holds the ODS when the PDF has several, renders that page to a sharp PNG (up to ~2400px wide so balloon zooms stay crisp), and feeds it through the same save + sync pipeline as an image. PNG/JPG unchanged. Needs the device online the first time (pdf.js comes from the cdnjs library site)."] },
@@ -1754,7 +1755,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-25";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:19";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "15:44";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-516: paint the true rev EVERYWHERE immediately — never let a stale placeholder show
 try{
   document.title = 'CONTROL PLAN GENERATOR - ' + APP_REV;
@@ -4343,7 +4344,7 @@ function cpPinFreezeModal(x, y, bubble){
   hdr.style.cssText = 'background:#1e8449; color:#fff; font-size:13px; font-weight:700; padding:10px 14px; display:flex; align-items:center; gap:10px;';
   hdr.innerHTML = '<span style="flex:1;">🔍 Balloon ' + String(bubble) + ' — the red ring marks your pin (it rides with the drawing) · drag or ARROW KEYS pan · scroll/DOUBLE-CLICK zooms · frame it readable, then close (view saved)</span>';
   const freezeBtn = document.createElement('button');
-  freezeBtn.textContent = '✔ Save readable view';
+  freezeBtn.textContent = '✔ Save';
   freezeBtn.title = 'Save this pan/zoom framing to the row and move to the next balloon';
   freezeBtn.style.cssText = 'border:none; background:#fff; color:#1e6f3f; border-radius:8px; font-size:13px; font-weight:800; padding:8px 14px; cursor:pointer; white-space:nowrap;';
   const closeBtn = document.createElement('button');
@@ -4386,7 +4387,17 @@ function cpPinFreezeModal(x, y, bubble){
   pinMinus.style.cssText = pinBtnCss; pinPlus.style.cssText = pinBtnCss;
   pinMinus.addEventListener('click', e => { e.stopPropagation(); cpPinScale = Math.max(0.35, cpPinScale - 0.25); cpSavePinScale(); place(); });
   pinPlus.addEventListener('click', e => { e.stopPropagation(); cpPinScale = Math.min(4, cpPinScale + 0.25); cpSavePinScale(); place(); });
-  hdr.appendChild(pinMinus); hdr.appendChild(pinPlus);
+  // Rev-518: tiny BUBBLE SIZE caption above the 🔴−/🔴+ pair
+  const pinGrp = document.createElement('span');
+  pinGrp.style.cssText = 'display:inline-flex; flex-direction:column; align-items:center; gap:2px;';
+  const pinLbl = document.createElement('span');
+  pinLbl.textContent = 'BUBBLE SIZE';
+  pinLbl.style.cssText = 'font-size:8px; font-weight:800; letter-spacing:.08em; color:rgba(255,255,255,.85); line-height:1;';
+  const pinRow = document.createElement('span');
+  pinRow.style.cssText = 'display:inline-flex; gap:6px;';
+  pinRow.appendChild(pinMinus); pinRow.appendChild(pinPlus);
+  pinGrp.appendChild(pinLbl); pinGrp.appendChild(pinRow);
+  hdr.appendChild(pinGrp);
   const addBtn = document.createElement('button');
   addBtn.textContent = '➕ Add ' + bubble;
   addBtn.title = 'The drawing is missing this balloon\u2019s circle — click this, then click the spot on the drawing to stamp a numbered circle for balloon ' + bubble + '. Click again to move it.';
