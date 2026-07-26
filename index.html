@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-529</title>
+<title>CONTROL PLAN GENERATOR - Rev-530</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-529 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-26 3:24 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-530 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-26 3:25 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1364,7 +1364,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-529";
+const APP_REV = "Rev-530";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1378,6 +1378,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-26", rev: "App Rev-530", type: "App", changes: ["DOWN/UP WORK FROM ANYWHERE ON THE BUILDER SCREEN \u2014 Rev-528\u2019s arrow navigation required the cursor to already be inside a cell; now just being on the Build Control Plan screen is enough: Down/Up activates the next/previous row, focuses its first field with text selected, and re-zooms the drawing. Inside-cell behavior unchanged."] },
   { ts: "2026-07-26", rev: "App Rev-529", type: "App", changes: ["12-HOUR TIME EVERYWHERE \u2014 the build stamp on the badge, card, and footer now reads normal AM/PM time (e.g. 3:24 PM ET) instead of military; the LOADED time was already 12-hour. From this rev on every build is stamped in 12-hour format."] },
   { ts: "2026-07-26", rev: "App Rev-528", type: "App", changes: ["ARROW-KEY NAVIGATION IN THE BUILDER GRID \u2014 Down/Up moves the cursor to the same column of the next/previous row (row expands, text pre-selected, ODS panel re-zooms to that row\u2019s balloon); Left/Right hop to the previous/next cell in the row, but ONLY when the text caret is already at the start/end of the field (or the text is fully selected), so editing inside a cell is never hijacked. Dropdowns keep their native Up/Down for choosing options; Left/Right still hop cells from a dropdown."] },
   { ts: "2026-07-25", rev: "App Rev-527", type: "App", changes: ["APP-BUILD PLAYBOOK ADDED AS RECIPE PART 3 \u2014 the playbook learned during the PFMEA build (two-repo pattern, per-app scoped tokens, Pages install route, manifest/icon rules incl. maskable PNGs and the pin-caches-its-birth-icon gotcha, Documents-not-Downloads hygiene, ITAR confirm gates) joins the \ud83d\udccb New-App Recipe \u2014 WITH one correction applied: its \u2018in-place document.write update\u2019 advice is struck and replaced by the Rev-526 rule (cache-skipping reload), since document.write half-loads in installed windows."] },
@@ -1780,7 +1781,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-26";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:24 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:25 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -13204,6 +13205,31 @@ Follow for every new app.
   // at the start/end of the field, so normal text editing is never hijacked.
   document.addEventListener('keydown', function(e){
     const t = e.target;
+    // Rev-530: Down/Up also work when NO cell has the cursor — just being on the builder
+    // screen is enough; the next/previous row becomes active with its first field focused.
+    if(t && (!t.closest || !t.closest('#cpBuilderTbody'))){
+      const scr = $('cpBuilderScreen');
+      const inField = t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT';
+      if(scr && !scr.classList.contains('hidden') && !inField && (e.key === 'ArrowDown' || e.key === 'ArrowUp') && cpBuildState && cpBuildState.rows){
+        const n = (cpBuildState.focusIdx || 0) + (e.key === 'ArrowDown' ? 1 : -1);
+        if(n >= 0 && n < cpBuildState.rows.length){
+          e.preventDefault();
+          cpBuildState.focusIdx = n;
+          renderCPBuilder();
+          requestAnimationFrame(() => {
+            try{
+              const tb = $('cpBuilderTbody');
+              const ntr = tb && tb.children[n];
+              const f = ntr && ntr.querySelector('input, textarea');
+              if(f){ f.focus(); if(f.select) f.select(); }
+              updateOdsPanel();
+            }catch(_){ }
+          });
+        }
+        return;
+      }
+      return;
+    }
     if(!t || !t.closest || !t.closest('#cpBuilderTbody')) return;
     if(!cpBuildState || !cpBuildState.rows) return;
     const tag = t.tagName;
