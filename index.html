@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-532</title>
+<title>CONTROL PLAN GENERATOR - Rev-533</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-532 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-26 3:52 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-533 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-26 3:58 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1364,7 +1364,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-532";
+const APP_REV = "Rev-533";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1378,6 +1378,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-26", rev: "App Rev-533", type: "App", changes: ["NO MORE SCREEN-FLASH ON EDIT/INSPECT VALIDATION \u2014 tapping Edit Machinist Validation (or Inspect Validation) used to visibly hop through the app\u2019s menu and feature-list screens before landing where you wanted. A curtain now covers the panel (\u23f3 Opening editing screens\u2026) from the instant it opens until the app reports it has landed on the destination screen, then fades out \u2014 with a 3.5-second failsafe so the curtain can never trap you. One tap, one smooth arrival."] },
   { ts: "2026-07-26", rev: "App Rev-532", type: "App", changes: ["\ud83e\uddf9 WHITE-OUT CLUTTER TOOL (embedded validation REV-131 \u2192 REV-132) \u2014 the \u270f\ufe0f Edit view / Grab-bubble screen gained Paint-style clean-up: a \ud83e\uddf9 White-out clutter mode where every box you drag erases that area to clean white (live preview while dragging, stays in the mode so you can wipe several dimensions fast), an \u21a9 Undo white-out button that removes the last box, and Clear now also clears the white-outs. The erasures are baked into the saved reference image \u2014 crop, wipe the neighboring dimensions, highlight the bubble, Save \u2014 so the machinist sees ONLY the feature that matters."] },
   { ts: "2026-07-26", rev: "App Rev-531", type: "App", changes: ["FULL EDITING ON THE VALIDATION EDITING SCREEN (embedded validation REV-130 \u2192 REV-131) \u2014 in the editing screens, the feature DESCRIPTION and the LOW / HIGH limit cards are now direct-type fields (dashed red border marks what\u2019s editable): change a value and it saves to the operation AND writes back to the saved Control Plan row (via the same whitelisted row-edit channel the popup editor uses), keeping an open builder in step. Guardrails: limits must be numbers, LOW can\u2019t exceed HIGH, description auto-uppercases. Together with the decimal-places picker, reference-photo tools, and \u270f\ufe0f Edit view, every per-feature setting is editable in place \u2014 the measurement METHOD stays read-only since it\u2019s governed by the Control Types Master List."] },
   { ts: "2026-07-26", rev: "App Rev-530", type: "App", changes: ["DOWN/UP WORK FROM ANYWHERE ON THE BUILDER SCREEN \u2014 Rev-528\u2019s arrow navigation required the cursor to already be inside a cell; now just being on the Build Control Plan screen is enough: Down/Up activates the next/previous row, focuses its first field with text selected, and re-zooms the drawing. Inside-cell behavior unchanged."] },
@@ -1783,7 +1784,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-26";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:58 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2781,13 +2782,14 @@ async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpe
       'if(typeof manageMode!=="undefined") manageMode=false; ' +
       'if(__pt && __pt.ops && __pt.ops.length===1 && typeof selectOp==="function"){ selectOp(idx, 0); } ' +
       'else if(typeof showOpPicker==="function"){ showOpPicker(idx); } ' +
+      'try{ parent.postMessage({type:"cpValLanded"},"*"); }catch(e){} ' +
       'return; ' +
     '} ' +
     'if(__pt && __pt.ops && __pt.ops.length===1){ ' +
       'if(typeof _showOpBuilder==="function"){ _showOpBuilder(idx, 0); } else if(typeof showOpBuilder==="function"){ showOpBuilder(idx, 0); } ' +
-      'setTimeout(function(){ try{ if(typeof startPreviewRun==="function") startPreviewRun(); }catch(e){ console.error("preview launch failed", e); } }, 40); ' +
+      'setTimeout(function(){ try{ if(typeof startPreviewRun==="function") startPreviewRun(); }catch(e){ console.error("preview launch failed", e); } try{ parent.postMessage({type:"cpValLanded"},"*"); }catch(e){} }, 40); ' +
     '} ' +
-    'else if(typeof showOpPicker==="function"){ showOpPicker(idx); } ' +
+    'else if(typeof showOpPicker==="function"){ showOpPicker(idx); try{ parent.postMessage({type:"cpValLanded"},"*"); }catch(e){} } ' +
     '}catch(e){ console.error("cpAutoOpen failed", e); } }\n';
   outHtml = outHtml.replace('openDB()\n', cpAutoOpenFn + 'openDB()\n');
   outHtml = outHtml.replace('.then(showMenu)', '.then(showMenu)\n  .then(cpAutoOpen)');
@@ -2839,6 +2841,7 @@ async function inspectMachinistValidation(idx){
   const built = await mvBuildPartForProject(p);
   if(!built){ flash('This plan has no features to inspect.', true); return; }
   mvMarkCreated(p);
+  window._cpMvWantCurtain = true;
   await mvOpenPanelWithParts([built.partBlock], String(p.partNum || 'PART') + (p.rev ? ' ' + p.rev : ''), built.partBlock.partNumber, 'inspect');
 }
 
@@ -2849,6 +2852,7 @@ async function createMachinistValidation(idx){
   const built = await mvBuildPartForProject(p);
   if(!built){ flash('This plan has no features to validate.', true); return; }
   mvMarkCreated(p);
+  window._cpMvWantCurtain = true;
   await mvOpenPanelWithParts([built.partBlock], String(p.partNum || 'PART') + (p.rev ? ' ' + p.rev : ''), built.partBlock.partNumber);
 }
 
@@ -2873,6 +2877,20 @@ function openMachinistValidationPanel(html, part, rev, featCount, hadImage, part
   back.onclick = () => { panel.remove(); };
 
   panel.appendChild(frame); panel.appendChild(back);
+  // Rev-533: while the app boots and auto-navigates to its destination screen, cover the
+  // panel with a curtain so the user never sees the intermediate menu/list flashes.
+  if(window._cpMvWantCurtain){
+    const cur = document.createElement('div');
+    cur.id = 'mvCurtain';
+    cur.style.cssText = 'position:absolute; inset:0; z-index:100001; background:#e9e6df; display:flex; align-items:center; justify-content:center; font:800 16px system-ui; color:#7a1a1c; letter-spacing:.04em; transition:opacity .18s ease;';
+    cur.textContent = '\u23f3 Opening editing screens\u2026';
+    panel.appendChild(cur);
+    const drop = () => { const c = document.getElementById('mvCurtain'); if(c){ c.style.opacity = '0'; setTimeout(() => c.remove(), 200); } window.removeEventListener('message', onMsg); };
+    const onMsg = (ev) => { if(ev && ev.data && ev.data.type === 'cpValLanded') drop(); };
+    window.addEventListener('message', onMsg);
+    setTimeout(drop, 3500);   // failsafe: never trap the user behind the curtain
+    window._cpMvWantCurtain = false;
+  }
   document.body.appendChild(panel);
 
   // Write the app into the iframe. A src-less iframe is same-origin as this page,
