@@ -1417,7 +1417,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-580";
+const APP_REV = "Rev-581";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1431,6 +1431,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-581", type: "App", changes: ["THE PENCIL NOW APPEARS ON PLANS WITH NO OP NUMBER (Rev-581) \u2014 Rev-580 put the \u270f\ufe0f only on rows that already HAD an operation number, which is exactly the rows that did not need it: every plan on this device predates per-operation plans and carries no op number, so no pencil ever showed. Those rows now read \u21b3 (no op number) with a pencil beside them, indented like any other operation. The editor was widened to match: it asks for the operation NUMBER first (off the traveller, e.g. 020), refuses a number already used by another plan on the same part and revision, then asks what that operation is (e.g. TURN COMPLETE). Because a gage\u2019s identity is built from part + operation + balloon, giving a plan its op number also CARRIES ITS GAGES AND GAGE DRAWINGS onto the new key rather than orphaning them."] },
   { ts: "2026-07-27", rev: "App Rev-580", type: "App", changes: ["OPERATIONS INDENTED, NAMED, AND THE REV COLUMN EXPLAINED (Rev-580) \u2014 (1) INDENT: operation rows on the Control Plans list are now genuinely indented (34px) under their part header instead of nudged by a single space, so a part and its operations read as parent and children. (2) OP # AND DESCRIPTION: each op row reads \u21b3 OP-020 \u00b7 TURN COMPLETE. A new Op Description field sits beside Op # on the New Control Plan and Add Op forms, taking the wording straight off the traveller. Plans built before this field existed show (no description) with a \u270f\ufe0f beside them \u2014 one tap names the operation and writes it back to the saved plan. (3) REV COLUMN: the header read simply Revision, which was ambiguous \u2014 it holds the CUSTOMER\u2019S PART / DRAWING revision typed on the New Control Plan form, NOT the Control Plan\u2019s own revision (Control Plan revs are the Rev-NN tokens on the .xlsx, per CP-1). The column now reads Part Rev and carries a tooltip saying exactly that."] },
   { ts: "2026-07-27", rev: "App Rev-579", type: "App", changes: ["TRAVELLER WINDOW NOW FILLS THE SCREEN (Rev-579) \u2014 the traveller window was sized max-height 94vh, which only CAPS the height; with the preview capped at 42vh the window shrank to fit its contents and left thick empty bands above and below on a tall monitor. It now CLAIMS the height (98vh) and runs the same fill mode the gage window got at Rev-577, so the preview stretches into everything the window can spare. Widened to 1400px, header bar and footer slimmed, and the backdrop padding cut from 16px to 10px. A full traveller page is now readable without scrolling on a 1080-tall screen."] },
   { ts: "2026-07-27", rev: "App Rev-578", type: "App", changes: ["NUDGE STEP NOW DEFAULTS TO 2 PX (Rev-578) \u2014 the step selector opened on 10 px, which overshoots when lining up two traveller pages; it now opens on 2 px, and the code fallback used before the selector renders matches. The selector also got a minimum width and breathing room after the px label \u2014 it was crowding the Reset nudges button. Small correction alongside: the status line said \u20181 page(s) loaded\u2019 after a second page went in because it was counting what that drop added rather than the total; it now reports every page loaded, matching the PAGE(S) count beside it."] },
@@ -1884,7 +1885,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:36 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2417,9 +2418,26 @@ function renderProjects(){
       ed.onclick = (e) => { e.stopPropagation(); cpSetOpDesc(p); };
       tdPart.appendChild(ed);
     } else {
+      // Rev-581: plans made before per-operation plans existed carry no op number at
+      // all, so they had nothing to edit and no pencil. They get one here.
+      tdPart.style.paddingLeft = '34px';
       const b = document.createElement('strong');
-      b.textContent = p.partNum || '';
+      b.textContent = '\u21b3 (no op number)';
+      b.style.cssText = 'font-weight:700; color:#a49a8d; letter-spacing:.03em;';
       tdPart.appendChild(b);
+      const d = document.createElement('span');
+      const desc = String(p.opDesc || p.operation || '').trim();
+      if(desc){
+        d.textContent = '  \u00b7  ' + desc;
+        d.style.cssText = 'font-size:12px; color:#5a5148; font-weight:600;';
+        tdPart.appendChild(d);
+      }
+      const ed = document.createElement('button');
+      ed.textContent = '\u270f\ufe0f';
+      ed.title = 'Give this plan its operation number and description';
+      ed.style.cssText = 'margin-left:8px; border:none; background:none; cursor:pointer; font-size:12px; opacity:.55;';
+      ed.onclick = (e) => { e.stopPropagation(); cpSetOpDesc(p); };
+      tdPart.appendChild(ed);
     }
     const tdRev = document.createElement('td'); tdRev.textContent = p.rev || '';
     const tdStatus = document.createElement('td');
@@ -3651,27 +3669,58 @@ function cpTravellerWire(){
   };
   window._cpTravShow = show;
 }
-// Rev-580: name an operation after the fact — plans built before the Op Description
-// field existed show "(no description)" until this is used.
+// Rev-581: set an operation's NUMBER and DESCRIPTION. Plans built before per-operation
+// plans existed have no op number at all; naming them here also carries their gages and
+// gage drawings over to the new key, which is built from part + op + balloon.
 function cpSetOpDesc(p){
-  const cur = String(p.opDesc || p.operation || '');
-  const v = prompt('What is OP-' + (p.opNum || '') + ' on ' + (p.partNum || '') + '?\n\nUse the wording off the traveller, e.g. TURN COMPLETE.', cur);
+  const oldOp = String(p.opNum || '');
+  const nOp = prompt('Operation number for ' + (p.partNum || '') + '?\n\nUse the routing number off the traveller, e.g. 020.'
+    + (oldOp ? '' : '\n\nThis plan has none yet. Leave blank to skip.'), oldOp);
+  if(nOp === null) return;
+  const newOp = String(nOp).trim().toUpperCase();
+  let projects = [];
+  try{ projects = JSON.parse(localStorage.getItem('cpProjects') || '[]'); }catch(e){}
+  if(newOp !== oldOp && newOp){
+    const clash = projects.some(x => String(x.partNum||'') === String(p.partNum||'')
+      && String(x.rev||'') === String(p.rev||'') && String(x.opNum||'') === newOp);
+    if(clash){ alert('There is already a plan for ' + (p.partNum||'') + ' OP-' + newOp + '. Pick a different operation number.'); return; }
+  }
+  const v = prompt('What is OP-' + (newOp || '?') + ' on ' + (p.partNum || '') + '?\n\nUse the wording off the traveller, e.g. TURN COMPLETE.',
+    String(p.opDesc || p.operation || ''));
   if(v === null) return;
   const desc = v.trim().toUpperCase();
+
+  let hit = false;
+  projects.forEach(x => {
+    if(String(x.partNum||'') === String(p.partNum||'') && String(x.rev||'') === String(p.rev||'')
+       && String(x.opNum||'') === oldOp){ x.opNum = newOp; x.opDesc = desc; hit = true; }
+  });
+  if(hit) try{ localStorage.setItem('cpProjects', JSON.stringify(projects)); }catch(e){}
+
+  // carry any gages (and their drawings) onto the new key
+  if(newOp !== oldOp){
+    try{
+      const map = cpGagesGet(); let moved = 0;
+      Object.keys(map).forEach(k => {
+        const g = map[k];
+        if(!g || String(g.part||'').toUpperCase() !== String(p.partNum||'').toUpperCase()) return;
+        if(String(g.opNum||'') !== oldOp) return;
+        const nk = cpGageKey(g.part, newOp, g.bubble);
+        if(nk === k) return;
+        try{ const d = _idbGetDrawing('GAGE::' + k); if(d && d.odsImage){ _idbPutDrawing('GAGE::' + nk, d.odsImage); _idbDelDrawing('GAGE::' + k); } }catch(e){}
+        g.opNum = newOp; g.key = nk; delete map[k]; map[nk] = g; moved++;
+      });
+      if(moved) cpGagesSet(map);
+    }catch(e){}
+  }
+
   try{
-    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
-    let hit = false;
-    projects.forEach(x => {
-      if(String(x.partNum||'') === String(p.partNum||'') && String(x.rev||'') === String(p.rev||'')
-         && String(x.opNum||'') === String(p.opNum||'')){ x.opDesc = desc; hit = true; }
-    });
-    if(hit) localStorage.setItem('cpProjects', JSON.stringify(projects));
+    if(cpBuildState && String(cpBuildState.partNum||'') === String(p.partNum||'')
+       && String(cpBuildState.opNum||'') === oldOp){ cpBuildState.opNum = newOp; cpBuildState.opDesc = desc; }
   }catch(e){}
-  try{ if(cpBuildState && String(cpBuildState.partNum||'') === String(p.partNum||'')
-        && String(cpBuildState.opNum||'') === String(p.opNum||'')) cpBuildState.opDesc = desc; }catch(e){}
-  p.opDesc = desc;
+  p.opNum = newOp; p.opDesc = desc;
   renderProjects();
-  flash(desc ? ('\u2713 OP-' + (p.opNum || '') + ' is ' + desc) : 'Description cleared.');
+  flash(newOp ? ('\u2713 OP-' + newOp + (desc ? ' \u00b7 ' + desc : '')) : (desc ? ('\u2713 ' + desc) : 'Updated.'));
 }
 function cpAddOpToPart(partNum){
   window._cpTravWaive = String(partNum || '');   // the part exists — never re-ask for its traveller
