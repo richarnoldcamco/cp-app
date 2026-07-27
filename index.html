@@ -477,6 +477,11 @@
       <label>Op # (routing)</label>
       <input type="text" id="cpOpNum" placeholder="E.G., 030">
     </div>
+    <!-- Rev-580: the operation's name off the traveller, e.g. TURN COMPLETE -->
+    <div class="field tight">
+      <label>Op Description</label>
+      <input type="text" id="cpOpDesc" placeholder="E.G., TURN COMPLETE">
+    </div>
     <div class="field tight">
       <label>Operation</label>
       <input type="text" id="cpOperation" placeholder="E.G., LATHE">
@@ -716,7 +721,7 @@
     <thead>
       <tr>
         <th>Part Number</th>
-        <th>Revision</th>
+        <th title="The customer's part / drawing revision — not the Control Plan revision">Part Rev</th>
         <th>Status</th>
         <th>Updated</th>
         <th>Action</th>
@@ -1412,7 +1417,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-579";
+const APP_REV = "Rev-580";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1426,6 +1431,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-580", type: "App", changes: ["OPERATIONS INDENTED, NAMED, AND THE REV COLUMN EXPLAINED (Rev-580) \u2014 (1) INDENT: operation rows on the Control Plans list are now genuinely indented (34px) under their part header instead of nudged by a single space, so a part and its operations read as parent and children. (2) OP # AND DESCRIPTION: each op row reads \u21b3 OP-020 \u00b7 TURN COMPLETE. A new Op Description field sits beside Op # on the New Control Plan and Add Op forms, taking the wording straight off the traveller. Plans built before this field existed show (no description) with a \u270f\ufe0f beside them \u2014 one tap names the operation and writes it back to the saved plan. (3) REV COLUMN: the header read simply Revision, which was ambiguous \u2014 it holds the CUSTOMER\u2019S PART / DRAWING revision typed on the New Control Plan form, NOT the Control Plan\u2019s own revision (Control Plan revs are the Rev-NN tokens on the .xlsx, per CP-1). The column now reads Part Rev and carries a tooltip saying exactly that."] },
   { ts: "2026-07-27", rev: "App Rev-579", type: "App", changes: ["TRAVELLER WINDOW NOW FILLS THE SCREEN (Rev-579) \u2014 the traveller window was sized max-height 94vh, which only CAPS the height; with the preview capped at 42vh the window shrank to fit its contents and left thick empty bands above and below on a tall monitor. It now CLAIMS the height (98vh) and runs the same fill mode the gage window got at Rev-577, so the preview stretches into everything the window can spare. Widened to 1400px, header bar and footer slimmed, and the backdrop padding cut from 16px to 10px. A full traveller page is now readable without scrolling on a 1080-tall screen."] },
   { ts: "2026-07-27", rev: "App Rev-578", type: "App", changes: ["NUDGE STEP NOW DEFAULTS TO 2 PX (Rev-578) \u2014 the step selector opened on 10 px, which overshoots when lining up two traveller pages; it now opens on 2 px, and the code fallback used before the selector renders matches. The selector also got a minimum width and breathing room after the px label \u2014 it was crowding the Reset nudges button. Small correction alongside: the status line said \u20181 page(s) loaded\u2019 after a second page went in because it was counting what that drop added rather than the total; it now reports every page loaded, matching the PAGE(S) count beside it."] },
   { ts: "2026-07-27", rev: "App Rev-577", type: "App", changes: ["THE DRAWING GETS THE ROOM (Rev-577) \u2014 the Special Gage window was spending most of its height on instructions while the drawing sat in a letterbox. Rebuilt as a full-height panel (94vh, widened to 1150px) where every fixed part is squeezed and the PREVIEW TAKES ALL THE REMAINING SPACE: the feature line and the writing prompt folded into one sentence, the text box dropped to three rows (still draggable if you want more), the section heading and footer tightened. The drop box now COLLAPSES once a page is loaded \u2014 the instructions have done their job by then, so it shrinks to a one-line \u2b06 ADD ANOTHER PAGE strip and hands the height to the drawing; remove the page and the full instructions come back. New fill mode on the capture panel makes the preview stretch to whatever the surrounding window can spare instead of a fixed 34vh box."] },
@@ -1878,7 +1884,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:28 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:36 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2390,10 +2396,31 @@ function renderProjects(){
     }
     const tr = document.createElement('tr');
     const p = item.data;
-    const tdPart = document.createElement('td'); const b=document.createElement('strong');
-    if(p.opNum){ b.textContent = '\u2003\u21b3 OP-' + p.opNum; b.style.fontWeight = '600'; }
-    else b.textContent = p.partNum || '';
-    tdPart.appendChild(b);
+    const tdPart = document.createElement('td');
+    if(p.opNum){
+      // Rev-580: operations sit indented under their part, showing the op number AND
+      // what that operation actually is off the traveller
+      tdPart.style.paddingLeft = '34px';
+      const b = document.createElement('strong');
+      b.textContent = '\u21b3 OP-' + p.opNum;
+      b.style.cssText = 'font-weight:800; letter-spacing:.03em;';
+      tdPart.appendChild(b);
+      const d = document.createElement('span');
+      const desc = String(p.opDesc || p.operation || '').trim();
+      d.textContent = desc ? ('  \u00b7  ' + desc) : '  \u00b7  (no description)';
+      d.style.cssText = 'font-size:12px; color:' + (desc ? '#5a5148' : '#a49a8d') + '; font-weight:600;';
+      tdPart.appendChild(d);
+      const ed = document.createElement('button');
+      ed.textContent = '\u270f\ufe0f';
+      ed.title = 'Set what this operation is (e.g. TURN COMPLETE)';
+      ed.style.cssText = 'margin-left:8px; border:none; background:none; cursor:pointer; font-size:12px; opacity:.55;';
+      ed.onclick = (e) => { e.stopPropagation(); cpSetOpDesc(p); };
+      tdPart.appendChild(ed);
+    } else {
+      const b = document.createElement('strong');
+      b.textContent = p.partNum || '';
+      tdPart.appendChild(b);
+    }
     const tdRev = document.createElement('td'); tdRev.textContent = p.rev || '';
     const tdStatus = document.createElement('td');
     if(item.kind === 'draft'){
@@ -3368,6 +3395,7 @@ function saveProject(partNum, rev, base64Data, customerName, qualityLevel){
     partNum,
     rev,
     opNum: _op,
+    opDesc: (cpBuildState && cpBuildState.opDesc) || '',   // Rev-580
     customer: customerName || '',
     qualityLevel: qualityLevel || '',
     created: new Date().toISOString(),
@@ -3623,6 +3651,28 @@ function cpTravellerWire(){
   };
   window._cpTravShow = show;
 }
+// Rev-580: name an operation after the fact — plans built before the Op Description
+// field existed show "(no description)" until this is used.
+function cpSetOpDesc(p){
+  const cur = String(p.opDesc || p.operation || '');
+  const v = prompt('What is OP-' + (p.opNum || '') + ' on ' + (p.partNum || '') + '?\n\nUse the wording off the traveller, e.g. TURN COMPLETE.', cur);
+  if(v === null) return;
+  const desc = v.trim().toUpperCase();
+  try{
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    let hit = false;
+    projects.forEach(x => {
+      if(String(x.partNum||'') === String(p.partNum||'') && String(x.rev||'') === String(p.rev||'')
+         && String(x.opNum||'') === String(p.opNum||'')){ x.opDesc = desc; hit = true; }
+    });
+    if(hit) localStorage.setItem('cpProjects', JSON.stringify(projects));
+  }catch(e){}
+  try{ if(cpBuildState && String(cpBuildState.partNum||'') === String(p.partNum||'')
+        && String(cpBuildState.opNum||'') === String(p.opNum||'')) cpBuildState.opDesc = desc; }catch(e){}
+  p.opDesc = desc;
+  renderProjects();
+  flash(desc ? ('\u2713 OP-' + (p.opNum || '') + ' is ' + desc) : 'Description cleared.');
+}
 function cpAddOpToPart(partNum){
   window._cpTravWaive = String(partNum || '');   // the part exists — never re-ask for its traveller
   // Rev-563: prefill the New CP form from the part's stored info — only the op fields are blank
@@ -3639,13 +3689,14 @@ function cpAddOpToPart(partNum){
       Array.from($('cpCustomer').options).forEach((o, oi) => { if(o.text === want) $('cpCustomer').selectedIndex = oi; });
       if(typeof $('cpCustomer').onchange === 'function') try{ $('cpCustomer').onchange(); }catch(e){}
     }
-    ['cpOpNum','cpOperation','cpMachine'].forEach(id => { if($(id)) $(id).value = ''; });
+    ['cpOpNum','cpOpDesc','cpOperation','cpMachine'].forEach(id => { if($(id)) $(id).value = ''; });
     const _t = $('newCpTitle'); if(_t) _t.textContent = 'New Operation Control Plan \u2014 ' + partNum;
     // Rev-566: this screen ONLY adds an operation — part data is fixed, traveller lives with the part
     const ts = $('travSection'); if(ts) ts.style.display = 'none';
     ['cpPartNum','cpRev','cpOwner'].forEach(id => { const el = $(id); if(el){ el.readOnly = true; el.style.background = 'var(--panel-2)'; } });
     const cu = $('cpCustomer'); if(cu){ cu.disabled = true; cu.style.background = 'var(--panel-2)'; }
     if($('cpOpNum')) $('cpOpNum').focus();
+    if($('cpOpDesc')) $('cpOpDesc').value = '';   // Rev-580: each op names itself
     flash('Adding an operation to ' + partNum + ' \u2014 traveller already on file. Enter the Op #, upload the op\u2019s ODS, and generate.');
   }, 120);
 }
@@ -4098,6 +4149,7 @@ async function generateCPBuild(){
   const owner = $('cpOwner').value.trim();
   const operation = ($('cpOperation').value.trim() || 'LATHE');
   const opNum = ($('cpOpNum') ? $('cpOpNum').value.trim() : '');
+  const opDesc = ($('cpOpDesc') ? $('cpOpDesc').value.trim() : '');   // Rev-580
   const machine = ($('cpMachine').value.trim() || 'HARDINGE QUEST');
   const numRows = parseInt($('cpRows').value || '15') || 15;
 
@@ -4142,7 +4194,7 @@ async function generateCPBuild(){
 
   // Build state: one row per balloon
   cpBuildState = {
-    partNum, rev, opNum, workcenter, owner, operation, machine,
+    partNum, rev, opNum, opDesc, workcenter, owner, operation, machine,
     cycleMinutes: ($('cpCycleMin') ? $('cpCycleMin').value.trim() : ''),
     customerName, qualityLevel,
     odsImage: currentODSImage || null,
