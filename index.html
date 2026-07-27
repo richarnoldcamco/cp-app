@@ -396,6 +396,10 @@
         <b style="font-size:15px;">🔬 MACHINIST VALIDATION</b><br>
         <small style="font-size:11px; opacity:.9;">ALL PLANS, READY TO INSPECT</small>
       </button>
+      <button class="menu-btn" id="mGages" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
+        <b style="font-size:15px;">🔧 GAGES TO BE MADE <span id="badgeGages" style="color:var(--signal); font-size:14px;">0</span></b><br>
+        <small style="font-size:11px; color:var(--ink-dim);">SPECIAL GAGES AND FIXTURES CALLED OUT ON ANY CONTROL PLAN</small>
+      </button>
       <button class="menu-btn" id="mReports" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
         <b style="font-size:15px;">📊 REPORTS</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">EVERY INSPECTION RUN, EVERY STATION</small>
@@ -1097,6 +1101,40 @@
 </div>
 
 <!-- INSPECTION REPORTS SCREEN (Rev-443) -->
+<div id="gagesScreen" class="setup wide hidden">
+  <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px; flex-wrap:wrap;">
+    <button class="ob-back" id="gagesBack" style="margin:0;">← Back</button>
+    <h1 style="margin:0; font-size:20px;">Gages To Be Made</h1>
+    <select id="gagesFilter" style="height:34px; border:1px solid var(--line-strong); border-radius:8px; padding:0 8px; font-size:13px; margin-left:auto;">
+      <option value="OPEN" selected>Open only</option>
+      <option value="ALL">All</option>
+      <option value="TO BE MADE">To be made</option>
+      <option value="DESIGNED">Designed</option>
+      <option value="ORDERED">Ordered</option>
+      <option value="IN PROGRESS">In progress</option>
+      <option value="COMPLETE">Complete</option>
+    </select>
+    <button id="gagesRefresh" style="background:#2c6e49; color:#fff; border:none; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer;">⟳ Refresh</button>
+  </div>
+  <p class="sub" style="margin-bottom:6px;">Every special gage or fixture written on a Control Plan row, gathered from every part and operation on this device.</p>
+  <p id="gagesStatus" style="font-size:12px; color:var(--ink-faint); margin-bottom:12px;"></p>
+  <table id="gagesTable" style="width:100%; border-collapse:collapse;">
+    <thead>
+      <tr style="background:#9DC3E6;">
+        <th style="padding:7px; border:1px solid #5a8bb5; width:110px;">Part / Op</th>
+        <th style="padding:7px; border:1px solid #5a8bb5; width:60px;">Balloon</th>
+        <th style="padding:7px; border:1px solid #5a8bb5; width:170px;">Feature</th>
+        <th style="padding:7px; border:1px solid #5a8bb5;">Gage / Fixture</th>
+        <th style="padding:7px; border:1px solid #5a8bb5; width:120px;">Status</th>
+        <th style="padding:7px; border:1px solid #5a8bb5; width:130px;">Assigned To</th>
+        <th style="padding:7px; border:1px solid #5a8bb5; width:80px;">Drawing</th>
+        <th style="padding:7px; border:1px solid #5a8bb5; width:250px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="gagesTbody"></tbody>
+  </table>
+</div>
+
 <div id="reportsScreen" class="setup hidden">
   <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
     <button class="ob-back" id="reportsBack" style="margin:0;">← Back</button>
@@ -1374,7 +1412,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-571";
+const APP_REV = "Rev-572";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1388,6 +1426,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-572", type: "App", changes: ["GAGES TO BE MADE \u2014 SHOP-WIDE LIST (Rev-572) \u2014 filling the Special Gage / Fixture column on any Control Plan row now automatically posts that gage to a list, reachable from a new \ud83d\udd27 GAGES TO BE MADE button on the main menu carrying a live badge (open / total). Each gage is keyed PART::OPnnn::Bnn so it follows its balloon, and the list carries Part/Op, balloon, feature + tolerance, the gage description, status, who it is assigned to, and its drawing. Five buttons per row: \u270f\ufe0f EDIT rewrites the description, \u21bb UPDATE sets status (TO BE MADE \u2192 DESIGNED \u2192 ORDERED \u2192 IN PROGRESS \u2192 COMPLETE) with an optional progress note, \ud83d\udc64 ASSIGNED TO names the toolmaker or vendor, \ud83d\udcc4 UPLOAD DRAWING attaches a picture or PDF of the gage design (stored under GAGE::<key> and GitHub-synced like any drawing, with View / \u2b06 Replace), and \ud83d\uddd1 DELETE removes it. A filter shows open-only, all, or one status. EDIT and DELETE write back to the Control Plan row they came from \u2014 the open builder updates immediately, a closed plan is corrected in its saved record \u2014 so the list and the plan never disagree. The list rides the normal GitHub data sync as cpGageList in cp_data.json, merged per gage key with the newest edit winning, so every device sees the same list."] },
   { ts: "2026-07-27", rev: "App Rev-571", type: "App", changes: ["SPECIAL GAGE / FIXTURE COLUMN (Rev-571) \u2014 a new column sits between Meas Method (CMM) and Reaction Plan on the Build Control Plan grid, recording whether a feature needs a gage or holding fixture BUILT rather than pulled off the shelf. A row with nothing recorded shows a + ADD GAGE button; pressing it opens a writing box headed with that balloon\u2019s number, description and tolerance, with room to describe the gage, what it mates to, and what the toolmaker needs to know. Ctrl+Enter saves, Esc backs out. A row that HAS a gage shows the text on a pale blue cell with \u270f\ufe0f Edit to reopen the box and \u2715 to clear it (confirmed first). The note is stored on the row as specialGage, so it saves and reloads with the plan like every other cell and shows as a \ud83d\udd27 chip in the compact row view. The writing box is exempt from the app\u2019s force-uppercase handler \u2014 gage descriptions are prose, not codes. NOTE: this column is ON-SCREEN ONLY for now; the Build .xlsx still exports the 17 columns of CP-2 and the Instructions (Rev-92) are untouched. Say the word and I will add it to the xlsx and update the Instructions to match \u2014 I will not change an ITAR deliverable\u2019s column set without your go-ahead."] },
   { ts: "2026-07-27", rev: "App Rev-570", type: "App", changes: ["TRAVELLER UPLOAD NOW USES THE PFMEA SEW + NUDGE ENGINE (Rev-570) \u2014 \u2b06 Upload Traveller no longer opens a bare one-file picker. It opens a full traveller screen ported from the PFMEA app (PF Rev-056 sewCanvas / nudge / sewApply), re-namespaced _cptv* so nothing collides with the ODS upload: (1) MULTI-PAGE LOAD \u2014 click, drag-drop, or paste with Ctrl+V; images or PDF, and EVERY page of a PDF comes in (the ODS helper only takes page 1 because a drawing is one sheet, a router is not) via new cpPdfPagesToImages. (2) PAGE STRIP \u2014 thumbnails with \u25c0 \u25b6 reorder and \u2715 remove, click one to select it. (3) SEW \u2014 stack top-to-bottom, side by side, or grid 2-across, with trim-overlap px and white/black background, live preview, and Undo last sew. (4) NUDGE BAR \u2014 push the selected page \u25b2\u25bc\u25c0\u25b6 (or arrow keys) at 1/2/5/10/25/50 px steps, \u21d4 Wider / \u21e5 Narrower to stretch or squeeze it, Reset nudges; the selected page carries a dashed red outline in the preview. (5) PREVIEW ZOOM \u2212 / FIT / 100% / +. Saving stores the finished single image under PART::TRAVELLER exactly as before (GitHub-synced) \u2014 several pages sew automatically on the way out. Reopening on a part that already has a traveller seeds it as page 1, so Replace can ADD a page instead of starting over. Esc closes."] },
   { ts: "2026-07-27", rev: "App Rev-569", type: "App", changes: ["PART-HEADER BUTTONS NOW LINE UP (Rev-569) \u2014 on the Control Plans list the \u2795 Add Op and Traveller buttons sat immediately after the part number, so a short part like Test1 pushed them far left of a long one like 1000222892 and the column zig-zagged down the page. The part name is now a fixed-width block (150px) and both buttons carry fixed widths (Add Op 96px, Traveller 150px, centered), so every part\u2019s buttons start and end on the same vertical line regardless of part-number length or whether the Traveller button reads \u2b06 Upload Traveller or \ud83d\udcc4 Traveller. Longer part numbers still display in full \u2014 the block only sets a minimum."] },
@@ -1832,7 +1871,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "1:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "2:14 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2080,6 +2119,7 @@ function showMenu(){
   $('menuScreen').classList.remove('hidden');
   $('newCPScreen').classList.add('hidden');
   $('projectsScreen').classList.add('hidden');
+  if($('gagesScreen'))$('gagesScreen').classList.add('hidden');
   $('masterListScreen').classList.add('hidden');
   $('customersScreen').classList.add('hidden');
   $('instructionsScreen').classList.add('hidden');
@@ -2107,6 +2147,7 @@ function showNewCP(fresh){
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.remove('hidden');
   $('projectsScreen').classList.add('hidden');
+  if($('gagesScreen'))$('gagesScreen').classList.add('hidden');
   $('masterListScreen').classList.add('hidden');
   $('customersScreen').classList.add('hidden');
   $('instructionsScreen').classList.add('hidden');
@@ -4584,6 +4625,7 @@ function cpGageCell(idx, row){
       e.stopPropagation();
       if(!confirm('Clear the special gage / fixture note on this row?')) return;
       cpBuildState.rows[idx].specialGage = '';
+      cpGageUpsertFromRow(cpBuildState.rows[idx]);   // Rev-572: also drops it off the list
       renderCPBuilder(); cpAutoSaveProject();
     };
     bar.appendChild(ed); bar.appendChild(rm);
@@ -4635,6 +4677,7 @@ function cpGagePopup(idx){
   document.getElementById('cpGageSave').onclick = () => {
     cpBuildState.rows[idx].specialGage = ta.value.trim();
     close();
+    cpGageUpsertFromRow(cpBuildState.rows[idx]);   // Rev-572: feed the Gages To Be Made list
     renderCPBuilder(); cpAutoSaveProject();
     flash(cpBuildState.rows[idx].specialGage ? '\u2713 Special gage saved on balloon ' + (row.bubble || '') : 'Special gage cleared.');
   };
@@ -4642,6 +4685,252 @@ function cpGagePopup(idx){
     if(e.key === 'Escape'){ e.preventDefault(); close(); }
     if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); document.getElementById('cpGageSave').click(); }
   });
+}
+
+// ===== Rev-572: GAGES TO BE MADE — the shop-wide list ============================
+// Every special gage / fixture written on a Control Plan row lands here automatically.
+// The list is keyed PART::OPnnn::Bnn so a gage follows its balloon, rides the normal
+// GitHub data sync (cpGageList in cp_data.json), and its drawing is stored like any
+// other drawing under GAGE::<key>.
+const CP_GAGE_STATUSES = ['TO BE MADE', 'DESIGNED', 'ORDERED', 'IN PROGRESS', 'COMPLETE'];
+function cpGageKey(part, op, bubble){
+  return String(part || '').toUpperCase() + '::OP' + String(op || '').toUpperCase() + '::B' + String(bubble || '').toUpperCase();
+}
+function cpGagesGet(){
+  try{ const o = JSON.parse(localStorage.getItem('cpGageList') || '{}'); return (o && typeof o === 'object') ? o : {}; }catch(e){ return {}; }
+}
+function cpGagesSet(map){
+  try{ localStorage.setItem('cpGageList', JSON.stringify(map || {})); }catch(e){}
+  try{ if(typeof cpUpdateGageBadge === 'function') cpUpdateGageBadge(); }catch(e){}
+}
+// Write (or clear) the list entry for one Control Plan row
+function cpGageUpsertFromRow(row){
+  if(!row || !cpBuildState) return;
+  const part = cpBuildState.partNum || '', op = cpBuildState.opNum || '';
+  const key = cpGageKey(part, op, row.bubble);
+  const map = cpGagesGet();
+  const desc = String(row.specialGage || '').trim();
+  if(!desc){                                   // note cleared on the plan — drop the list entry
+    if(map[key]) delete map[key];
+    cpGagesSet(map);
+    return;
+  }
+  const prev = map[key] || {};
+  map[key] = {
+    key, part, opNum: op, rev: cpBuildState.rev || '',
+    bubble: row.bubble || '',
+    feature: row.featureDesc || '',
+    spec: row.spec || '',
+    desc,
+    status: prev.status || 'TO BE MADE',
+    assignedTo: prev.assignedTo || '',
+    notes: prev.notes || '',
+    createdAt: prev.createdAt || new Date().toISOString(),
+    ut: new Date().toISOString()
+  };
+  cpGagesSet(map);
+}
+function cpUpdateGageBadge(){
+  const b = document.getElementById('badgeGages'); if(!b) return;
+  const all = Object.values(cpGagesGet());
+  const open = all.filter(g => String(g.status || '').toUpperCase() !== 'COMPLETE').length;
+  b.textContent = all.length ? (open + ' OPEN / ' + all.length) : '0';
+}
+function showGages(){
+  ['menuScreen','newCPScreen','projectsScreen','masterListScreen','customersScreen','instructionsScreen',
+   'settingsScreen','adminScreen','appInstructionsScreen','recentChangesScreen','reportsScreen','historyScreen']
+    .forEach(id => { const e = document.getElementById(id); if(e) e.classList.add('hidden'); });
+  const g = document.getElementById('gagesScreen'); if(g) g.classList.remove('hidden');
+  try{ setHeaderBackVisible(true); }catch(e){}
+  renderGages();
+}
+function renderGages(){
+  const tb = document.getElementById('gagesTbody'); if(!tb) return;
+  const map = cpGagesGet();
+  const filt = (document.getElementById('gagesFilter') || {}).value || 'OPEN';
+  let list = Object.values(map);
+  if(filt === 'OPEN') list = list.filter(g => String(g.status || '').toUpperCase() !== 'COMPLETE');
+  else if(filt !== 'ALL') list = list.filter(g => String(g.status || '').toUpperCase() === filt);
+  list.sort((a, b) => String(a.part + a.opNum).localeCompare(String(b.part + b.opNum))
+    || (parseInt(a.bubble, 10) || 0) - (parseInt(b.bubble, 10) || 0));
+  const st = document.getElementById('gagesStatus');
+  const all = Object.values(map);
+  if(st) st.textContent = all.length
+    ? (all.length + ' gage(s) on the list \u2014 ' + all.filter(g => String(g.status).toUpperCase() !== 'COMPLETE').length + ' still open. Showing ' + list.length + '.')
+    : 'Nothing here yet. Gages appear automatically when you fill the Special Gage / Fixture column on a Control Plan row.';
+  tb.innerHTML = '';
+  const cell = (html, align) => { const td = document.createElement('td');
+    td.style.cssText = 'padding:8px; border:1px solid var(--line); font-size:12px; text-align:' + (align || 'left') + '; vertical-align:top;';
+    td.innerHTML = html; return td; };
+  list.forEach(g => {
+    const tr = document.createElement('tr');
+    const done = String(g.status || '').toUpperCase() === 'COMPLETE';
+    if(done) tr.style.background = '#eef7ee';
+    tr.appendChild(cell('<b>' + g.part + '</b>' + (g.opNum ? '<br><span style="font-size:11px; color:#6b6257;">OP-' + g.opNum + '</span>' : '')));
+    tr.appendChild(cell('<b style="font-size:14px;">' + (g.bubble || '') + '</b>', 'center'));
+    tr.appendChild(cell((g.feature || '') + (g.spec ? '<br><span style="font-size:11px; color:#6b6257;">' + g.spec + '</span>' : '')));
+    tr.appendChild(cell('<span style="white-space:normal; word-break:break-word;">' + String(g.desc || '').replace(/</g, '&lt;') + '</span>'
+      + (g.notes ? '<div style="font-size:11px; color:#6b6257; margin-top:4px; white-space:normal;">\u270e ' + String(g.notes).replace(/</g, '&lt;') + '</div>' : '')));
+    const stColor = done ? '#2c6e49' : (String(g.status).toUpperCase() === 'IN PROGRESS' ? '#a35400' : '#7a1a1c');
+    tr.appendChild(cell('<b style="color:' + stColor + '; letter-spacing:.04em;">' + (g.status || 'TO BE MADE') + '</b>'
+      + '<div style="font-size:10px; color:#6b6257; margin-top:3px;">' + (g.ut ? new Date(g.ut).toLocaleDateString() : '') + '</div>', 'center'));
+    tr.appendChild(cell(g.assignedTo ? ('\ud83d\udc64 ' + g.assignedTo) : '<span style="color:#9a9184;">\u2014</span>', 'center'));
+    let hasDwg = false;
+    try{ const d = _idbGetDrawing('GAGE::' + g.key); hasDwg = !!(d && d.odsImage); }catch(e){}
+    tr.appendChild(cell(hasDwg
+      ? '<button data-vw="' + g.key + '" style="font-size:11px; font-weight:700; padding:4px 10px; cursor:pointer;">\ud83d\udcc4 View</button>'
+      : '<span style="color:#9a9184;">none</span>', 'center'));
+    const btn = (attr, label, css) => '<button data-' + attr + '="' + g.key + '" style="font-size:11px; font-weight:700; padding:4px 9px; margin:0 3px 3px 0; border-radius:5px; cursor:pointer; ' + (css || '') + '">' + label + '</button>';
+    tr.appendChild(cell(
+      btn('ged', '\u270f\ufe0f Edit', 'border:1px solid #1a5276; background:#fff; color:#1a5276;') +
+      btn('gup', '\u21bb Update', 'border:1px solid #a35400; background:#fff; color:#a35400;') +
+      btn('gas', '\ud83d\udc64 Assigned To', 'border:1px solid #4a2a5a; background:#fff; color:#4a2a5a;') +
+      btn('gdw', '\ud83d\udcc4 Upload Drawing', 'border:1px solid #5a4a2a; background:#fff; color:#5a4a2a;') +
+      btn('gdl', '\ud83d\uddd1 Delete', 'border:1px solid #8a2a2a; background:#fff; color:#8a2a2a;')));
+    tb.appendChild(tr);
+  });
+  tb.querySelectorAll('[data-ged]').forEach(b => b.onclick = () => cpGageListEdit(b.dataset.ged));
+  tb.querySelectorAll('[data-gup]').forEach(b => b.onclick = () => cpGageListUpdate(b.dataset.gup));
+  tb.querySelectorAll('[data-gas]').forEach(b => b.onclick = () => cpGageListAssign(b.dataset.gas));
+  tb.querySelectorAll('[data-gdw]').forEach(b => b.onclick = () => cpGageListDrawing(b.dataset.gdw));
+  tb.querySelectorAll('[data-gdl]').forEach(b => b.onclick = () => cpGageListDelete(b.dataset.gdl));
+  tb.querySelectorAll('[data-vw]').forEach(b => b.onclick = () => cpGageViewDrawing(b.dataset.vw));
+  cpUpdateGageBadge();
+}
+// --- small shared modal shell -------------------------------------------------
+function _cpGModal(title, bodyHtml, onSave){
+  const old = document.getElementById('cpGModalBg'); if(old) old.remove();
+  const bg = document.createElement('div');
+  bg.id = 'cpGModalBg';
+  bg.style.cssText = 'position:fixed; inset:0; z-index:100006; background:rgba(20,15,12,.85); display:flex; align-items:center; justify-content:center; padding:18px;';
+  bg.innerHTML = '<div style="background:#fff; border-radius:10px; width:100%; max-width:600px; overflow:hidden; box-shadow:0 10px 44px rgba(0,0,0,.5);">' +
+    '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.05em; padding:11px 16px; font-size:14px;">' + title + '</div>' +
+    '<div style="padding:16px;">' + bodyHtml + '</div>' +
+    '<div style="background:#f1ede6; padding:11px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid #ddd6cc;">' +
+      '<button id="cpGModalCancel" style="padding:8px 18px; font-weight:700; cursor:pointer;">Cancel</button>' +
+      '<button id="cpGModalSave" style="padding:8px 24px; font-weight:800; cursor:pointer; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px;">\u2713 Save</button>' +
+    '</div></div>';
+  document.body.appendChild(bg);
+  const close = () => bg.remove();
+  document.getElementById('cpGModalCancel').onclick = close;
+  bg.onclick = (e) => { if(e.target === bg) close(); };
+  document.getElementById('cpGModalSave').onclick = () => { if(onSave(close) !== false) close(); };
+  return bg;
+}
+function _cpGTouch(key, fields){
+  const map = cpGagesGet(); const g = map[key]; if(!g) return null;
+  Object.assign(g, fields, { ut: new Date().toISOString() });
+  cpGagesSet(map);
+  return g;
+}
+function cpGageListEdit(key){
+  const g = cpGagesGet()[key]; if(!g) return;
+  _cpGModal('EDIT GAGE \u2014 ' + g.part + ' BALLOON ' + g.bubble,
+    '<div style="font-size:12px; color:#555; margin-bottom:8px;"><b>' + (g.feature || '') + '</b>' + (g.spec ? ' \u2014 ' + g.spec : '') + '</div>' +
+    '<textarea id="cpGEditTxt" class="no-upper" rows="6" style="width:100%; box-sizing:border-box; font-size:13px; padding:10px; border:2px solid #c9c0b4; border-radius:6px; font-family:inherit; line-height:1.5;"></textarea>',
+    () => {
+      const v = document.getElementById('cpGEditTxt').value.trim();
+      if(!v){ alert('Describe the gage, or use Delete to take it off the list.'); return false; }
+      _cpGTouch(key, { desc: v });
+      cpGageSyncBackToPlan(key, v);
+      renderGages(); flash('\u2713 Gage updated.');
+    });
+  const t = document.getElementById('cpGEditTxt'); t.value = g.desc || ''; t.focus();
+}
+function cpGageListUpdate(key){
+  const g = cpGagesGet()[key]; if(!g) return;
+  _cpGModal('UPDATE STATUS \u2014 ' + g.part + ' BALLOON ' + g.bubble,
+    '<label style="display:block; font-size:11px; font-weight:800; letter-spacing:.05em; margin-bottom:4px;">STATUS</label>' +
+    '<select id="cpGStatus" style="width:100%; font-size:14px; padding:9px; border:2px solid #c9c0b4; border-radius:6px;">' +
+      CP_GAGE_STATUSES.map(s => '<option value="' + s + '"' + (s === (g.status || 'TO BE MADE') ? ' selected' : '') + '>' + s + '</option>').join('') +
+    '</select>' +
+    '<label style="display:block; font-size:11px; font-weight:800; letter-spacing:.05em; margin:12px 0 4px;">PROGRESS NOTE (OPTIONAL)</label>' +
+    '<textarea id="cpGNotes" class="no-upper" rows="4" placeholder="E.g. pins ordered from Deltronic, due 8/12" style="width:100%; box-sizing:border-box; font-size:13px; padding:9px; border:2px solid #c9c0b4; border-radius:6px; font-family:inherit;"></textarea>',
+    () => {
+      _cpGTouch(key, { status: document.getElementById('cpGStatus').value, notes: document.getElementById('cpGNotes').value.trim() });
+      renderGages(); flash('\u2713 Status updated.');
+    });
+  document.getElementById('cpGNotes').value = g.notes || '';
+}
+function cpGageListAssign(key){
+  const g = cpGagesGet()[key]; if(!g) return;
+  _cpGModal('ASSIGNED TO \u2014 ' + g.part + ' BALLOON ' + g.bubble,
+    '<div style="font-size:12px; color:#555; margin-bottom:8px;">Who is building or sourcing this gage? Leave blank to unassign.</div>' +
+    '<input id="cpGWho" class="no-upper" placeholder="Name, toolmaker, or outside vendor" style="width:100%; box-sizing:border-box; font-size:14px; padding:10px; border:2px solid #c9c0b4; border-radius:6px;">',
+    () => { _cpGTouch(key, { assignedTo: document.getElementById('cpGWho').value.trim() }); renderGages(); flash('\u2713 Assignment saved.'); });
+  const w = document.getElementById('cpGWho'); w.value = g.assignedTo || ''; w.focus();
+}
+function cpGageListDrawing(key){
+  const g = cpGagesGet()[key]; if(!g) return;
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*,application/pdf'; inp.style.display = 'none';
+  document.body.appendChild(inp);
+  inp.onchange = async () => {
+    const f = inp.files && inp.files[0];
+    try{
+      if(!f) return;
+      flash('Reading gage drawing\u2026');
+      let file = f;
+      if(/pdf$/i.test(f.name || '') || f.type === 'application/pdf') file = await convertPdfToImageFile(f);
+      const img = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(file); });
+      _idbPutDrawing('GAGE::' + key, img);            // stored + GitHub-synced like any drawing
+      _cpGTouch(key, { hasDrawing: true });
+      renderGages(); flash('\u2713 Gage drawing saved.');
+      setTimeout(() => cpGageViewDrawing(key), 200);
+    }catch(e){ alert('Could not read the drawing: ' + (e && e.message || e)); }
+    finally{ try{ inp.remove(); }catch(e){} }
+  };
+  inp.click();
+}
+function cpGageViewDrawing(key){
+  const g = cpGagesGet()[key] || {};
+  let img = null;
+  try{ const d = _idbGetDrawing('GAGE::' + key); img = d && d.odsImage; }catch(e){}
+  if(!img){ alert('No drawing stored for this gage yet.'); return; }
+  const old = document.getElementById('cpGDwgView'); if(old) old.remove();
+  const v = document.createElement('div');
+  v.id = 'cpGDwgView';
+  v.style.cssText = 'position:fixed; inset:0; z-index:100007; background:rgba(20,15,12,.9); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px;';
+  v.innerHTML = '<div style="color:#fff; font-weight:800; letter-spacing:.05em; margin-bottom:10px;">GAGE DRAWING \u2014 ' + (g.part || '') + ' BALLOON ' + (g.bubble || '') + '</div>' +
+    '<img src="' + img + '" style="max-width:94vw; max-height:80vh; background:#fff; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5);">' +
+    '<div style="margin-top:14px; display:flex; gap:10px;">' +
+    '<button id="cpGDwgClose" style="background:#fff; color:#7a1414; border:2px solid #fff; border-radius:8px; padding:9px 26px; font-weight:800; cursor:pointer;">\u2715 Close</button>' +
+    '<button id="cpGDwgRepl" style="background:#5a4a2a; color:#fff; border:2px solid #5a4a2a; border-radius:8px; padding:9px 26px; font-weight:800; cursor:pointer;">\u2b06 Replace</button></div>';
+  document.body.appendChild(v);
+  document.getElementById('cpGDwgClose').onclick = () => v.remove();
+  document.getElementById('cpGDwgRepl').onclick = () => { v.remove(); cpGageListDrawing(key); };
+  v.onclick = (e) => { if(e.target === v) v.remove(); };
+}
+function cpGageListDelete(key){
+  const g = cpGagesGet()[key]; if(!g) return;
+  if(!confirm('Delete this gage from the list?\n\n' + g.part + ' balloon ' + g.bubble + '\n' + (g.desc || '') +
+    '\n\nThis also clears the Special Gage / Fixture note on that Control Plan row.')) return;
+  const map = cpGagesGet(); delete map[key]; cpGagesSet(map);
+  cpGageSyncBackToPlan(key, '');
+  renderGages(); flash('Gage deleted.');
+}
+// Keep the Control Plan row and the list saying the same thing. Edits reach the OPEN
+// builder immediately; a plan that is not open is updated in its saved record.
+function cpGageSyncBackToPlan(key, desc){
+  const g = cpGagesGet()[key] || {};
+  const part = String(key).split('::')[0];
+  try{
+    if(cpBuildState && String(cpBuildState.partNum || '').toUpperCase() === part
+       && cpGageKey(cpBuildState.partNum, cpBuildState.opNum, '') === cpGageKey(part, g.opNum, '')){
+      const r = (cpBuildState.rows || []).find(x => String(x.bubble) === String(g.bubble));
+      if(r){ r.specialGage = desc; try{ renderCPBuilder(); cpAutoSaveProject(); }catch(e){} return; }
+    }
+  }catch(e){}
+  try{
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    let touched = false;
+    projects.forEach(p => {
+      if(String(p.partNum || '').toUpperCase() !== part) return;
+      if(String(p.opNum || '') !== String(g.opNum || '')) return;
+      (p.rows || []).forEach(r => { if(String(r.bubble) === String(g.bubble)){ r.specialGage = desc; touched = true; } });
+    });
+    if(touched) localStorage.setItem('cpProjects', JSON.stringify(projects));
+  }catch(e){}
 }
 
 // Rev-196: zoom the side panel to the focused balloon (window ≈35% of drawing width ≈ 1/8 area).
@@ -6934,6 +7223,7 @@ function showMasterList(){
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.add('hidden');
   $('projectsScreen').classList.add('hidden');
+  if($('gagesScreen'))$('gagesScreen').classList.add('hidden');
   $('customersScreen').classList.add('hidden');
   $('instructionsScreen').classList.add('hidden');
   $('settingsScreen').classList.add('hidden');
@@ -6958,6 +7248,7 @@ function showCustomers(){
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.add('hidden');
   $('projectsScreen').classList.add('hidden');
+  if($('gagesScreen'))$('gagesScreen').classList.add('hidden');
   $('masterListScreen').classList.add('hidden');
   $('instructionsScreen').classList.add('hidden');
   $('settingsScreen').classList.add('hidden');
@@ -7189,6 +7480,7 @@ function showInstructions(){
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.add('hidden');
   $('projectsScreen').classList.add('hidden');
+  if($('gagesScreen'))$('gagesScreen').classList.add('hidden');
   $('masterListScreen').classList.add('hidden');
   $('customersScreen').classList.add('hidden');
   $('settingsScreen').classList.add('hidden');
@@ -9026,6 +9318,7 @@ function showSettings(){
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.add('hidden');
   $('projectsScreen').classList.add('hidden');
+  if($('gagesScreen'))$('gagesScreen').classList.add('hidden');
   $('masterListScreen').classList.add('hidden');
   $('customersScreen').classList.add('hidden');
   $('instructionsScreen').classList.add('hidden');
@@ -9060,6 +9353,7 @@ function showHistory(presetFilter){
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.add('hidden');
   $('projectsScreen').classList.add('hidden');
+  if($('gagesScreen'))$('gagesScreen').classList.add('hidden');
   $('masterListScreen').classList.add('hidden');
   $('customersScreen').classList.add('hidden');
   $('instructionsScreen').classList.add('hidden');
@@ -9154,6 +9448,7 @@ function showAdmin(){
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.add('hidden');
   $('projectsScreen').classList.add('hidden');
+  if($('gagesScreen'))$('gagesScreen').classList.add('hidden');
   $('masterListScreen').classList.add('hidden');
   $('customersScreen').classList.add('hidden');
   $('instructionsScreen').classList.add('hidden');
@@ -9178,6 +9473,7 @@ function showAppInstructions(){
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.add('hidden');
   $('projectsScreen').classList.add('hidden');
+  if($('gagesScreen'))$('gagesScreen').classList.add('hidden');
   $('masterListScreen').classList.add('hidden');
   $('customersScreen').classList.add('hidden');
   $('instructionsScreen').classList.add('hidden');
@@ -9716,6 +10012,7 @@ function showInspectionReports(){
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.add('hidden');
   $('projectsScreen').classList.add('hidden');
+  if($('gagesScreen'))$('gagesScreen').classList.add('hidden');
   $('masterListScreen').classList.add('hidden');
   $('customersScreen').classList.add('hidden');
   $('instructionsScreen').classList.add('hidden');
@@ -9733,6 +10030,7 @@ function showRecentChanges(){
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.add('hidden');
   $('projectsScreen').classList.add('hidden');
+  if($('gagesScreen'))$('gagesScreen').classList.add('hidden');
   $('masterListScreen').classList.add('hidden');
   $('customersScreen').classList.add('hidden');
   $('instructionsScreen').classList.add('hidden');
@@ -10008,6 +10306,18 @@ function mergeRestore(backup){
     localStorage.setItem('cpRetiredTypes', JSON.stringify(merged));
   }
 
+  // Rev-572: gage list — merge per gage key, newest edit wins
+  if(backup.cpGageList && typeof backup.cpGageList === 'object'){
+    const mine = cpGagesGet(), theirs = backup.cpGageList, out = Object.assign({}, mine);
+    Object.keys(theirs).forEach(k => {
+      const a = mine[k], b = theirs[k];
+      if(!b) return;
+      if(!a || String(b.ut || '') > String(a.ut || '')) out[k] = b;
+    });
+    cpGagesSet(out);
+    summary.push(Object.keys(out).length + ' gages');
+  }
+
   return summary;
 }
 
@@ -10196,7 +10506,8 @@ function buildDataBundle(){
     deletedProjectKeys: JSON.parse(localStorage.getItem('deletedProjectKeys') || '[]'),
     deletedDraftKeys: JSON.parse(localStorage.getItem('deletedDraftKeys') || '[]'),
     controlTypeCorrections: JSON.parse(localStorage.getItem('cpControlTypeCorrections') || '[]'),
-    cpRetiredTypes: JSON.parse(localStorage.getItem('cpRetiredTypes') || '[]')
+    cpRetiredTypes: JSON.parse(localStorage.getItem('cpRetiredTypes') || '[]'),
+    cpGageList: JSON.parse(localStorage.getItem('cpGageList') || '{}')
   };
 }
 
@@ -13262,6 +13573,11 @@ if($('cpWorkcenter')) $('cpWorkcenter').addEventListener('input', updateEditExis
 if($('mSaveApp')) $('mSaveApp').onclick = saveThisApp;
 try{   // Rev-521: boot-tail guard — any failure below REPORTS itself instead of silently dying
 $('mProjects').onclick = showProjects;
+if($('mGages')) $('mGages').onclick = showGages;
+if($('gagesBack')) $('gagesBack').onclick = showMenu;
+if($('gagesRefresh')) $('gagesRefresh').onclick = renderGages;
+if($('gagesFilter')) $('gagesFilter').onchange = renderGages;
+try{ cpUpdateGageBadge(); }catch(e){}
 $('mMasterList').onclick = showMasterList;
 $('mValidation').onclick = openAllMachinistValidations;
 $('validationBack').onclick = hideValidation;
