@@ -721,7 +721,6 @@
     <thead>
       <tr>
         <th>Part Number</th>
-        <th title="The customer's part / drawing revision — not the Control Plan revision">Part Rev</th>
         <th>Status</th>
         <th>Updated</th>
         <th>Action</th>
@@ -1417,7 +1416,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-582";
+const APP_REV = "Rev-583";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1431,6 +1430,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-583", type: "App", changes: ["EDITS STOPPED VANISHING + CONTROL PLAN REV REPLACES PART REV (Rev-583) \u2014 (1) THE BUG: naming an operation appeared to do nothing. The edit WAS written to this device, but the GitHub merge takes the incoming copy for every project unconditionally, and a pull runs on open, every 60 seconds and on every tap \u2014 so the server copy (with no op number) overwrote the edit seconds later. The edit now pushes to GitHub immediately, so it IS the copy that comes back, and the entry\u2019s sync id follows its op number instead of being keyed to the old one. (2) A related latent fault: the auto-save id was part::rev with NO operation, so two operations on one part would have overwritten each other on every keystroke; it now carries the op, and auto-save records opNum / opDesc. (3) PART REV COLUMN REPLACED: the column held the customer\u2019s drawing rev, which is not what the list is about. It is gone. In its place the CONTROL PLAN\u2019S OWN revision \u2014 a count of how many times that plan has been saved \u2014 now sits at the FAR RIGHT after the buttons in small grey text as CP Rev-N. Hovering it still shows the part / drawing rev."] },
   { ts: "2026-07-27", rev: "App Rev-582", type: "App", changes: ["PROPER OPERATION WINDOW REPLACES THE BROWSER PROMPTS (Rev-582) \u2014 naming an operation fired two stacked browser prompt() boxes: black, unstyled, browser-branded, one question at a time with no way to see or correct the first answer while typing the second. Replaced with a real window matching the rest of the app: OP # and OP DESCRIPTION side by side, both mandatory-yellow (fafa96) per the Camco UI standards, Enter saves, Esc cancels, clicking outside closes. A duplicate operation number is reported IN the window in red and the window stays open so it can be corrected, instead of an alert throwing the work away. Layout fix alongside: the Part Number cell was wrapping \u2018(no op number)\u2019 onto three lines and squashing the column \u2014 operation rows no longer wrap."] },
   { ts: "2026-07-27", rev: "App Rev-581", type: "App", changes: ["THE PENCIL NOW APPEARS ON PLANS WITH NO OP NUMBER (Rev-581) \u2014 Rev-580 put the \u270f\ufe0f only on rows that already HAD an operation number, which is exactly the rows that did not need it: every plan on this device predates per-operation plans and carries no op number, so no pencil ever showed. Those rows now read \u21b3 (no op number) with a pencil beside them, indented like any other operation. The editor was widened to match: it asks for the operation NUMBER first (off the traveller, e.g. 020), refuses a number already used by another plan on the same part and revision, then asks what that operation is (e.g. TURN COMPLETE). Because a gage\u2019s identity is built from part + operation + balloon, giving a plan its op number also CARRIES ITS GAGES AND GAGE DRAWINGS onto the new key rather than orphaning them."] },
   { ts: "2026-07-27", rev: "App Rev-580", type: "App", changes: ["OPERATIONS INDENTED, NAMED, AND THE REV COLUMN EXPLAINED (Rev-580) \u2014 (1) INDENT: operation rows on the Control Plans list are now genuinely indented (34px) under their part header instead of nudged by a single space, so a part and its operations read as parent and children. (2) OP # AND DESCRIPTION: each op row reads \u21b3 OP-020 \u00b7 TURN COMPLETE. A new Op Description field sits beside Op # on the New Control Plan and Add Op forms, taking the wording straight off the traveller. Plans built before this field existed show (no description) with a \u270f\ufe0f beside them \u2014 one tap names the operation and writes it back to the saved plan. (3) REV COLUMN: the header read simply Revision, which was ambiguous \u2014 it holds the CUSTOMER\u2019S PART / DRAWING revision typed on the New Control Plan form, NOT the Control Plan\u2019s own revision (Control Plan revs are the Rev-NN tokens on the .xlsx, per CP-1). The column now reads Part Rev and carries a tooltip saying exactly that."] },
@@ -1886,7 +1886,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:04 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2365,7 +2365,7 @@ function renderProjects(){
       _lastPartHdr = _pk;
       const htr = document.createElement('tr');
       const htd = document.createElement('td');
-      htd.colSpan = 5;
+      htd.colSpan = 4;   // Rev-583: Part Rev column removed
       htd.style.cssText = 'background:#efe9df; border-top:2px solid #7a1a1c; padding:7px 10px;';
       const hb = document.createElement('b');
       hb.textContent = item.data.partNum || '';
@@ -2440,7 +2440,8 @@ function renderProjects(){
       ed.onclick = (e) => { e.stopPropagation(); cpSetOpDesc(p); };
       tdPart.appendChild(ed);
     }
-    const tdRev = document.createElement('td'); tdRev.textContent = p.rev || '';
+    // Rev-583: Part Rev column removed — the CONTROL PLAN's own revision (how many times
+    // this plan has been saved) rides at the far right instead, after the buttons.
     const tdStatus = document.createElement('td');
     if(item.kind === 'draft'){
       tdStatus.innerHTML = '<span style="background:#e6a817; color:#3a2c00; font-weight:700; font-size:11px; padding:2px 8px; border-radius:10px; white-space:nowrap;">📝 DRAFT</span>';
@@ -2526,7 +2527,13 @@ function renderProjects(){
       if(!p.builderState){ custBtn.disabled = true; custBtn.style.opacity = '0.45'; custBtn.title = 'No plan data to export'; }
       tdActions.appendChild(custBtn);
     }
-    tr.appendChild(tdPart); tr.appendChild(tdRev); tr.appendChild(tdStatus); tr.appendChild(tdDate); tr.appendChild(tdActions);
+    const cpRevTag = document.createElement('span');
+    cpRevTag.textContent = 'CP Rev-' + (parseInt(p.cpRevNum, 10) || 1);
+    cpRevTag.title = 'Control Plan revision — how many times this plan has been saved'
+      + (p.rev ? ('\nPart / drawing rev: ' + p.rev) : '');
+    cpRevTag.style.cssText = 'margin-left:14px; font-size:11px; font-weight:700; color:#8a8279; letter-spacing:.03em; white-space:nowrap;';
+    tdActions.appendChild(cpRevTag);
+    tr.appendChild(tdPart); tr.appendChild(tdStatus); tr.appendChild(tdDate); tr.appendChild(tdActions);
     tbody.appendChild(tr);
   });
 }
@@ -3438,8 +3445,11 @@ function saveProject(partNum, rev, base64Data, customerName, qualityLevel){
   if(entry.builderState) entry.builderState.srcId = entry.id;
   if(existingIdx >= 0){
     entry.created = projects[existingIdx].created; // keep original created date
+    // Rev-583: the Control Plan's OWN revision — how many times this plan has been saved
+    entry.cpRevNum = (parseInt(projects[existingIdx].cpRevNum, 10) || 1) + 1;
     projects[existingIdx] = entry;
   } else {
+    entry.cpRevNum = 1;
     projects.push(entry);
   }
   localStorage.setItem('cpProjects', JSON.stringify(projects));
@@ -3727,7 +3737,13 @@ function cpSetOpDesc(p){
     let hit = false;
     projects.forEach(x => {
       if(String(x.partNum||'') === String(p.partNum||'') && String(x.rev||'') === String(p.rev||'')
-         && String(x.opNum||'') === oldOp){ x.opNum = newOp; x.opDesc = desc; hit = true; }
+         && String(x.opNum||'') === oldOp){
+        x.opNum = newOp; x.opDesc = desc;
+        // Rev-583: the sync keys on id, so it has to follow the op number
+        x.id = (x.partNum || '') + '::' + (x.rev || '') + (newOp ? '::OP' + newOp : '');
+        x.updated = new Date().toISOString();
+        hit = true;
+      }
     });
     if(hit) try{ localStorage.setItem('cpProjects', JSON.stringify(projects)); }catch(e){}
 
@@ -3756,6 +3772,10 @@ function cpSetOpDesc(p){
     close();
     renderProjects();
     flash(newOp ? ('\u2713 OP-' + newOp + (desc ? ' \u00b7 ' + desc : '')) : (desc ? ('\u2713 ' + desc) : 'Updated.'));
+    // Rev-583 FIX: the GitHub merge takes the incoming copy for every project, so a
+    // local-only edit is wiped by the next pull (which runs on open, every 60s, and on
+    // every tap). Push straight away so this edit IS the copy that comes back.
+    try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
   };
   bg.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){ e.preventDefault(); close(); }
@@ -4384,7 +4404,8 @@ function cpAutoSaveProject(){
   _cpAutoT = setTimeout(() => {
     try {
       const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
-      const id = cpBuildState.partNum + '::' + cpBuildState.rev;
+      // Rev-583: include the op, or two operations on one part overwrite each other
+      const id = cpBuildState.partNum + '::' + cpBuildState.rev + (cpBuildState.opNum ? '::OP' + cpBuildState.opNum : '');
       if(typeof beFeatures !== 'undefined' && beFeatures && beFeatures.length) cpBuildState.features = JSON.parse(JSON.stringify(beFeatures));   // Rev-294: save AI-located balloons WITH the plan
       const bs = JSON.parse(JSON.stringify(cpBuildState));
       if(_idbReady && bs.odsImage){ _idbPutDrawing(bs.partNum, bs.odsImage, bs.cleanOdsImage); delete bs.odsImage; delete bs.cleanOdsImage; bs._idb = 1; }   // Rev-338: drawings live in IndexedDB, not localStorage
@@ -4399,15 +4420,18 @@ function cpAutoSaveProject(){
           tombs.push({ key: cpBuildState.srcId, deletedAt: new Date().toISOString() });
           localStorage.setItem('deletedProjectKeys', JSON.stringify(tombs.filter(t => t.key !== id)));
           projects[j].id = id; projects[j].partNum = cpBuildState.partNum; projects[j].rev = cpBuildState.rev;
+          projects[j].opNum = cpBuildState.opNum || ''; projects[j].opDesc = cpBuildState.opDesc || '';
           i = j;
         }
       }
       cpBuildState.srcId = id;   // Rev-336: keep tracking under the (possibly new) id
       bs.srcId = id;
-      if(i >= 0){ projects[i].builderState = bs; projects[i].underConstruction = !!cpBuildState.underConstruction; projects[i].updated = new Date().toISOString(); }
+      if(i >= 0){ projects[i].builderState = bs; projects[i].underConstruction = !!cpBuildState.underConstruction; projects[i].updated = new Date().toISOString();
+        if(!projects[i].cpRevNum) projects[i].cpRevNum = 1; }
       else projects.push({ id, partNum: cpBuildState.partNum, rev: cpBuildState.rev,
+        opNum: cpBuildState.opNum || '', opDesc: cpBuildState.opDesc || '',
         customer: cpBuildState.customerName || '', qualityLevel: cpBuildState.qualityLevel || '',
-        underConstruction: !!cpBuildState.underConstruction,
+        underConstruction: !!cpBuildState.underConstruction, cpRevNum: 1,
         created: new Date().toISOString(), updated: new Date().toISOString(), data: null, builderState: bs });
       localStorage.setItem('cpProjects', JSON.stringify(projects));
     } catch(e){}
