@@ -173,6 +173,27 @@
     padding:11px 16px;border-radius:10px;font-size:14px;
     box-shadow:0 2px 0 var(--line-strong), 0 3px 6px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.7);
   }
+  /* Rev-584: Control Plans list — one restrained palette, one button size, columns
+     that line up. Filled green = the two things you actually do; outlined neutral =
+     supporting actions; outlined red = destructive. */
+  #projectsTable{ border-collapse:collapse; width:100%; }
+  #projectsTable th{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; font-weight:800;
+    color:#4a443c; background:#e8e4dc; border-bottom:2px solid #c9c0b4; padding:9px 10px; text-align:left; white-space:nowrap; }
+  #projectsTable td{ padding:9px 10px; border-bottom:1px solid #e2ddd4; vertical-align:middle; font-size:13px; }
+  #projectsTable tr.cp-op-row:hover td{ background:#f4f1ea; }
+  .cp-act{ display:flex; gap:6px; flex-wrap:nowrap; align-items:center; }
+  .cp-btn{ height:32px; border-radius:6px; font-size:12px; font-weight:700; letter-spacing:.01em;
+    cursor:pointer; padding:0 12px; white-space:nowrap; text-align:center; font-family:inherit;
+    transition:filter .12s ease; }
+  .cp-btn:hover:not(:disabled){ filter:brightness(1.08); }
+  .cp-btn:disabled{ opacity:.4; cursor:not-allowed; }
+  .cp-btn-primary{ background:#2c6e49; color:#fff; border:1px solid #24593b; }
+  .cp-btn-go{ background:#1f8a3b; color:#fff; border:1px solid #1a7433; }
+  .cp-btn-quiet{ background:#fff; color:#3d3831; border:1px solid #c2b9ab; }
+  .cp-btn-danger{ background:#fff; color:#9b2c2c; border:1px solid #d3a3a3; }
+  .cp-pill{ display:inline-block; font-size:10px; font-weight:800; letter-spacing:.05em;
+    padding:4px 10px; border-radius:11px; white-space:nowrap; }
+  .cp-rev{ font-size:11px; font-weight:700; color:#8a8279; letter-spacing:.03em; white-space:nowrap; }
   .btn-ghost:active{transform:translateY(2px);background:var(--panel-2);box-shadow:0 0 0 var(--line-strong), 0 1px 2px rgba(0,0,0,.15), inset 0 2px 4px rgba(0,0,0,.12)}
 
   .menu{padding:0 0 8px;max-width:none;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column;overflow:hidden;max-height:100vh}
@@ -719,11 +740,12 @@
   <button id="projectsNewBtn" onclick="showNewCP(true)" style="display:inline-flex; align-items:center; gap:8px; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:8px; padding:12px 20px; font-size:15px; font-weight:800; cursor:pointer; margin:6px 0 16px;">＋ New Control Plan</button>
   <table id="projectsTable">
     <thead>
-      <tr>
+      <tr class="cp-plan-head">
         <th>Part Number</th>
         <th>Status</th>
         <th>Updated</th>
-        <th>Action</th>
+        <th>Actions</th>
+        <th style="text-align:right;">CP Rev</th>
       </tr>
     </thead>
     <tbody id="projectsTbody"></tbody>
@@ -1416,7 +1438,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-583";
+const APP_REV = "Rev-584";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1430,6 +1452,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-584", type: "App", changes: ["CONTROL PLANS LIST CLEANED UP (Rev-584) \u2014 the list had seven buttons in six different colours, each a different width, so no two rows lined up and the CP Rev label was being shoved off the right edge. Rebuilt on one system: (1) ONE BUTTON STYLE \u2014 every action is the same height with a fixed width per role, so the columns line up straight down the page. (2) THREE COLOURS INSTEAD OF SIX \u2014 filled green for the two things you actually do (Edit Plan, Inspect), outlined neutral for supporting actions (Validation, Customer CP, Download, Rename), outlined red for Delete. Colour now means something. (3) EMOJI REMOVED from the action buttons and status pills; labels shortened (Edit Control Plan \u2192 Edit Plan, Edit Machinist Validation \u2192 Validation) with the full meaning kept in the hover tooltip. (4) STATUS PILLS \u2014 UNDER CONSTRUCTION / SAVED became IN PROGRESS / COMPLETE in matched soft tones rather than a hard amber and a hard green. (5) CP REV GOT ITS OWN RIGHT-ALIGNED COLUMN so a long row of buttons can never clip it again. (6) Proper table styling throughout: uppercase column headings on a tinted band, consistent row padding, hairline row separators, a hover highlight, and the part header bar squared up with its buttons on one baseline."] },
   { ts: "2026-07-27", rev: "App Rev-583", type: "App", changes: ["EDITS STOPPED VANISHING + CONTROL PLAN REV REPLACES PART REV (Rev-583) \u2014 (1) THE BUG: naming an operation appeared to do nothing. The edit WAS written to this device, but the GitHub merge takes the incoming copy for every project unconditionally, and a pull runs on open, every 60 seconds and on every tap \u2014 so the server copy (with no op number) overwrote the edit seconds later. The edit now pushes to GitHub immediately, so it IS the copy that comes back, and the entry\u2019s sync id follows its op number instead of being keyed to the old one. (2) A related latent fault: the auto-save id was part::rev with NO operation, so two operations on one part would have overwritten each other on every keystroke; it now carries the op, and auto-save records opNum / opDesc. (3) PART REV COLUMN REPLACED: the column held the customer\u2019s drawing rev, which is not what the list is about. It is gone. In its place the CONTROL PLAN\u2019S OWN revision \u2014 a count of how many times that plan has been saved \u2014 now sits at the FAR RIGHT after the buttons in small grey text as CP Rev-N. Hovering it still shows the part / drawing rev."] },
   { ts: "2026-07-27", rev: "App Rev-582", type: "App", changes: ["PROPER OPERATION WINDOW REPLACES THE BROWSER PROMPTS (Rev-582) \u2014 naming an operation fired two stacked browser prompt() boxes: black, unstyled, browser-branded, one question at a time with no way to see or correct the first answer while typing the second. Replaced with a real window matching the rest of the app: OP # and OP DESCRIPTION side by side, both mandatory-yellow (fafa96) per the Camco UI standards, Enter saves, Esc cancels, clicking outside closes. A duplicate operation number is reported IN the window in red and the window stays open so it can be corrected, instead of an alert throwing the work away. Layout fix alongside: the Part Number cell was wrapping \u2018(no op number)\u2019 onto three lines and squashing the column \u2014 operation rows no longer wrap."] },
   { ts: "2026-07-27", rev: "App Rev-581", type: "App", changes: ["THE PENCIL NOW APPEARS ON PLANS WITH NO OP NUMBER (Rev-581) \u2014 Rev-580 put the \u270f\ufe0f only on rows that already HAD an operation number, which is exactly the rows that did not need it: every plan on this device predates per-operation plans and carries no op number, so no pencil ever showed. Those rows now read \u21b3 (no op number) with a pencil beside them, indented like any other operation. The editor was widened to match: it asks for the operation NUMBER first (off the traveller, e.g. 020), refuses a number already used by another plan on the same part and revision, then asks what that operation is (e.g. TURN COMPLETE). Because a gage\u2019s identity is built from part + operation + balloon, giving a plan its op number also CARRIES ITS GAGES AND GAGE DRAWINGS onto the new key rather than orphaning them."] },
@@ -1886,7 +1909,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:04 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:26 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2365,32 +2388,33 @@ function renderProjects(){
       _lastPartHdr = _pk;
       const htr = document.createElement('tr');
       const htd = document.createElement('td');
-      htd.colSpan = 4;   // Rev-583: Part Rev column removed
-      htd.style.cssText = 'background:#efe9df; border-top:2px solid #7a1a1c; padding:7px 10px;';
+      htd.colSpan = 5;   // Rev-584: CP Rev has its own column
+      htd.style.cssText = 'background:#e4ded4; border-top:2px solid #7a1a1c; border-bottom:1px solid #cfc6b8; padding:8px 10px;';
       const hb = document.createElement('b');
       hb.textContent = item.data.partNum || '';
       // Rev-569: fixed-width name block so every part's buttons start on the same
       // vertical line instead of stepping in and out with the part-number length
-      hb.style.cssText = 'font-size:14px; letter-spacing:.04em; display:inline-block; min-width:150px; margin-right:14px; vertical-align:middle;';
+      hb.style.cssText = 'font-size:14px; font-weight:800; letter-spacing:.05em; color:#5c1416; display:inline-block; min-width:170px; margin-right:14px; vertical-align:middle;';
       htd.appendChild(hb);
       const addOp = document.createElement('button');
       addOp.className = 'btn-ghost';
-      addOp.textContent = '+ Add Op';
+      addOp.className = 'cp-btn cp-btn-primary';
+      addOp.textContent = 'Add Operation';
       addOp.title = 'Add another operation\u2019s Control Plan to this part (traveller already on file)';
-      addOp.style.cssText = 'background:#2c6e49; color:#fff; border:1px solid #215236; padding:4px 12px; font-size:12px; margin-right:8px; min-width:96px; text-align:center; vertical-align:middle;';
+      addOp.style.cssText = 'width:124px; margin-right:8px; vertical-align:middle;';
       addOp.onclick = () => cpAddOpToPart(item.data.partNum);
       htd.appendChild(addOp);
       const trav = document.createElement('button');
-      trav.className = 'btn-ghost';
       // Rev-568: the button reports whether this part HAS a traveller yet, and either
       // views it or uploads one. Parts created before Rev-563 have none on file.
       let _hasTrav = false;
       try{ const _td = _idbGetDrawing(_pk + '::TRAVELLER'); _hasTrav = !!(_td && _td.odsImage); }catch(e){}
-      trav.textContent = _hasTrav ? '\ud83d\udcc4 Traveller' : '\u2b06 Upload Traveller';
+      trav.className = 'cp-btn ' + (_hasTrav ? 'cp-btn-quiet' : 'cp-btn-primary');
+      trav.textContent = _hasTrav ? 'View Traveller' : 'Upload Traveller';
       trav.title = _hasTrav ? 'View this part\u2019s traveller (routing)' : 'No traveller on file for this part \u2014 tap to upload the routing (image or PDF)';
       // Rev-569: same width in both states so the column edge never shifts
-      trav.style.cssText = 'padding:4px 12px; font-size:12px; min-width:150px; text-align:center; vertical-align:middle;'
-        + (_hasTrav ? '' : ' background:#5a4a2a; color:#fff; border:1px solid #47391f;');
+      trav.style.cssText = 'width:140px; vertical-align:middle;'
+        + (_hasTrav ? '' : ' background:#7a5c2a; border-color:#63481f;');
       trav.onclick = () => _hasTrav ? cpViewTraveller(item.data.partNum) : cpTravellerPick(item.data.partNum);
       htd.appendChild(trav);
       htr.appendChild(htd);
@@ -2409,7 +2433,7 @@ function renderProjects(){
       tdPart.appendChild(b);
       const d = document.createElement('span');
       const desc = String(p.opDesc || p.operation || '').trim();
-      d.textContent = desc ? ('  \u00b7  ' + desc) : '  \u00b7  (no description)';
+      d.textContent = desc ? ('  \u2014  ' + desc) : '  \u2014  no description';
       d.style.cssText = 'font-size:12px; color:' + (desc ? '#5a5148' : '#a49a8d') + '; font-weight:600;';
       tdPart.appendChild(d);
       const ed = document.createElement('button');
@@ -2444,96 +2468,62 @@ function renderProjects(){
     // this plan has been saved) rides at the far right instead, after the buttons.
     const tdStatus = document.createElement('td');
     if(item.kind === 'draft'){
-      tdStatus.innerHTML = '<span style="background:#e6a817; color:#3a2c00; font-weight:700; font-size:11px; padding:2px 8px; border-radius:10px; white-space:nowrap;">📝 DRAFT</span>';
+      tdStatus.innerHTML = '<span class="cp-pill" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">DRAFT</span>';
+    } else if(p.underConstruction){
+      tdStatus.innerHTML = '<span class="cp-pill" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">IN PROGRESS</span>';
     } else {
-      if(p.underConstruction){
-        tdStatus.innerHTML = '<span style="background:#e6a817; color:#3a2c00; font-weight:700; font-size:11px; padding:2px 8px; border-radius:10px; white-space:nowrap;">🚧 UNDER CONSTRUCTION</span>';
-      } else {
-        tdStatus.innerHTML = '<span style="background:#2c6e49; color:#fff; font-weight:700; font-size:11px; padding:2px 8px; border-radius:10px; white-space:nowrap;">✓ SAVED</span>';
-      }
+      tdStatus.innerHTML = '<span class="cp-pill" style="background:#dcecdf; color:#1f5133; border:1px solid #a9cdb5;">COMPLETE</span>';
     }
     const tdDate = document.createElement('td');
     const dateVal = item.kind === 'draft' ? p.savedAt : p.created;
     tdDate.textContent = dateVal ? new Date(dateVal).toLocaleDateString() : '';
     const tdActions = document.createElement('td');
-    tdActions.style.whiteSpace = 'nowrap';
+    const actWrap = document.createElement('div');
+    actWrap.className = 'cp-act';
+    tdActions.appendChild(actWrap);
+    // Rev-584: every action button is built the same way — same height, same weight,
+    // fixed width per role so the columns line up down the whole list.
+    const mkBtn = (label, tone, width, title, fn, enabled) => {
+      const b = document.createElement('button');
+      b.className = 'cp-btn cp-btn-' + tone;
+      b.textContent = label;
+      if(title) b.title = title;
+      b.style.width = width + 'px';
+      if(enabled === false){ b.disabled = true; }
+      else b.onclick = fn;
+      actWrap.appendChild(b);
+      return b;
+    };
 
     if(item.kind === 'draft'){
-      const resumeBtn = document.createElement('button');
-      resumeBtn.className = 'btn-ghost';
-      resumeBtn.textContent = '▶️ Resume';
-      resumeBtn.style.cssText = 'margin-right:6px; background:#2c6e49; color:#fff; border:1px solid #215236;';
-      resumeBtn.onclick = () => { showNewCP(); loadDraft(p.partNum); };
-      const delBtn = document.createElement('button');
-      delBtn.className = 'btn-ghost';
-      delBtn.textContent = '🗑️ Delete';
-      delBtn.style.cssText = 'background:#d9534f; color:#fff; border:1px solid #c9302c;';
-      delBtn.onclick = () => { deleteDraft(p.partNum); renderProjects(); updateHomeScreen(); };
-      tdActions.appendChild(resumeBtn);
-      tdActions.appendChild(delBtn);
+      mkBtn('Resume', 'primary', 96, 'Carry on building this draft', () => { showNewCP(); loadDraft(p.partNum); });
+      mkBtn('Delete', 'danger', 82, 'Discard this draft', () => { deleteDraft(p.partNum); renderProjects(); updateHomeScreen(); });
     } else {
       const i = item.idx;
-      const editBtn = document.createElement('button');
-      editBtn.className = 'btn-ghost';
-      editBtn.textContent = '✏️ Edit Control Plan';
-      editBtn.style.cssText = 'margin-right:6px; background:#2c6e49; color:#fff; border:1px solid #215236;';
-      editBtn.onclick = () => editProject(i);
-      if(!p.builderState){ editBtn.disabled = true; editBtn.style.opacity = '0.45'; editBtn.title = 'Saved before editing was supported'; }
-      const dlBtn = document.createElement('button');
-      dlBtn.className = 'btn-ghost';
-      dlBtn.textContent = 'Download';
-      dlBtn.onclick = () => downloadProject(i);
-      const renBtn = document.createElement('button');
-      renBtn.className = 'btn-ghost';
-      renBtn.textContent = '✏️ Rename';
-      renBtn.title = 'Change this plan\u2019s part number (and rev) IN PLACE — no duplicate is created';
-      renBtn.style.cssText = 'margin-left:6px; background:#1a5276; color:#fff; border:1px solid #154360;';
-      renBtn.onclick = () => renameProject(i);
-      const delBtn = document.createElement('button');
-      delBtn.className = 'btn-ghost';
-      delBtn.textContent = '🗑️ Delete';
-      delBtn.style.cssText = 'margin-left:6px; background:#d9534f; color:#fff; border:1px solid #c9302c;';
-      delBtn.onclick = () => deleteProject(i);
-      // Rev-386: create a Machinist Validation inspection sheet from this Control Plan
-      const valBtn = document.createElement('button');
-      valBtn.className = 'btn-ghost';
-      const __mvMade = mvIsCreated(p);
-      valBtn.textContent = '🔧 Edit Machinist Validation';   // Rev-496: one fixed label
-      valBtn.title = __mvMade ? 'Open / edit the Machinist Validation for this Control Plan' : 'Create a Machinist Validation inspection from this Control Plan';
-      valBtn.style.cssText = 'margin-left:6px; background:#5b3a86; color:#fff; border:1px solid #472d69;';
-      valBtn.onclick = () => createMachinistValidation(i);
-      if(!p.builderState){ valBtn.disabled = true; valBtn.style.opacity = '0.45'; valBtn.title = 'No plan data to build a validation from'; }
-      // Rev-483: PERFORM INSPECTION — machinist's one-tap entry into a real saved run
-      const inspBtn = document.createElement('button');
-      inspBtn.className = 'btn-ghost';
-      inspBtn.textContent = '\u25b6 Inspect Validation';
-      inspBtn.title = 'Machinist: start a real inspection run for this plan (readings are saved)';
-      inspBtn.style.cssText = 'background:#1f8a3b; color:#fff; border:1px solid #186e2f; font-weight:800;';
-      inspBtn.onclick = () => inspectMachinistValidation(i);
-      if(!p.builderState){ inspBtn.disabled = true; inspBtn.style.opacity = '0.45'; inspBtn.title = 'No plan data to inspect'; }
-      // Rev-496: user-specified order
-      tdActions.appendChild(editBtn);
-      tdActions.appendChild(valBtn);
-      tdActions.appendChild(inspBtn);
-      tdActions.appendChild(renBtn);
-      tdActions.appendChild(delBtn);
-      tdActions.appendChild(dlBtn);
-      const custBtn = document.createElement('button');
-      custBtn.className = 'btn-ghost';
-      custBtn.textContent = '\ud83d\udce4 Customer CP';
-      custBtn.title = 'Build the L3Harris-format Control Plan xlsx for customer submittal';
-      custBtn.style.cssText = 'margin-left:6px; background:#6b3fa0; color:#fff; border:1px solid #543181;';
-      custBtn.onclick = () => cpCustomerExport(i);
-      if(!p.builderState){ custBtn.disabled = true; custBtn.style.opacity = '0.45'; custBtn.title = 'No plan data to export'; }
-      tdActions.appendChild(custBtn);
+      const has = !!p.builderState;
+      mkBtn('Edit Plan', 'primary', 104, 'Open this Control Plan in the builder'
+        + (has ? '' : ' \u2014 saved before editing was supported'), () => editProject(i), has);
+      mkBtn('Inspect', 'go', 92, 'Machinist: start a real inspection run for this plan (readings are saved)'
+        + (has ? '' : ' \u2014 no plan data to inspect'), () => inspectMachinistValidation(i), has);
+      mkBtn('Validation', 'quiet', 106, (mvIsCreated(p)
+        ? 'Open / edit the Machinist Validation for this Control Plan'
+        : 'Create a Machinist Validation inspection from this Control Plan')
+        + (has ? '' : ' \u2014 no plan data to build a validation from'), () => createMachinistValidation(i), has);
+      mkBtn('Customer CP', 'quiet', 116, 'Build the L3Harris-format Control Plan xlsx for customer submittal'
+        + (has ? '' : ' \u2014 no plan data to export'), () => cpCustomerExport(i), has);
+      mkBtn('Download', 'quiet', 98, 'Download this plan\u2019s .xlsx', () => downloadProject(i));
+      mkBtn('Rename', 'quiet', 88, 'Change this plan\u2019s part number (and rev) IN PLACE \u2014 no duplicate is created', () => renameProject(i));
+      mkBtn('Delete', 'danger', 82, 'Delete this Control Plan', () => deleteProject(i));
     }
-    const cpRevTag = document.createElement('span');
-    cpRevTag.textContent = 'CP Rev-' + (parseInt(p.cpRevNum, 10) || 1);
-    cpRevTag.title = 'Control Plan revision — how many times this plan has been saved'
-      + (p.rev ? ('\nPart / drawing rev: ' + p.rev) : '');
-    cpRevTag.style.cssText = 'margin-left:14px; font-size:11px; font-weight:700; color:#8a8279; letter-spacing:.03em; white-space:nowrap;';
-    tdActions.appendChild(cpRevTag);
-    tr.appendChild(tdPart); tr.appendChild(tdStatus); tr.appendChild(tdDate); tr.appendChild(tdActions);
+    // Rev-584: the Control Plan rev has its own right-aligned column now, so it can no
+    // longer be pushed off the edge by a long row of buttons
+    const tdCpRev = document.createElement('td');
+    tdCpRev.style.cssText = 'text-align:right; white-space:nowrap;';
+    tdCpRev.innerHTML = '<span class="cp-rev" title="Control Plan revision \u2014 how many times this plan has been saved'
+      + (p.rev ? ('&#10;Part / drawing rev: ' + String(p.rev).replace(/"/g,'')) : '') + '">Rev-'
+      + (parseInt(p.cpRevNum, 10) || 1) + '</span>';
+    tr.className = 'cp-op-row';
+    tr.appendChild(tdPart); tr.appendChild(tdStatus); tr.appendChild(tdDate); tr.appendChild(tdActions); tr.appendChild(tdCpRev);
     tbody.appendChild(tr);
   });
 }
