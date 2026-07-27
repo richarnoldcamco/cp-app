@@ -1372,7 +1372,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-569";
+const APP_REV = "Rev-570";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1386,6 +1386,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-570", type: "App", changes: ["TRAVELLER UPLOAD NOW USES THE PFMEA SEW + NUDGE ENGINE (Rev-570) \u2014 \u2b06 Upload Traveller no longer opens a bare one-file picker. It opens a full traveller screen ported from the PFMEA app (PF Rev-056 sewCanvas / nudge / sewApply), re-namespaced _cptv* so nothing collides with the ODS upload: (1) MULTI-PAGE LOAD \u2014 click, drag-drop, or paste with Ctrl+V; images or PDF, and EVERY page of a PDF comes in (the ODS helper only takes page 1 because a drawing is one sheet, a router is not) via new cpPdfPagesToImages. (2) PAGE STRIP \u2014 thumbnails with \u25c0 \u25b6 reorder and \u2715 remove, click one to select it. (3) SEW \u2014 stack top-to-bottom, side by side, or grid 2-across, with trim-overlap px and white/black background, live preview, and Undo last sew. (4) NUDGE BAR \u2014 push the selected page \u25b2\u25bc\u25c0\u25b6 (or arrow keys) at 1/2/5/10/25/50 px steps, \u21d4 Wider / \u21e5 Narrower to stretch or squeeze it, Reset nudges; the selected page carries a dashed red outline in the preview. (5) PREVIEW ZOOM \u2212 / FIT / 100% / +. Saving stores the finished single image under PART::TRAVELLER exactly as before (GitHub-synced) \u2014 several pages sew automatically on the way out. Reopening on a part that already has a traveller seeds it as page 1, so Replace can ADD a page instead of starting over. Esc closes."] },
   { ts: "2026-07-27", rev: "App Rev-569", type: "App", changes: ["PART-HEADER BUTTONS NOW LINE UP (Rev-569) \u2014 on the Control Plans list the \u2795 Add Op and Traveller buttons sat immediately after the part number, so a short part like Test1 pushed them far left of a long one like 1000222892 and the column zig-zagged down the page. The part name is now a fixed-width block (150px) and both buttons carry fixed widths (Add Op 96px, Traveller 150px, centered), so every part\u2019s buttons start and end on the same vertical line regardless of part-number length or whether the Traveller button reads \u2b06 Upload Traveller or \ud83d\udcc4 Traveller. Longer part numbers still display in full \u2014 the block only sets a minimum."] },
   { ts: "2026-07-27", rev: "App Rev-568", type: "App", changes: ["UPLOAD A TRAVELLER FOR AN EXISTING PART (Rev-568) \u2014 parts created before Rev-563 had no way to get a traveller on file: the part-header button only VIEWED one and dead-ended in an alert, New Control Plan waives the traveller for a known part, and \u2795 Add Op hides the traveller box entirely. Now the part-header button reports the real state \u2014 \u2b06 Upload Traveller (amber) when none is stored, \ud83d\udcc4 Traveller when one is. Tapping upload opens the file picker (image or PDF, PDFs auto-convert via the Rev-510 helper), stores it under PART::TRAVELLER exactly like part-first creation, marks hasTraveller in cpPartInfo, syncs to GitHub through _idbPutDrawing, re-renders the list, and opens the viewer. The viewer gained \u2b06 Replace for swapping in a newer routing, and the old no-traveller alert now offers to upload on the spot instead of dead-ending."] },
   { ts: "2026-07-27", rev: "App Rev-567", type: "App", changes: ["\ud83d\udcac NEW CHAT PROMPT UPDATED WITH THE FULL ARCHITECTURE MAP (Rev-567) \u2014 the handoff prompt now carries a compact snapshot of everything this era built: per-operation plans + part::rev::OP identity, part-first creation with the traveller store, the cpMvKey/cpMvFindProject validation keying and all three writeback channels, the complete FEATURE DRAWING editor behavior (modes, zoom/pan, Enter flow, selectable white-outs with active-edge nudging, keyboard ownership, project-persisted edit state), the combined per-part Customer CP editor/export, and the landing curtain \u2014 plus each saved plan\u2019s OP number in the plans list. A brand-new chat now inherits the wiring, not just the last 8 changelog lines."] },
@@ -1828,7 +1829,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:47 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "1:34 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3597,45 +3598,312 @@ function cpAddOpToPart(partNum){
     flash('Adding an operation to ' + partNum + ' \u2014 traveller already on file. Enter the Op #, upload the op\u2019s ODS, and generate.');
   }, 120);
 }
-// Rev-568: upload (or replace) a traveller for a part that ALREADY exists. Parts created
-// before Rev-563 never got asked for one, and + Add Op hides the traveller box, so this is
-// the only route in for them. Same store as part-first creation: PART::TRAVELLER.
-function cpTravellerPick(partNum){
+// ===== Rev-570: TRAVELLER UPLOAD — multi-page + SEW + NUDGE ======================
+// Ported from the PFMEA app's sew engine (PF Rev-056 sewCanvas / nudge / sewApply) and
+// re-namespaced _cptv* so nothing collides with the CP app's ODS upload. Load every page
+// of a multi-page router, reorder them, push individual pages around with the nudge bar,
+// sew them edge-to-edge into ONE image, and save it as the part's traveller.
+let _cptvPart = '', _cptvPages = [], _cptvSel = 0, _cptvBackup = null, _cptvTimer = null, _cptvZoom = 0;
+
+function _cptvLoad(url){
+  return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('could not decode a page')); im.src = url; });
+}
+// Rev-570: EVERY page of a PDF becomes a page here (the ODS helper only takes page 1,
+// because a drawing is one sheet — a traveller routinely runs two or three)
+async function cpPdfPagesToImages(file){
+  await loadPdfJs();
+  const buf = await file.arrayBuffer();
+  const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
+  const out = [];
+  for(let n = 1; n <= pdf.numPages; n++){
+    const page = await pdf.getPage(n);
+    const vp = page.getViewport({ scale: 2.5 });
+    const c = document.createElement('canvas');
+    c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+    await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+    out.push({ name: String(file.name || 'traveller').replace(/\.pdf$/i, '') + ' p' + n + '.png', url: c.toDataURL('image/png') });
+  }
+  return out;
+}
+async function _cptvAddFiles(files){
+  const arr = Array.from(files || []);
+  for(const f of arr){
+    try{
+      if(/pdf$/i.test(f.name || '') || f.type === 'application/pdf'){
+        flash('Converting PDF pages\u2026');
+        (await cpPdfPagesToImages(f)).forEach(p => _cptvPages.push(p));
+      } else if(/^image\//.test(f.type || '')){
+        const url = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(f); });
+        _cptvPages.push({ name: f.name || 'page.png', url });
+      }
+    }catch(e){ alert('Could not read ' + (f.name || 'a file') + ': ' + (e && e.message || e)); }
+  }
+  _cptvSel = Math.min(_cptvSel, Math.max(0, _cptvPages.length - 1));
+  _cptvRender(); _cptvPreview();
+}
+// Straight edge-to-edge join, with each page's own nudge offsets applied
+async function _cptvCanvas(layout, overlap, bg, markPos){
+  const imgs = await Promise.all(_cptvPages.map(p => _cptvLoad(p.url)));
+  const ov = Math.max(0, overlap | 0);
+  const c = document.createElement('canvas'), ctx = c.getContext('2d');
+  const off = i => ({ x: _cptvPages[i].ox || 0, y: _cptvPages[i].oy || 0, w: _cptvPages[i].ow || 0 });
+  let mrect = null;
+  const mark = (i, x, y, w, h) => { if(i === markPos) mrect = { x, y, w, h }; };
+  if(layout === 'h'){
+    const h = Math.max.apply(null, imgs.map(i => i.naturalHeight));
+    const cols = imgs.map(i => ({ i, h, w: Math.round(i.naturalWidth * (h / i.naturalHeight)) }));
+    c.height = h;
+    c.width = Math.max(1, cols.reduce((a, r) => a + r.w, 0) - ov * (cols.length - 1));
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, c.width, c.height);
+    let x = 0;
+    cols.forEach((r, i) => { const o = off(i), w2 = Math.max(20, r.w + (o.w || 0));
+      ctx.drawImage(r.i, x + o.x, o.y, w2, r.h); mark(i, x + o.x, o.y, w2, r.h); x += r.w - ov; });
+  } else if(layout === 'g'){
+    const per = 2, cw = Math.max.apply(null, imgs.map(i => i.naturalWidth));
+    const cells = imgs.map(i => ({ i, w: cw, h: Math.round(i.naturalHeight * (cw / i.naturalWidth)) }));
+    const rowsN = Math.ceil(cells.length / per);
+    const rowH = [];
+    for(let r = 0; r < rowsN; r++) rowH.push(Math.max.apply(null, cells.slice(r * per, (r + 1) * per).map(x => x.h)));
+    c.width = cw * per - ov * (per - 1);
+    c.height = Math.max(1, rowH.reduce((a, b) => a + b, 0) - ov * (rowsN - 1));
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, c.width, c.height);
+    let y = 0;
+    for(let r = 0; r < rowsN; r++){
+      let x = 0;
+      cells.slice(r * per, (r + 1) * per).forEach((cel, ci) => {
+        const o = off(r * per + ci), w2 = Math.max(20, cel.w + (o.w || 0));
+        ctx.drawImage(cel.i, x + o.x, y + o.y, w2, cel.h);
+        mark(r * per + ci, x + o.x, y + o.y, w2, cel.h); x += cw - ov;
+      });
+      y += rowH[r] - ov;
+    }
+  } else {
+    const w = Math.max.apply(null, imgs.map(i => i.naturalWidth));
+    const rows = imgs.map(i => ({ i, w, h: Math.round(i.naturalHeight * (w / i.naturalWidth)) }));
+    c.width = w;
+    c.height = Math.max(1, rows.reduce((a, r) => a + r.h, 0) - ov * (rows.length - 1));
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, c.width, c.height);
+    let y = 0;
+    rows.forEach((r, i) => { const o = off(i), w2 = Math.max(20, r.w + (o.w || 0));
+      ctx.drawImage(r.i, o.x, y + o.y, w2, r.h); mark(i, o.x, y + o.y, w2, r.h); y += r.h - ov; });
+  }
+  if(mrect){                                  // dashed red outline round the selected page
+    ctx.strokeStyle = '#E01212';
+    ctx.lineWidth = Math.max(4, Math.round(Math.max(c.width, c.height) / 250));
+    ctx.setLineDash([22, 14]);
+    ctx.strokeRect(mrect.x + ctx.lineWidth / 2, mrect.y + ctx.lineWidth / 2, mrect.w - ctx.lineWidth, mrect.h - ctx.lineWidth);
+    ctx.setLineDash([]);
+  }
+  return c;
+}
+function _cptvV(id){ const e = document.getElementById(id); return e ? e.value : ''; }
+function _cptvRender(){
+  const strip = document.getElementById('cptvStrip'); if(!strip) return;
+  if(!_cptvPages.length){ strip.innerHTML = '<span style="font-size:12px; color:#6b6257;">No pages loaded yet.</span>'; }
+  else strip.innerHTML = _cptvPages.map((p, i) => {
+    const tag = (p.ox || p.oy || p.ow) ? ('x' + (p.ox || 0) + ' y' + (p.oy || 0) + (p.ow ? ' w' + (p.ow > 0 ? '+' : '') + p.ow : '')) : '';
+    return '<div data-pg="' + i + '" style="border:2px solid ' + (i === _cptvSel ? '#7a1a1c' : '#c9c0b4') + '; background:#fff; border-radius:6px; padding:4px; width:104px; text-align:center; cursor:pointer;">' +
+      '<img src="' + p.url + '" style="width:94px; height:64px; object-fit:contain; display:block;">' +
+      '<div style="font-size:10px; font-weight:700; margin-top:2px;">' + (i + 1) + ' of ' + _cptvPages.length + '</div>' +
+      (tag ? '<div style="font-size:9px; color:#7a1a1c;">' + tag + '</div>' : '') +
+      '<div style="margin-top:2px;"><button data-sl="' + i + '" style="font-size:10px; padding:1px 5px;">\u25c0</button>' +
+      '<button data-sr="' + i + '" style="font-size:10px; padding:1px 5px; margin:0 3px;">\u25b6</button>' +
+      '<button data-rm="' + i + '" style="font-size:10px; padding:1px 5px; color:#a11;">\u2715</button></div></div>';
+  }).join('');
+  const lbl = document.getElementById('cptvSelLbl'); if(lbl) lbl.textContent = String(_cptvSel + 1);
+  const cnt = document.getElementById('cptvCount'); if(cnt) cnt.textContent = _cptvPages.length + ' PAGE(S)';
+  strip.querySelectorAll('[data-pg]').forEach(d => d.onclick = (e) => {
+    if(e.target.tagName === 'BUTTON') return;
+    _cptvSel = +d.dataset.pg; _cptvRender();
+    clearTimeout(_cptvTimer); _cptvTimer = setTimeout(_cptvPreview, 60);
+  });
+  strip.querySelectorAll('[data-sl]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.sl; if(i < 1) return;
+    const t = _cptvPages[i - 1]; _cptvPages[i - 1] = _cptvPages[i]; _cptvPages[i] = t;
+    _cptvSel = i - 1; _cptvRender(); _cptvPreview();
+  });
+  strip.querySelectorAll('[data-sr]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.sr; if(i >= _cptvPages.length - 1) return;
+    const t = _cptvPages[i + 1]; _cptvPages[i + 1] = _cptvPages[i]; _cptvPages[i] = t;
+    _cptvSel = i + 1; _cptvRender(); _cptvPreview();
+  });
+  strip.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => {
+    _cptvPages.splice(+b.dataset.rm, 1);
+    _cptvSel = Math.max(0, Math.min(_cptvSel, _cptvPages.length - 1));
+    _cptvRender(); _cptvPreview();
+  });
+}
+async function _cptvPreview(){
+  const pv = document.getElementById('cptvPrev'); if(!pv) return;
+  if(!_cptvPages.length){ pv.innerHTML = '<p style="color:#6b6257; font-size:12px;">Load the traveller pages to see the join.</p>'; return; }
+  try{
+    const c = await _cptvCanvas(_cptvV('cptvLayout'), +_cptvV('cptvOverlap'), _cptvV('cptvBgCol'), _cptvSel);
+    const style = _cptvZoom > 0 ? ('width:' + Math.round(c.width * _cptvZoom) + 'px; max-width:none;') : 'max-width:100%;';
+    pv.innerHTML = '<img src="' + c.toDataURL('image/jpeg', 0.72) + '" title="' + c.width + ' \u00d7 ' + c.height + ' px" style="' + style + ' display:block; background:#fff; border:1px solid #c9c0b4;">' +
+      '<div style="font-size:11px; color:#6b6257; margin-top:4px;">' + c.width + ' \u00d7 ' + c.height + ' px</div>';
+  }catch(e){ pv.innerHTML = '<p style="color:#a11; font-size:12px;">Could not build a preview: ' + (e && e.message || e) + '</p>'; }
+}
+// Nudge: push the SELECTED page around, or stretch/squeeze its width
+function _cptvNudge(dx, dy, dw){
+  const p = _cptvPages[_cptvSel]; if(!p) return;
+  const step = +_cptvV('cptvStep') || 10;
+  p.ox = (p.ox || 0) + dx * step;
+  p.oy = (p.oy || 0) + dy * step;
+  p.ow = (p.ow || 0) + (dw || 0) * step;
+  _cptvRender();
+  clearTimeout(_cptvTimer); _cptvTimer = setTimeout(_cptvPreview, 160);
+}
+function _cptvKeys(e){
+  if(!document.getElementById('cptvBg')) return;
+  const t = e.target && e.target.tagName;
+  if(t === 'INPUT' || t === 'SELECT' || t === 'TEXTAREA') return;
+  const map = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
+  if(map[e.key]){ e.preventDefault(); _cptvNudge(map[e.key][0], map[e.key][1]); }
+  if(e.key === 'Escape'){ e.preventDefault(); _cptvClose(); }
+}
+function _cptvPaste(e){
+  const items = (e.clipboardData && e.clipboardData.items) || [];
+  const files = [];
+  for(let i = 0; i < items.length; i++){ if(items[i].type && items[i].type.indexOf('image') === 0){ const f = items[i].getAsFile(); if(f) files.push(f); } }
+  if(files.length){ e.preventDefault(); _cptvAddFiles(files); }
+}
+function _cptvClose(){
+  const v = document.getElementById('cptvBg'); if(v) v.remove();
+  document.removeEventListener('keydown', _cptvKeys, true);
+  document.removeEventListener('paste', _cptvPaste, true);
+}
+
+// The traveller upload screen itself — drop zone, page strip, sew controls, nudge bar,
+// live preview. Built in code so it cannot collide with any existing markup ids.
+async function cpTravellerPick(partNum){
   const P = String(partNum || '').trim().toUpperCase();
   if(!P) return;
-  const inp = document.createElement('input');
-  inp.type = 'file';
-  inp.accept = 'image/*,application/pdf';
-  inp.style.display = 'none';
-  document.body.appendChild(inp);
-  inp.onchange = async () => {
-    const f = inp.files && inp.files[0];
+  _cptvClose();
+  _cptvPart = P; _cptvPages = []; _cptvSel = 0; _cptvBackup = null; _cptvZoom = 0;
+  // seed with whatever is already on file so Replace can ADD pages rather than start over
+  try{ const d = _idbGetDrawing(P + '::TRAVELLER'); if(d && d.odsImage) _cptvPages.push({ name: 'on file', url: d.odsImage }); }catch(e){}
+
+  const bg = document.createElement('div');
+  bg.id = 'cptvBg';
+  bg.style.cssText = 'position:fixed; inset:0; z-index:100004; background:rgba(20,15,12,.9); display:flex; align-items:center; justify-content:center; padding:16px;';
+  bg.innerHTML =
+   '<div style="background:#efe9df; border-radius:10px; width:100%; max-width:1180px; max-height:94vh; display:flex; flex-direction:column; overflow:hidden;">' +
+    '<div style="background:#7a1a1c; color:#fff; font-weight:800; letter-spacing:.06em; padding:10px 16px; font-size:14px;">TRAVELLER \u2014 ' + P + '</div>' +
+    '<div style="padding:14px 16px; overflow:auto;">' +
+      '<div id="cptvDrop" style="border:2px dashed #a89b8a; border-radius:8px; padding:18px; text-align:center; cursor:pointer; background:#f6f2ea;">' +
+        '<div style="font-weight:800; letter-spacing:.05em; font-size:13px;">UPLOAD TRAVELLER PAGES</div>' +
+        '<div style="font-size:12px; color:#6b6257; margin-top:5px; line-height:1.5;">Tap to choose files, drag them onto this box, or paste a screenshot with Ctrl+V.<br>Load EVERY page of a multi-page traveller \u2014 images or PDF (all PDF pages come in).</div>' +
+      '</div>' +
+      '<div style="display:flex; align-items:center; gap:10px; margin:10px 0 6px;">' +
+        '<b id="cptvCount" style="font-size:12px; letter-spacing:.05em;">0 PAGE(S)</b>' +
+        '<button id="cptvZOut" style="font-size:12px; padding:3px 10px; cursor:pointer;">\u2212</button>' +
+        '<button id="cptvZFit" style="font-size:12px; padding:3px 10px; cursor:pointer;">FIT</button>' +
+        '<button id="cptvZ100" style="font-size:12px; padding:3px 10px; cursor:pointer;">100%</button>' +
+        '<button id="cptvZIn" style="font-size:12px; padding:3px 10px; cursor:pointer;">+</button>' +
+      '</div>' +
+      '<div id="cptvStrip" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; min-height:30px;"></div>' +
+      '<div style="display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; background:#e5ddd1; border-radius:8px; padding:10px 12px;">' +
+        '<div><label style="display:block; font-size:11px; font-weight:700; letter-spacing:.05em;">LAYOUT</label>' +
+          '<select id="cptvLayout" style="font-size:12px; padding:4px;"><option value="v">Stack top to bottom</option><option value="h">Side by side</option><option value="g">Grid, 2 across</option></select></div>' +
+        '<div><label style="display:block; font-size:11px; font-weight:700; letter-spacing:.05em;">TRIM OVERLAP (PX)</label>' +
+          '<input id="cptvOverlap" type="number" min="0" step="10" value="0" style="font-size:12px; padding:4px; width:90px;"></div>' +
+        '<div><label style="display:block; font-size:11px; font-weight:700; letter-spacing:.05em;">BACKGROUND</label>' +
+          '<select id="cptvBgCol" style="font-size:12px; padding:4px;"><option value="#ffffff">White</option><option value="#000000">Black</option></select></div>' +
+        '<button id="cptvRefresh" style="font-size:12px; padding:5px 12px; cursor:pointer;">Update preview</button>' +
+      '</div>' +
+      '<div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:8px; font-size:12px;">' +
+        '<span>Nudge page <b id="cptvSelLbl">1</b> \u2014 click a thumbnail to pick it, then push it:</span>' +
+        '<button id="cptvNUp" title="Up (or \u2191 key)" style="padding:3px 9px; cursor:pointer;">\u25b2</button>' +
+        '<button id="cptvNDown" title="Down (or \u2193 key)" style="padding:3px 9px; cursor:pointer;">\u25bc</button>' +
+        '<button id="cptvNLeft" title="Left (or \u2190 key)" style="padding:3px 9px; cursor:pointer;">\u25c0</button>' +
+        '<button id="cptvNRight" title="Right (or \u2192 key)" style="padding:3px 9px; cursor:pointer;">\u25b6</button>' +
+        '<button id="cptvNWide" style="padding:3px 9px; cursor:pointer;">\u21d4 Wider</button>' +
+        '<button id="cptvNNarrow" style="padding:3px 9px; cursor:pointer;">\u21e5 Narrower</button>' +
+        '<span>step</span><select id="cptvStep" style="font-size:12px; padding:3px;"><option>1</option><option>2</option><option>5</option><option selected>10</option><option>25</option><option>50</option></select><span>px</span>' +
+        '<button id="cptvNReset" style="padding:3px 9px; cursor:pointer;">Reset nudges</button>' +
+      '</div>' +
+      '<div id="cptvPrev" style="margin-top:10px; max-height:42vh; overflow:auto; background:#ded5c8; border-radius:6px; padding:8px;"></div>' +
+    '</div>' +
+    '<div style="background:#e5ddd1; padding:10px 16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; border-top:1px solid #c9c0b4;">' +
+      '<button id="cptvCancel" style="padding:8px 18px; font-weight:700; cursor:pointer;">Cancel</button>' +
+      '<button id="cptvUndo" style="padding:8px 18px; font-weight:700; cursor:pointer;">Undo last sew</button>' +
+      '<button id="cptvSew" style="padding:8px 18px; font-weight:700; cursor:pointer; background:#5a4a2a; color:#fff; border:1px solid #47391f; border-radius:6px;">\ud83e\uddf5 Sew pages into one</button>' +
+      '<button id="cptvSave" style="padding:8px 22px; font-weight:800; cursor:pointer; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px;">\u2713 Save traveller</button>' +
+    '</div>' +
+   '</div>';
+  document.body.appendChild(bg);
+
+  const file = document.createElement('input');
+  file.type = 'file'; file.accept = 'image/*,application/pdf'; file.multiple = true; file.style.display = 'none';
+  bg.appendChild(file);
+  file.onchange = () => { const f = file.files; file.value = ''; if(f && f.length) _cptvAddFiles(f); };
+
+  const drop = document.getElementById('cptvDrop');
+  drop.onclick = () => file.click();
+  drop.ondragover = (e) => { e.preventDefault(); drop.style.background = '#e8dfcd'; };
+  drop.ondragleave = () => { drop.style.background = '#f6f2ea'; };
+  drop.ondrop = (e) => { e.preventDefault(); drop.style.background = '#f6f2ea'; if(e.dataTransfer && e.dataTransfer.files.length) _cptvAddFiles(e.dataTransfer.files); };
+
+  document.getElementById('cptvZOut').onclick = () => { _cptvZoom = _cptvZoom ? Math.max(0.1, _cptvZoom - 0.15) : 0.85; _cptvPreview(); };
+  document.getElementById('cptvZIn').onclick = () => { _cptvZoom = (_cptvZoom || 0.85) + 0.15; _cptvPreview(); };
+  document.getElementById('cptvZFit').onclick = () => { _cptvZoom = 0; _cptvPreview(); };
+  document.getElementById('cptvZ100').onclick = () => { _cptvZoom = 1; _cptvPreview(); };
+  document.getElementById('cptvRefresh').onclick = _cptvPreview;
+  ['cptvLayout','cptvOverlap','cptvBgCol'].forEach(id => { const el = document.getElementById(id); if(el) el.onchange = _cptvPreview; });
+  document.getElementById('cptvNUp').onclick = () => _cptvNudge(0, -1);
+  document.getElementById('cptvNDown').onclick = () => _cptvNudge(0, 1);
+  document.getElementById('cptvNLeft').onclick = () => _cptvNudge(-1, 0);
+  document.getElementById('cptvNRight').onclick = () => _cptvNudge(1, 0);
+  document.getElementById('cptvNWide').onclick = () => _cptvNudge(0, 0, 1);
+  document.getElementById('cptvNNarrow').onclick = () => _cptvNudge(0, 0, -1);
+  document.getElementById('cptvNReset').onclick = () => { _cptvPages.forEach(p => { p.ox = 0; p.oy = 0; p.ow = 0; }); _cptvRender(); _cptvPreview(); };
+  document.getElementById('cptvCancel').onclick = _cptvClose;
+
+  // Sew: collapse every loaded page into ONE page, keeping the originals for Undo
+  document.getElementById('cptvSew').onclick = async () => {
+    if(_cptvPages.length < 2){ alert('Load at least two pages before sewing.'); return; }
     try{
-      if(!f) return;
-      flash('Reading traveller\u2026');
-      let img = null;
-      if(/pdf$/i.test(f.name) || f.type === 'application/pdf'){
-        const asImg = await convertPdfToImageFile(f);   // Rev-510 helper
-        img = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(asImg); });
-      } else {
-        img = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(f); });
-      }
-      if(!img) return;
-      _idbPutDrawing(P + '::TRAVELLER', img);           // stores + syncs to GitHub
-      const info = cpPartInfoGet(P) || {};
-      info.hasTraveller = true; info.savedAt = new Date().toISOString();
-      cpPartInfoSet(P, info);
-      flash('\u2713 Traveller saved for ' + P);
-      try{ if(typeof renderProjects === 'function') renderProjects(); }catch(e){}
-      setTimeout(() => cpViewTraveller(P), 250);
-    }catch(e){
-      alert('Could not read the traveller: ' + (e && e.message || e));
-    }finally{
-      try{ inp.remove(); }catch(e){}
-    }
+      flash('Sewing pages\u2026');
+      const c = await _cptvCanvas(_cptvV('cptvLayout'), +_cptvV('cptvOverlap'), _cptvV('cptvBgCol'));
+      _cptvBackup = _cptvPages.slice();
+      _cptvPages = [{ name: 'sewn-' + _cptvBackup.length + '-pages.png', url: c.toDataURL('image/png') }];
+      _cptvSel = 0; _cptvRender(); _cptvPreview();
+      flash('\u2713 Sewn into one ' + c.width + ' \u00d7 ' + c.height + ' image \u2014 Undo last sew puts the pages back.');
+    }catch(e){ alert('Could not sew: ' + (e && e.message || e)); }
   };
-  inp.click();
+  document.getElementById('cptvUndo').onclick = () => {
+    if(!_cptvBackup){ alert('Nothing to undo.'); return; }
+    _cptvPages = _cptvBackup.slice(); _cptvBackup = null;
+    _cptvSel = 0; _cptvRender(); _cptvPreview();
+    flash('Put the separate pages back.');
+  };
+  // Save: one page saves as-is; several pages sew on the way out using the current settings
+  document.getElementById('cptvSave').onclick = async () => {
+    if(!_cptvPages.length){ alert('Load at least one page first.'); return; }
+    try{
+      let url = _cptvPages[0].url;
+      if(_cptvPages.length > 1){
+        const c = await _cptvCanvas(_cptvV('cptvLayout'), +_cptvV('cptvOverlap'), _cptvV('cptvBgCol'));
+        url = c.toDataURL('image/png');
+      }
+      _idbPutDrawing(_cptvPart + '::TRAVELLER', url);      // stores + syncs to GitHub
+      const info = cpPartInfoGet(_cptvPart) || {};
+      info.hasTraveller = true; info.savedAt = new Date().toISOString();
+      cpPartInfoSet(_cptvPart, info);
+      const part = _cptvPart;
+      _cptvClose();
+      flash('\u2713 Traveller saved for ' + part);
+      try{ if(typeof renderProjects === 'function') renderProjects(); }catch(e){}
+      setTimeout(() => cpViewTraveller(part), 250);
+    }catch(e){ alert('Could not save the traveller: ' + (e && e.message || e)); }
+  };
+
+  document.addEventListener('keydown', _cptvKeys, true);
+  document.addEventListener('paste', _cptvPaste, true);
+  _cptvRender(); _cptvPreview();
+  if(!_cptvPages.length) setTimeout(() => file.click(), 150);
 }
+
 async function cpViewTraveller(partNum){
   let img = null;
   try{ const d = await _idbGetDrawing(String(partNum).toUpperCase() + '::TRAVELLER'); img = d && d.odsImage; }catch(e){}
