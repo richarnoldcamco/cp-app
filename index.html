@@ -1412,7 +1412,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-573";
+const APP_REV = "Rev-574";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1426,6 +1426,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-574", type: "App", changes: ["UPLOAD BUG FIXED \u2014 PICKED FILES WERE BEING THROWN AWAY (Rev-574) \u2014 choosing a file in the capture studio (traveller or gage drawing) did nothing at all, silently. Cause: the picker handler read file.files into a variable and then reset the input with file.value = \u2018\u2019 to allow re-picking the same file. file.files is a LIVE list, so clearing the input emptied the very list already being held \u2014 the code then looked at zero files and quietly stopped. The chosen files are now copied into a real array BEFORE the input is reset. Three hardening changes alongside: (1) PDF detection no longer trusts the file name or the browser\u2019s MIME label \u2014 the first bytes are read and anything starting %PDF is treated as a PDF, so Chrome PDF Documents and OneDrive files with odd type labels work. (2) A live status line under the drop zone reports every step \u2014 reading, loading the PDF reader, converting page n of n, pages loaded \u2014 so a slow or failed load explains itself instead of looking dead. (3) Failures are translated into plain language: a PDF reader that cannot download says it needs internet the first time on a device, and an unreadable file suggests a OneDrive file still showing a red X needs to finish downloading first."] },
   { ts: "2026-07-27", rev: "App Rev-573", type: "App", changes: ["GAGE DRAWINGS GET CTRL+V AND PDF (Rev-573) \u2014 \ud83d\udcc4 Upload Drawing on the Gages To Be Made list was a bare file picker: no paste, no drag, one page only. The traveller screen built at Rev-570 has been generalised into a shared capture studio (cpImageStudio) and BOTH now use it, so a gage drawing gets the identical treatment: click, drag-drop, or Ctrl+V; images or PDF with EVERY page loaded; reorder, sew and nudge; \u2212 / FIT / 100% / + zoom; an existing drawing seeds as page 1 so Replace can add a sheet instead of starting over. The paste handler was widened: it now reads clipboard FILES first, accepts application/pdf as well as images \u2014 so a page copied out of Chrome\u2019s built-in PDF viewer pastes straight in \u2014 and if what was pasted is only text it says so instead of appearing dead. The traveller screen is unchanged in behaviour; it is now a thin wrapper that configures the same studio."] },
   { ts: "2026-07-27", rev: "App Rev-572", type: "App", changes: ["GAGES TO BE MADE \u2014 SHOP-WIDE LIST (Rev-572) \u2014 filling the Special Gage / Fixture column on any Control Plan row now automatically posts that gage to a list, reachable from a new \ud83d\udd27 GAGES TO BE MADE button on the main menu carrying a live badge (open / total). Each gage is keyed PART::OPnnn::Bnn so it follows its balloon, and the list carries Part/Op, balloon, feature + tolerance, the gage description, status, who it is assigned to, and its drawing. Five buttons per row: \u270f\ufe0f EDIT rewrites the description, \u21bb UPDATE sets status (TO BE MADE \u2192 DESIGNED \u2192 ORDERED \u2192 IN PROGRESS \u2192 COMPLETE) with an optional progress note, \ud83d\udc64 ASSIGNED TO names the toolmaker or vendor, \ud83d\udcc4 UPLOAD DRAWING attaches a picture or PDF of the gage design (stored under GAGE::<key> and GitHub-synced like any drawing, with View / \u2b06 Replace), and \ud83d\uddd1 DELETE removes it. A filter shows open-only, all, or one status. EDIT and DELETE write back to the Control Plan row they came from \u2014 the open builder updates immediately, a closed plan is corrected in its saved record \u2014 so the list and the plan never disagree. The list rides the normal GitHub data sync as cpGageList in cp_data.json, merged per gage key with the newest edit winning, so every device sees the same list."] },
   { ts: "2026-07-27", rev: "App Rev-571", type: "App", changes: ["SPECIAL GAGE / FIXTURE COLUMN (Rev-571) \u2014 a new column sits between Meas Method (CMM) and Reaction Plan on the Build Control Plan grid, recording whether a feature needs a gage or holding fixture BUILT rather than pulled off the shelf. A row with nothing recorded shows a + ADD GAGE button; pressing it opens a writing box headed with that balloon\u2019s number, description and tolerance, with room to describe the gage, what it mates to, and what the toolmaker needs to know. Ctrl+Enter saves, Esc backs out. A row that HAS a gage shows the text on a pale blue cell with \u270f\ufe0f Edit to reopen the box and \u2715 to clear it (confirmed first). The note is stored on the row as specialGage, so it saves and reloads with the plan like every other cell and shows as a \ud83d\udd27 chip in the compact row view. The writing box is exempt from the app\u2019s force-uppercase handler \u2014 gage descriptions are prose, not codes. NOTE: this column is ON-SCREEN ONLY for now; the Build .xlsx still exports the 17 columns of CP-2 and the Instructions (Rev-92) are untouched. Say the word and I will add it to the xlsx and update the Instructions to match \u2014 I will not change an ITAR deliverable\u2019s column set without your go-ahead."] },
@@ -1872,7 +1873,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:34 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:36 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3655,12 +3656,13 @@ function _cptvLoad(url){
 }
 // Rev-570: EVERY page of a PDF becomes a page here (the ODS helper only takes page 1,
 // because a drawing is one sheet — a traveller routinely runs two or three)
-async function cpPdfPagesToImages(file){
+async function cpPdfPagesToImages(file, onProgress){
   await loadPdfJs();
   const buf = await file.arrayBuffer();
   const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
   const out = [];
   for(let n = 1; n <= pdf.numPages; n++){
+    if(typeof onProgress === 'function') try{ onProgress(n, pdf.numPages); }catch(e){}
     const page = await pdf.getPage(n);
     const vp = page.getViewport({ scale: 2.5 });
     const c = document.createElement('canvas');
@@ -3670,19 +3672,49 @@ async function cpPdfPagesToImages(file){
   }
   return out;
 }
+// Rev-574: says out loud what it is doing, on the screen, at every step — a load that
+// fails should explain itself instead of looking like nothing happened.
+function _cptvSay(msg, bad){
+  const el = document.getElementById('cptvSay');
+  if(el){ el.textContent = msg || ''; el.style.color = bad ? '#a11' : '#6b6257'; el.style.display = msg ? 'block' : 'none'; }
+  if(msg) try{ flash(msg, !!bad); }catch(e){}
+}
+// Rev-574: do not trust the file name or the browser's type label — read the first bytes.
+// A PDF always starts %PDF. OneDrive placeholders and odd MIME labels stop mattering.
+async function _cptvIsPdf(f){
+  try{
+    const head = new Uint8Array(await f.slice(0, 5).arrayBuffer());
+    if(head.length >= 4 && head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46) return true;
+  }catch(e){}
+  return /\.pdf$/i.test(f.name || '') || f.type === 'application/pdf';
+}
 async function _cptvAddFiles(files){
   const arr = Array.from(files || []);
+  if(!arr.length){ _cptvSay('Nothing came through from the picker — try again.', true); return; }
+  let added = 0;
   for(const f of arr){
+    const nm = f.name || 'file';
     try{
-      if(/pdf$/i.test(f.name || '') || f.type === 'application/pdf'){
-        flash('Converting PDF pages\u2026');
-        (await cpPdfPagesToImages(f)).forEach(p => _cptvPages.push(p));
-      } else if(/^image\//.test(f.type || '')){
-        const url = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(f); });
-        _cptvPages.push({ name: f.name || 'page.png', url });
+      _cptvSay('Reading ' + nm + ' \u2026');
+      if(await _cptvIsPdf(f)){
+        _cptvSay('Converting ' + nm + ' \u2014 loading the PDF reader\u2026');
+        const pgs = await cpPdfPagesToImages(f, (n, tot) => _cptvSay('Converting ' + nm + ' \u2014 page ' + n + ' of ' + tot + '\u2026'));
+        pgs.forEach(p => _cptvPages.push(p)); added += pgs.length;
+      } else {
+        const url = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error || new Error('read failed')); r.readAsDataURL(f); });
+        if(!/^data:image\//.test(url)) throw new Error('that file is not a picture or a PDF');
+        _cptvPages.push({ name: nm, url }); added++;
       }
-    }catch(e){ alert('Could not read ' + (f.name || 'a file') + ': ' + (e && e.message || e)); }
+    }catch(e){
+      const msg = String((e && e.message) || e);
+      let help = msg;
+      if(/offline|Failed to fetch|load|network/i.test(msg) && /pdf/i.test(nm)) help = 'the PDF reader could not be downloaded \u2014 this needs internet the FIRST time on a device';
+      else if(/NotReadable|NotFound|permission/i.test(msg)) help = 'the file could not be read off the disk \u2014 if it is a OneDrive file showing a red X, open the folder and let it finish downloading, then try again';
+      _cptvSay('Could not load ' + nm + ': ' + help, true);
+      alert('Could not load ' + nm + '\n\n' + help);
+    }
   }
+  if(added) _cptvSay(added + ' page(s) loaded.');
   _cptvSel = Math.min(_cptvSel, Math.max(0, _cptvPages.length - 1));
   _cptvRender(); _cptvPreview();
 }
@@ -3854,6 +3886,7 @@ async function cpImageStudio(opts){
         '<div style="font-weight:800; letter-spacing:.05em; font-size:13px;">' + String(o.dropLabel || 'UPLOAD PAGES') + '</div>' +
         '<div style="font-size:12px; color:#6b6257; margin-top:5px; line-height:1.5;">Tap to choose files, drag them onto this box, or paste with <b>Ctrl+V</b> \u2014 a screenshot, or a page copied straight out of the Chrome PDF viewer.<br>' + String(o.dropHint || 'Load EVERY page \u2014 images or PDF (all PDF pages come in).') + '</div>' +
       '</div>' +
+      '<div id="cptvSay" style="display:none; font-size:12px; font-weight:700; margin-top:8px;"></div>' +
       '<div style="display:flex; align-items:center; gap:10px; margin:10px 0 6px;">' +
         '<b id="cptvCount" style="font-size:12px; letter-spacing:.05em;">0 PAGE(S)</b>' +
         '<button id="cptvZOut" style="font-size:12px; padding:3px 10px; cursor:pointer;">\u2212</button>' +
@@ -3896,7 +3929,13 @@ async function cpImageStudio(opts){
   const file = document.createElement('input');
   file.type = 'file'; file.accept = 'image/*,application/pdf'; file.multiple = true; file.style.display = 'none';
   bg.appendChild(file);
-  file.onchange = () => { const f = file.files; file.value = ''; if(f && f.length) _cptvAddFiles(f); };
+  file.onchange = () => {
+    // Rev-574 FIX: file.files is a LIVE list — setting .value = '' empties it, so the
+    // chosen files must be copied into a real array BEFORE the input is reset.
+    const picked = Array.from(file.files || []);
+    file.value = '';
+    if(picked.length) _cptvAddFiles(picked);
+  };
 
   const drop = document.getElementById('cptvDrop');
   drop.onclick = () => file.click();
