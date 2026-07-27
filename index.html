@@ -595,6 +595,8 @@
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:80px;">Lower Limit</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:55px;">Class</th>
             <th colspan="5" style="padding:6px; border:1px solid #5a8bb5;">METHODS BAND (auto-filled from Master List)</th>
+            <!-- Rev-571: does this feature need a special gage or fixture MADE? -->
+            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:170px;">Special Gage / Fixture<br><span style="font-weight:400; font-size:9px;">(to be made)</span></th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:90px;">Reaction Plan</th>
           </tr>
           <tr style="background:#bdd7ee;">
@@ -1372,7 +1374,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-570";
+const APP_REV = "Rev-571";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1386,6 +1388,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-571", type: "App", changes: ["SPECIAL GAGE / FIXTURE COLUMN (Rev-571) \u2014 a new column sits between Meas Method (CMM) and Reaction Plan on the Build Control Plan grid, recording whether a feature needs a gage or holding fixture BUILT rather than pulled off the shelf. A row with nothing recorded shows a + ADD GAGE button; pressing it opens a writing box headed with that balloon\u2019s number, description and tolerance, with room to describe the gage, what it mates to, and what the toolmaker needs to know. Ctrl+Enter saves, Esc backs out. A row that HAS a gage shows the text on a pale blue cell with \u270f\ufe0f Edit to reopen the box and \u2715 to clear it (confirmed first). The note is stored on the row as specialGage, so it saves and reloads with the plan like every other cell and shows as a \ud83d\udd27 chip in the compact row view. The writing box is exempt from the app\u2019s force-uppercase handler \u2014 gage descriptions are prose, not codes. NOTE: this column is ON-SCREEN ONLY for now; the Build .xlsx still exports the 17 columns of CP-2 and the Instructions (Rev-92) are untouched. Say the word and I will add it to the xlsx and update the Instructions to match \u2014 I will not change an ITAR deliverable\u2019s column set without your go-ahead."] },
   { ts: "2026-07-27", rev: "App Rev-570", type: "App", changes: ["TRAVELLER UPLOAD NOW USES THE PFMEA SEW + NUDGE ENGINE (Rev-570) \u2014 \u2b06 Upload Traveller no longer opens a bare one-file picker. It opens a full traveller screen ported from the PFMEA app (PF Rev-056 sewCanvas / nudge / sewApply), re-namespaced _cptv* so nothing collides with the ODS upload: (1) MULTI-PAGE LOAD \u2014 click, drag-drop, or paste with Ctrl+V; images or PDF, and EVERY page of a PDF comes in (the ODS helper only takes page 1 because a drawing is one sheet, a router is not) via new cpPdfPagesToImages. (2) PAGE STRIP \u2014 thumbnails with \u25c0 \u25b6 reorder and \u2715 remove, click one to select it. (3) SEW \u2014 stack top-to-bottom, side by side, or grid 2-across, with trim-overlap px and white/black background, live preview, and Undo last sew. (4) NUDGE BAR \u2014 push the selected page \u25b2\u25bc\u25c0\u25b6 (or arrow keys) at 1/2/5/10/25/50 px steps, \u21d4 Wider / \u21e5 Narrower to stretch or squeeze it, Reset nudges; the selected page carries a dashed red outline in the preview. (5) PREVIEW ZOOM \u2212 / FIT / 100% / +. Saving stores the finished single image under PART::TRAVELLER exactly as before (GitHub-synced) \u2014 several pages sew automatically on the way out. Reopening on a part that already has a traveller seeds it as page 1, so Replace can ADD a page instead of starting over. Esc closes."] },
   { ts: "2026-07-27", rev: "App Rev-569", type: "App", changes: ["PART-HEADER BUTTONS NOW LINE UP (Rev-569) \u2014 on the Control Plans list the \u2795 Add Op and Traveller buttons sat immediately after the part number, so a short part like Test1 pushed them far left of a long one like 1000222892 and the column zig-zagged down the page. The part name is now a fixed-width block (150px) and both buttons carry fixed widths (Add Op 96px, Traveller 150px, centered), so every part\u2019s buttons start and end on the same vertical line regardless of part-number length or whether the Traveller button reads \u2b06 Upload Traveller or \ud83d\udcc4 Traveller. Longer part numbers still display in full \u2014 the block only sets a minimum."] },
   { ts: "2026-07-27", rev: "App Rev-568", type: "App", changes: ["UPLOAD A TRAVELLER FOR AN EXISTING PART (Rev-568) \u2014 parts created before Rev-563 had no way to get a traveller on file: the part-header button only VIEWED one and dead-ended in an alert, New Control Plan waives the traveller for a known part, and \u2795 Add Op hides the traveller box entirely. Now the part-header button reports the real state \u2014 \u2b06 Upload Traveller (amber) when none is stored, \ud83d\udcc4 Traveller when one is. Tapping upload opens the file picker (image or PDF, PDFs auto-convert via the Rev-510 helper), stores it under PART::TRAVELLER exactly like part-first creation, marks hasTraveller in cpPartInfo, syncs to GitHub through _idbPutDrawing, re-renders the list, and opens the viewer. The viewer gained \u2b06 Replace for swapping in a newer routing, and the old no-traveller alert now offers to upload on the spot instead of dead-ending."] },
@@ -1829,7 +1832,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "1:34 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "1:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4476,6 +4479,10 @@ function renderCPBuilder(){
         tr.appendChild(td);
       });
 
+      // Rev-571: Special Gage / Fixture — empty rows carry an ADD GAGE button; filled rows
+      // show the description with a pencil to reopen the writing box.
+      tr.appendChild(cpGageCell(idx, row));
+
       // Reaction Plan (narrow, editable)
       tr.appendChild(editableCell(idx, 'reactionPlan', row.reactionPlan, 'left', true));
     } else {
@@ -4508,6 +4515,10 @@ function renderCPBuilder(){
         tr.appendChild(td); })();
       tr.appendChild(compactCell(row.freqQE, 'center'));
       tr.appendChild(compactCell(row.measMethodCMM, 'left'));
+      // Rev-571: special gage shows as a chip in the compact row (read-only at this size)
+      (function(){ const td = compactCell(row.specialGage ? '\ud83d\udd27 ' + row.specialGage : '', 'left');
+        if(row.specialGage){ td.style.background = '#eef4ff'; td.style.fontWeight = '700'; }
+        tr.appendChild(td); })();
       tr.appendChild(compactCell(row.reactionPlan, 'left'));
     }
 
@@ -4543,6 +4554,94 @@ function renderCPBuilder(){
   });
   updateOdsPanel();
   cpAutoSaveProject();   // Rev-224: continuous save on every redraw/edit
+}
+
+// ===== Rev-571: SPECIAL GAGE / FIXTURE ==========================================
+// Some features cannot be checked with anything on the shelf — they need a gage or a
+// holding fixture BUILT. This column records that decision on the row itself, so the
+// requirement travels with the Control Plan instead of living in someone's head.
+function cpGageCell(idx, row){
+  const td = document.createElement('td');
+  const has = !!(row.specialGage && String(row.specialGage).trim());
+  td.style.cssText = 'padding:6px; border:1px solid var(--line); font-size:12px; text-align:left; vertical-align:middle;' + (has ? 'background:#eef4ff;' : '');
+  if(has){
+    const txt = document.createElement('div');
+    txt.textContent = '\ud83d\udd27 ' + row.specialGage;
+    txt.title = row.specialGage;
+    txt.style.cssText = 'white-space:normal; word-break:break-word; font-weight:600; color:#1a3f6b; line-height:1.35; max-height:66px; overflow:auto;';
+    td.appendChild(txt);
+    const bar = document.createElement('div');
+    bar.style.cssText = 'margin-top:4px; display:flex; gap:6px;';
+    const ed = document.createElement('button');
+    ed.textContent = '\u270f\ufe0f Edit';
+    ed.style.cssText = 'font-size:10px; font-weight:700; padding:2px 8px; border-radius:5px; border:1px solid #1a3f6b; background:#fff; color:#1a3f6b; cursor:pointer;';
+    ed.onclick = (e) => { e.stopPropagation(); cpGagePopup(idx); };
+    const rm = document.createElement('button');
+    rm.textContent = '\u2715';
+    rm.title = 'No special gage needed after all \u2014 clear this row';
+    rm.style.cssText = 'font-size:10px; font-weight:700; padding:2px 8px; border-radius:5px; border:1px solid #8a2a2a; background:#fff; color:#8a2a2a; cursor:pointer;';
+    rm.onclick = (e) => {
+      e.stopPropagation();
+      if(!confirm('Clear the special gage / fixture note on this row?')) return;
+      cpBuildState.rows[idx].specialGage = '';
+      renderCPBuilder(); cpAutoSaveProject();
+    };
+    bar.appendChild(ed); bar.appendChild(rm);
+    td.appendChild(bar);
+  } else {
+    const add = document.createElement('button');
+    add.textContent = '+ ADD GAGE';
+    add.title = 'This feature needs a gage or fixture made \u2014 describe it';
+    add.style.cssText = 'font-size:11px; font-weight:700; padding:5px 12px; border-radius:6px; border:1px solid #1a5276; background:#fff; color:#1a5276; cursor:pointer; width:100%;';
+    add.onclick = (e) => { e.stopPropagation(); cpGagePopup(idx); };
+    td.appendChild(add);
+  }
+  return td;
+}
+function cpGagePopup(idx){
+  const row = cpBuildState && cpBuildState.rows && cpBuildState.rows[idx];
+  if(!row) return;
+  const old = document.getElementById('cpGageBg'); if(old) old.remove();
+  const bg = document.createElement('div');
+  bg.id = 'cpGageBg';
+  bg.style.cssText = 'position:fixed; inset:0; z-index:100005; background:rgba(20,15,12,.85); display:flex; align-items:center; justify-content:center; padding:18px;';
+  bg.innerHTML =
+   '<div style="background:#fff; border-radius:10px; width:100%; max-width:640px; overflow:hidden; box-shadow:0 10px 44px rgba(0,0,0,.5);">' +
+    '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.05em; padding:11px 16px; font-size:14px;">SPECIAL GAGE / FIXTURE \u2014 BALLOON ' + (row.bubble || '') + '</div>' +
+    '<div style="padding:16px;">' +
+      '<div style="font-size:12px; color:#555; line-height:1.5; margin-bottom:10px;">' +
+        '<b>' + String(row.featureDesc || '(no description yet)') + '</b>' + (row.spec ? ' \u2014 ' + row.spec : '') + '<br>' +
+        'Describe the gage or fixture that has to be made to check this feature \u2014 what it is, what it mates to, and anything the toolmaker needs to know.' +
+      '</div>' +
+      '<textarea id="cpGageText" rows="7" placeholder="E.G. PLUG GAGE, GO/NO-GO, .6040/.6035 \u2014 CARBIDE PINS, HANDLE STAMPED WITH PART NUMBER AND BALLOON 3. OR: HOLDING FIXTURE TO SUPPORT THE RING ON THE ROLL CHECKER WITHOUT DISTORTING THE .029/.027 WALL." ' +
+        'style="width:100%; box-sizing:border-box; font-size:13px; padding:10px; border:2px solid #c9c0b4; border-radius:6px; font-family:inherit; line-height:1.5; resize:vertical;"></textarea>' +
+    '</div>' +
+    '<div style="background:#f1ede6; padding:11px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid #ddd6cc;">' +
+      '<button id="cpGageCancel" style="padding:8px 18px; font-weight:700; cursor:pointer;">Cancel</button>' +
+      '<button id="cpGageClear" style="padding:8px 18px; font-weight:700; cursor:pointer; color:#8a2a2a;">Clear</button>' +
+      '<button id="cpGageSave" style="padding:8px 24px; font-weight:800; cursor:pointer; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px;">\u2713 Save</button>' +
+    '</div>' +
+   '</div>';
+  document.body.appendChild(bg);
+  const ta = document.getElementById('cpGageText');
+  ta.value = row.specialGage || '';
+  // the app force-uppercases most fields; this is free prose, so leave what is typed alone
+  ta.classList.add('no-upper');
+  setTimeout(() => { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }, 60);
+  const close = () => bg.remove();
+  document.getElementById('cpGageCancel').onclick = close;
+  bg.onclick = (e) => { if(e.target === bg) close(); };
+  document.getElementById('cpGageClear').onclick = () => { ta.value = ''; ta.focus(); };
+  document.getElementById('cpGageSave').onclick = () => {
+    cpBuildState.rows[idx].specialGage = ta.value.trim();
+    close();
+    renderCPBuilder(); cpAutoSaveProject();
+    flash(cpBuildState.rows[idx].specialGage ? '\u2713 Special gage saved on balloon ' + (row.bubble || '') : 'Special gage cleared.');
+  };
+  bg.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){ e.preventDefault(); close(); }
+    if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); document.getElementById('cpGageSave').click(); }
+  });
 }
 
 // Rev-196: zoom the side panel to the focused balloon (window ≈35% of drawing width ≈ 1/8 area).
