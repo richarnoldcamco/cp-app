@@ -1417,7 +1417,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-581";
+const APP_REV = "Rev-582";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1431,6 +1431,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-582", type: "App", changes: ["PROPER OPERATION WINDOW REPLACES THE BROWSER PROMPTS (Rev-582) \u2014 naming an operation fired two stacked browser prompt() boxes: black, unstyled, browser-branded, one question at a time with no way to see or correct the first answer while typing the second. Replaced with a real window matching the rest of the app: OP # and OP DESCRIPTION side by side, both mandatory-yellow (fafa96) per the Camco UI standards, Enter saves, Esc cancels, clicking outside closes. A duplicate operation number is reported IN the window in red and the window stays open so it can be corrected, instead of an alert throwing the work away. Layout fix alongside: the Part Number cell was wrapping \u2018(no op number)\u2019 onto three lines and squashing the column \u2014 operation rows no longer wrap."] },
   { ts: "2026-07-27", rev: "App Rev-581", type: "App", changes: ["THE PENCIL NOW APPEARS ON PLANS WITH NO OP NUMBER (Rev-581) \u2014 Rev-580 put the \u270f\ufe0f only on rows that already HAD an operation number, which is exactly the rows that did not need it: every plan on this device predates per-operation plans and carries no op number, so no pencil ever showed. Those rows now read \u21b3 (no op number) with a pencil beside them, indented like any other operation. The editor was widened to match: it asks for the operation NUMBER first (off the traveller, e.g. 020), refuses a number already used by another plan on the same part and revision, then asks what that operation is (e.g. TURN COMPLETE). Because a gage\u2019s identity is built from part + operation + balloon, giving a plan its op number also CARRIES ITS GAGES AND GAGE DRAWINGS onto the new key rather than orphaning them."] },
   { ts: "2026-07-27", rev: "App Rev-580", type: "App", changes: ["OPERATIONS INDENTED, NAMED, AND THE REV COLUMN EXPLAINED (Rev-580) \u2014 (1) INDENT: operation rows on the Control Plans list are now genuinely indented (34px) under their part header instead of nudged by a single space, so a part and its operations read as parent and children. (2) OP # AND DESCRIPTION: each op row reads \u21b3 OP-020 \u00b7 TURN COMPLETE. A new Op Description field sits beside Op # on the New Control Plan and Add Op forms, taking the wording straight off the traveller. Plans built before this field existed show (no description) with a \u270f\ufe0f beside them \u2014 one tap names the operation and writes it back to the saved plan. (3) REV COLUMN: the header read simply Revision, which was ambiguous \u2014 it holds the CUSTOMER\u2019S PART / DRAWING revision typed on the New Control Plan form, NOT the Control Plan\u2019s own revision (Control Plan revs are the Rev-NN tokens on the .xlsx, per CP-1). The column now reads Part Rev and carries a tooltip saying exactly that."] },
   { ts: "2026-07-27", rev: "App Rev-579", type: "App", changes: ["TRAVELLER WINDOW NOW FILLS THE SCREEN (Rev-579) \u2014 the traveller window was sized max-height 94vh, which only CAPS the height; with the preview capped at 42vh the window shrank to fit its contents and left thick empty bands above and below on a tall monitor. It now CLAIMS the height (98vh) and runs the same fill mode the gage window got at Rev-577, so the preview stretches into everything the window can spare. Widened to 1400px, header bar and footer slimmed, and the backdrop padding cut from 16px to 10px. A full traveller page is now readable without scrolling on a 1080-tall screen."] },
@@ -1885,7 +1886,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:44 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2401,7 +2402,7 @@ function renderProjects(){
     if(p.opNum){
       // Rev-580: operations sit indented under their part, showing the op number AND
       // what that operation actually is off the traveller
-      tdPart.style.paddingLeft = '34px';
+      tdPart.style.cssText = 'padding-left:34px; white-space:nowrap;';
       const b = document.createElement('strong');
       b.textContent = '\u21b3 OP-' + p.opNum;
       b.style.cssText = 'font-weight:800; letter-spacing:.03em;';
@@ -2420,7 +2421,7 @@ function renderProjects(){
     } else {
       // Rev-581: plans made before per-operation plans existed carry no op number at
       // all, so they had nothing to edit and no pencil. They get one here.
-      tdPart.style.paddingLeft = '34px';
+      tdPart.style.cssText = 'padding-left:34px; white-space:nowrap;';
       const b = document.createElement('strong');
       b.textContent = '\u21b3 (no op number)';
       b.style.cssText = 'font-weight:700; color:#a49a8d; letter-spacing:.03em;';
@@ -3669,58 +3670,97 @@ function cpTravellerWire(){
   };
   window._cpTravShow = show;
 }
-// Rev-581: set an operation's NUMBER and DESCRIPTION. Plans built before per-operation
-// plans existed have no op number at all; naming them here also carries their gages and
-// gage drawings over to the new key, which is built from part + op + balloon.
+// Rev-582: set an operation's NUMBER and DESCRIPTION in a proper window rather than
+// two stacked browser prompts. Both fields on screen at once, mandatory-yellow per the
+// Camco UI standards, Enter saves, Esc cancels. Plans built before per-operation plans
+// existed have no op number; naming one also carries its gages and gage drawings over
+// to the new key, which is built from part + operation + balloon.
 function cpSetOpDesc(p){
   const oldOp = String(p.opNum || '');
-  const nOp = prompt('Operation number for ' + (p.partNum || '') + '?\n\nUse the routing number off the traveller, e.g. 020.'
-    + (oldOp ? '' : '\n\nThis plan has none yet. Leave blank to skip.'), oldOp);
-  if(nOp === null) return;
-  const newOp = String(nOp).trim().toUpperCase();
-  let projects = [];
-  try{ projects = JSON.parse(localStorage.getItem('cpProjects') || '[]'); }catch(e){}
-  if(newOp !== oldOp && newOp){
-    const clash = projects.some(x => String(x.partNum||'') === String(p.partNum||'')
-      && String(x.rev||'') === String(p.rev||'') && String(x.opNum||'') === newOp);
-    if(clash){ alert('There is already a plan for ' + (p.partNum||'') + ' OP-' + newOp + '. Pick a different operation number.'); return; }
-  }
-  const v = prompt('What is OP-' + (newOp || '?') + ' on ' + (p.partNum || '') + '?\n\nUse the wording off the traveller, e.g. TURN COMPLETE.',
-    String(p.opDesc || p.operation || ''));
-  if(v === null) return;
-  const desc = v.trim().toUpperCase();
+  const old = document.getElementById('cpOpInfoBg'); if(old) old.remove();
+  const bg = document.createElement('div');
+  bg.id = 'cpOpInfoBg';
+  bg.style.cssText = 'position:fixed; inset:0; z-index:100008; background:rgba(20,15,12,.85); display:flex; align-items:center; justify-content:center; padding:18px;';
+  bg.innerHTML =
+   '<div style="background:#fff; border-radius:10px; width:100%; max-width:560px; overflow:hidden; box-shadow:0 10px 44px rgba(0,0,0,.5);">' +
+    '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.05em; padding:11px 16px; font-size:14px;">OPERATION \u2014 ' + (p.partNum || '') + '</div>' +
+    '<div style="padding:16px;">' +
+      '<div style="font-size:12px; color:#555; line-height:1.5; margin-bottom:14px;">Take both straight off the traveller. ' +
+        (oldOp ? '' : 'This plan has no operation number yet.') + '</div>' +
+      '<div style="display:flex; gap:14px; flex-wrap:wrap;">' +
+        '<div style="flex:0 0 140px;">' +
+          '<label style="display:block; font-size:11px; font-weight:800; letter-spacing:.05em; margin-bottom:4px;">OP #</label>' +
+          '<input id="cpOpInfoNum" placeholder="E.G. 030" style="width:100%; box-sizing:border-box; font-size:15px; font-weight:700; padding:10px; border:2px solid #c9c0b4; border-radius:6px; background:#fafa96;">' +
+        '</div>' +
+        '<div style="flex:1 1 240px; min-width:220px;">' +
+          '<label style="display:block; font-size:11px; font-weight:800; letter-spacing:.05em; margin-bottom:4px;">OP DESCRIPTION</label>' +
+          '<input id="cpOpInfoDesc" placeholder="E.G. TURN COMPLETE" style="width:100%; box-sizing:border-box; font-size:15px; font-weight:700; padding:10px; border:2px solid #c9c0b4; border-radius:6px; background:#fafa96;">' +
+        '</div>' +
+      '</div>' +
+      '<div id="cpOpInfoWarn" style="display:none; font-size:12px; font-weight:700; color:#a11; margin-top:10px;"></div>' +
+    '</div>' +
+    '<div style="background:#f1ede6; padding:11px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid #ddd6cc;">' +
+      '<button id="cpOpInfoCancel" style="padding:8px 18px; font-weight:700; cursor:pointer;">Cancel</button>' +
+      '<button id="cpOpInfoSave" style="padding:8px 24px; font-weight:800; cursor:pointer; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px;">\u2713 Save</button>' +
+    '</div>' +
+   '</div>';
+  document.body.appendChild(bg);
+  const inNum = document.getElementById('cpOpInfoNum'), inDesc = document.getElementById('cpOpInfoDesc');
+  inNum.value = oldOp;
+  inDesc.value = String(p.opDesc || p.operation || '');
+  setTimeout(() => { (oldOp ? inDesc : inNum).focus(); }, 60);
+  const close = () => bg.remove();
+  document.getElementById('cpOpInfoCancel').onclick = close;
+  bg.onclick = (e) => { if(e.target === bg) close(); };
+  const warn = (m) => { const w = document.getElementById('cpOpInfoWarn'); w.textContent = m || ''; w.style.display = m ? 'block' : 'none'; };
 
-  let hit = false;
-  projects.forEach(x => {
-    if(String(x.partNum||'') === String(p.partNum||'') && String(x.rev||'') === String(p.rev||'')
-       && String(x.opNum||'') === oldOp){ x.opNum = newOp; x.opDesc = desc; hit = true; }
-  });
-  if(hit) try{ localStorage.setItem('cpProjects', JSON.stringify(projects)); }catch(e){}
+  document.getElementById('cpOpInfoSave').onclick = () => {
+    const newOp = inNum.value.trim().toUpperCase();
+    const desc = inDesc.value.trim().toUpperCase();
+    let projects = [];
+    try{ projects = JSON.parse(localStorage.getItem('cpProjects') || '[]'); }catch(e){}
+    if(newOp !== oldOp && newOp){
+      const clash = projects.some(x => String(x.partNum||'') === String(p.partNum||'')
+        && String(x.rev||'') === String(p.rev||'') && String(x.opNum||'') === newOp);
+      if(clash){ warn('There is already a plan for ' + (p.partNum||'') + ' OP-' + newOp + '. Pick a different operation number.'); return; }
+    }
+    let hit = false;
+    projects.forEach(x => {
+      if(String(x.partNum||'') === String(p.partNum||'') && String(x.rev||'') === String(p.rev||'')
+         && String(x.opNum||'') === oldOp){ x.opNum = newOp; x.opDesc = desc; hit = true; }
+    });
+    if(hit) try{ localStorage.setItem('cpProjects', JSON.stringify(projects)); }catch(e){}
 
-  // carry any gages (and their drawings) onto the new key
-  if(newOp !== oldOp){
+    // carry any gages (and their drawings) onto the new key
+    if(newOp !== oldOp){
+      try{
+        const map = cpGagesGet(); let moved = 0;
+        Object.keys(map).forEach(k => {
+          const g = map[k];
+          if(!g || String(g.part||'').toUpperCase() !== String(p.partNum||'').toUpperCase()) return;
+          if(String(g.opNum||'') !== oldOp) return;
+          const nk = cpGageKey(g.part, newOp, g.bubble);
+          if(nk === k) return;
+          try{ const d = _idbGetDrawing('GAGE::' + k); if(d && d.odsImage){ _idbPutDrawing('GAGE::' + nk, d.odsImage); _idbDelDrawing('GAGE::' + k); } }catch(e){}
+          g.opNum = newOp; g.key = nk; delete map[k]; map[nk] = g; moved++;
+        });
+        if(moved) cpGagesSet(map);
+      }catch(e){}
+    }
+
     try{
-      const map = cpGagesGet(); let moved = 0;
-      Object.keys(map).forEach(k => {
-        const g = map[k];
-        if(!g || String(g.part||'').toUpperCase() !== String(p.partNum||'').toUpperCase()) return;
-        if(String(g.opNum||'') !== oldOp) return;
-        const nk = cpGageKey(g.part, newOp, g.bubble);
-        if(nk === k) return;
-        try{ const d = _idbGetDrawing('GAGE::' + k); if(d && d.odsImage){ _idbPutDrawing('GAGE::' + nk, d.odsImage); _idbDelDrawing('GAGE::' + k); } }catch(e){}
-        g.opNum = newOp; g.key = nk; delete map[k]; map[nk] = g; moved++;
-      });
-      if(moved) cpGagesSet(map);
+      if(cpBuildState && String(cpBuildState.partNum||'') === String(p.partNum||'')
+         && String(cpBuildState.opNum||'') === oldOp){ cpBuildState.opNum = newOp; cpBuildState.opDesc = desc; }
     }catch(e){}
-  }
-
-  try{
-    if(cpBuildState && String(cpBuildState.partNum||'') === String(p.partNum||'')
-       && String(cpBuildState.opNum||'') === oldOp){ cpBuildState.opNum = newOp; cpBuildState.opDesc = desc; }
-  }catch(e){}
-  p.opNum = newOp; p.opDesc = desc;
-  renderProjects();
-  flash(newOp ? ('\u2713 OP-' + newOp + (desc ? ' \u00b7 ' + desc : '')) : (desc ? ('\u2713 ' + desc) : 'Updated.'));
+    p.opNum = newOp; p.opDesc = desc;
+    close();
+    renderProjects();
+    flash(newOp ? ('\u2713 OP-' + newOp + (desc ? ' \u00b7 ' + desc : '')) : (desc ? ('\u2713 ' + desc) : 'Updated.'));
+  };
+  bg.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){ e.preventDefault(); close(); }
+    if(e.key === 'Enter'){ e.preventDefault(); document.getElementById('cpOpInfoSave').click(); }
+  });
 }
 function cpAddOpToPart(partNum){
   window._cpTravWaive = String(partNum || '');   // the part exists — never re-ask for its traveller
