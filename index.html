@@ -1412,7 +1412,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-578";
+const APP_REV = "Rev-579";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1426,6 +1426,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-579", type: "App", changes: ["TRAVELLER WINDOW NOW FILLS THE SCREEN (Rev-579) \u2014 the traveller window was sized max-height 94vh, which only CAPS the height; with the preview capped at 42vh the window shrank to fit its contents and left thick empty bands above and below on a tall monitor. It now CLAIMS the height (98vh) and runs the same fill mode the gage window got at Rev-577, so the preview stretches into everything the window can spare. Widened to 1400px, header bar and footer slimmed, and the backdrop padding cut from 16px to 10px. A full traveller page is now readable without scrolling on a 1080-tall screen."] },
   { ts: "2026-07-27", rev: "App Rev-578", type: "App", changes: ["NUDGE STEP NOW DEFAULTS TO 2 PX (Rev-578) \u2014 the step selector opened on 10 px, which overshoots when lining up two traveller pages; it now opens on 2 px, and the code fallback used before the selector renders matches. The selector also got a minimum width and breathing room after the px label \u2014 it was crowding the Reset nudges button. Small correction alongside: the status line said \u20181 page(s) loaded\u2019 after a second page went in because it was counting what that drop added rather than the total; it now reports every page loaded, matching the PAGE(S) count beside it."] },
   { ts: "2026-07-27", rev: "App Rev-577", type: "App", changes: ["THE DRAWING GETS THE ROOM (Rev-577) \u2014 the Special Gage window was spending most of its height on instructions while the drawing sat in a letterbox. Rebuilt as a full-height panel (94vh, widened to 1150px) where every fixed part is squeezed and the PREVIEW TAKES ALL THE REMAINING SPACE: the feature line and the writing prompt folded into one sentence, the text box dropped to three rows (still draggable if you want more), the section heading and footer tightened. The drop box now COLLAPSES once a page is loaded \u2014 the instructions have done their job by then, so it shrinks to a one-line \u2b06 ADD ANOTHER PAGE strip and hands the height to the drawing; remove the page and the full instructions come back. New fill mode on the capture panel makes the preview stretch to whatever the surrounding window can spare instead of a fixed 34vh box."] },
   { ts: "2026-07-27", rev: "App Rev-576", type: "App", changes: ["ONE SCREEN \u2014 THE GAGE UPLOADER MOVED INTO THE WRITING BOX (Rev-576) \u2014 attaching a gage drawing no longer opens a second window. The capture engine was made mountable, and it is now embedded directly in the GAGE DRAWING section of the Special Gage / Fixture box: drop area, page thumbnails and live preview all sit under the text, in the same window, with one \u2713 Save that writes the wording and the drawing together. Browse, drag-drop, or Ctrl+V; any PDF including a Chrome PDF Document, every page. The window widened to 900px and scrolls. CLUTTER CONTROL: the joining controls (layout, trim overlap, background, \ud83e\uddf5 Sew, Undo) and the whole nudge bar now appear ONLY when two or more pages are loaded \u2014 a single-page drawing shows just the drop box, the thumbnail and the preview. Zoom \u2212 / FIT / 100% / + appears once any page is loaded. Clear wipes the wording only and says so; the drawing survives. Saving with no pages loaded removes any drawing that was there. The traveller keeps its own full window \u2014 same engine, now wrapped rather than duplicated."] },
@@ -1877,7 +1878,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:24 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:28 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4011,17 +4012,19 @@ async function cpImageStudio(opts){
   _cptvPart = String(o.title || '');
   const bg = document.createElement('div');
   bg.id = 'cptvBg';
-  bg.style.cssText = 'position:fixed; inset:0; z-index:100010; background:rgba(20,15,12,.9); display:flex; align-items:center; justify-content:center; padding:16px;';
+  bg.style.cssText = 'position:fixed; inset:0; z-index:100010; background:rgba(20,15,12,.9); display:flex; align-items:center; justify-content:center; padding:10px;';
   bg.innerHTML =
-   '<div style="background:#efe9df; border-radius:10px; width:100%; max-width:1180px; max-height:94vh; display:flex; flex-direction:column; overflow:hidden;">' +
-    '<div style="background:#7a1a1c; color:#fff; font-weight:800; letter-spacing:.06em; padding:10px 16px; font-size:14px;">' + String(o.title || 'UPLOAD') + '</div>' +
-    '<div id="cptvBody" style="padding:14px 16px; overflow:auto;"></div>' +
-    '<div style="background:#e5ddd1; padding:10px 16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; border-top:1px solid #c9c0b4;">' +
+   // Rev-579: the window now CLAIMS the height instead of shrinking to its contents
+   '<div style="background:#efe9df; border-radius:10px; width:100%; max-width:1400px; height:98vh; display:flex; flex-direction:column; overflow:hidden;">' +
+    '<div style="background:#7a1a1c; color:#fff; font-weight:800; letter-spacing:.06em; padding:8px 16px; font-size:13px;">' + String(o.title || 'UPLOAD') + '</div>' +
+    '<div id="cptvBody" style="padding:10px 14px; flex:1 1 auto; min-height:0; display:flex; flex-direction:column;"></div>' +
+    '<div style="background:#e5ddd1; padding:8px 14px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; border-top:1px solid #c9c0b4; flex:0 0 auto;">' +
       '<button id="cptvCancel" style="padding:8px 18px; font-weight:700; cursor:pointer;">Cancel</button>' +
       '<button id="cptvSave" style="padding:8px 22px; font-weight:800; cursor:pointer; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px;">\u2713 ' + String(o.saveLabel || 'Save') + '</button>' +
     '</div>' +
    '</div>';
   document.body.appendChild(bg);
+  o.fill = true;                              // Rev-579: preview takes every spare pixel
   const file = cpImageStudioInline(document.getElementById('cptvBody'), o);
   document.getElementById('cptvCancel').onclick = _cptvClose;
   document.getElementById('cptvSave').onclick = async () => {
