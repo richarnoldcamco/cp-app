@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-559</title>
+<title>CONTROL PLAN GENERATOR - Rev-560</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-559 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 10:07 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-560 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 10:23 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1364,7 +1364,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-559";
+const APP_REV = "Rev-560";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1378,6 +1378,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-560", type: "App", changes: ["\ud83d\udce4 CUSTOMER CP IS NOW AN IN-APP EDITABLE SCREEN (Rev-559 \u2192 Rev-560) \u2014 clicking \ud83d\udce4 Customer CP no longer downloads instantly. It opens a full-screen editor that LOOKS like the submitted L3Harris sheet: full title block, light-blue header band, rotated Classification, all feature rows \u2014 and EVERY CELL IS EDITABLE (click and type: fill Part/Dwg Revision, Family Name, fix any description, size, frequency\u2026). Edits save onto the plan automatically on Close or Download (p.custCP, synced to GitHub with everything else) so the screen reopens exactly as you left it. \u2b07 Download .xlsx builds the file from the edited screen. The dead H/I title-block column from the first export was also removed."] },
   { ts: "2026-07-27", rev: "App Rev-559", type: "App", changes: ["\ud83d\udce4 CUSTOMER CP EXPORT \u2014 new purple \ud83d\udce4 Customer CP button on every Control Plans row builds the L3HARRIS LEGACY-FORMAT Control Plan .xlsx for customer submittal, entirely on this device (ExcelJS loaded on demand from cdnjs; no data leaves the machine). Layout mirrors the submitted 1000222892 example: full title block (Company/ITAR Export Control/Control Plan Number L3H_<part>_CP/dates original+revised/approval blocks, Process Owner SARAH ETZL, team R. ARNOLD, M. BROWN, R. SHEDDEN, T. HANNON), light-blue header band, rotated Classification, and per-row mapping: Reference = FAI ITEM <bubble>, Product = feature description, Process = MEASURE, Spec/Tol, Evaluation Measurement Technique = machinist method, Size = # recorded, Frequency = FREQ(EVERY), Control Method = INSPECTION, Reaction Plan (CW843-1 default). Op number/description/machine print on the first row of each operation only. File saves as L3H_<part>_CP.xlsx. FIRST-EXPORT REVIEW REQUIRED: Part/Dwg Revision and Family Name cells are left blank (not stored in the app yet) \u2014 fill in Excel before sending, and report any column that should map differently."] },
   { ts: "2026-07-27", rev: "App Rev-558", type: "App", changes: ["TOLERANCE LINE REMOVED FROM THE FEATURE SCREEN (embedded validation REV-155 \u2192 REV-156) \u2014 the \u2018Tolerance .6040 / .6035\u2019 text under the gage name duplicated the LOW / HIGH cards right below it and is gone. The CMM-method note that shared that line still shows when a feature has one."] },
   { ts: "2026-07-27", rev: "App Rev-557", type: "App", changes: ["FRESHLY DRAWN WHITE-OUTS ARE ACTIVE ON RELEASE (embedded validation REV-154 \u2192 REV-155) \u2014 draw a white-out box and, the moment the mouse button is released, it is already SELECTED (red dashed outline, edge grips ready) \u2014 arrows nudge and edges click immediately, no second click needed. Draw \u2192 trim \u2192 Enter to accept \u2192 draw the next."] },
@@ -1810,7 +1811,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:07 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:23 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2992,17 +2993,133 @@ function renameProject(idx){
   flash('✏️ Renamed to ' + partClean + ' ' + revClean + ' — one plan, no duplicate.');
 }
 
-// Rev-559: CUSTOMER CONTROL PLAN EXPORT — builds the L3Harris legacy-format .xlsx
-// (title block w/ Export Control + approvals, FAI ITEM references, INSPECTION control
-// method) from a saved plan's rows, entirely on-device via ExcelJS (loaded on demand).
+// Rev-560: CUSTOMER CONTROL PLAN — in-app editable screen in the L3Harris legacy format.
+// Opens a full-screen editor that LOOKS like the submitted sheet; every cell is editable;
+// edits save onto the project (p.custCP, synced like everything else); Download builds the
+// .xlsx from the edited screen via ExcelJS (on-demand, on-device).
+function cpCustBuildModel(p){
+  if(p.custCP && p.custCP.rows && p.custCP.rows.length) return JSON.parse(JSON.stringify(p.custCP));
+  const bs = p.builderState || {};
+  const rows = (bs.rows && bs.rows.length ? bs.rows : (bs.state && bs.state.rows)) || [];
+  const today = new Date();
+  const fmtD = (d) => (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear();
+  const created = p.created ? new Date(p.created) : today;
+  let lastStep = null;
+  return {
+    tb: {
+      cpNum: 'L3H_' + String(p.partNum||'') + '_CP',
+      dateOrig: fmtD(created), dateRev: fmtD(today),
+      partNum: String(p.partNum||''), dwgRev: '', family: '', program: 'N/A',
+      owner: 'SARAH ETZL, CUSTOMER COORDINATOR   sarah.etzl@camcomfginc.com',
+      team: 'R. ARNOLD, M. BROWN, R. SHEDDEN, T. HANNON',
+      engApp: 'N/A', qualApp: 'N/A', otherApp: 'N/A'
+    },
+    rows: rows.map((row, ri) => {
+      const step = String(row.processStep || '');
+      const first = step && step !== lastStep; if(first) lastStep = step;
+      return {
+        doc: String(row.docLine || (ri+1)),
+        step: first ? step : '',
+        desc: first ? String(row.process || '') : '',
+        machine: first ? String(row.machineTools || '') : '',
+        ref: row.bubble ? ('FAI ITEM ' + String(row.bubble)) : '',
+        product: String(row.featureDesc || ''),
+        process: 'MEASURE',
+        cls: String(row.classification || ''),
+        spec: String(row.spec || ((row.upperLimit||row.lowerLimit) ? (String(row.upperLimit||'') + (row.lowerLimit?'/'+row.lowerLimit:'')) : '')),
+        tech: String(row.measMethod || ''),
+        size: String(row.numRecorded || ''),
+        freq: String(row.freqEvery || ''),
+        method: 'INSPECTION',
+        reaction: String(row.reactionPlan || 'FOLLOW SHOP NON-CONFORMING PARTS FLOW CHART (CW843-1).')
+      };
+    })
+  };
+}
+function cpCustReadModelFromDom(){
+  const g = (id) => { const el = document.getElementById(id); return el ? el.innerText.trim() : ''; };
+  const model = { tb: {
+    cpNum: g('ccTbCpNum'), dateOrig: g('ccTbDateOrig'), dateRev: g('ccTbDateRev'),
+    partNum: g('ccTbPart'), dwgRev: g('ccTbDwgRev'), family: g('ccTbFamily'), program: g('ccTbProgram'),
+    owner: g('ccTbOwner'), team: g('ccTbTeam'), engApp: g('ccTbEng'), qualApp: g('ccTbQual'), otherApp: g('ccTbOther')
+  }, rows: [] };
+  document.querySelectorAll('#ccRows tr').forEach(tr => {
+    const c = tr.querySelectorAll('td[contenteditable]');
+    if(c.length < 14) return;
+    model.rows.push({ doc:c[0].innerText.trim(), step:c[1].innerText.trim(), desc:c[2].innerText.trim(),
+      machine:c[3].innerText.trim(), ref:c[4].innerText.trim(), product:c[5].innerText.trim(),
+      process:c[6].innerText.trim(), cls:c[7].innerText.trim(), spec:c[8].innerText.trim(),
+      tech:c[9].innerText.trim(), size:c[10].innerText.trim(), freq:c[11].innerText.trim(),
+      method:c[12].innerText.trim(), reaction:c[13].innerText.trim() });
+  });
+  return model;
+}
+function cpCustSave(idx){
+  try{
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    if(!projects[idx]) return;
+    projects[idx].custCP = cpCustReadModelFromDom();
+    projects[idx].updatedAt = new Date().toISOString();
+    localStorage.setItem('cpProjects', JSON.stringify(projects));
+    try{ if(typeof ghAutoSyncPush === 'function') ghAutoSyncPush(); }catch(_){ }
+  }catch(e){}
+}
 async function cpCustomerExport(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   const p = projects[idx];
   if(!p || !p.builderState){ alert('This plan has no editable data to export.'); return; }
-  const bs = p.builderState || {};
-  const rows = (bs.rows && bs.rows.length ? bs.rows : (bs.state && bs.state.rows)) || [];
-  if(!rows.length){ alert('This plan has no feature rows yet.'); return; }
-  flash('Building customer Control Plan\u2026');
+  const m = cpCustBuildModel(p);
+  const old = document.getElementById('ccPanel'); if(old) old.remove();
+  const panel = document.createElement('div');
+  panel.id = 'ccPanel';
+  panel.style.cssText = 'position:fixed; inset:0; z-index:100002; background:#fff; display:flex; flex-direction:column; font-family:Arial,system-ui;';
+  const ed = 'contenteditable="true" style="outline:none; min-height:16px;"';
+  const lab = 'background:#fff; font:9pt Arial; padding:2px 5px; border:1px solid #000;';
+  const valS = 'background:#fff; font:bold 9pt Arial; padding:2px 5px; border:1px solid #000;';
+  const rowsHtml = m.rows.map(r => '<tr>' + [r.doc,r.step,r.desc,r.machine,r.ref,r.product,r.process,r.cls,r.spec,r.tech,r.size,r.freq,r.method,r.reaction]
+    .map(v => '<td contenteditable="true" style="border:1px solid #000; padding:4px; text-align:center; vertical-align:middle; font:9pt Arial; min-width:34px;">' + String(v||'').replace(/</g,'&lt;') + '</td>').join('') + '</tr>').join('');
+  const heads = ['Doc (Line) #','Process Step','Process Description','Machine, Device, Jig, Tools For Mfg.','Reference','Product','Process','Classification','Product / Process Specification/ Tolerance','Evaluation Measurement Technique','Size','Frequency','Control Method','Reaction Plan'];
+  panel.innerHTML =
+    '<div style="flex:none; display:flex; align-items:center; gap:10px; padding:10px 14px; background:#7a1a1c; color:#fff;">' +
+      '<b style="font-size:15px; letter-spacing:.05em;">CUSTOMER CONTROL PLAN \u2014 ' + String(p.partNum||'') + '</b>' +
+      '<span style="font-size:12px; opacity:.85;">every cell is editable \u00b7 edits save to this plan automatically</span>' +
+      '<span style="flex:1"></span>' +
+      '<button id="ccDl" style="background:#1e7e34; color:#fff; border:0; border-radius:8px; padding:10px 22px; font-weight:800; font-size:14px; cursor:pointer;">\u2b07 Download .xlsx</button>' +
+      '<button id="ccClose" style="background:#fff; color:#7a1414; border:2px solid #fff; border-radius:8px; padding:8px 18px; font-weight:800; font-size:14px; cursor:pointer;">\u2715 Close</button>' +
+    '</div>' +
+    '<div style="flex:1; overflow:auto; padding:14px;">' +
+      '<div style="min-width:1400px;">' +
+      '<table style="border-collapse:collapse; width:100%; margin-bottom:0;"><tr>' +
+        '<td colspan="4" style="' + valS + ' font-size:13pt;">Control Plan</td><td colspan="10" style="border:1px solid #000;"></td></tr>' +
+      '<tr><td colspan="2" style="' + lab + ' text-align:center;">Pre-Production</td><td colspan="2" style="' + valS + ' text-align:center;">Production</td><td colspan="10" style="border:1px solid #000;"></td></tr>' +
+      '<tr><td colspan="4" style="' + lab + '">Company/Organization Name:</td><td colspan="3" style="' + lab + '">Export Control Classification:</td><td colspan="2" style="' + lab + '">Control Plan Number &amp; Revision:</td><td colspan="2" style="' + lab + '">Date (Original):</td><td colspan="3" style="' + lab + '">Date (Revised):</td></tr>' +
+      '<tr><td colspan="4" style="' + valS + '">CAMCO MANUFACTURING, INC</td><td colspan="3" style="' + valS + '">ITAR</td><td colspan="2" style="' + valS + '" id="ccTbCpNum" ' + ed + '>' + m.tb.cpNum + '</td><td colspan="2" style="' + valS + '" id="ccTbDateOrig" ' + ed + '>' + m.tb.dateOrig + '</td><td colspan="3" style="' + valS + '" id="ccTbDateRev" ' + ed + '>' + m.tb.dateRev + '</td></tr>' +
+      '<tr><td colspan="4" style="' + lab + '">Company/Organization Location:</td><td colspan="3" style="' + lab + '">Other Restrictions:</td><td colspan="2" style="border:1px solid #000;"></td><td colspan="5" style="' + lab + '">Customer Engineering Approval/Date (If Required):</td></tr>' +
+      '<tr><td colspan="4" style="' + valS + '">317 SOUTH THOMAS AVE, SAYRE, PA  18840</td><td colspan="3" style="' + valS + '">N/A</td><td colspan="2" style="border:1px solid #000;"></td><td colspan="5" style="' + valS + '" id="ccTbEng" ' + ed + '>' + m.tb.engApp + '</td></tr>' +
+      '<tr><td colspan="4" style="' + lab + '">Part/Dwg Number:</td><td colspan="3" style="' + lab + '">Program/Project:</td><td colspan="2" style="border:1px solid #000;"></td><td colspan="5" style="' + lab + '">Customer Quality Approval/Date (If Required):</td></tr>' +
+      '<tr><td colspan="4" style="' + valS + '" id="ccTbPart" ' + ed + '>' + m.tb.partNum + '</td><td colspan="3" style="' + valS + '" id="ccTbProgram" ' + ed + '>' + m.tb.program + '</td><td colspan="2" style="border:1px solid #000;"></td><td colspan="5" style="' + valS + '" id="ccTbQual" ' + ed + '>' + m.tb.qualApp + '</td></tr>' +
+      '<tr><td colspan="4" style="' + lab + '">Part/Dwg Revision:</td><td colspan="3" style="' + lab + '">Process Owner Name &amp; E-mail:</td><td colspan="2" style="border:1px solid #000;"></td><td colspan="5" style="' + lab + '">Other Approval/Date (If Required):</td></tr>' +
+      '<tr><td colspan="4" style="' + valS + '" id="ccTbDwgRev" ' + ed + '>' + m.tb.dwgRev + '</td><td colspan="3" style="' + valS + '" id="ccTbOwner" ' + ed + '>' + m.tb.owner + '</td><td colspan="2" style="border:1px solid #000;"></td><td colspan="5" style="' + valS + '" id="ccTbOther" ' + ed + '>' + m.tb.otherApp + '</td></tr>' +
+      '<tr><td colspan="4" style="' + lab + '">Part/Dwg or Family Name:</td><td colspan="3" style="' + lab + '">Cross Functional Team Members:</td><td colspan="2" style="border:1px solid #000;"></td><td colspan="5" style="border:1px solid #000;"></td></tr>' +
+      '<tr><td colspan="4" style="' + valS + '" id="ccTbFamily" ' + ed + '>' + m.tb.family + '</td><td colspan="3" style="' + valS + '" id="ccTbTeam" ' + ed + '>' + m.tb.team + '</td><td colspan="2" style="border:1px solid #000;"></td><td colspan="5" style="border:1px solid #000;"></td></tr>' +
+      '</table>' +
+      '<table style="border-collapse:collapse; width:100%;"><thead><tr>' +
+        heads.map(function(h, hi){
+          const rot = hi===7 ? ' writing-mode:vertical-rl; transform:rotate(180deg); max-width:26px;' : '';
+          return '<th style="border:1px solid #000; background:#9DC3E6; font:bold 9pt Arial; padding:6px 4px; text-align:center; vertical-align:middle;' + rot + '">' + h + '</th>';
+        }).join('') +
+      '</tr></thead><tbody id="ccRows">' + rowsHtml + '</tbody></table>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(panel);
+  document.getElementById('ccClose').onclick = function(){ cpCustSave(idx); panel.remove(); flash('Customer Control Plan saved'); };
+  document.getElementById('ccDl').onclick = function(){ cpCustSave(idx); cpCustXlsx(idx); };
+}
+async function cpCustXlsx(idx){
+  const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+  const p = projects[idx]; if(!p) return;
+  const m = p.custCP || cpCustBuildModel(p);
+  flash('Building the .xlsx\u2026');
   if(typeof ExcelJS === 'undefined'){
     await new Promise((res, rej) => {
       const s = document.createElement('script');
@@ -3017,82 +3134,38 @@ async function cpCustomerExport(idx){
     const ws = wb.addWorksheet('Control Plan', { views:[{ state:'frozen', ySplit:13 }] });
     const BLUE = 'FF9DC3E6', thin = { style:'thin', color:{argb:'FF000000'} };
     const allB = { top:thin, left:thin, bottom:thin, right:thin };
-    const COLS = 14;
-    ws.columns = [
-      { width:7 },{ width:9 },{ width:22 },{ width:14 },{ width:12 },{ width:15 },{ width:11 },
-      { width:5 },{ width:20 },{ width:20 },{ width:12 },{ width:13 },{ width:16 },{ width:30 }
-    ];
-    const put = (cellRef, v, opt) => {
-      const c = ws.getCell(cellRef); c.value = v;
-      c.font = Object.assign({ name:'Arial', size:9 }, (opt&&opt.font)||{});
-      c.alignment = Object.assign({ vertical:'middle', wrapText:true }, (opt&&opt.align)||{});
-      if(opt && opt.fill) c.fill = { type:'pattern', pattern:'solid', fgColor:{argb:opt.fill} };
-      c.border = allB;
-      return c;
-    };
-    const today = new Date();
-    const fmtD = (d) => (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear();
-    const created = p.created ? new Date(p.created) : today;
-    // ---- Title block ----
-    ws.mergeCells('A1:C1'); put('A1', 'Control Plan', { font:{ bold:true, size:13 } });
-    ws.mergeCells('D1:N1'); put('D1', '');
-    ws.mergeCells('A2:B2'); put('A2', 'Pre-Production', { align:{ horizontal:'center' } });
-    ws.mergeCells('C2:D2'); put('C2', 'Production', { align:{ horizontal:'center' }, font:{ bold:true } });
-    ws.mergeCells('E2:N2'); put('E2', '');
-    const band = (r, cells) => cells.forEach(cc => {
-      ws.mergeCells(cc[0]); put(cc[0].split(':')[0], cc[1], { font:{ bold: !!cc[2] } });
-    });
-    band(3, [['A3:D3','Company/Organization Name:'],['E3:G3','Export Control Classification:'],['H3:I3','Control Plan Number & Revision:'],['J3:K3','Date (Original):'],['L3:N3','Date (Revised):']]);
-    band(4, [['A4:D4','CAMCO MANUFACTURING, INC',1],['E4:G4','ITAR',1],['H4:I4','L3H_' + String(p.partNum||'') + '_CP',1],['J4:K4', fmtD(created),1],['L4:N4', fmtD(today),1]]);
-    band(5, [['A5:D5','Company/Organization Location:'],['E5:G5','Other Restrictions:'],['H5:I5',''],['J5:N5','Customer Engineering Approval/Date (If Required):']]);
-    band(6, [['A6:D6','317 SOUTH THOMAS AVE, SAYRE, PA  18840',1],['E6:G6','N/A',1],['H6:I6',''],['J6:N6','N/A',1]]);
-    band(7, [['A7:D7','Part/Dwg Number:'],['E7:G7','Program/Project:'],['H7:I7',''],['J7:N7','Customer Quality Approval/Date (If Required):']]);
-    band(8, [['A8:D8', String(p.partNum||''),1],['E8:G8','N/A',1],['H8:I8',''],['J8:N8','N/A',1]]);
-    band(9, [['A9:D9','Part/Dwg Revision:'],['E9:G9','Process Owner Name & E-mail:'],['H9:I9',''],['J9:N9','Other Approval/Date (If Required):']]);
-    band(10,[['A10:D10','',1],['E10:G10','SARAH ETZL, CUSTOMER COORDINATOR   sarah.etzl@camcomfginc.com',1],['H10:I10',''],['J10:N10','N/A',1]]);
-    band(11,[['A11:D11','Part/Dwg or Family Name:'],['E11:G11','Cross Functional Team Members:'],['H11:I11',''],['J11:N11','']]);
-    band(12,[['A12:D12','',1],['E12:G12','R. ARNOLD, M. BROWN, R. SHEDDEN, T. HANNON',1],['H12:I12',''],['J12:N12','']]);
-    // ---- Column header row (13) ----
+    ws.columns = [{width:7},{width:9},{width:22},{width:14},{width:12},{width:15},{width:11},{width:5},{width:20},{width:20},{width:12},{width:13},{width:16},{width:30}];
+    const put = (ref, v, bold, size) => { const c = ws.getCell(ref);
+      c.value = v; c.font = { name:'Arial', size:size||9, bold:!!bold };
+      c.alignment = { vertical:'middle', wrapText:true }; c.border = allB; };
+    const band = (cells) => cells.forEach(cc => { ws.mergeCells(cc[0]); put(cc[0].split(':')[0], cc[1], cc[2], cc[3]); });
+    band([['A1:C1','Control Plan',1,13],['D1:N1','']]);
+    band([['A2:B2','Pre-Production'],['C2:D2','Production',1],['E2:N2','']]);
+    band([['A3:D3','Company/Organization Name:'],['E3:G3','Export Control Classification:'],['H3:I3','Control Plan Number & Revision:'],['J3:K3','Date (Original):'],['L3:N3','Date (Revised):']]);
+    band([['A4:D4','CAMCO MANUFACTURING, INC',1],['E4:G4','ITAR',1],['H4:I4', m.tb.cpNum,1],['J4:K4', m.tb.dateOrig,1],['L4:N4', m.tb.dateRev,1]]);
+    band([['A5:D5','Company/Organization Location:'],['E5:G5','Other Restrictions:'],['H5:I5',''],['J5:N5','Customer Engineering Approval/Date (If Required):']]);
+    band([['A6:D6','317 SOUTH THOMAS AVE, SAYRE, PA  18840',1],['E6:G6','N/A',1],['H6:I6',''],['J6:N6', m.tb.engApp,1]]);
+    band([['A7:D7','Part/Dwg Number:'],['E7:G7','Program/Project:'],['H7:I7',''],['J7:N7','Customer Quality Approval/Date (If Required):']]);
+    band([['A8:D8', m.tb.partNum,1],['E8:G8', m.tb.program,1],['H8:I8',''],['J8:N8', m.tb.qualApp,1]]);
+    band([['A9:D9','Part/Dwg Revision:'],['E9:G9','Process Owner Name & E-mail:'],['H9:I9',''],['J9:N9','Other Approval/Date (If Required):']]);
+    band([['A10:D10', m.tb.dwgRev,1],['E10:G10', m.tb.owner,1],['H10:I10',''],['J10:N10', m.tb.otherApp,1]]);
+    band([['A11:D11','Part/Dwg or Family Name:'],['E11:G11','Cross Functional Team Members:'],['H11:I11',''],['J11:N11','']]);
+    band([['A12:D12', m.tb.family,1],['E12:G12', m.tb.team,1],['H12:I12',''],['J12:N12','']]);
     const heads = ['Doc (Line) #','Process Step','Process Description','Machine, Device, Jig, Tools For Mfg.','Reference','Product','Process','Classification','Product / Process Specification/ Tolerance','Evaluation Measurement Technique','Size','Frequency','Control Method','Reaction Plan'];
-    heads.forEach((h, ci) => {
-      const c = ws.getCell(13, ci+1); c.value = h;
-      c.font = { name:'Arial', size:9, bold:true };
+    heads.forEach((h, ci) => { const c = ws.getCell(13, ci+1);
+      c.value = h; c.font = { name:'Arial', size:9, bold:true };
       c.alignment = { vertical:'middle', horizontal:'center', wrapText:true };
-      c.fill = { type:'pattern', pattern:'solid', fgColor:{argb:BLUE} };
-      c.border = allB;
-    });
+      c.fill = { type:'pattern', pattern:'solid', fgColor:{argb:BLUE} }; c.border = allB; });
     ws.getRow(13).height = 44;
     ws.getCell(13, 8).alignment = { vertical:'middle', horizontal:'center', wrapText:true, textRotation:90 };
-    // ---- Data rows ----
-    let r = 14, lastStep = null;
-    rows.forEach((row, ri) => {
-      const step = String(row.processStep || '');
-      const firstOfOp = step && step !== lastStep;
-      const vals = [
-        String(row.docLine || (ri+1)),
-        firstOfOp ? step : '',
-        firstOfOp ? String(row.process || '') : '',
-        firstOfOp ? String(row.machineTools || '') : '',
-        row.bubble ? ('FAI ITEM ' + String(row.bubble)) : '',
-        String(row.featureDesc || ''),
-        'MEASURE',
-        String(row.classification || ''),
-        String(row.spec || ((row.upperLimit||row.lowerLimit) ? (String(row.upperLimit||'') + (row.lowerLimit?'/'+row.lowerLimit:'')) : '')),
-        String(row.measMethod || ''),
-        String(row.numRecorded || ''),
-        String(row.freqEvery || ''),
-        'INSPECTION',
-        String(row.reactionPlan || 'FOLLOW SHOP NON-CONFORMING PARTS FLOW CHART (CW843-1).')
-      ];
-      vals.forEach((v, ci) => {
-        const c = ws.getCell(r, ci+1); c.value = String(v).toUpperCase();
+    let r = 14;
+    (m.rows||[]).forEach(row => {
+      [row.doc,row.step,row.desc,row.machine,row.ref,row.product,row.process,row.cls,row.spec,row.tech,row.size,row.freq,row.method,row.reaction].forEach((v, ci) => {
+        const c = ws.getCell(r, ci+1); c.value = String(v||'').toUpperCase();
         c.font = { name:'Arial', size:9 };
-        c.alignment = { vertical:'middle', horizontal:'center', wrapText:true };
-        c.border = allB;
+        c.alignment = { vertical:'middle', horizontal:'center', wrapText:true }; c.border = allB;
       });
-      ws.getRow(r).height = 30;
-      if(firstOfOp) lastStep = step;
-      r++;
+      ws.getRow(r).height = 30; r++;
     });
     const buf = await wb.xlsx.writeBuffer();
     const blob = new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -3102,9 +3175,7 @@ async function cpCustomerExport(idx){
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     flash('Customer Control Plan downloaded \u2014 review before submittal');
-  }catch(e){
-    alert('Customer CP export failed: ' + (e && e.message || e));
-  }
+  }catch(e){ alert('Customer CP export failed: ' + (e && e.message || e)); }
 }
 async function downloadProject(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
