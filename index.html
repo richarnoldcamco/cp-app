@@ -1412,7 +1412,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-577";
+const APP_REV = "Rev-578";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1426,6 +1426,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-578", type: "App", changes: ["NUDGE STEP NOW DEFAULTS TO 2 PX (Rev-578) \u2014 the step selector opened on 10 px, which overshoots when lining up two traveller pages; it now opens on 2 px, and the code fallback used before the selector renders matches. The selector also got a minimum width and breathing room after the px label \u2014 it was crowding the Reset nudges button. Small correction alongside: the status line said \u20181 page(s) loaded\u2019 after a second page went in because it was counting what that drop added rather than the total; it now reports every page loaded, matching the PAGE(S) count beside it."] },
   { ts: "2026-07-27", rev: "App Rev-577", type: "App", changes: ["THE DRAWING GETS THE ROOM (Rev-577) \u2014 the Special Gage window was spending most of its height on instructions while the drawing sat in a letterbox. Rebuilt as a full-height panel (94vh, widened to 1150px) where every fixed part is squeezed and the PREVIEW TAKES ALL THE REMAINING SPACE: the feature line and the writing prompt folded into one sentence, the text box dropped to three rows (still draggable if you want more), the section heading and footer tightened. The drop box now COLLAPSES once a page is loaded \u2014 the instructions have done their job by then, so it shrinks to a one-line \u2b06 ADD ANOTHER PAGE strip and hands the height to the drawing; remove the page and the full instructions come back. New fill mode on the capture panel makes the preview stretch to whatever the surrounding window can spare instead of a fixed 34vh box."] },
   { ts: "2026-07-27", rev: "App Rev-576", type: "App", changes: ["ONE SCREEN \u2014 THE GAGE UPLOADER MOVED INTO THE WRITING BOX (Rev-576) \u2014 attaching a gage drawing no longer opens a second window. The capture engine was made mountable, and it is now embedded directly in the GAGE DRAWING section of the Special Gage / Fixture box: drop area, page thumbnails and live preview all sit under the text, in the same window, with one \u2713 Save that writes the wording and the drawing together. Browse, drag-drop, or Ctrl+V; any PDF including a Chrome PDF Document, every page. The window widened to 900px and scrolls. CLUTTER CONTROL: the joining controls (layout, trim overlap, background, \ud83e\uddf5 Sew, Undo) and the whole nudge bar now appear ONLY when two or more pages are loaded \u2014 a single-page drawing shows just the drop box, the thumbnail and the preview. Zoom \u2212 / FIT / 100% / + appears once any page is loaded. Clear wipes the wording only and says so; the drawing survives. Saving with no pages loaded removes any drawing that was there. The traveller keeps its own full window \u2014 same engine, now wrapped rather than duplicated."] },
   { ts: "2026-07-27", rev: "App Rev-575", type: "App", changes: ["UPLOAD THE GAGE DRAWING FROM THE CONTROL PLAN ROW (Rev-575) \u2014 the Special Gage / Fixture writing box now carries a GAGE DRAWING section under the text, so a drawing can be attached at the moment the gage is written instead of going to the Gages To Be Made list afterwards. \ud83d\udcc4 Upload drawing opens the shared capture studio: browse, drag-drop, or Ctrl+V; any PDF including a Chrome PDF Document, with every page loaded; sew and nudge for multi-sheet designs. An attached drawing shows as a thumbnail (click to view full size) with \u2b06 Replace drawing and \u2715 Remove drawing beside it. The drawing is keyed to the balloon with the same PART::OPnnn::Bnn key the gage list uses, so it can be attached BEFORE the description is saved and still lands on the right gage. Two supporting fixes: the capture studio now opens above the gage popup rather than behind it, and a proper _idbDelDrawing path was added \u2014 _idbPutDrawing rightly refuses a blank image to guard against wiping a drawing by accident, so removing one needed its own route."] },
@@ -1876,7 +1877,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "4:22 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:24 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3717,7 +3718,7 @@ async function _cptvAddFiles(files){
       alert('Could not load ' + nm + '\n\n' + help);
     }
   }
-  if(added) _cptvSay(added + ' page(s) loaded.');
+  if(added) _cptvSay(_cptvPages.length + ' page(s) loaded.');
   _cptvSel = Math.min(_cptvSel, Math.max(0, _cptvPages.length - 1));
   _cptvRender(); _cptvPreview();
 }
@@ -3842,7 +3843,7 @@ async function _cptvPreview(){
 // Nudge: push the SELECTED page around, or stretch/squeeze its width
 function _cptvNudge(dx, dy, dw){
   const p = _cptvPages[_cptvSel]; if(!p) return;
-  const step = +_cptvV('cptvStep') || 10;
+  const step = +_cptvV('cptvStep') || 2;   // Rev-578: fine by default
   p.ox = (p.ox || 0) + dx * step;
   p.oy = (p.oy || 0) + dy * step;
   p.ow = (p.ow || 0) + (dw || 0) * step;
@@ -3928,7 +3929,7 @@ function _cptvPanelHtml(o){
         '<button type="button" id="cptvNRight" title="Right (or \u2192 key)" style="padding:3px 9px; cursor:pointer;">\u25b6</button>' +
         '<button type="button" id="cptvNWide" style="padding:3px 9px; cursor:pointer;">\u21d4 Wider</button>' +
         '<button type="button" id="cptvNNarrow" style="padding:3px 9px; cursor:pointer;">\u21e5 Narrower</button>' +
-        '<span>step</span><select id="cptvStep" style="font-size:12px; padding:3px;"><option>1</option><option>2</option><option>5</option><option selected>10</option><option>25</option><option>50</option></select><span>px</span>' +
+        '<span>step</span><select id="cptvStep" style="font-size:12px; padding:3px; min-width:56px;"><option>1</option><option selected>2</option><option>5</option><option>10</option><option>25</option><option>50</option></select><span style="margin-right:6px;">px</span>' +
         '<button type="button" id="cptvNReset" style="padding:3px 9px; cursor:pointer;">Reset nudges</button>' +
       '</div>' +
       '<div id="cptvPrev" style="margin-top:10px; ' +
