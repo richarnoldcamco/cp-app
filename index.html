@@ -1372,7 +1372,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-568";
+const APP_REV = "Rev-569";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1386,6 +1386,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-569", type: "App", changes: ["PART-HEADER BUTTONS NOW LINE UP (Rev-569) \u2014 on the Control Plans list the \u2795 Add Op and Traveller buttons sat immediately after the part number, so a short part like Test1 pushed them far left of a long one like 1000222892 and the column zig-zagged down the page. The part name is now a fixed-width block (150px) and both buttons carry fixed widths (Add Op 96px, Traveller 150px, centered), so every part\u2019s buttons start and end on the same vertical line regardless of part-number length or whether the Traveller button reads \u2b06 Upload Traveller or \ud83d\udcc4 Traveller. Longer part numbers still display in full \u2014 the block only sets a minimum."] },
   { ts: "2026-07-27", rev: "App Rev-568", type: "App", changes: ["UPLOAD A TRAVELLER FOR AN EXISTING PART (Rev-568) \u2014 parts created before Rev-563 had no way to get a traveller on file: the part-header button only VIEWED one and dead-ended in an alert, New Control Plan waives the traveller for a known part, and \u2795 Add Op hides the traveller box entirely. Now the part-header button reports the real state \u2014 \u2b06 Upload Traveller (amber) when none is stored, \ud83d\udcc4 Traveller when one is. Tapping upload opens the file picker (image or PDF, PDFs auto-convert via the Rev-510 helper), stores it under PART::TRAVELLER exactly like part-first creation, marks hasTraveller in cpPartInfo, syncs to GitHub through _idbPutDrawing, re-renders the list, and opens the viewer. The viewer gained \u2b06 Replace for swapping in a newer routing, and the old no-traveller alert now offers to upload on the spot instead of dead-ending."] },
   { ts: "2026-07-27", rev: "App Rev-567", type: "App", changes: ["\ud83d\udcac NEW CHAT PROMPT UPDATED WITH THE FULL ARCHITECTURE MAP (Rev-567) \u2014 the handoff prompt now carries a compact snapshot of everything this era built: per-operation plans + part::rev::OP identity, part-first creation with the traveller store, the cpMvKey/cpMvFindProject validation keying and all three writeback channels, the complete FEATURE DRAWING editor behavior (modes, zoom/pan, Enter flow, selectable white-outs with active-edge nudging, keyboard ownership, project-persisted edit state), the combined per-part Customer CP editor/export, and the landing curtain \u2014 plus each saved plan\u2019s OP number in the plans list. A brand-new chat now inherits the wiring, not just the last 8 changelog lines."] },
   { ts: "2026-07-27", rev: "App Rev-566", type: "App", changes: ["ADD-OP SCREEN LOCKED TO OPERATION DATA ONLY (Rev-566) \u2014 arriving via \u2795 Add Op: the TRAVELLER section is hidden entirely (the traveller lives with the part, uploaded once at part creation), and the part-level fields (Part #, Revision, Process Owner, Customer, Quality Level) are FIXED \u2014 greyed and read-only, filled from the part\u2019s stored data. Only the OPERATION fields (Op #, Operation, Machine, balloons) and the op\u2019s ODS upload are live. A fresh New Control Plan opening still shows everything editable with the traveller required."] },
@@ -1827,7 +1828,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:41 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:47 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2308,13 +2309,15 @@ function renderProjects(){
       htd.style.cssText = 'background:#efe9df; border-top:2px solid #7a1a1c; padding:7px 10px;';
       const hb = document.createElement('b');
       hb.textContent = item.data.partNum || '';
-      hb.style.cssText = 'font-size:14px; letter-spacing:.04em; margin-right:14px;';
+      // Rev-569: fixed-width name block so every part's buttons start on the same
+      // vertical line instead of stepping in and out with the part-number length
+      hb.style.cssText = 'font-size:14px; letter-spacing:.04em; display:inline-block; min-width:150px; margin-right:14px; vertical-align:middle;';
       htd.appendChild(hb);
       const addOp = document.createElement('button');
       addOp.className = 'btn-ghost';
       addOp.textContent = '+ Add Op';
       addOp.title = 'Add another operation\u2019s Control Plan to this part (traveller already on file)';
-      addOp.style.cssText = 'background:#2c6e49; color:#fff; border:1px solid #215236; padding:4px 12px; font-size:12px; margin-right:6px;';
+      addOp.style.cssText = 'background:#2c6e49; color:#fff; border:1px solid #215236; padding:4px 12px; font-size:12px; margin-right:8px; min-width:96px; text-align:center; vertical-align:middle;';
       addOp.onclick = () => cpAddOpToPart(item.data.partNum);
       htd.appendChild(addOp);
       const trav = document.createElement('button');
@@ -2325,9 +2328,9 @@ function renderProjects(){
       try{ const _td = _idbGetDrawing(_pk + '::TRAVELLER'); _hasTrav = !!(_td && _td.odsImage); }catch(e){}
       trav.textContent = _hasTrav ? '\ud83d\udcc4 Traveller' : '\u2b06 Upload Traveller';
       trav.title = _hasTrav ? 'View this part\u2019s traveller (routing)' : 'No traveller on file for this part \u2014 tap to upload the routing (image or PDF)';
-      trav.style.cssText = _hasTrav
-        ? 'padding:4px 12px; font-size:12px;'
-        : 'padding:4px 12px; font-size:12px; background:#5a4a2a; color:#fff; border:1px solid #47391f;';
+      // Rev-569: same width in both states so the column edge never shifts
+      trav.style.cssText = 'padding:4px 12px; font-size:12px; min-width:150px; text-align:center; vertical-align:middle;'
+        + (_hasTrav ? '' : ' background:#5a4a2a; color:#fff; border:1px solid #47391f;');
       trav.onclick = () => _hasTrav ? cpViewTraveller(item.data.partNum) : cpTravellerPick(item.data.partNum);
       htd.appendChild(trav);
       htr.appendChild(htd);
