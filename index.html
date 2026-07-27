@@ -1412,7 +1412,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-572";
+const APP_REV = "Rev-573";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1426,6 +1426,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-573", type: "App", changes: ["GAGE DRAWINGS GET CTRL+V AND PDF (Rev-573) \u2014 \ud83d\udcc4 Upload Drawing on the Gages To Be Made list was a bare file picker: no paste, no drag, one page only. The traveller screen built at Rev-570 has been generalised into a shared capture studio (cpImageStudio) and BOTH now use it, so a gage drawing gets the identical treatment: click, drag-drop, or Ctrl+V; images or PDF with EVERY page loaded; reorder, sew and nudge; \u2212 / FIT / 100% / + zoom; an existing drawing seeds as page 1 so Replace can add a sheet instead of starting over. The paste handler was widened: it now reads clipboard FILES first, accepts application/pdf as well as images \u2014 so a page copied out of Chrome\u2019s built-in PDF viewer pastes straight in \u2014 and if what was pasted is only text it says so instead of appearing dead. The traveller screen is unchanged in behaviour; it is now a thin wrapper that configures the same studio."] },
   { ts: "2026-07-27", rev: "App Rev-572", type: "App", changes: ["GAGES TO BE MADE \u2014 SHOP-WIDE LIST (Rev-572) \u2014 filling the Special Gage / Fixture column on any Control Plan row now automatically posts that gage to a list, reachable from a new \ud83d\udd27 GAGES TO BE MADE button on the main menu carrying a live badge (open / total). Each gage is keyed PART::OPnnn::Bnn so it follows its balloon, and the list carries Part/Op, balloon, feature + tolerance, the gage description, status, who it is assigned to, and its drawing. Five buttons per row: \u270f\ufe0f EDIT rewrites the description, \u21bb UPDATE sets status (TO BE MADE \u2192 DESIGNED \u2192 ORDERED \u2192 IN PROGRESS \u2192 COMPLETE) with an optional progress note, \ud83d\udc64 ASSIGNED TO names the toolmaker or vendor, \ud83d\udcc4 UPLOAD DRAWING attaches a picture or PDF of the gage design (stored under GAGE::<key> and GitHub-synced like any drawing, with View / \u2b06 Replace), and \ud83d\uddd1 DELETE removes it. A filter shows open-only, all, or one status. EDIT and DELETE write back to the Control Plan row they came from \u2014 the open builder updates immediately, a closed plan is corrected in its saved record \u2014 so the list and the plan never disagree. The list rides the normal GitHub data sync as cpGageList in cp_data.json, merged per gage key with the newest edit winning, so every device sees the same list."] },
   { ts: "2026-07-27", rev: "App Rev-571", type: "App", changes: ["SPECIAL GAGE / FIXTURE COLUMN (Rev-571) \u2014 a new column sits between Meas Method (CMM) and Reaction Plan on the Build Control Plan grid, recording whether a feature needs a gage or holding fixture BUILT rather than pulled off the shelf. A row with nothing recorded shows a + ADD GAGE button; pressing it opens a writing box headed with that balloon\u2019s number, description and tolerance, with room to describe the gage, what it mates to, and what the toolmaker needs to know. Ctrl+Enter saves, Esc backs out. A row that HAS a gage shows the text on a pale blue cell with \u270f\ufe0f Edit to reopen the box and \u2715 to clear it (confirmed first). The note is stored on the row as specialGage, so it saves and reloads with the plan like every other cell and shows as a \ud83d\udd27 chip in the compact row view. The writing box is exempt from the app\u2019s force-uppercase handler \u2014 gage descriptions are prose, not codes. NOTE: this column is ON-SCREEN ONLY for now; the Build .xlsx still exports the 17 columns of CP-2 and the Instructions (Rev-92) are untouched. Say the word and I will add it to the xlsx and update the Instructions to match \u2014 I will not change an ITAR deliverable\u2019s column set without your go-ahead."] },
   { ts: "2026-07-27", rev: "App Rev-570", type: "App", changes: ["TRAVELLER UPLOAD NOW USES THE PFMEA SEW + NUDGE ENGINE (Rev-570) \u2014 \u2b06 Upload Traveller no longer opens a bare one-file picker. It opens a full traveller screen ported from the PFMEA app (PF Rev-056 sewCanvas / nudge / sewApply), re-namespaced _cptv* so nothing collides with the ODS upload: (1) MULTI-PAGE LOAD \u2014 click, drag-drop, or paste with Ctrl+V; images or PDF, and EVERY page of a PDF comes in (the ODS helper only takes page 1 because a drawing is one sheet, a router is not) via new cpPdfPagesToImages. (2) PAGE STRIP \u2014 thumbnails with \u25c0 \u25b6 reorder and \u2715 remove, click one to select it. (3) SEW \u2014 stack top-to-bottom, side by side, or grid 2-across, with trim-overlap px and white/black background, live preview, and Undo last sew. (4) NUDGE BAR \u2014 push the selected page \u25b2\u25bc\u25c0\u25b6 (or arrow keys) at 1/2/5/10/25/50 px steps, \u21d4 Wider / \u21e5 Narrower to stretch or squeeze it, Reset nudges; the selected page carries a dashed red outline in the preview. (5) PREVIEW ZOOM \u2212 / FIT / 100% / +. Saving stores the finished single image under PART::TRAVELLER exactly as before (GitHub-synced) \u2014 several pages sew automatically on the way out. Reopening on a part that already has a traveller seeds it as page 1, so Replace can ADD a page instead of starting over. Esc closes."] },
@@ -1871,7 +1872,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "2:34 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3806,10 +3807,23 @@ function _cptvKeys(e){
   if(e.key === 'Escape'){ e.preventDefault(); _cptvClose(); }
 }
 function _cptvPaste(e){
-  const items = (e.clipboardData && e.clipboardData.items) || [];
+  const dt = e.clipboardData; if(!dt) return;
   const files = [];
-  for(let i = 0; i < items.length; i++){ if(items[i].type && items[i].type.indexOf('image') === 0){ const f = items[i].getAsFile(); if(f) files.push(f); } }
-  if(files.length){ e.preventDefault(); _cptvAddFiles(files); }
+  // Rev-573: take anything pasteable — screenshots, image files, AND a PDF copied out of
+  // Chrome's built-in PDF viewer (which lands on the clipboard as an application/pdf file)
+  const list = dt.files && dt.files.length ? Array.from(dt.files) : [];
+  list.forEach(f => { if(f && (/^image\//.test(f.type || '') || f.type === 'application/pdf' || /\.pdf$/i.test(f.name || ''))) files.push(f); });
+  if(!files.length){
+    const items = dt.items || [];
+    for(let i = 0; i < items.length; i++){
+      const it = items[i]; if(!it || it.kind !== 'file') continue;
+      if(it.type && (it.type.indexOf('image') === 0 || it.type === 'application/pdf')){ const f = it.getAsFile(); if(f) files.push(f); }
+    }
+  }
+  if(files.length){ e.preventDefault(); e.stopPropagation(); _cptvAddFiles(files); return; }
+  // nothing usable — say so rather than looking broken
+  const txt = dt.getData ? (dt.getData('text/plain') || '') : '';
+  if(txt) flash('That paste was text, not a picture. Copy the page as an image or drop the PDF file in.', true);
 }
 function _cptvClose(){
   const v = document.getElementById('cptvBg'); if(v) v.remove();
@@ -3819,24 +3833,26 @@ function _cptvClose(){
 
 // The traveller upload screen itself — drop zone, page strip, sew controls, nudge bar,
 // live preview. Built in code so it cannot collide with any existing markup ids.
-async function cpTravellerPick(partNum){
-  const P = String(partNum || '').trim().toUpperCase();
-  if(!P) return;
+// Rev-573: the traveller screen became a GENERAL page-capture studio so anything that
+// needs a picture (traveller, gage drawing) gets the same Ctrl+V paste, drag-drop,
+// multi-page PDF, sew and nudge. opts = { title, dropLabel, dropHint, seedKey, saveLabel, onSave(url) }
+async function cpImageStudio(opts){
+  const o = opts || {};
   _cptvClose();
-  _cptvPart = P; _cptvPages = []; _cptvSel = 0; _cptvBackup = null; _cptvZoom = 0;
+  _cptvPart = String(o.title || ''); _cptvPages = []; _cptvSel = 0; _cptvBackup = null; _cptvZoom = 0;
   // seed with whatever is already on file so Replace can ADD pages rather than start over
-  try{ const d = _idbGetDrawing(P + '::TRAVELLER'); if(d && d.odsImage) _cptvPages.push({ name: 'on file', url: d.odsImage }); }catch(e){}
+  if(o.seedKey){ try{ const d = _idbGetDrawing(o.seedKey); if(d && d.odsImage) _cptvPages.push({ name: 'on file', url: d.odsImage }); }catch(e){} }
 
   const bg = document.createElement('div');
   bg.id = 'cptvBg';
   bg.style.cssText = 'position:fixed; inset:0; z-index:100004; background:rgba(20,15,12,.9); display:flex; align-items:center; justify-content:center; padding:16px;';
   bg.innerHTML =
    '<div style="background:#efe9df; border-radius:10px; width:100%; max-width:1180px; max-height:94vh; display:flex; flex-direction:column; overflow:hidden;">' +
-    '<div style="background:#7a1a1c; color:#fff; font-weight:800; letter-spacing:.06em; padding:10px 16px; font-size:14px;">TRAVELLER \u2014 ' + P + '</div>' +
+    '<div style="background:#7a1a1c; color:#fff; font-weight:800; letter-spacing:.06em; padding:10px 16px; font-size:14px;">' + String(o.title || 'UPLOAD') + '</div>' +
     '<div style="padding:14px 16px; overflow:auto;">' +
       '<div id="cptvDrop" style="border:2px dashed #a89b8a; border-radius:8px; padding:18px; text-align:center; cursor:pointer; background:#f6f2ea;">' +
-        '<div style="font-weight:800; letter-spacing:.05em; font-size:13px;">UPLOAD TRAVELLER PAGES</div>' +
-        '<div style="font-size:12px; color:#6b6257; margin-top:5px; line-height:1.5;">Tap to choose files, drag them onto this box, or paste a screenshot with Ctrl+V.<br>Load EVERY page of a multi-page traveller \u2014 images or PDF (all PDF pages come in).</div>' +
+        '<div style="font-weight:800; letter-spacing:.05em; font-size:13px;">' + String(o.dropLabel || 'UPLOAD PAGES') + '</div>' +
+        '<div style="font-size:12px; color:#6b6257; margin-top:5px; line-height:1.5;">Tap to choose files, drag them onto this box, or paste with <b>Ctrl+V</b> \u2014 a screenshot, or a page copied straight out of the Chrome PDF viewer.<br>' + String(o.dropHint || 'Load EVERY page \u2014 images or PDF (all PDF pages come in).') + '</div>' +
       '</div>' +
       '<div style="display:flex; align-items:center; gap:10px; margin:10px 0 6px;">' +
         '<b id="cptvCount" style="font-size:12px; letter-spacing:.05em;">0 PAGE(S)</b>' +
@@ -3872,7 +3888,7 @@ async function cpTravellerPick(partNum){
       '<button id="cptvCancel" style="padding:8px 18px; font-weight:700; cursor:pointer;">Cancel</button>' +
       '<button id="cptvUndo" style="padding:8px 18px; font-weight:700; cursor:pointer;">Undo last sew</button>' +
       '<button id="cptvSew" style="padding:8px 18px; font-weight:700; cursor:pointer; background:#5a4a2a; color:#fff; border:1px solid #47391f; border-radius:6px;">\ud83e\uddf5 Sew pages into one</button>' +
-      '<button id="cptvSave" style="padding:8px 22px; font-weight:800; cursor:pointer; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px;">\u2713 Save traveller</button>' +
+      '<button id="cptvSave" style="padding:8px 22px; font-weight:800; cursor:pointer; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px;">\u2713 ' + String(o.saveLabel || 'Save') + '</button>' +
     '</div>' +
    '</div>';
   document.body.appendChild(bg);
@@ -3930,22 +3946,36 @@ async function cpTravellerPick(partNum){
         const c = await _cptvCanvas(_cptvV('cptvLayout'), +_cptvV('cptvOverlap'), _cptvV('cptvBgCol'));
         url = c.toDataURL('image/png');
       }
-      _idbPutDrawing(_cptvPart + '::TRAVELLER', url);      // stores + syncs to GitHub
-      const info = cpPartInfoGet(_cptvPart) || {};
-      info.hasTraveller = true; info.savedAt = new Date().toISOString();
-      cpPartInfoSet(_cptvPart, info);
-      const part = _cptvPart;
       _cptvClose();
-      flash('\u2713 Traveller saved for ' + part);
-      try{ if(typeof renderProjects === 'function') renderProjects(); }catch(e){}
-      setTimeout(() => cpViewTraveller(part), 250);
-    }catch(e){ alert('Could not save the traveller: ' + (e && e.message || e)); }
+      if(typeof o.onSave === 'function') await o.onSave(url);
+    }catch(e){ alert('Could not save: ' + (e && e.message || e)); }
   };
 
   document.addEventListener('keydown', _cptvKeys, true);
   document.addEventListener('paste', _cptvPaste, true);
   _cptvRender(); _cptvPreview();
-  if(!_cptvPages.length) setTimeout(() => file.click(), 150);
+  if(!_cptvPages.length && o.autoPick !== false) setTimeout(() => file.click(), 150);
+}
+// Rev-573: traveller now just configures the shared studio
+async function cpTravellerPick(partNum){
+  const P = String(partNum || '').trim().toUpperCase();
+  if(!P) return;
+  await cpImageStudio({
+    title: 'TRAVELLER \u2014 ' + P,
+    dropLabel: 'UPLOAD TRAVELLER PAGES',
+    dropHint: 'Load EVERY page of a multi-page traveller \u2014 images or PDF (all PDF pages come in).',
+    seedKey: P + '::TRAVELLER',
+    saveLabel: 'Save traveller',
+    onSave: (url) => {
+      _idbPutDrawing(P + '::TRAVELLER', url);            // stores + syncs to GitHub
+      const info = cpPartInfoGet(P) || {};
+      info.hasTraveller = true; info.savedAt = new Date().toISOString();
+      cpPartInfoSet(P, info);
+      flash('\u2713 Traveller saved for ' + P);
+      try{ if(typeof renderProjects === 'function') renderProjects(); }catch(e){}
+      setTimeout(() => cpViewTraveller(P), 250);
+    }
+  });
 }
 
 async function cpViewTraveller(partNum){
@@ -4862,25 +4892,22 @@ function cpGageListAssign(key){
 }
 function cpGageListDrawing(key){
   const g = cpGagesGet()[key]; if(!g) return;
-  const inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = 'image/*,application/pdf'; inp.style.display = 'none';
-  document.body.appendChild(inp);
-  inp.onchange = async () => {
-    const f = inp.files && inp.files[0];
-    try{
-      if(!f) return;
-      flash('Reading gage drawing\u2026');
-      let file = f;
-      if(/pdf$/i.test(f.name || '') || f.type === 'application/pdf') file = await convertPdfToImageFile(f);
-      const img = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(file); });
-      _idbPutDrawing('GAGE::' + key, img);            // stored + GitHub-synced like any drawing
+  // Rev-573: same capture studio as the traveller — Ctrl+V paste, drag-drop, PDF (every
+  // page), sew and nudge. A gage design is often two shots or a printed PDF page.
+  cpImageStudio({
+    title: 'GAGE DRAWING \u2014 ' + (g.part || '') + ' BALLOON ' + (g.bubble || ''),
+    dropLabel: 'UPLOAD GAGE DRAWING',
+    dropHint: 'Sketch, photo, screenshot or PDF. Paste straight from the Chrome PDF viewer with Ctrl+V, or load several pages and sew them.',
+    seedKey: 'GAGE::' + key,
+    saveLabel: 'Save gage drawing',
+    onSave: (url) => {
+      _idbPutDrawing('GAGE::' + key, url);              // stored + GitHub-synced
       _cpGTouch(key, { hasDrawing: true });
-      renderGages(); flash('\u2713 Gage drawing saved.');
-      setTimeout(() => cpGageViewDrawing(key), 200);
-    }catch(e){ alert('Could not read the drawing: ' + (e && e.message || e)); }
-    finally{ try{ inp.remove(); }catch(e){} }
-  };
-  inp.click();
+      renderGages();
+      flash('\u2713 Gage drawing saved.');
+      setTimeout(() => cpGageViewDrawing(key), 250);
+    }
+  });
 }
 function cpGageViewDrawing(key){
   const g = cpGagesGet()[key] || {};
