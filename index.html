@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-555</title>
+<title>CONTROL PLAN GENERATOR - Rev-556</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-555 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 9:33 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-556 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 9:37 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1364,7 +1364,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-555";
+const APP_REV = "Rev-556";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1378,6 +1378,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-556", type: "App", changes: ["Home screen: added the missing space in the CONTROL PLANS badge \u2014 \u20186 Projects\u2019 instead of \u20186Projects\u2019."] },
   { ts: "2026-07-27", rev: "App Rev-555", type: "App", changes: ["DRAW A NEW WHITE-OUT STARTING INSIDE AN EXISTING ONE (embedded validation REV-153 \u2192 REV-154) \u2014 click-and-DRAG starting inside a white-out now draws a NEW box (crop/highlight/white-out per the current mode), while a click with NO mouse movement ACTIVATES that white-out for nudging \u2014 exactly the click-vs-drag distinction requested. The already-active white-out still moves when dragged, and the edge grips still resize. Small 4-px dead zone (scaled with zoom) decides click vs drag."] },
   { ts: "2026-07-27", rev: "App Rev-554", type: "App", changes: ["CLICK THE BUBBLE HIGHLIGHT, HIT DELETE, IT\u2019S GONE (embedded validation REV-152 \u2192 REV-153) \u2014 clicking the yellow highlight now SELECTS it (gold dashed glow, any selected white-out is deselected so Delete can never hit the wrong object), and Delete removes it. Clicking empty drawing or pressing Esc deselects; dragging still moves it and wheel still resizes it. The no-click Delete shortcut from Rev-553 still works when nothing else is selected."] },
   { ts: "2026-07-27", rev: "App Rev-553", type: "App", changes: ["DELETE KEY REMOVES THE BUBBLE HIGHLIGHT (embedded validation REV-151 \u2192 REV-152) \u2014 there was no way to remove the yellow highlight ellipse short of Clear (which wipes everything). Now, with no white-out selected, pressing DELETE removes the highlight \u2014 draw a fresh one any time in \u2461 Highlight mode (a new drag always replaces the old one). Delete with a white-out selected still removes that white-out, as before."] },
@@ -1806,7 +1807,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:33 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:37 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -1963,7 +1964,7 @@ function updateMenuBadges(){
   const drafts = JSON.parse(localStorage.getItem('cpDrafts') || '[]');
   const totalCount = projects.length + drafts.length;
   const bp = $('badgeProjects');
-  if(bp) bp.innerHTML = totalCount + '<span class="bsub">Projects</span>';
+  if(bp) bp.innerHTML = totalCount + ' <span class="bsub">Projects</span>';
 
   // Master List (control types) — Rev-275: seed the default set ONLY when the list is EMPTY. The old
   // check reinitialized whenever the count wasn't exactly 55, which wiped every added control type
