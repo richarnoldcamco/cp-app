@@ -1372,7 +1372,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-567";
+const APP_REV = "Rev-568";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1386,6 +1386,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-568", type: "App", changes: ["UPLOAD A TRAVELLER FOR AN EXISTING PART (Rev-568) \u2014 parts created before Rev-563 had no way to get a traveller on file: the part-header button only VIEWED one and dead-ended in an alert, New Control Plan waives the traveller for a known part, and \u2795 Add Op hides the traveller box entirely. Now the part-header button reports the real state \u2014 \u2b06 Upload Traveller (amber) when none is stored, \ud83d\udcc4 Traveller when one is. Tapping upload opens the file picker (image or PDF, PDFs auto-convert via the Rev-510 helper), stores it under PART::TRAVELLER exactly like part-first creation, marks hasTraveller in cpPartInfo, syncs to GitHub through _idbPutDrawing, re-renders the list, and opens the viewer. The viewer gained \u2b06 Replace for swapping in a newer routing, and the old no-traveller alert now offers to upload on the spot instead of dead-ending."] },
   { ts: "2026-07-27", rev: "App Rev-567", type: "App", changes: ["\ud83d\udcac NEW CHAT PROMPT UPDATED WITH THE FULL ARCHITECTURE MAP (Rev-567) \u2014 the handoff prompt now carries a compact snapshot of everything this era built: per-operation plans + part::rev::OP identity, part-first creation with the traveller store, the cpMvKey/cpMvFindProject validation keying and all three writeback channels, the complete FEATURE DRAWING editor behavior (modes, zoom/pan, Enter flow, selectable white-outs with active-edge nudging, keyboard ownership, project-persisted edit state), the combined per-part Customer CP editor/export, and the landing curtain \u2014 plus each saved plan\u2019s OP number in the plans list. A brand-new chat now inherits the wiring, not just the last 8 changelog lines."] },
   { ts: "2026-07-27", rev: "App Rev-566", type: "App", changes: ["ADD-OP SCREEN LOCKED TO OPERATION DATA ONLY (Rev-566) \u2014 arriving via \u2795 Add Op: the TRAVELLER section is hidden entirely (the traveller lives with the part, uploaded once at part creation), and the part-level fields (Part #, Revision, Process Owner, Customer, Quality Level) are FIXED \u2014 greyed and read-only, filled from the part\u2019s stored data. Only the OPERATION fields (Op #, Operation, Machine, balloons) and the op\u2019s ODS upload are live. A fresh New Control Plan opening still shows everything editable with the traveller required."] },
   { ts: "2026-07-27", rev: "App Rev-565", type: "App", changes: ["Arriving via \u2795 Add Op, the screen is now titled NEW OPERATION CONTROL PLAN \u2014 <part number>, so it\u2019s always clear an operation is being added to an existing part rather than a new part being created. A fresh New Control Plan opening still says New Control Plan."] },
@@ -1826,7 +1827,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:25 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:41 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2318,9 +2319,16 @@ function renderProjects(){
       htd.appendChild(addOp);
       const trav = document.createElement('button');
       trav.className = 'btn-ghost';
-      trav.textContent = '\ud83d\udcc4 Traveller';
-      trav.style.cssText = 'padding:4px 12px; font-size:12px;';
-      trav.onclick = () => cpViewTraveller(item.data.partNum);
+      // Rev-568: the button reports whether this part HAS a traveller yet, and either
+      // views it or uploads one. Parts created before Rev-563 have none on file.
+      let _hasTrav = false;
+      try{ const _td = _idbGetDrawing(_pk + '::TRAVELLER'); _hasTrav = !!(_td && _td.odsImage); }catch(e){}
+      trav.textContent = _hasTrav ? '\ud83d\udcc4 Traveller' : '\u2b06 Upload Traveller';
+      trav.title = _hasTrav ? 'View this part\u2019s traveller (routing)' : 'No traveller on file for this part \u2014 tap to upload the routing (image or PDF)';
+      trav.style.cssText = _hasTrav
+        ? 'padding:4px 12px; font-size:12px;'
+        : 'padding:4px 12px; font-size:12px; background:#5a4a2a; color:#fff; border:1px solid #47391f;';
+      trav.onclick = () => _hasTrav ? cpViewTraveller(item.data.partNum) : cpTravellerPick(item.data.partNum);
       htd.appendChild(trav);
       htr.appendChild(htd);
       tbody.appendChild(htr);
@@ -3586,19 +3594,67 @@ function cpAddOpToPart(partNum){
     flash('Adding an operation to ' + partNum + ' \u2014 traveller already on file. Enter the Op #, upload the op\u2019s ODS, and generate.');
   }, 120);
 }
+// Rev-568: upload (or replace) a traveller for a part that ALREADY exists. Parts created
+// before Rev-563 never got asked for one, and + Add Op hides the traveller box, so this is
+// the only route in for them. Same store as part-first creation: PART::TRAVELLER.
+function cpTravellerPick(partNum){
+  const P = String(partNum || '').trim().toUpperCase();
+  if(!P) return;
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*,application/pdf';
+  inp.style.display = 'none';
+  document.body.appendChild(inp);
+  inp.onchange = async () => {
+    const f = inp.files && inp.files[0];
+    try{
+      if(!f) return;
+      flash('Reading traveller\u2026');
+      let img = null;
+      if(/pdf$/i.test(f.name) || f.type === 'application/pdf'){
+        const asImg = await convertPdfToImageFile(f);   // Rev-510 helper
+        img = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(asImg); });
+      } else {
+        img = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(f); });
+      }
+      if(!img) return;
+      _idbPutDrawing(P + '::TRAVELLER', img);           // stores + syncs to GitHub
+      const info = cpPartInfoGet(P) || {};
+      info.hasTraveller = true; info.savedAt = new Date().toISOString();
+      cpPartInfoSet(P, info);
+      flash('\u2713 Traveller saved for ' + P);
+      try{ if(typeof renderProjects === 'function') renderProjects(); }catch(e){}
+      setTimeout(() => cpViewTraveller(P), 250);
+    }catch(e){
+      alert('Could not read the traveller: ' + (e && e.message || e));
+    }finally{
+      try{ inp.remove(); }catch(e){}
+    }
+  };
+  inp.click();
+}
 async function cpViewTraveller(partNum){
   let img = null;
   try{ const d = await _idbGetDrawing(String(partNum).toUpperCase() + '::TRAVELLER'); img = d && d.odsImage; }catch(e){}
-  if(!img){ alert('No traveller is stored for ' + partNum + ' yet. Upload one on the New Control Plan screen.'); return; }
+  if(!img){
+    // Rev-568: no dead end — offer to upload it right here
+    if(confirm('No traveller is stored for ' + partNum + ' yet.\n\nUpload one now?')) cpTravellerPick(partNum);
+    return;
+  }
   const old = document.getElementById('travViewPanel'); if(old) old.remove();
   const v = document.createElement('div');
   v.id = 'travViewPanel';
   v.style.cssText = 'position:fixed; inset:0; z-index:100003; background:rgba(20,15,12,.88); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px;';
   v.innerHTML = '<div style="color:#fff; font-weight:800; letter-spacing:.05em; margin-bottom:10px;">TRAVELLER \u2014 ' + String(partNum) + '</div>' +
     '<img src="' + img + '" style="max-width:94vw; max-height:82vh; background:#fff; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5);">' +
-    '<button id="travViewClose" style="margin-top:14px; background:#fff; color:#7a1414; border:2px solid #fff; border-radius:8px; padding:9px 26px; font-weight:800; cursor:pointer;">\u2715 Close</button>';
+    '<div style="margin-top:14px; display:flex; gap:10px;">' +
+    '<button id="travViewClose" style="background:#fff; color:#7a1414; border:2px solid #fff; border-radius:8px; padding:9px 26px; font-weight:800; cursor:pointer;">\u2715 Close</button>' +
+    '<button id="travViewReplace" style="background:#5a4a2a; color:#fff; border:2px solid #5a4a2a; border-radius:8px; padding:9px 26px; font-weight:800; cursor:pointer;">\u2b06 Replace</button>' +
+    '</div>';
   document.body.appendChild(v);
   document.getElementById('travViewClose').onclick = () => v.remove();
+  // Rev-568: swap in a newer routing without leaving the viewer
+  document.getElementById('travViewReplace').onclick = () => { v.remove(); cpTravellerPick(partNum); };
   v.onclick = (e) => { if(e.target === v) v.remove(); };
 }
 function cpPartInfoGet(part){
