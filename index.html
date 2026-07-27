@@ -1412,7 +1412,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-576";
+const APP_REV = "Rev-577";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1426,6 +1426,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-577", type: "App", changes: ["THE DRAWING GETS THE ROOM (Rev-577) \u2014 the Special Gage window was spending most of its height on instructions while the drawing sat in a letterbox. Rebuilt as a full-height panel (94vh, widened to 1150px) where every fixed part is squeezed and the PREVIEW TAKES ALL THE REMAINING SPACE: the feature line and the writing prompt folded into one sentence, the text box dropped to three rows (still draggable if you want more), the section heading and footer tightened. The drop box now COLLAPSES once a page is loaded \u2014 the instructions have done their job by then, so it shrinks to a one-line \u2b06 ADD ANOTHER PAGE strip and hands the height to the drawing; remove the page and the full instructions come back. New fill mode on the capture panel makes the preview stretch to whatever the surrounding window can spare instead of a fixed 34vh box."] },
   { ts: "2026-07-27", rev: "App Rev-576", type: "App", changes: ["ONE SCREEN \u2014 THE GAGE UPLOADER MOVED INTO THE WRITING BOX (Rev-576) \u2014 attaching a gage drawing no longer opens a second window. The capture engine was made mountable, and it is now embedded directly in the GAGE DRAWING section of the Special Gage / Fixture box: drop area, page thumbnails and live preview all sit under the text, in the same window, with one \u2713 Save that writes the wording and the drawing together. Browse, drag-drop, or Ctrl+V; any PDF including a Chrome PDF Document, every page. The window widened to 900px and scrolls. CLUTTER CONTROL: the joining controls (layout, trim overlap, background, \ud83e\uddf5 Sew, Undo) and the whole nudge bar now appear ONLY when two or more pages are loaded \u2014 a single-page drawing shows just the drop box, the thumbnail and the preview. Zoom \u2212 / FIT / 100% / + appears once any page is loaded. Clear wipes the wording only and says so; the drawing survives. Saving with no pages loaded removes any drawing that was there. The traveller keeps its own full window \u2014 same engine, now wrapped rather than duplicated."] },
   { ts: "2026-07-27", rev: "App Rev-575", type: "App", changes: ["UPLOAD THE GAGE DRAWING FROM THE CONTROL PLAN ROW (Rev-575) \u2014 the Special Gage / Fixture writing box now carries a GAGE DRAWING section under the text, so a drawing can be attached at the moment the gage is written instead of going to the Gages To Be Made list afterwards. \ud83d\udcc4 Upload drawing opens the shared capture studio: browse, drag-drop, or Ctrl+V; any PDF including a Chrome PDF Document, with every page loaded; sew and nudge for multi-sheet designs. An attached drawing shows as a thumbnail (click to view full size) with \u2b06 Replace drawing and \u2715 Remove drawing beside it. The drawing is keyed to the balloon with the same PART::OPnnn::Bnn key the gage list uses, so it can be attached BEFORE the description is saved and still lands on the right gage. Two supporting fixes: the capture studio now opens above the gage popup rather than behind it, and a proper _idbDelDrawing path was added \u2014 _idbPutDrawing rightly refuses a blank image to guard against wiping a drawing by accident, so removing one needed its own route."] },
   { ts: "2026-07-27", rev: "App Rev-574", type: "App", changes: ["UPLOAD BUG FIXED \u2014 PICKED FILES WERE BEING THROWN AWAY (Rev-574) \u2014 choosing a file in the capture studio (traveller or gage drawing) did nothing at all, silently. Cause: the picker handler read file.files into a variable and then reset the input with file.value = \u2018\u2019 to allow re-picking the same file. file.files is a LIVE list, so clearing the input emptied the very list already being held \u2014 the code then looked at zero files and quietly stopped. The chosen files are now copied into a real array BEFORE the input is reset. Three hardening changes alongside: (1) PDF detection no longer trusts the file name or the browser\u2019s MIME label \u2014 the first bytes are read and anything starting %PDF is treated as a PDF, so Chrome PDF Documents and OneDrive files with odd type labels work. (2) A live status line under the drop zone reports every step \u2014 reading, loading the PDF reader, converting page n of n, pages loaded \u2014 so a slow or failed load explains itself instead of looking dead. (3) Failures are translated into plain language: a PDF reader that cannot download says it needs internet the first time on a device, and an unreadable file suggests a OneDrive file still showing a red X needs to finish downloading first."] },
@@ -1875,7 +1876,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "4:06 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "4:22 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3791,6 +3792,17 @@ function _cptvRender(){
   }).join('');
   const lbl = document.getElementById('cptvSelLbl'); if(lbl) lbl.textContent = String(_cptvSel + 1);
   const cnt = document.getElementById('cptvCount'); if(cnt) cnt.textContent = _cptvPages.length + ' PAGE(S)';
+  // Rev-577: once a page is in, the instructions have done their job — shrink the drop
+  // box to a one-line strip so the drawing gets the room
+  const dz = document.getElementById('cptvDrop'), dh = document.getElementById('cptvDropHint'), dt = document.getElementById('cptvDropTitle');
+  if(dz && dh && dt){
+    const loaded = _cptvPages.length > 0;
+    dh.style.display = loaded ? 'none' : 'block';
+    dz.style.padding = loaded ? '7px 10px' : '14px';
+    dt.style.fontSize = loaded ? '11px' : '13px';
+    dt.textContent = loaded ? '\u2b06 ADD ANOTHER PAGE \u2014 tap, drag, or Ctrl+V' : String(dz.dataset.label || dt.textContent);
+    if(!dz.dataset.label && !loaded) dz.dataset.label = dt.textContent;
+  }
   // Rev-576: joining controls are noise until there are two pages to join
   const zb = document.getElementById('cptvZoomBar'); if(zb) zb.style.display = _cptvPages.length ? 'flex' : 'none';
   const sb = document.getElementById('cptvSewBar'); if(sb) sb.style.display = _cptvPages.length > 1 ? 'flex' : 'none';
@@ -3880,10 +3892,12 @@ function _cptvClose(){
 // line, page strip, sew controls, nudge bar, preview) and _cptvWire hooks it up; the
 // overlay version just wraps that in a window with its own footer.
 function _cptvPanelHtml(o){
-  return '' +
-      '<div id="cptvDrop" style="border:2px dashed #a89b8a; border-radius:8px; padding:14px; text-align:center; cursor:pointer; background:#f6f2ea;">' +
-        '<div style="font-weight:800; letter-spacing:.05em; font-size:13px;">' + String(o.dropLabel || 'UPLOAD PAGES') + '</div>' +
-        '<div style="font-size:12px; color:#6b6257; margin-top:5px; line-height:1.5;">Tap to choose files, drag them onto this box, or paste with <b>Ctrl+V</b>.<br>' + String(o.dropHint || 'Images or PDF \u2014 every page of a PDF loads.') + '</div>' +
+  // Rev-577: fill mode makes the panel a column that stretches, so the preview keeps
+  // every pixel the surrounding window can spare
+  return (o.fill ? '<div id="cptvCol" style="display:flex; flex-direction:column; min-height:0; height:100%;">' : '') +
+      '<div id="cptvDrop" style="border:2px dashed #a89b8a; border-radius:8px; padding:14px; text-align:center; cursor:pointer; background:#f6f2ea; flex:0 0 auto;">' +
+        '<div id="cptvDropTitle" style="font-weight:800; letter-spacing:.05em; font-size:13px;">' + String(o.dropLabel || 'UPLOAD PAGES') + '</div>' +
+        '<div id="cptvDropHint" style="font-size:12px; color:#6b6257; margin-top:5px; line-height:1.5;">Tap to choose files, drag them onto this box, or paste with <b>Ctrl+V</b>.<br>' + String(o.dropHint || 'Images or PDF \u2014 every page of a PDF loads.') + '</div>' +
       '</div>' +
       '<div id="cptvSay" style="display:none; font-size:12px; font-weight:700; margin-top:8px;"></div>' +
       '<div id="cptvZoomBar" style="display:none; align-items:center; gap:10px; margin:10px 0 6px;">' +
@@ -3893,7 +3907,7 @@ function _cptvPanelHtml(o){
         '<button type="button" id="cptvZ100" style="font-size:12px; padding:3px 10px; cursor:pointer;">100%</button>' +
         '<button type="button" id="cptvZIn" style="font-size:12px; padding:3px 10px; cursor:pointer;">+</button>' +
       '</div>' +
-      '<div id="cptvStrip" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;"></div>' +
+      '<div id="cptvStrip" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; flex:0 0 auto;"></div>' +
       // Rev-576: joining controls only appear once there are two or more pages to join
       '<div id="cptvSewBar" style="display:none; gap:14px; flex-wrap:wrap; align-items:flex-end; background:#e5ddd1; border-radius:8px; padding:10px 12px;">' +
         '<div><label style="display:block; font-size:11px; font-weight:700; letter-spacing:.05em;">LAYOUT</label>' +
@@ -3917,7 +3931,10 @@ function _cptvPanelHtml(o){
         '<span>step</span><select id="cptvStep" style="font-size:12px; padding:3px;"><option>1</option><option>2</option><option>5</option><option selected>10</option><option>25</option><option>50</option></select><span>px</span>' +
         '<button type="button" id="cptvNReset" style="padding:3px 9px; cursor:pointer;">Reset nudges</button>' +
       '</div>' +
-      '<div id="cptvPrev" style="margin-top:10px; max-height:' + (o.previewMax || '42vh') + '; overflow:auto; background:#ded5c8; border-radius:6px; padding:8px;"></div>';
+      '<div id="cptvPrev" style="margin-top:10px; ' +
+        (o.fill ? 'flex:1 1 auto; min-height:180px;' : 'max-height:' + (o.previewMax || '42vh') + ';') +
+        ' overflow:auto; background:#ded5c8; border-radius:6px; padding:8px;"></div>' +
+      (o.fill ? '</div>' : '');
 }
 function _cptvWire(root, o){
   const file = document.createElement('input');
@@ -4736,20 +4753,20 @@ function cpGagePopup(idx){
   bg.id = 'cpGageBg';
   bg.style.cssText = 'position:fixed; inset:0; z-index:100005; background:rgba(20,15,12,.85); display:flex; align-items:center; justify-content:center; padding:18px;';
   bg.innerHTML =
-   '<div style="background:#fff; border-radius:10px; width:100%; max-width:900px; max-height:94vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 10px 44px rgba(0,0,0,.5);">' +
-    '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.05em; padding:11px 16px; font-size:14px;">SPECIAL GAGE / FIXTURE \u2014 BALLOON ' + (row.bubble || '') + '</div>' +
-    '<div style="padding:16px; overflow:auto;">' +
-      '<div style="font-size:12px; color:#555; line-height:1.5; margin-bottom:10px;">' +
-        '<b>' + String(row.featureDesc || '(no description yet)') + '</b>' + (row.spec ? ' \u2014 ' + row.spec : '') + '<br>' +
-        'Describe the gage or fixture that has to be made to check this feature \u2014 what it is, what it mates to, and anything the toolmaker needs to know.' +
+   '<div style="background:#fff; border-radius:10px; width:100%; max-width:1150px; height:94vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 10px 44px rgba(0,0,0,.5);">' +
+    '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.05em; padding:9px 16px; font-size:13px;">SPECIAL GAGE / FIXTURE \u2014 BALLOON ' + (row.bubble || '') + '</div>' +
+    '<div style="padding:12px 16px; flex:1 1 auto; min-height:0; display:flex; flex-direction:column;">' +
+      '<div style="font-size:12px; color:#555; line-height:1.45; margin-bottom:6px; flex:0 0 auto;">' +
+        '<b>' + String(row.featureDesc || '(no description yet)') + '</b>' + (row.spec ? ' \u2014 ' + row.spec : '') +
+        ' <span style="color:#8a8279;">\u2014 describe the gage or fixture to be made: what it is, what it mates to, what the toolmaker needs to know.</span>' +
       '</div>' +
-      '<textarea id="cpGageText" rows="5" placeholder="E.G. PLUG GAGE, GO/NO-GO, .6040/.6035 \u2014 CARBIDE PINS, HANDLE STAMPED WITH PART NUMBER AND BALLOON 3. OR: HOLDING FIXTURE TO SUPPORT THE RING ON THE ROLL CHECKER WITHOUT DISTORTING THE .029/.027 WALL." ' +
-        'style="width:100%; box-sizing:border-box; font-size:13px; padding:10px; border:2px solid #c9c0b4; border-radius:6px; font-family:inherit; line-height:1.5; resize:vertical;"></textarea>' +
+      '<textarea id="cpGageText" rows="3" placeholder="E.G. PLUG GAGE, GO/NO-GO, .6040/.6035 \u2014 CARBIDE PINS, HANDLE STAMPED WITH PART NUMBER AND BALLOON 3. OR: HOLDING FIXTURE TO SUPPORT THE RING ON THE ROLL CHECKER WITHOUT DISTORTING THE .029/.027 WALL." ' +
+        'style="width:100%; box-sizing:border-box; font-size:13px; padding:8px 10px; border:2px solid #c9c0b4; border-radius:6px; font-family:inherit; line-height:1.45; resize:vertical; flex:0 0 auto;"></textarea>' +
       // Rev-575: attach the gage drawing right here, without going to the list first
-      '<div style="font-size:11px; font-weight:800; letter-spacing:.05em; margin:16px 0 6px; border-top:1px solid #e4ded4; padding-top:14px;">GAGE DRAWING</div>' +
-      '<div id="cpGageDwgRow"></div>' +
+      '<div style="font-size:11px; font-weight:800; letter-spacing:.05em; margin:10px 0 6px; border-top:1px solid #e4ded4; padding-top:9px; flex:0 0 auto;">GAGE DRAWING</div>' +
+      '<div id="cpGageDwgRow" style="flex:1 1 auto; min-height:0; display:flex; flex-direction:column;"></div>' +
     '</div>' +
-    '<div style="background:#f1ede6; padding:11px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid #ddd6cc;">' +
+    '<div style="background:#f1ede6; padding:9px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid #ddd6cc; flex:0 0 auto;">' +
       '<button id="cpGageCancel" style="padding:8px 18px; font-weight:700; cursor:pointer;">Cancel</button>' +
       '<button id="cpGageClear" style="padding:8px 18px; font-weight:700; cursor:pointer; color:#8a2a2a;">Clear</button>' +
       '<button id="cpGageSave" style="padding:8px 24px; font-weight:800; cursor:pointer; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px;">\u2713 Save</button>' +
@@ -4769,7 +4786,7 @@ function cpGagePopup(idx){
     dropLabel: 'UPLOAD GAGE DRAWING',
     dropHint: 'Sketch, photo, screenshot or PDF \u2014 any PDF, including a Chrome PDF Document. Ctrl+V pastes a screenshot or a page copied out of the PDF viewer.',
     seedKey: 'GAGE::' + gkey,
-    previewMax: '34vh'
+    fill: true
   });
 
   const close = () => { bg.remove(); try{ _cptvClose(); }catch(e){} };
