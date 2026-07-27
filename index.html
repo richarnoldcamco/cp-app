@@ -1412,7 +1412,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-574";
+const APP_REV = "Rev-575";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1426,6 +1426,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-575", type: "App", changes: ["UPLOAD THE GAGE DRAWING FROM THE CONTROL PLAN ROW (Rev-575) \u2014 the Special Gage / Fixture writing box now carries a GAGE DRAWING section under the text, so a drawing can be attached at the moment the gage is written instead of going to the Gages To Be Made list afterwards. \ud83d\udcc4 Upload drawing opens the shared capture studio: browse, drag-drop, or Ctrl+V; any PDF including a Chrome PDF Document, with every page loaded; sew and nudge for multi-sheet designs. An attached drawing shows as a thumbnail (click to view full size) with \u2b06 Replace drawing and \u2715 Remove drawing beside it. The drawing is keyed to the balloon with the same PART::OPnnn::Bnn key the gage list uses, so it can be attached BEFORE the description is saved and still lands on the right gage. Two supporting fixes: the capture studio now opens above the gage popup rather than behind it, and a proper _idbDelDrawing path was added \u2014 _idbPutDrawing rightly refuses a blank image to guard against wiping a drawing by accident, so removing one needed its own route."] },
   { ts: "2026-07-27", rev: "App Rev-574", type: "App", changes: ["UPLOAD BUG FIXED \u2014 PICKED FILES WERE BEING THROWN AWAY (Rev-574) \u2014 choosing a file in the capture studio (traveller or gage drawing) did nothing at all, silently. Cause: the picker handler read file.files into a variable and then reset the input with file.value = \u2018\u2019 to allow re-picking the same file. file.files is a LIVE list, so clearing the input emptied the very list already being held \u2014 the code then looked at zero files and quietly stopped. The chosen files are now copied into a real array BEFORE the input is reset. Three hardening changes alongside: (1) PDF detection no longer trusts the file name or the browser\u2019s MIME label \u2014 the first bytes are read and anything starting %PDF is treated as a PDF, so Chrome PDF Documents and OneDrive files with odd type labels work. (2) A live status line under the drop zone reports every step \u2014 reading, loading the PDF reader, converting page n of n, pages loaded \u2014 so a slow or failed load explains itself instead of looking dead. (3) Failures are translated into plain language: a PDF reader that cannot download says it needs internet the first time on a device, and an unreadable file suggests a OneDrive file still showing a red X needs to finish downloading first."] },
   { ts: "2026-07-27", rev: "App Rev-573", type: "App", changes: ["GAGE DRAWINGS GET CTRL+V AND PDF (Rev-573) \u2014 \ud83d\udcc4 Upload Drawing on the Gages To Be Made list was a bare file picker: no paste, no drag, one page only. The traveller screen built at Rev-570 has been generalised into a shared capture studio (cpImageStudio) and BOTH now use it, so a gage drawing gets the identical treatment: click, drag-drop, or Ctrl+V; images or PDF with EVERY page loaded; reorder, sew and nudge; \u2212 / FIT / 100% / + zoom; an existing drawing seeds as page 1 so Replace can add a sheet instead of starting over. The paste handler was widened: it now reads clipboard FILES first, accepts application/pdf as well as images \u2014 so a page copied out of Chrome\u2019s built-in PDF viewer pastes straight in \u2014 and if what was pasted is only text it says so instead of appearing dead. The traveller screen is unchanged in behaviour; it is now a thin wrapper that configures the same studio."] },
   { ts: "2026-07-27", rev: "App Rev-572", type: "App", changes: ["GAGES TO BE MADE \u2014 SHOP-WIDE LIST (Rev-572) \u2014 filling the Special Gage / Fixture column on any Control Plan row now automatically posts that gage to a list, reachable from a new \ud83d\udd27 GAGES TO BE MADE button on the main menu carrying a live badge (open / total). Each gage is keyed PART::OPnnn::Bnn so it follows its balloon, and the list carries Part/Op, balloon, feature + tolerance, the gage description, status, who it is assigned to, and its drawing. Five buttons per row: \u270f\ufe0f EDIT rewrites the description, \u21bb UPDATE sets status (TO BE MADE \u2192 DESIGNED \u2192 ORDERED \u2192 IN PROGRESS \u2192 COMPLETE) with an optional progress note, \ud83d\udc64 ASSIGNED TO names the toolmaker or vendor, \ud83d\udcc4 UPLOAD DRAWING attaches a picture or PDF of the gage design (stored under GAGE::<key> and GitHub-synced like any drawing, with View / \u2b06 Replace), and \ud83d\uddd1 DELETE removes it. A filter shows open-only, all, or one status. EDIT and DELETE write back to the Control Plan row they came from \u2014 the open builder updates immediately, a closed plan is corrected in its saved record \u2014 so the list and the plan never disagree. The list rides the normal GitHub data sync as cpGageList in cp_data.json, merged per gage key with the newest edit winning, so every device sees the same list."] },
@@ -1873,7 +1874,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:36 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:48 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3877,7 +3878,7 @@ async function cpImageStudio(opts){
 
   const bg = document.createElement('div');
   bg.id = 'cptvBg';
-  bg.style.cssText = 'position:fixed; inset:0; z-index:100004; background:rgba(20,15,12,.9); display:flex; align-items:center; justify-content:center; padding:16px;';
+  bg.style.cssText = 'position:fixed; inset:0; z-index:100010; background:rgba(20,15,12,.9); display:flex; align-items:center; justify-content:center; padding:16px;';
   bg.innerHTML =
    '<div style="background:#efe9df; border-radius:10px; width:100%; max-width:1180px; max-height:94vh; display:flex; flex-direction:column; overflow:hidden;">' +
     '<div style="background:#7a1a1c; color:#fff; font-weight:800; letter-spacing:.06em; padding:10px 16px; font-size:14px;">' + String(o.title || 'UPLOAD') + '</div>' +
@@ -4726,6 +4727,9 @@ function cpGagePopup(idx){
       '</div>' +
       '<textarea id="cpGageText" rows="7" placeholder="E.G. PLUG GAGE, GO/NO-GO, .6040/.6035 \u2014 CARBIDE PINS, HANDLE STAMPED WITH PART NUMBER AND BALLOON 3. OR: HOLDING FIXTURE TO SUPPORT THE RING ON THE ROLL CHECKER WITHOUT DISTORTING THE .029/.027 WALL." ' +
         'style="width:100%; box-sizing:border-box; font-size:13px; padding:10px; border:2px solid #c9c0b4; border-radius:6px; font-family:inherit; line-height:1.5; resize:vertical;"></textarea>' +
+      // Rev-575: attach the gage drawing right here, without going to the list first
+      '<div style="font-size:11px; font-weight:800; letter-spacing:.05em; margin:14px 0 6px;">GAGE DRAWING</div>' +
+      '<div id="cpGageDwgRow"></div>' +
     '</div>' +
     '<div style="background:#f1ede6; padding:11px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid #ddd6cc;">' +
       '<button id="cpGageCancel" style="padding:8px 18px; font-weight:700; cursor:pointer;">Cancel</button>' +
@@ -4739,6 +4743,67 @@ function cpGagePopup(idx){
   // the app force-uppercases most fields; this is free prose, so leave what is typed alone
   ta.classList.add('no-upper');
   setTimeout(() => { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }, 60);
+  // Rev-575: the drawing is keyed to this balloon, so it can be attached before the
+  // description is even saved — same key the Gages To Be Made list uses.
+  const gkey = cpGageKey(cpBuildState.partNum, cpBuildState.opNum, row.bubble);
+  function drawDwgRow(){
+    const box = document.getElementById('cpGageDwgRow'); if(!box) return;
+    let img = null;
+    try{ const d = _idbGetDrawing('GAGE::' + gkey); img = d && d.odsImage; }catch(e){}
+    box.innerHTML = '';
+    if(img){
+      const im = document.createElement('img');
+      im.src = img;
+      im.style.cssText = 'max-width:100%; max-height:180px; display:block; border:1px solid #c9c0b4; border-radius:6px; background:#fff; cursor:zoom-in;';
+      im.title = 'Click to view full size';
+      im.onclick = () => cpGageViewDrawing(gkey);
+      box.appendChild(im);
+    }
+    const bar = document.createElement('div');
+    bar.style.cssText = 'display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;';
+    const up = document.createElement('button');
+    up.textContent = img ? '\u2b06 Replace drawing' : '\ud83d\udcc4 Upload drawing';
+    up.title = 'Browse, drag-drop, or paste with Ctrl+V \u2014 images or PDF, every page';
+    up.style.cssText = 'font-size:12px; font-weight:700; padding:7px 14px; border-radius:6px; border:1px solid #5a4a2a; background:#5a4a2a; color:#fff; cursor:pointer;';
+    up.onclick = (e) => {
+      e.preventDefault();
+      cpImageStudio({
+        title: 'GAGE DRAWING \u2014 ' + (cpBuildState.partNum || '') + ' BALLOON ' + (row.bubble || ''),
+        dropLabel: 'UPLOAD GAGE DRAWING',
+        dropHint: 'Sketch, photo, screenshot or PDF \u2014 any PDF, including a Chrome PDF Document. Ctrl+V pastes a screenshot or a page copied out of the PDF viewer. Load several pages and sew them if the design runs long.',
+        seedKey: 'GAGE::' + gkey,
+        saveLabel: 'Save gage drawing',
+        onSave: (url) => {
+          _idbPutDrawing('GAGE::' + gkey, url);      // stored + GitHub-synced
+          try{ _cpGTouch(gkey, { hasDrawing: true }); }catch(e){}
+          drawDwgRow();
+          flash('\u2713 Gage drawing saved.');
+        }
+      });
+    };
+    bar.appendChild(up);
+    if(img){
+      const rm = document.createElement('button');
+      rm.textContent = '\u2715 Remove drawing';
+      rm.style.cssText = 'font-size:12px; font-weight:700; padding:7px 14px; border-radius:6px; border:1px solid #8a2a2a; background:#fff; color:#8a2a2a; cursor:pointer;';
+      rm.onclick = (e) => {
+        e.preventDefault();
+        if(!confirm('Remove the drawing attached to this gage?')) return;
+        try{ _idbDelDrawing('GAGE::' + gkey); }catch(e){}
+        try{ _cpGTouch(gkey, { hasDrawing: false }); }catch(e){}
+        drawDwgRow();
+      };
+      bar.appendChild(rm);
+    } else {
+      const hint = document.createElement('div');
+      hint.textContent = 'Browse, drag a file in, or paste with Ctrl+V. Images or PDF \u2014 every page loads.';
+      hint.style.cssText = 'font-size:11px; color:#6b6257; align-self:center;';
+      bar.appendChild(hint);
+    }
+    box.appendChild(bar);
+  }
+  drawDwgRow();
+
   const close = () => bg.remove();
   document.getElementById('cpGageCancel').onclick = close;
   bg.onclick = (e) => { if(e.target === bg) close(); };
@@ -5045,6 +5110,15 @@ function _idbPutDrawing(partNum, odsImage, cleanOdsImage){
 function _idbGetDrawing(partNum){
   const P = String(partNum||'').trim().toUpperCase();
   return _idbDrawCache[P] || null;
+}
+// Rev-575: _idbPutDrawing refuses a blank image (correctly — it guards against wiping a
+// drawing by accident), so removing one needs its own path.
+function _idbDelDrawing(partNum){
+  const P = String(partNum||'').trim().toUpperCase();
+  if(!P) return;
+  delete _idbDrawCache[P];
+  if(!_idbDb) return;
+  try{ _idbDb.transaction('drawings', 'readwrite').objectStore('drawings').delete(P); }catch(e){}
 }
 // ===== Rev-506: DRAWING SYNC =====================================================
 // Each part's ODS drawing lives in its own repo file drawings/{PART}.json. Saving a
