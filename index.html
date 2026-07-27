@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-563</title>
+<title>CONTROL PLAN GENERATOR - Rev-564</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-563 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 11:24 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-564 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 11:30 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1370,7 +1370,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-563";
+const APP_REV = "Rev-564";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1384,6 +1384,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-564", type: "App", changes: ["ADD-OP TRAVELLER BUG FIXED + TRUE SUBSECTIONS (Rev-564) \u2014 (1) \u2795 Add Op on an existing part was still demanding the traveller: the known-part check only looked at saved PROJECTS, so parts living as under-construction DRAFTS failed it. The check now recognizes projects, drafts, stored part info, AND the Add-Op button itself vouches for the part \u2014 the traveller is asked for ONLY when a brand-new part number is typed on the main New Control Plan screen. (2) Operation plans now render as true SUBSECTIONS under the part header: \u21b3 OP-050 indented in the Part column with the revision kept clean \u2014 a part with 12 operations reads as one part block with 12 op rows beneath it."] },
   { ts: "2026-07-27", rev: "App Rev-563", type: "App", changes: ["PART-FIRST CREATION WITH A REQUIRED TRAVELLER (Rev-563) \u2014 New Control Plan is now organized around the PART: (1) Part fields (Part #, Revision, Owner, Customer, Quality Level) followed by a TRAVELLER upload (image or PDF \u2014 PDFs auto-convert) that is REQUIRED the first time a part is created; the traveller is stored once with the part (and syncs to GitHub like drawings) \u2014 adding later ops never re-asks for it. (2) An OPERATION section (Op #, Operation, Machine, balloons, ODS) creates ONE op-plan, per Rev-561. (3) The Control Plans list now GROUPS BY PART with a header bar per part carrying \u2795 Add Op (opens New CP pre-filled from the part \u2014 just enter the Op #, upload that op\u2019s ODS, generate) and \ud83d\udcc4 Traveller (full-screen viewer). (4) The unused Operation ID#/workcenter and Cycle Time fields were removed from the form. Existing plans untouched."] },
   { ts: "2026-07-27", rev: "App Rev-562", type: "App", changes: ["CUSTOMER CP NOW COMBINES ALL OPERATIONS OF THE PART (Rev-562) \u2014 clicking \ud83d\udce4 Customer CP on ANY of a part\u2019s op-plans builds ONE customer sheet spanning every operation: rows gathered from every op-plan of that part number in routing order (OP-020, then 030, \u2026), one section per operation with the op number / operation / machine printed on its first row like the submitted 1000222892 example, and continuous Doc line numbers. The edited sheet is stored once per part (whichever sibling holds it opens from any row\u2019s button), and a new \u21bb Rebuild from plans button discards screen edits and regenerates fresh after op-plans change. Single-op parts behave exactly as before."] },
   { ts: "2026-07-27", rev: "App Rev-561", type: "App", changes: ["ONE CONTROL PLAN PER OPERATION (Rev-561) \u2014 a part number can now carry a SEPARATE Control Plan for every routing operation. New \u2018Op # (routing)\u2019 field on the New Control Plan form (E.G. 030): plans with an Op # get their own identity (part :: rev :: OP-nnn) so 912767-M OP-020 and 912767-M OP-030 live side-by-side without overwriting each other; the Control Plans list shows the op beside the revision (Rev-1 \u00b7 OP-030). Each op-plan gets its OWN Machinist Validation (injected as \u2018912767-M OP-030\u2019), and all writeback channels (reference images, feature edits, edit-state restore) were re-keyed to land on the correct op-plan. Rows default their Process Step to the Op #. Existing plans without an Op # are completely untouched. To split an existing single-op plan: create a new plan per op with the same part number and the right Op #."] },
@@ -1820,7 +1821,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:24 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:30 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2314,8 +2315,11 @@ function renderProjects(){
     }
     const tr = document.createElement('tr');
     const p = item.data;
-    const tdPart = document.createElement('td'); const b=document.createElement('strong'); b.textContent=p.partNum||''; tdPart.appendChild(b);
-    const tdRev = document.createElement('td'); tdRev.textContent = (p.rev || '') + (p.opNum ? ' \u00b7 OP-' + p.opNum : '');
+    const tdPart = document.createElement('td'); const b=document.createElement('strong');
+    if(p.opNum){ b.textContent = '\u2003\u21b3 OP-' + p.opNum; b.style.fontWeight = '600'; }
+    else b.textContent = p.partNum || '';
+    tdPart.appendChild(b);
+    const tdRev = document.createElement('td'); tdRev.textContent = p.rev || '';
     const tdStatus = document.createElement('td');
     if(item.kind === 'draft'){
       tdStatus.innerHTML = '<span style="background:#e6a817; color:#3a2c00; font-weight:700; font-size:11px; padding:2px 8px; border-radius:10px; white-space:nowrap;">📝 DRAFT</span>';
@@ -3545,6 +3549,7 @@ function cpTravellerWire(){
   window._cpTravShow = show;
 }
 function cpAddOpToPart(partNum){
+  window._cpTravWaive = String(partNum || '');   // the part exists — never re-ask for its traveller
   // Rev-563: prefill the New CP form from the part's stored info — only the op fields are blank
   showNewCP(true);
   setTimeout(() => {
@@ -3615,7 +3620,12 @@ async function generateCPBuild(){
   // Rev-563: a NEW part requires its traveller. A part that already has one (info stored
   // or any existing plan) sails through — adding ops never re-asks for the traveller.
   const _projectsNow = JSON.parse(localStorage.getItem('cpProjects') || '[]');
-  const _partKnown = !!cpPartInfoGet(partNum) || _projectsNow.some(x => String(x.partNum).toUpperCase() === String(partNum).toUpperCase());
+  const _draftsNow = JSON.parse(localStorage.getItem('cpDrafts') || '[]');
+  const _pk = String(partNum).toUpperCase();
+  const _partKnown = !!cpPartInfoGet(partNum)
+    || _projectsNow.some(x => String(x.partNum).toUpperCase() === _pk)
+    || _draftsNow.some(x => String(x.partNum).toUpperCase() === _pk)
+    || String(window._cpTravWaive || '').toUpperCase() === _pk;   // + Add Op came from a part header
   if(!_partKnown && !currentTravellerImage){
     alert('This is a NEW part — upload its TRAVELLER (the routing) first.\n\nThe traveller is stored once with the part; every operation you add afterwards reuses it.');
     return;
