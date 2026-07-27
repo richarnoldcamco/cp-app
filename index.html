@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-565</title>
+<title>CONTROL PLAN GENERATOR - Rev-566</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-565 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 11:34 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-566 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 11:37 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -457,6 +457,7 @@
     </div>
   </div>
 
+  <div id="travSection">
   <div style="font-weight:800; letter-spacing:.06em; color:#7a1a1c; margin:14px 0 4px;">TRAVELLER <span style="font-weight:400; font-size:12px; color:#6b6257;">(required the first time a part is created — the routing that lists its operations)</span></div>
   <div id="travDrop" style="border:2px dashed #b8a; border-color:#b89; border-radius:10px; background:#fff; padding:14px; text-align:center; cursor:pointer;">
     <span id="travDropLabel">📄 Tap to upload the traveller (image or PDF)</span>
@@ -464,6 +465,7 @@
   </div>
   <input id="travFile" type="file" accept="image/*,.pdf" style="display:none">
   <div style="text-align:right; margin-top:4px;"><button type="button" id="travRemove" class="btn-ghost" style="display:none; font-size:12px; padding:4px 10px;">✕ Remove traveller</button></div>
+  </div>
 
   <div style="font-weight:800; letter-spacing:.06em; color:#7a1a1c; margin:14px 0 4px;">OPERATION <span style="font-weight:400; font-size:12px; color:#6b6257;">(this plan covers ONE operation — add more ops to the part from the Control Plans list)</span></div>
   <div class="grid3">
@@ -1370,7 +1372,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-565";
+const APP_REV = "Rev-566";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1384,6 +1386,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-566", type: "App", changes: ["ADD-OP SCREEN LOCKED TO OPERATION DATA ONLY (Rev-566) \u2014 arriving via \u2795 Add Op: the TRAVELLER section is hidden entirely (the traveller lives with the part, uploaded once at part creation), and the part-level fields (Part #, Revision, Process Owner, Customer, Quality Level) are FIXED \u2014 greyed and read-only, filled from the part\u2019s stored data. Only the OPERATION fields (Op #, Operation, Machine, balloons) and the op\u2019s ODS upload are live. A fresh New Control Plan opening still shows everything editable with the traveller required."] },
   { ts: "2026-07-27", rev: "App Rev-565", type: "App", changes: ["Arriving via \u2795 Add Op, the screen is now titled NEW OPERATION CONTROL PLAN \u2014 <part number>, so it\u2019s always clear an operation is being added to an existing part rather than a new part being created. A fresh New Control Plan opening still says New Control Plan."] },
   { ts: "2026-07-27", rev: "App Rev-564", type: "App", changes: ["ADD-OP TRAVELLER BUG FIXED + TRUE SUBSECTIONS (Rev-564) \u2014 (1) \u2795 Add Op on an existing part was still demanding the traveller: the known-part check only looked at saved PROJECTS, so parts living as under-construction DRAFTS failed it. The check now recognizes projects, drafts, stored part info, AND the Add-Op button itself vouches for the part \u2014 the traveller is asked for ONLY when a brand-new part number is typed on the main New Control Plan screen. (2) Operation plans now render as true SUBSECTIONS under the part header: \u21b3 OP-050 indented in the Part column with the revision kept clean \u2014 a part with 12 operations reads as one part block with 12 op rows beneath it."] },
   { ts: "2026-07-27", rev: "App Rev-563", type: "App", changes: ["PART-FIRST CREATION WITH A REQUIRED TRAVELLER (Rev-563) \u2014 New Control Plan is now organized around the PART: (1) Part fields (Part #, Revision, Owner, Customer, Quality Level) followed by a TRAVELLER upload (image or PDF \u2014 PDFs auto-convert) that is REQUIRED the first time a part is created; the traveller is stored once with the part (and syncs to GitHub like drawings) \u2014 adding later ops never re-asks for it. (2) An OPERATION section (Op #, Operation, Machine, balloons, ODS) creates ONE op-plan, per Rev-561. (3) The Control Plans list now GROUPS BY PART with a header bar per part carrying \u2795 Add Op (opens New CP pre-filled from the part \u2014 just enter the Op #, upload that op\u2019s ODS, generate) and \ud83d\udcc4 Traveller (full-screen viewer). (4) The unused Operation ID#/workcenter and Cycle Time fields were removed from the form. Existing plans untouched."] },
@@ -1822,7 +1825,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:34 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:37 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2088,6 +2091,12 @@ function showMenu(){
 function showNewCP(fresh){
   setTimeout(cpTravellerWire, 50);
   const _t = $('newCpTitle'); if(_t) _t.textContent = 'New Control Plan';   // Rev-565: reset — Add Op overrides below
+  // Rev-566: reset the Add-Op lockdown — traveller visible, part fields editable
+  setTimeout(() => {
+    const ts = $('travSection'); if(ts) ts.style.display = '';
+    ['cpPartNum','cpRev','cpOwner'].forEach(id => { const el = $(id); if(el){ el.readOnly = false; el.style.background = ''; } });
+    const cu = $('cpCustomer'); if(cu){ cu.disabled = false; cu.style.background = ''; }
+  }, 60);
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.remove('hidden');
   $('projectsScreen').classList.add('hidden');
@@ -3568,6 +3577,10 @@ function cpAddOpToPart(partNum){
     }
     ['cpOpNum','cpOperation','cpMachine'].forEach(id => { if($(id)) $(id).value = ''; });
     const _t = $('newCpTitle'); if(_t) _t.textContent = 'New Operation Control Plan \u2014 ' + partNum;
+    // Rev-566: this screen ONLY adds an operation — part data is fixed, traveller lives with the part
+    const ts = $('travSection'); if(ts) ts.style.display = 'none';
+    ['cpPartNum','cpRev','cpOwner'].forEach(id => { const el = $(id); if(el){ el.readOnly = true; el.style.background = 'var(--panel-2)'; } });
+    const cu = $('cpCustomer'); if(cu){ cu.disabled = true; cu.style.background = 'var(--panel-2)'; }
     if($('cpOpNum')) $('cpOpNum').focus();
     flash('Adding an operation to ' + partNum + ' \u2014 traveller already on file. Enter the Op #, upload the op\u2019s ODS, and generate.');
   }, 120);
