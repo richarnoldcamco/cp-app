@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-561</title>
+<title>CONTROL PLAN GENERATOR - Rev-562</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-561 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 10:34 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-562 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 11:19 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1368,7 +1368,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-561";
+const APP_REV = "Rev-562";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1382,6 +1382,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-562", type: "App", changes: ["CUSTOMER CP NOW COMBINES ALL OPERATIONS OF THE PART (Rev-562) \u2014 clicking \ud83d\udce4 Customer CP on ANY of a part\u2019s op-plans builds ONE customer sheet spanning every operation: rows gathered from every op-plan of that part number in routing order (OP-020, then 030, \u2026), one section per operation with the op number / operation / machine printed on its first row like the submitted 1000222892 example, and continuous Doc line numbers. The edited sheet is stored once per part (whichever sibling holds it opens from any row\u2019s button), and a new \u21bb Rebuild from plans button discards screen edits and regenerates fresh after op-plans change. Single-op parts behave exactly as before."] },
   { ts: "2026-07-27", rev: "App Rev-561", type: "App", changes: ["ONE CONTROL PLAN PER OPERATION (Rev-561) \u2014 a part number can now carry a SEPARATE Control Plan for every routing operation. New \u2018Op # (routing)\u2019 field on the New Control Plan form (E.G. 030): plans with an Op # get their own identity (part :: rev :: OP-nnn) so 912767-M OP-020 and 912767-M OP-030 live side-by-side without overwriting each other; the Control Plans list shows the op beside the revision (Rev-1 \u00b7 OP-030). Each op-plan gets its OWN Machinist Validation (injected as \u2018912767-M OP-030\u2019), and all writeback channels (reference images, feature edits, edit-state restore) were re-keyed to land on the correct op-plan. Rows default their Process Step to the Op #. Existing plans without an Op # are completely untouched. To split an existing single-op plan: create a new plan per op with the same part number and the right Op #."] },
   { ts: "2026-07-27", rev: "App Rev-560", type: "App", changes: ["\ud83d\udce4 CUSTOMER CP IS NOW AN IN-APP EDITABLE SCREEN (Rev-559 \u2192 Rev-560) \u2014 clicking \ud83d\udce4 Customer CP no longer downloads instantly. It opens a full-screen editor that LOOKS like the submitted L3Harris sheet: full title block, light-blue header band, rotated Classification, all feature rows \u2014 and EVERY CELL IS EDITABLE (click and type: fill Part/Dwg Revision, Family Name, fix any description, size, frequency\u2026). Edits save onto the plan automatically on Close or Download (p.custCP, synced to GitHub with everything else) so the screen reopens exactly as you left it. \u2b07 Download .xlsx builds the file from the edited screen. The dead H/I title-block column from the first export was also removed."] },
   { ts: "2026-07-27", rev: "App Rev-559", type: "App", changes: ["\ud83d\udce4 CUSTOMER CP EXPORT \u2014 new purple \ud83d\udce4 Customer CP button on every Control Plans row builds the L3HARRIS LEGACY-FORMAT Control Plan .xlsx for customer submittal, entirely on this device (ExcelJS loaded on demand from cdnjs; no data leaves the machine). Layout mirrors the submitted 1000222892 example: full title block (Company/ITAR Export Control/Control Plan Number L3H_<part>_CP/dates original+revised/approval blocks, Process Owner SARAH ETZL, team R. ARNOLD, M. BROWN, R. SHEDDEN, T. HANNON), light-blue header band, rotated Classification, and per-row mapping: Reference = FAI ITEM <bubble>, Product = feature description, Process = MEASURE, Spec/Tol, Evaluation Measurement Technique = machinist method, Size = # recorded, Frequency = FREQ(EVERY), Control Method = INSPECTION, Reaction Plan (CW843-1 default). Op number/description/machine print on the first row of each operation only. File saves as L3H_<part>_CP.xlsx. FIRST-EXPORT REVIEW REQUIRED: Part/Dwg Revision and Family Name cells are left blank (not stored in the app yet) \u2014 fill in Excel before sending, and report any column that should map differently."] },
@@ -1816,7 +1817,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:34 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:19 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3003,13 +3004,26 @@ function renameProject(idx){
 // Opens a full-screen editor that LOOKS like the submitted sheet; every cell is editable;
 // edits save onto the project (p.custCP, synced like everything else); Download builds the
 // .xlsx from the edited screen via ExcelJS (on-demand, on-device).
-function cpCustBuildModel(p){
+function cpCustGroup(projects, p){
+  // Rev-562: every plan for this part number (all ops + legacy), ops in routing order
+  const g = projects.map((x, i) => ({ x, i })).filter(o => o.x && String(o.x.partNum) === String(p.partNum));
+  g.sort((a, b) => (parseInt(a.x.opNum || '0') || 0) - (parseInt(b.x.opNum || '0') || 0));
+  return g;
+}
+function cpCustBuildModel(p, projects){
   if(p.custCP && p.custCP.rows && p.custCP.rows.length) return JSON.parse(JSON.stringify(p.custCP));
-  const bs = p.builderState || {};
-  const rows = (bs.rows && bs.rows.length ? bs.rows : (bs.state && bs.state.rows)) || [];
+  const group = projects ? cpCustGroup(projects, p) : [{ x: p, i: -1 }];
   const today = new Date();
   const fmtD = (d) => (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear();
   const created = p.created ? new Date(p.created) : today;
+  // Rev-562: rows from EVERY operation's plan, one section per op, continuous Doc #s
+  const allRows = [];
+  group.forEach(o => {
+    const bs = o.x.builderState || {};
+    const rr = (bs.rows && bs.rows.length ? bs.rows : (bs.state && bs.state.rows)) || [];
+    rr.forEach(row => allRows.push({ row, opNum: String(o.x.opNum || ''), opLabel: String(bs.operation || ''), opMachine: String(bs.machine || '') }));
+  });
+  const rows = allRows;
   let lastStep = null;
   return {
     tb: {
@@ -3020,14 +3034,15 @@ function cpCustBuildModel(p){
       team: 'R. ARNOLD, M. BROWN, R. SHEDDEN, T. HANNON',
       engApp: 'N/A', qualApp: 'N/A', otherApp: 'N/A'
     },
-    rows: rows.map((row, ri) => {
-      const step = String(row.processStep || '');
+    rows: rows.map((it, ri) => {
+      const row = it.row || it;
+      const step = String(it.opNum || row.processStep || '');
       const first = step && step !== lastStep; if(first) lastStep = step;
       return {
-        doc: String(row.docLine || (ri+1)),
+        doc: String(ri+1),
         step: first ? step : '',
-        desc: first ? String(row.process || '') : '',
-        machine: first ? String(row.machineTools || '') : '',
+        desc: first ? (String(it.opLabel || row.process || '')) : '',
+        machine: first ? (String(it.opMachine || row.machineTools || '')) : '',
         ref: row.bubble ? ('FAI ITEM ' + String(row.bubble)) : '',
         product: String(row.featureDesc || ''),
         process: 'MEASURE',
@@ -3072,9 +3087,14 @@ function cpCustSave(idx){
 }
 async function cpCustomerExport(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
-  const p = projects[idx];
+  let p = projects[idx];
   if(!p || !p.builderState){ alert('This plan has no editable data to export.'); return; }
-  const m = cpCustBuildModel(p);
+  // Rev-562: the customer sheet is per PART — if any sibling op-plan already holds the
+  // edited customer copy, open THAT one so edits are shared across all the part's rows.
+  const grp = cpCustGroup(projects, p);
+  const holder = grp.find(o => o.x.custCP && o.x.custCP.rows && o.x.custCP.rows.length);
+  if(holder){ idx = holder.i; p = projects[idx]; }
+  const m = cpCustBuildModel(p, projects);
   const old = document.getElementById('ccPanel'); if(old) old.remove();
   const panel = document.createElement('div');
   panel.id = 'ccPanel';
@@ -3088,8 +3108,9 @@ async function cpCustomerExport(idx){
   panel.innerHTML =
     '<div style="flex:none; display:flex; align-items:center; gap:10px; padding:10px 14px; background:#7a1a1c; color:#fff;">' +
       '<b style="font-size:15px; letter-spacing:.05em;">CUSTOMER CONTROL PLAN \u2014 ' + String(p.partNum||'') + '</b>' +
-      '<span style="font-size:12px; opacity:.85;">every cell is editable \u00b7 edits save to this plan automatically</span>' +
+      '<span style="font-size:12px; opacity:.85;">ALL OPERATIONS of this part \u00b7 every cell is editable \u00b7 edits save automatically</span>' +
       '<span style="flex:1"></span>' +
+      '<button id="ccRebuild" style="background:#b8860b; color:#fff; border:0; border-radius:8px; padding:10px 16px; font-weight:800; font-size:13px; cursor:pointer;" title="Throw away screen edits and rebuild fresh from the current op-plans">\u21bb Rebuild from plans</button>' +
       '<button id="ccDl" style="background:#1e7e34; color:#fff; border:0; border-radius:8px; padding:10px 22px; font-weight:800; font-size:14px; cursor:pointer;">\u2b07 Download .xlsx</button>' +
       '<button id="ccClose" style="background:#fff; color:#7a1414; border:2px solid #fff; border-radius:8px; padding:8px 18px; font-weight:800; font-size:14px; cursor:pointer;">\u2715 Close</button>' +
     '</div>' +
@@ -3119,6 +3140,12 @@ async function cpCustomerExport(idx){
     '</div>';
   document.body.appendChild(panel);
   document.getElementById('ccClose').onclick = function(){ cpCustSave(idx); panel.remove(); flash('Customer Control Plan saved'); };
+  document.getElementById('ccRebuild').onclick = function(){
+    if(!confirm('Rebuild the customer sheet fresh from the current op-plans? Your screen edits will be discarded.')) return;
+    const pj = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    if(pj[idx]){ delete pj[idx].custCP; localStorage.setItem('cpProjects', JSON.stringify(pj)); }
+    panel.remove(); cpCustomerExport(idx);
+  };
   document.getElementById('ccDl').onclick = function(){ cpCustSave(idx); cpCustXlsx(idx); };
 }
 async function cpCustXlsx(idx){
