@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-558</title>
+<title>CONTROL PLAN GENERATOR - Rev-559</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-558 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 9:41 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-559 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 10:07 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1364,7 +1364,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-558";
+const APP_REV = "Rev-559";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1378,6 +1378,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-559", type: "App", changes: ["\ud83d\udce4 CUSTOMER CP EXPORT \u2014 new purple \ud83d\udce4 Customer CP button on every Control Plans row builds the L3HARRIS LEGACY-FORMAT Control Plan .xlsx for customer submittal, entirely on this device (ExcelJS loaded on demand from cdnjs; no data leaves the machine). Layout mirrors the submitted 1000222892 example: full title block (Company/ITAR Export Control/Control Plan Number L3H_<part>_CP/dates original+revised/approval blocks, Process Owner SARAH ETZL, team R. ARNOLD, M. BROWN, R. SHEDDEN, T. HANNON), light-blue header band, rotated Classification, and per-row mapping: Reference = FAI ITEM <bubble>, Product = feature description, Process = MEASURE, Spec/Tol, Evaluation Measurement Technique = machinist method, Size = # recorded, Frequency = FREQ(EVERY), Control Method = INSPECTION, Reaction Plan (CW843-1 default). Op number/description/machine print on the first row of each operation only. File saves as L3H_<part>_CP.xlsx. FIRST-EXPORT REVIEW REQUIRED: Part/Dwg Revision and Family Name cells are left blank (not stored in the app yet) \u2014 fill in Excel before sending, and report any column that should map differently."] },
   { ts: "2026-07-27", rev: "App Rev-558", type: "App", changes: ["TOLERANCE LINE REMOVED FROM THE FEATURE SCREEN (embedded validation REV-155 \u2192 REV-156) \u2014 the \u2018Tolerance .6040 / .6035\u2019 text under the gage name duplicated the LOW / HIGH cards right below it and is gone. The CMM-method note that shared that line still shows when a feature has one."] },
   { ts: "2026-07-27", rev: "App Rev-557", type: "App", changes: ["FRESHLY DRAWN WHITE-OUTS ARE ACTIVE ON RELEASE (embedded validation REV-154 \u2192 REV-155) \u2014 draw a white-out box and, the moment the mouse button is released, it is already SELECTED (red dashed outline, edge grips ready) \u2014 arrows nudge and edges click immediately, no second click needed. Draw \u2192 trim \u2192 Enter to accept \u2192 draw the next."] },
   { ts: "2026-07-27", rev: "App Rev-556", type: "App", changes: ["Home screen: added the missing space in the CONTROL PLANS badge \u2014 \u20186 Projects\u2019 instead of \u20186Projects\u2019."] },
@@ -1809,7 +1810,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:41 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:07 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2343,6 +2344,14 @@ function renderProjects(){
       tdActions.appendChild(renBtn);
       tdActions.appendChild(delBtn);
       tdActions.appendChild(dlBtn);
+      const custBtn = document.createElement('button');
+      custBtn.className = 'btn-ghost';
+      custBtn.textContent = '\ud83d\udce4 Customer CP';
+      custBtn.title = 'Build the L3Harris-format Control Plan xlsx for customer submittal';
+      custBtn.style.cssText = 'margin-left:6px; background:#6b3fa0; color:#fff; border:1px solid #543181;';
+      custBtn.onclick = () => cpCustomerExport(i);
+      if(!p.builderState){ custBtn.disabled = true; custBtn.style.opacity = '0.45'; custBtn.title = 'No plan data to export'; }
+      tdActions.appendChild(custBtn);
     }
     tr.appendChild(tdPart); tr.appendChild(tdRev); tr.appendChild(tdStatus); tr.appendChild(tdDate); tr.appendChild(tdActions);
     tbody.appendChild(tr);
@@ -2983,6 +2992,120 @@ function renameProject(idx){
   flash('✏️ Renamed to ' + partClean + ' ' + revClean + ' — one plan, no duplicate.');
 }
 
+// Rev-559: CUSTOMER CONTROL PLAN EXPORT — builds the L3Harris legacy-format .xlsx
+// (title block w/ Export Control + approvals, FAI ITEM references, INSPECTION control
+// method) from a saved plan's rows, entirely on-device via ExcelJS (loaded on demand).
+async function cpCustomerExport(idx){
+  const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+  const p = projects[idx];
+  if(!p || !p.builderState){ alert('This plan has no editable data to export.'); return; }
+  const bs = p.builderState || {};
+  const rows = (bs.rows && bs.rows.length ? bs.rows : (bs.state && bs.state.rows)) || [];
+  if(!rows.length){ alert('This plan has no feature rows yet.'); return; }
+  flash('Building customer Control Plan\u2026');
+  if(typeof ExcelJS === 'undefined'){
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
+      s.onload = res; s.onerror = () => rej(new Error('Could not load the Excel engine (offline?)'));
+      document.head.appendChild(s);
+    }).catch(e => { alert(e.message); });
+    if(typeof ExcelJS === 'undefined') return;
+  }
+  try{
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet('Control Plan', { views:[{ state:'frozen', ySplit:13 }] });
+    const BLUE = 'FF9DC3E6', thin = { style:'thin', color:{argb:'FF000000'} };
+    const allB = { top:thin, left:thin, bottom:thin, right:thin };
+    const COLS = 14;
+    ws.columns = [
+      { width:7 },{ width:9 },{ width:22 },{ width:14 },{ width:12 },{ width:15 },{ width:11 },
+      { width:5 },{ width:20 },{ width:20 },{ width:12 },{ width:13 },{ width:16 },{ width:30 }
+    ];
+    const put = (cellRef, v, opt) => {
+      const c = ws.getCell(cellRef); c.value = v;
+      c.font = Object.assign({ name:'Arial', size:9 }, (opt&&opt.font)||{});
+      c.alignment = Object.assign({ vertical:'middle', wrapText:true }, (opt&&opt.align)||{});
+      if(opt && opt.fill) c.fill = { type:'pattern', pattern:'solid', fgColor:{argb:opt.fill} };
+      c.border = allB;
+      return c;
+    };
+    const today = new Date();
+    const fmtD = (d) => (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear();
+    const created = p.created ? new Date(p.created) : today;
+    // ---- Title block ----
+    ws.mergeCells('A1:C1'); put('A1', 'Control Plan', { font:{ bold:true, size:13 } });
+    ws.mergeCells('D1:N1'); put('D1', '');
+    ws.mergeCells('A2:B2'); put('A2', 'Pre-Production', { align:{ horizontal:'center' } });
+    ws.mergeCells('C2:D2'); put('C2', 'Production', { align:{ horizontal:'center' }, font:{ bold:true } });
+    ws.mergeCells('E2:N2'); put('E2', '');
+    const band = (r, cells) => cells.forEach(cc => {
+      ws.mergeCells(cc[0]); put(cc[0].split(':')[0], cc[1], { font:{ bold: !!cc[2] } });
+    });
+    band(3, [['A3:D3','Company/Organization Name:'],['E3:G3','Export Control Classification:'],['H3:I3','Control Plan Number & Revision:'],['J3:K3','Date (Original):'],['L3:N3','Date (Revised):']]);
+    band(4, [['A4:D4','CAMCO MANUFACTURING, INC',1],['E4:G4','ITAR',1],['H4:I4','L3H_' + String(p.partNum||'') + '_CP',1],['J4:K4', fmtD(created),1],['L4:N4', fmtD(today),1]]);
+    band(5, [['A5:D5','Company/Organization Location:'],['E5:G5','Other Restrictions:'],['H5:I5',''],['J5:N5','Customer Engineering Approval/Date (If Required):']]);
+    band(6, [['A6:D6','317 SOUTH THOMAS AVE, SAYRE, PA  18840',1],['E6:G6','N/A',1],['H6:I6',''],['J6:N6','N/A',1]]);
+    band(7, [['A7:D7','Part/Dwg Number:'],['E7:G7','Program/Project:'],['H7:I7',''],['J7:N7','Customer Quality Approval/Date (If Required):']]);
+    band(8, [['A8:D8', String(p.partNum||''),1],['E8:G8','N/A',1],['H8:I8',''],['J8:N8','N/A',1]]);
+    band(9, [['A9:D9','Part/Dwg Revision:'],['E9:G9','Process Owner Name & E-mail:'],['H9:I9',''],['J9:N9','Other Approval/Date (If Required):']]);
+    band(10,[['A10:D10','',1],['E10:G10','SARAH ETZL, CUSTOMER COORDINATOR   sarah.etzl@camcomfginc.com',1],['H10:I10',''],['J10:N10','N/A',1]]);
+    band(11,[['A11:D11','Part/Dwg or Family Name:'],['E11:G11','Cross Functional Team Members:'],['H11:I11',''],['J11:N11','']]);
+    band(12,[['A12:D12','',1],['E12:G12','R. ARNOLD, M. BROWN, R. SHEDDEN, T. HANNON',1],['H12:I12',''],['J12:N12','']]);
+    // ---- Column header row (13) ----
+    const heads = ['Doc (Line) #','Process Step','Process Description','Machine, Device, Jig, Tools For Mfg.','Reference','Product','Process','Classification','Product / Process Specification/ Tolerance','Evaluation Measurement Technique','Size','Frequency','Control Method','Reaction Plan'];
+    heads.forEach((h, ci) => {
+      const c = ws.getCell(13, ci+1); c.value = h;
+      c.font = { name:'Arial', size:9, bold:true };
+      c.alignment = { vertical:'middle', horizontal:'center', wrapText:true };
+      c.fill = { type:'pattern', pattern:'solid', fgColor:{argb:BLUE} };
+      c.border = allB;
+    });
+    ws.getRow(13).height = 44;
+    ws.getCell(13, 8).alignment = { vertical:'middle', horizontal:'center', wrapText:true, textRotation:90 };
+    // ---- Data rows ----
+    let r = 14, lastStep = null;
+    rows.forEach((row, ri) => {
+      const step = String(row.processStep || '');
+      const firstOfOp = step && step !== lastStep;
+      const vals = [
+        String(row.docLine || (ri+1)),
+        firstOfOp ? step : '',
+        firstOfOp ? String(row.process || '') : '',
+        firstOfOp ? String(row.machineTools || '') : '',
+        row.bubble ? ('FAI ITEM ' + String(row.bubble)) : '',
+        String(row.featureDesc || ''),
+        'MEASURE',
+        String(row.classification || ''),
+        String(row.spec || ((row.upperLimit||row.lowerLimit) ? (String(row.upperLimit||'') + (row.lowerLimit?'/'+row.lowerLimit:'')) : '')),
+        String(row.measMethod || ''),
+        String(row.numRecorded || ''),
+        String(row.freqEvery || ''),
+        'INSPECTION',
+        String(row.reactionPlan || 'FOLLOW SHOP NON-CONFORMING PARTS FLOW CHART (CW843-1).')
+      ];
+      vals.forEach((v, ci) => {
+        const c = ws.getCell(r, ci+1); c.value = String(v).toUpperCase();
+        c.font = { name:'Arial', size:9 };
+        c.alignment = { vertical:'middle', horizontal:'center', wrapText:true };
+        c.border = allB;
+      });
+      ws.getRow(r).height = 30;
+      if(firstOfOp) lastStep = step;
+      r++;
+    });
+    const buf = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'L3H_' + String(p.partNum||'PART') + '_CP.xlsx';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    flash('Customer Control Plan downloaded \u2014 review before submittal');
+  }catch(e){
+    alert('Customer CP export failed: ' + (e && e.message || e));
+  }
+}
 async function downloadProject(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   const p = projects[idx];
