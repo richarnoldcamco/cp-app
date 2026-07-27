@@ -1412,7 +1412,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-575";
+const APP_REV = "Rev-576";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1426,6 +1426,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-576", type: "App", changes: ["ONE SCREEN \u2014 THE GAGE UPLOADER MOVED INTO THE WRITING BOX (Rev-576) \u2014 attaching a gage drawing no longer opens a second window. The capture engine was made mountable, and it is now embedded directly in the GAGE DRAWING section of the Special Gage / Fixture box: drop area, page thumbnails and live preview all sit under the text, in the same window, with one \u2713 Save that writes the wording and the drawing together. Browse, drag-drop, or Ctrl+V; any PDF including a Chrome PDF Document, every page. The window widened to 900px and scrolls. CLUTTER CONTROL: the joining controls (layout, trim overlap, background, \ud83e\uddf5 Sew, Undo) and the whole nudge bar now appear ONLY when two or more pages are loaded \u2014 a single-page drawing shows just the drop box, the thumbnail and the preview. Zoom \u2212 / FIT / 100% / + appears once any page is loaded. Clear wipes the wording only and says so; the drawing survives. Saving with no pages loaded removes any drawing that was there. The traveller keeps its own full window \u2014 same engine, now wrapped rather than duplicated."] },
   { ts: "2026-07-27", rev: "App Rev-575", type: "App", changes: ["UPLOAD THE GAGE DRAWING FROM THE CONTROL PLAN ROW (Rev-575) \u2014 the Special Gage / Fixture writing box now carries a GAGE DRAWING section under the text, so a drawing can be attached at the moment the gage is written instead of going to the Gages To Be Made list afterwards. \ud83d\udcc4 Upload drawing opens the shared capture studio: browse, drag-drop, or Ctrl+V; any PDF including a Chrome PDF Document, with every page loaded; sew and nudge for multi-sheet designs. An attached drawing shows as a thumbnail (click to view full size) with \u2b06 Replace drawing and \u2715 Remove drawing beside it. The drawing is keyed to the balloon with the same PART::OPnnn::Bnn key the gage list uses, so it can be attached BEFORE the description is saved and still lands on the right gage. Two supporting fixes: the capture studio now opens above the gage popup rather than behind it, and a proper _idbDelDrawing path was added \u2014 _idbPutDrawing rightly refuses a blank image to guard against wiping a drawing by accident, so removing one needed its own route."] },
   { ts: "2026-07-27", rev: "App Rev-574", type: "App", changes: ["UPLOAD BUG FIXED \u2014 PICKED FILES WERE BEING THROWN AWAY (Rev-574) \u2014 choosing a file in the capture studio (traveller or gage drawing) did nothing at all, silently. Cause: the picker handler read file.files into a variable and then reset the input with file.value = \u2018\u2019 to allow re-picking the same file. file.files is a LIVE list, so clearing the input emptied the very list already being held \u2014 the code then looked at zero files and quietly stopped. The chosen files are now copied into a real array BEFORE the input is reset. Three hardening changes alongside: (1) PDF detection no longer trusts the file name or the browser\u2019s MIME label \u2014 the first bytes are read and anything starting %PDF is treated as a PDF, so Chrome PDF Documents and OneDrive files with odd type labels work. (2) A live status line under the drop zone reports every step \u2014 reading, loading the PDF reader, converting page n of n, pages loaded \u2014 so a slow or failed load explains itself instead of looking dead. (3) Failures are translated into plain language: a PDF reader that cannot download says it needs internet the first time on a device, and an unreadable file suggests a OneDrive file still showing a red X needs to finish downloading first."] },
   { ts: "2026-07-27", rev: "App Rev-573", type: "App", changes: ["GAGE DRAWINGS GET CTRL+V AND PDF (Rev-573) \u2014 \ud83d\udcc4 Upload Drawing on the Gages To Be Made list was a bare file picker: no paste, no drag, one page only. The traveller screen built at Rev-570 has been generalised into a shared capture studio (cpImageStudio) and BOTH now use it, so a gage drawing gets the identical treatment: click, drag-drop, or Ctrl+V; images or PDF with EVERY page loaded; reorder, sew and nudge; \u2212 / FIT / 100% / + zoom; an existing drawing seeds as page 1 so Replace can add a sheet instead of starting over. The paste handler was widened: it now reads clipboard FILES first, accepts application/pdf as well as images \u2014 so a page copied out of Chrome\u2019s built-in PDF viewer pastes straight in \u2014 and if what was pasted is only text it says so instead of appearing dead. The traveller screen is unchanged in behaviour; it is now a thin wrapper that configures the same studio."] },
@@ -1874,7 +1875,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:48 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "4:06 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3777,7 +3778,7 @@ async function _cptvCanvas(layout, overlap, bg, markPos){
 function _cptvV(id){ const e = document.getElementById(id); return e ? e.value : ''; }
 function _cptvRender(){
   const strip = document.getElementById('cptvStrip'); if(!strip) return;
-  if(!_cptvPages.length){ strip.innerHTML = '<span style="font-size:12px; color:#6b6257;">No pages loaded yet.</span>'; }
+  if(!_cptvPages.length){ strip.innerHTML = ''; }
   else strip.innerHTML = _cptvPages.map((p, i) => {
     const tag = (p.ox || p.oy || p.ow) ? ('x' + (p.ox || 0) + ' y' + (p.oy || 0) + (p.ow ? ' w' + (p.ow > 0 ? '+' : '') + p.ow : '')) : '';
     return '<div data-pg="' + i + '" style="border:2px solid ' + (i === _cptvSel ? '#7a1a1c' : '#c9c0b4') + '; background:#fff; border-radius:6px; padding:4px; width:104px; text-align:center; cursor:pointer;">' +
@@ -3790,6 +3791,10 @@ function _cptvRender(){
   }).join('');
   const lbl = document.getElementById('cptvSelLbl'); if(lbl) lbl.textContent = String(_cptvSel + 1);
   const cnt = document.getElementById('cptvCount'); if(cnt) cnt.textContent = _cptvPages.length + ' PAGE(S)';
+  // Rev-576: joining controls are noise until there are two pages to join
+  const zb = document.getElementById('cptvZoomBar'); if(zb) zb.style.display = _cptvPages.length ? 'flex' : 'none';
+  const sb = document.getElementById('cptvSewBar'); if(sb) sb.style.display = _cptvPages.length > 1 ? 'flex' : 'none';
+  const nb = document.getElementById('cptvNudgeBar'); if(nb) nb.style.display = _cptvPages.length > 1 ? 'flex' : 'none';
   strip.querySelectorAll('[data-pg]').forEach(d => d.onclick = (e) => {
     if(e.target.tagName === 'BUTTON') return;
     _cptvSel = +d.dataset.pg; _cptvRender();
@@ -3813,7 +3818,8 @@ function _cptvRender(){
 }
 async function _cptvPreview(){
   const pv = document.getElementById('cptvPrev'); if(!pv) return;
-  if(!_cptvPages.length){ pv.innerHTML = '<p style="color:#6b6257; font-size:12px;">Load the traveller pages to see the join.</p>'; return; }
+  if(!_cptvPages.length){ pv.innerHTML = ''; pv.style.display = 'none'; return; }
+  pv.style.display = 'block';
   try{
     const c = await _cptvCanvas(_cptvV('cptvLayout'), +_cptvV('cptvOverlap'), _cptvV('cptvBgCol'), _cptvSel);
     const style = _cptvZoom > 0 ? ('width:' + Math.round(c.width * _cptvZoom) + 'px; max-width:none;') : 'max-width:100%;';
@@ -3869,132 +3875,144 @@ function _cptvClose(){
 // Rev-573: the traveller screen became a GENERAL page-capture studio so anything that
 // needs a picture (traveller, gage drawing) gets the same Ctrl+V paste, drag-drop,
 // multi-page PDF, sew and nudge. opts = { title, dropLabel, dropHint, seedKey, saveLabel, onSave(url) }
-async function cpImageStudio(opts){
-  const o = opts || {};
-  _cptvClose();
-  _cptvPart = String(o.title || ''); _cptvPages = []; _cptvSel = 0; _cptvBackup = null; _cptvZoom = 0;
-  // seed with whatever is already on file so Replace can ADD pages rather than start over
-  if(o.seedKey){ try{ const d = _idbGetDrawing(o.seedKey); if(d && d.odsImage) _cptvPages.push({ name: 'on file', url: d.odsImage }); }catch(e){} }
-
-  const bg = document.createElement('div');
-  bg.id = 'cptvBg';
-  bg.style.cssText = 'position:fixed; inset:0; z-index:100010; background:rgba(20,15,12,.9); display:flex; align-items:center; justify-content:center; padding:16px;';
-  bg.innerHTML =
-   '<div style="background:#efe9df; border-radius:10px; width:100%; max-width:1180px; max-height:94vh; display:flex; flex-direction:column; overflow:hidden;">' +
-    '<div style="background:#7a1a1c; color:#fff; font-weight:800; letter-spacing:.06em; padding:10px 16px; font-size:14px;">' + String(o.title || 'UPLOAD') + '</div>' +
-    '<div style="padding:14px 16px; overflow:auto;">' +
-      '<div id="cptvDrop" style="border:2px dashed #a89b8a; border-radius:8px; padding:18px; text-align:center; cursor:pointer; background:#f6f2ea;">' +
+// Rev-576: the capture studio can now be MOUNTED INSIDE another panel instead of
+// opening its own window. _cptvPanelHtml builds the working area (drop box, status
+// line, page strip, sew controls, nudge bar, preview) and _cptvWire hooks it up; the
+// overlay version just wraps that in a window with its own footer.
+function _cptvPanelHtml(o){
+  return '' +
+      '<div id="cptvDrop" style="border:2px dashed #a89b8a; border-radius:8px; padding:14px; text-align:center; cursor:pointer; background:#f6f2ea;">' +
         '<div style="font-weight:800; letter-spacing:.05em; font-size:13px;">' + String(o.dropLabel || 'UPLOAD PAGES') + '</div>' +
-        '<div style="font-size:12px; color:#6b6257; margin-top:5px; line-height:1.5;">Tap to choose files, drag them onto this box, or paste with <b>Ctrl+V</b> \u2014 a screenshot, or a page copied straight out of the Chrome PDF viewer.<br>' + String(o.dropHint || 'Load EVERY page \u2014 images or PDF (all PDF pages come in).') + '</div>' +
+        '<div style="font-size:12px; color:#6b6257; margin-top:5px; line-height:1.5;">Tap to choose files, drag them onto this box, or paste with <b>Ctrl+V</b>.<br>' + String(o.dropHint || 'Images or PDF \u2014 every page of a PDF loads.') + '</div>' +
       '</div>' +
       '<div id="cptvSay" style="display:none; font-size:12px; font-weight:700; margin-top:8px;"></div>' +
-      '<div style="display:flex; align-items:center; gap:10px; margin:10px 0 6px;">' +
+      '<div id="cptvZoomBar" style="display:none; align-items:center; gap:10px; margin:10px 0 6px;">' +
         '<b id="cptvCount" style="font-size:12px; letter-spacing:.05em;">0 PAGE(S)</b>' +
-        '<button id="cptvZOut" style="font-size:12px; padding:3px 10px; cursor:pointer;">\u2212</button>' +
-        '<button id="cptvZFit" style="font-size:12px; padding:3px 10px; cursor:pointer;">FIT</button>' +
-        '<button id="cptvZ100" style="font-size:12px; padding:3px 10px; cursor:pointer;">100%</button>' +
-        '<button id="cptvZIn" style="font-size:12px; padding:3px 10px; cursor:pointer;">+</button>' +
+        '<button type="button" id="cptvZOut" style="font-size:12px; padding:3px 10px; cursor:pointer;">\u2212</button>' +
+        '<button type="button" id="cptvZFit" style="font-size:12px; padding:3px 10px; cursor:pointer;">FIT</button>' +
+        '<button type="button" id="cptvZ100" style="font-size:12px; padding:3px 10px; cursor:pointer;">100%</button>' +
+        '<button type="button" id="cptvZIn" style="font-size:12px; padding:3px 10px; cursor:pointer;">+</button>' +
       '</div>' +
-      '<div id="cptvStrip" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; min-height:30px;"></div>' +
-      '<div style="display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; background:#e5ddd1; border-radius:8px; padding:10px 12px;">' +
+      '<div id="cptvStrip" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;"></div>' +
+      // Rev-576: joining controls only appear once there are two or more pages to join
+      '<div id="cptvSewBar" style="display:none; gap:14px; flex-wrap:wrap; align-items:flex-end; background:#e5ddd1; border-radius:8px; padding:10px 12px;">' +
         '<div><label style="display:block; font-size:11px; font-weight:700; letter-spacing:.05em;">LAYOUT</label>' +
           '<select id="cptvLayout" style="font-size:12px; padding:4px;"><option value="v">Stack top to bottom</option><option value="h">Side by side</option><option value="g">Grid, 2 across</option></select></div>' +
         '<div><label style="display:block; font-size:11px; font-weight:700; letter-spacing:.05em;">TRIM OVERLAP (PX)</label>' +
           '<input id="cptvOverlap" type="number" min="0" step="10" value="0" style="font-size:12px; padding:4px; width:90px;"></div>' +
         '<div><label style="display:block; font-size:11px; font-weight:700; letter-spacing:.05em;">BACKGROUND</label>' +
           '<select id="cptvBgCol" style="font-size:12px; padding:4px;"><option value="#ffffff">White</option><option value="#000000">Black</option></select></div>' +
-        '<button id="cptvRefresh" style="font-size:12px; padding:5px 12px; cursor:pointer;">Update preview</button>' +
+        '<button type="button" id="cptvRefresh" style="font-size:12px; padding:5px 12px; cursor:pointer;">Update preview</button>' +
+        '<button type="button" id="cptvSew" style="font-size:12px; padding:5px 12px; cursor:pointer; background:#5a4a2a; color:#fff; border:1px solid #47391f; border-radius:6px;">\ud83e\uddf5 Sew pages into one</button>' +
+        '<button type="button" id="cptvUndo" style="font-size:12px; padding:5px 12px; cursor:pointer;">Undo last sew</button>' +
       '</div>' +
-      '<div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:8px; font-size:12px;">' +
+      '<div id="cptvNudgeBar" style="display:none; gap:6px; flex-wrap:wrap; align-items:center; margin-top:8px; font-size:12px;">' +
         '<span>Nudge page <b id="cptvSelLbl">1</b> \u2014 click a thumbnail to pick it, then push it:</span>' +
-        '<button id="cptvNUp" title="Up (or \u2191 key)" style="padding:3px 9px; cursor:pointer;">\u25b2</button>' +
-        '<button id="cptvNDown" title="Down (or \u2193 key)" style="padding:3px 9px; cursor:pointer;">\u25bc</button>' +
-        '<button id="cptvNLeft" title="Left (or \u2190 key)" style="padding:3px 9px; cursor:pointer;">\u25c0</button>' +
-        '<button id="cptvNRight" title="Right (or \u2192 key)" style="padding:3px 9px; cursor:pointer;">\u25b6</button>' +
-        '<button id="cptvNWide" style="padding:3px 9px; cursor:pointer;">\u21d4 Wider</button>' +
-        '<button id="cptvNNarrow" style="padding:3px 9px; cursor:pointer;">\u21e5 Narrower</button>' +
+        '<button type="button" id="cptvNUp" title="Up (or \u2191 key)" style="padding:3px 9px; cursor:pointer;">\u25b2</button>' +
+        '<button type="button" id="cptvNDown" title="Down (or \u2193 key)" style="padding:3px 9px; cursor:pointer;">\u25bc</button>' +
+        '<button type="button" id="cptvNLeft" title="Left (or \u2190 key)" style="padding:3px 9px; cursor:pointer;">\u25c0</button>' +
+        '<button type="button" id="cptvNRight" title="Right (or \u2192 key)" style="padding:3px 9px; cursor:pointer;">\u25b6</button>' +
+        '<button type="button" id="cptvNWide" style="padding:3px 9px; cursor:pointer;">\u21d4 Wider</button>' +
+        '<button type="button" id="cptvNNarrow" style="padding:3px 9px; cursor:pointer;">\u21e5 Narrower</button>' +
         '<span>step</span><select id="cptvStep" style="font-size:12px; padding:3px;"><option>1</option><option>2</option><option>5</option><option selected>10</option><option>25</option><option>50</option></select><span>px</span>' +
-        '<button id="cptvNReset" style="padding:3px 9px; cursor:pointer;">Reset nudges</button>' +
+        '<button type="button" id="cptvNReset" style="padding:3px 9px; cursor:pointer;">Reset nudges</button>' +
       '</div>' +
-      '<div id="cptvPrev" style="margin-top:10px; max-height:42vh; overflow:auto; background:#ded5c8; border-radius:6px; padding:8px;"></div>' +
-    '</div>' +
-    '<div style="background:#e5ddd1; padding:10px 16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; border-top:1px solid #c9c0b4;">' +
-      '<button id="cptvCancel" style="padding:8px 18px; font-weight:700; cursor:pointer;">Cancel</button>' +
-      '<button id="cptvUndo" style="padding:8px 18px; font-weight:700; cursor:pointer;">Undo last sew</button>' +
-      '<button id="cptvSew" style="padding:8px 18px; font-weight:700; cursor:pointer; background:#5a4a2a; color:#fff; border:1px solid #47391f; border-radius:6px;">\ud83e\uddf5 Sew pages into one</button>' +
-      '<button id="cptvSave" style="padding:8px 22px; font-weight:800; cursor:pointer; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px;">\u2713 ' + String(o.saveLabel || 'Save') + '</button>' +
-    '</div>' +
-   '</div>';
-  document.body.appendChild(bg);
-
+      '<div id="cptvPrev" style="margin-top:10px; max-height:' + (o.previewMax || '42vh') + '; overflow:auto; background:#ded5c8; border-radius:6px; padding:8px;"></div>';
+}
+function _cptvWire(root, o){
   const file = document.createElement('input');
   file.type = 'file'; file.accept = 'image/*,application/pdf'; file.multiple = true; file.style.display = 'none';
-  bg.appendChild(file);
+  root.appendChild(file);
   file.onchange = () => {
-    // Rev-574 FIX: file.files is a LIVE list — setting .value = '' empties it, so the
-    // chosen files must be copied into a real array BEFORE the input is reset.
+    // Rev-574 FIX: file.files is a LIVE list — resetting the input empties it, so copy first
     const picked = Array.from(file.files || []);
     file.value = '';
     if(picked.length) _cptvAddFiles(picked);
   };
-
-  const drop = document.getElementById('cptvDrop');
+  const drop = root.querySelector('#cptvDrop');
   drop.onclick = () => file.click();
   drop.ondragover = (e) => { e.preventDefault(); drop.style.background = '#e8dfcd'; };
   drop.ondragleave = () => { drop.style.background = '#f6f2ea'; };
   drop.ondrop = (e) => { e.preventDefault(); drop.style.background = '#f6f2ea'; if(e.dataTransfer && e.dataTransfer.files.length) _cptvAddFiles(e.dataTransfer.files); };
 
-  document.getElementById('cptvZOut').onclick = () => { _cptvZoom = _cptvZoom ? Math.max(0.1, _cptvZoom - 0.15) : 0.85; _cptvPreview(); };
-  document.getElementById('cptvZIn').onclick = () => { _cptvZoom = (_cptvZoom || 0.85) + 0.15; _cptvPreview(); };
-  document.getElementById('cptvZFit').onclick = () => { _cptvZoom = 0; _cptvPreview(); };
-  document.getElementById('cptvZ100').onclick = () => { _cptvZoom = 1; _cptvPreview(); };
-  document.getElementById('cptvRefresh').onclick = _cptvPreview;
-  ['cptvLayout','cptvOverlap','cptvBgCol'].forEach(id => { const el = document.getElementById(id); if(el) el.onchange = _cptvPreview; });
-  document.getElementById('cptvNUp').onclick = () => _cptvNudge(0, -1);
-  document.getElementById('cptvNDown').onclick = () => _cptvNudge(0, 1);
-  document.getElementById('cptvNLeft').onclick = () => _cptvNudge(-1, 0);
-  document.getElementById('cptvNRight').onclick = () => _cptvNudge(1, 0);
-  document.getElementById('cptvNWide').onclick = () => _cptvNudge(0, 0, 1);
-  document.getElementById('cptvNNarrow').onclick = () => _cptvNudge(0, 0, -1);
-  document.getElementById('cptvNReset').onclick = () => { _cptvPages.forEach(p => { p.ox = 0; p.oy = 0; p.ow = 0; }); _cptvRender(); _cptvPreview(); };
-  document.getElementById('cptvCancel').onclick = _cptvClose;
-
-  // Sew: collapse every loaded page into ONE page, keeping the originals for Undo
-  document.getElementById('cptvSew').onclick = async () => {
+  const on = (id, fn) => { const el = root.querySelector('#' + id); if(el) el.onclick = fn; };
+  on('cptvZOut', () => { _cptvZoom = _cptvZoom ? Math.max(0.1, _cptvZoom - 0.15) : 0.85; _cptvPreview(); });
+  on('cptvZIn', () => { _cptvZoom = (_cptvZoom || 0.85) + 0.15; _cptvPreview(); });
+  on('cptvZFit', () => { _cptvZoom = 0; _cptvPreview(); });
+  on('cptvZ100', () => { _cptvZoom = 1; _cptvPreview(); });
+  on('cptvRefresh', _cptvPreview);
+  ['cptvLayout','cptvOverlap','cptvBgCol'].forEach(id => { const el = root.querySelector('#' + id); if(el) el.onchange = _cptvPreview; });
+  on('cptvNUp', () => _cptvNudge(0, -1));
+  on('cptvNDown', () => _cptvNudge(0, 1));
+  on('cptvNLeft', () => _cptvNudge(-1, 0));
+  on('cptvNRight', () => _cptvNudge(1, 0));
+  on('cptvNWide', () => _cptvNudge(0, 0, 1));
+  on('cptvNNarrow', () => _cptvNudge(0, 0, -1));
+  on('cptvNReset', () => { _cptvPages.forEach(p => { p.ox = 0; p.oy = 0; p.ow = 0; }); _cptvRender(); _cptvPreview(); });
+  on('cptvSew', async () => {
     if(_cptvPages.length < 2){ alert('Load at least two pages before sewing.'); return; }
     try{
-      flash('Sewing pages\u2026');
+      _cptvSay('Sewing pages\u2026');
       const c = await _cptvCanvas(_cptvV('cptvLayout'), +_cptvV('cptvOverlap'), _cptvV('cptvBgCol'));
       _cptvBackup = _cptvPages.slice();
       _cptvPages = [{ name: 'sewn-' + _cptvBackup.length + '-pages.png', url: c.toDataURL('image/png') }];
       _cptvSel = 0; _cptvRender(); _cptvPreview();
-      flash('\u2713 Sewn into one ' + c.width + ' \u00d7 ' + c.height + ' image \u2014 Undo last sew puts the pages back.');
+      _cptvSay('\u2713 Sewn into one ' + c.width + ' \u00d7 ' + c.height + ' image \u2014 Undo last sew puts the pages back.');
     }catch(e){ alert('Could not sew: ' + (e && e.message || e)); }
-  };
-  document.getElementById('cptvUndo').onclick = () => {
+  });
+  on('cptvUndo', () => {
     if(!_cptvBackup){ alert('Nothing to undo.'); return; }
     _cptvPages = _cptvBackup.slice(); _cptvBackup = null;
     _cptvSel = 0; _cptvRender(); _cptvPreview();
-    flash('Put the separate pages back.');
-  };
-  // Save: one page saves as-is; several pages sew on the way out using the current settings
-  document.getElementById('cptvSave').onclick = async () => {
-    if(!_cptvPages.length){ alert('Load at least one page first.'); return; }
-    try{
-      let url = _cptvPages[0].url;
-      if(_cptvPages.length > 1){
-        const c = await _cptvCanvas(_cptvV('cptvLayout'), +_cptvV('cptvOverlap'), _cptvV('cptvBgCol'));
-        url = c.toDataURL('image/png');
-      }
-      _cptvClose();
-      if(typeof o.onSave === 'function') await o.onSave(url);
-    }catch(e){ alert('Could not save: ' + (e && e.message || e)); }
-  };
-
+    _cptvSay('Put the separate pages back.');
+  });
   document.addEventListener('keydown', _cptvKeys, true);
   document.addEventListener('paste', _cptvPaste, true);
   _cptvRender(); _cptvPreview();
-  if(!_cptvPages.length && o.autoPick !== false) setTimeout(() => file.click(), 150);
+  return file;
+}
+// Build the finished single image out of whatever is loaded (sewing if needed)
+async function cpStudioResult(){
+  if(!_cptvPages.length) return null;
+  if(_cptvPages.length === 1) return _cptvPages[0].url;
+  const c = await _cptvCanvas(_cptvV('cptvLayout'), +_cptvV('cptvOverlap'), _cptvV('cptvBgCol'));
+  return c.toDataURL('image/png');
+}
+// Mount the studio inside an existing element (no window of its own)
+function cpImageStudioInline(container, o){
+  if(!container) return null;
+  _cptvPages = []; _cptvSel = 0; _cptvBackup = null; _cptvZoom = 0;
+  if(o && o.seedKey){ try{ const d = _idbGetDrawing(o.seedKey); if(d && d.odsImage) _cptvPages.push({ name: 'on file', url: d.odsImage }); }catch(e){} }
+  container.innerHTML = _cptvPanelHtml(o || {});
+  return _cptvWire(container, o || {});
+}
+// Full-window version (used by the traveller)
+async function cpImageStudio(opts){
+  const o = opts || {};
+  _cptvClose();
+  _cptvPart = String(o.title || '');
+  const bg = document.createElement('div');
+  bg.id = 'cptvBg';
+  bg.style.cssText = 'position:fixed; inset:0; z-index:100010; background:rgba(20,15,12,.9); display:flex; align-items:center; justify-content:center; padding:16px;';
+  bg.innerHTML =
+   '<div style="background:#efe9df; border-radius:10px; width:100%; max-width:1180px; max-height:94vh; display:flex; flex-direction:column; overflow:hidden;">' +
+    '<div style="background:#7a1a1c; color:#fff; font-weight:800; letter-spacing:.06em; padding:10px 16px; font-size:14px;">' + String(o.title || 'UPLOAD') + '</div>' +
+    '<div id="cptvBody" style="padding:14px 16px; overflow:auto;"></div>' +
+    '<div style="background:#e5ddd1; padding:10px 16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; border-top:1px solid #c9c0b4;">' +
+      '<button id="cptvCancel" style="padding:8px 18px; font-weight:700; cursor:pointer;">Cancel</button>' +
+      '<button id="cptvSave" style="padding:8px 22px; font-weight:800; cursor:pointer; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px;">\u2713 ' + String(o.saveLabel || 'Save') + '</button>' +
+    '</div>' +
+   '</div>';
+  document.body.appendChild(bg);
+  const file = cpImageStudioInline(document.getElementById('cptvBody'), o);
+  document.getElementById('cptvCancel').onclick = _cptvClose;
+  document.getElementById('cptvSave').onclick = async () => {
+    const url = await cpStudioResult();
+    if(!url){ alert('Load at least one page first.'); return; }
+    try{ _cptvClose(); if(typeof o.onSave === 'function') await o.onSave(url); }
+    catch(e){ alert('Could not save: ' + (e && e.message || e)); }
+  };
+  if(!_cptvPages.length && o.autoPick !== false && file) setTimeout(() => file.click(), 150);
 }
 // Rev-573: traveller now just configures the shared studio
 async function cpTravellerPick(partNum){
@@ -4718,17 +4736,17 @@ function cpGagePopup(idx){
   bg.id = 'cpGageBg';
   bg.style.cssText = 'position:fixed; inset:0; z-index:100005; background:rgba(20,15,12,.85); display:flex; align-items:center; justify-content:center; padding:18px;';
   bg.innerHTML =
-   '<div style="background:#fff; border-radius:10px; width:100%; max-width:640px; overflow:hidden; box-shadow:0 10px 44px rgba(0,0,0,.5);">' +
+   '<div style="background:#fff; border-radius:10px; width:100%; max-width:900px; max-height:94vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 10px 44px rgba(0,0,0,.5);">' +
     '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.05em; padding:11px 16px; font-size:14px;">SPECIAL GAGE / FIXTURE \u2014 BALLOON ' + (row.bubble || '') + '</div>' +
-    '<div style="padding:16px;">' +
+    '<div style="padding:16px; overflow:auto;">' +
       '<div style="font-size:12px; color:#555; line-height:1.5; margin-bottom:10px;">' +
         '<b>' + String(row.featureDesc || '(no description yet)') + '</b>' + (row.spec ? ' \u2014 ' + row.spec : '') + '<br>' +
         'Describe the gage or fixture that has to be made to check this feature \u2014 what it is, what it mates to, and anything the toolmaker needs to know.' +
       '</div>' +
-      '<textarea id="cpGageText" rows="7" placeholder="E.G. PLUG GAGE, GO/NO-GO, .6040/.6035 \u2014 CARBIDE PINS, HANDLE STAMPED WITH PART NUMBER AND BALLOON 3. OR: HOLDING FIXTURE TO SUPPORT THE RING ON THE ROLL CHECKER WITHOUT DISTORTING THE .029/.027 WALL." ' +
+      '<textarea id="cpGageText" rows="5" placeholder="E.G. PLUG GAGE, GO/NO-GO, .6040/.6035 \u2014 CARBIDE PINS, HANDLE STAMPED WITH PART NUMBER AND BALLOON 3. OR: HOLDING FIXTURE TO SUPPORT THE RING ON THE ROLL CHECKER WITHOUT DISTORTING THE .029/.027 WALL." ' +
         'style="width:100%; box-sizing:border-box; font-size:13px; padding:10px; border:2px solid #c9c0b4; border-radius:6px; font-family:inherit; line-height:1.5; resize:vertical;"></textarea>' +
       // Rev-575: attach the gage drawing right here, without going to the list first
-      '<div style="font-size:11px; font-weight:800; letter-spacing:.05em; margin:14px 0 6px;">GAGE DRAWING</div>' +
+      '<div style="font-size:11px; font-weight:800; letter-spacing:.05em; margin:16px 0 6px; border-top:1px solid #e4ded4; padding-top:14px;">GAGE DRAWING</div>' +
       '<div id="cpGageDwgRow"></div>' +
     '</div>' +
     '<div style="background:#f1ede6; padding:11px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid #ddd6cc;">' +
@@ -4743,77 +4761,35 @@ function cpGagePopup(idx){
   // the app force-uppercases most fields; this is free prose, so leave what is typed alone
   ta.classList.add('no-upper');
   setTimeout(() => { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }, 60);
-  // Rev-575: the drawing is keyed to this balloon, so it can be attached before the
-  // description is even saved — same key the Gages To Be Made list uses.
+  // Rev-576: the uploader lives IN this window now — no second screen. Same capture
+  // engine, mounted straight into the GAGE DRAWING section: browse, drag, or Ctrl+V;
+  // any PDF including a Chrome PDF Document; sew + nudge appear only for 2+ pages.
   const gkey = cpGageKey(cpBuildState.partNum, cpBuildState.opNum, row.bubble);
-  function drawDwgRow(){
-    const box = document.getElementById('cpGageDwgRow'); if(!box) return;
-    let img = null;
-    try{ const d = _idbGetDrawing('GAGE::' + gkey); img = d && d.odsImage; }catch(e){}
-    box.innerHTML = '';
-    if(img){
-      const im = document.createElement('img');
-      im.src = img;
-      im.style.cssText = 'max-width:100%; max-height:180px; display:block; border:1px solid #c9c0b4; border-radius:6px; background:#fff; cursor:zoom-in;';
-      im.title = 'Click to view full size';
-      im.onclick = () => cpGageViewDrawing(gkey);
-      box.appendChild(im);
-    }
-    const bar = document.createElement('div');
-    bar.style.cssText = 'display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;';
-    const up = document.createElement('button');
-    up.textContent = img ? '\u2b06 Replace drawing' : '\ud83d\udcc4 Upload drawing';
-    up.title = 'Browse, drag-drop, or paste with Ctrl+V \u2014 images or PDF, every page';
-    up.style.cssText = 'font-size:12px; font-weight:700; padding:7px 14px; border-radius:6px; border:1px solid #5a4a2a; background:#5a4a2a; color:#fff; cursor:pointer;';
-    up.onclick = (e) => {
-      e.preventDefault();
-      cpImageStudio({
-        title: 'GAGE DRAWING \u2014 ' + (cpBuildState.partNum || '') + ' BALLOON ' + (row.bubble || ''),
-        dropLabel: 'UPLOAD GAGE DRAWING',
-        dropHint: 'Sketch, photo, screenshot or PDF \u2014 any PDF, including a Chrome PDF Document. Ctrl+V pastes a screenshot or a page copied out of the PDF viewer. Load several pages and sew them if the design runs long.',
-        seedKey: 'GAGE::' + gkey,
-        saveLabel: 'Save gage drawing',
-        onSave: (url) => {
-          _idbPutDrawing('GAGE::' + gkey, url);      // stored + GitHub-synced
-          try{ _cpGTouch(gkey, { hasDrawing: true }); }catch(e){}
-          drawDwgRow();
-          flash('\u2713 Gage drawing saved.');
-        }
-      });
-    };
-    bar.appendChild(up);
-    if(img){
-      const rm = document.createElement('button');
-      rm.textContent = '\u2715 Remove drawing';
-      rm.style.cssText = 'font-size:12px; font-weight:700; padding:7px 14px; border-radius:6px; border:1px solid #8a2a2a; background:#fff; color:#8a2a2a; cursor:pointer;';
-      rm.onclick = (e) => {
-        e.preventDefault();
-        if(!confirm('Remove the drawing attached to this gage?')) return;
-        try{ _idbDelDrawing('GAGE::' + gkey); }catch(e){}
-        try{ _cpGTouch(gkey, { hasDrawing: false }); }catch(e){}
-        drawDwgRow();
-      };
-      bar.appendChild(rm);
-    } else {
-      const hint = document.createElement('div');
-      hint.textContent = 'Browse, drag a file in, or paste with Ctrl+V. Images or PDF \u2014 every page loads.';
-      hint.style.cssText = 'font-size:11px; color:#6b6257; align-self:center;';
-      bar.appendChild(hint);
-    }
-    box.appendChild(bar);
-  }
-  drawDwgRow();
+  cpImageStudioInline(document.getElementById('cpGageDwgRow'), {
+    dropLabel: 'UPLOAD GAGE DRAWING',
+    dropHint: 'Sketch, photo, screenshot or PDF \u2014 any PDF, including a Chrome PDF Document. Ctrl+V pastes a screenshot or a page copied out of the PDF viewer.',
+    seedKey: 'GAGE::' + gkey,
+    previewMax: '34vh'
+  });
 
-  const close = () => bg.remove();
+  const close = () => { bg.remove(); try{ _cptvClose(); }catch(e){} };
   document.getElementById('cpGageCancel').onclick = close;
   bg.onclick = (e) => { if(e.target === bg) close(); };
-  document.getElementById('cpGageClear').onclick = () => { ta.value = ''; ta.focus(); };
-  document.getElementById('cpGageSave').onclick = () => {
+  document.getElementById('cpGageClear').onclick = () => { ta.value = ''; ta.focus(); _cptvSay('Wording cleared \u2014 the drawing is untouched. Save to apply.'); };
+  document.getElementById('cpGageSave').onclick = async () => {
+    // Rev-576: one Save for the whole window — wording AND drawing together
+    let url = null;
+    try{ url = await cpStudioResult(); }catch(e){ alert('Could not build the drawing: ' + (e && e.message || e)); return; }
     cpBuildState.rows[idx].specialGage = ta.value.trim();
+    if(url) _idbPutDrawing('GAGE::' + gkey, url);        // stored + GitHub-synced
+    else { try{ _idbDelDrawing('GAGE::' + gkey); }catch(e){} }
     close();
     cpGageUpsertFromRow(cpBuildState.rows[idx]);   // Rev-572: feed the Gages To Be Made list
+    try{ if(url) _cpGTouch(gkey, { hasDrawing: true }); }catch(e){}
     renderCPBuilder(); cpAutoSaveProject();
-    flash(cpBuildState.rows[idx].specialGage ? '\u2713 Special gage saved on balloon ' + (row.bubble || '') : 'Special gage cleared.');
+    flash(cpBuildState.rows[idx].specialGage
+      ? ('\u2713 Special gage saved on balloon ' + (row.bubble || '') + (url ? ' (with drawing)' : ''))
+      : 'Special gage cleared.');
   };
   bg.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){ e.preventDefault(); close(); }
