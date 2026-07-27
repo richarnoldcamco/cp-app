@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-566</title>
+<title>CONTROL PLAN GENERATOR - Rev-567</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -370,7 +370,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-566 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 11:37 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-567 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 12:25 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1372,7 +1372,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-566";
+const APP_REV = "Rev-567";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1386,6 +1386,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-567", type: "App", changes: ["\ud83d\udcac NEW CHAT PROMPT UPDATED WITH THE FULL ARCHITECTURE MAP (Rev-567) \u2014 the handoff prompt now carries a compact snapshot of everything this era built: per-operation plans + part::rev::OP identity, part-first creation with the traveller store, the cpMvKey/cpMvFindProject validation keying and all three writeback channels, the complete FEATURE DRAWING editor behavior (modes, zoom/pan, Enter flow, selectable white-outs with active-edge nudging, keyboard ownership, project-persisted edit state), the combined per-part Customer CP editor/export, and the landing curtain \u2014 plus each saved plan\u2019s OP number in the plans list. A brand-new chat now inherits the wiring, not just the last 8 changelog lines."] },
   { ts: "2026-07-27", rev: "App Rev-566", type: "App", changes: ["ADD-OP SCREEN LOCKED TO OPERATION DATA ONLY (Rev-566) \u2014 arriving via \u2795 Add Op: the TRAVELLER section is hidden entirely (the traveller lives with the part, uploaded once at part creation), and the part-level fields (Part #, Revision, Process Owner, Customer, Quality Level) are FIXED \u2014 greyed and read-only, filled from the part\u2019s stored data. Only the OPERATION fields (Op #, Operation, Machine, balloons) and the op\u2019s ODS upload are live. A fresh New Control Plan opening still shows everything editable with the traveller required."] },
   { ts: "2026-07-27", rev: "App Rev-565", type: "App", changes: ["Arriving via \u2795 Add Op, the screen is now titled NEW OPERATION CONTROL PLAN \u2014 <part number>, so it\u2019s always clear an operation is being added to an existing part rather than a new part being created. A fresh New Control Plan opening still says New Control Plan."] },
   { ts: "2026-07-27", rev: "App Rev-564", type: "App", changes: ["ADD-OP TRAVELLER BUG FIXED + TRUE SUBSECTIONS (Rev-564) \u2014 (1) \u2795 Add Op on an existing part was still demanding the traveller: the known-part check only looked at saved PROJECTS, so parts living as under-construction DRAFTS failed it. The check now recognizes projects, drafts, stored part info, AND the Add-Op button itself vouches for the part \u2014 the traveller is asked for ONLY when a brand-new part number is typed on the main New Control Plan screen. (2) Operation plans now render as true SUBSECTIONS under the part header: \u21b3 OP-050 indented in the Part column with the revision kept clean \u2014 a part with 12 operations reads as one part block with 12 op rows beneath it."] },
@@ -1825,7 +1826,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:37 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:25 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -12483,7 +12484,7 @@ function buildCpSpecific(){
   // Rev-514: LIVE handoff — everything a brand-new chat needs to pick up exactly where
   // this one left off, generated fresh every time the button is pressed.
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
-  const projLines = projects.map(p => '- ' + p.partNum + ' ' + (p.rev||'') + (p.customerName? ' · ' + p.customerName : '') + (p.updatedAt? ' · updated ' + String(p.updatedAt).slice(0,10) : '')).join('\n') || '- (none on this device — Pull Data first)';
+  const projLines = projects.map(p => '- ' + p.partNum + (p.opNum ? ' OP-' + p.opNum : '') + ' ' + (p.rev||'') + (p.customerName? ' · ' + p.customerName : '') + (p.updatedAt? ' · updated ' + String(p.updatedAt).slice(0,10) : '')).join('\n') || '- (none on this device — Pull Data first)';
   let valRev = '?';
   try{ const m = /const APP_REV\s*=\s*(\d+)/.exec(decodeURIComponent(escape(atob(VALIDATION_APP_B64.slice(0, 400000))))); if(m) valRev = m[1]; }catch(e){}
   const logs = (typeof CHANGE_LOG !== 'undefined' ? CHANGE_LOG : []).slice(0, 8)
@@ -12499,6 +12500,14 @@ function buildCpSpecific(){
 'USER: Rich Arnold, quality engineer, CAMCO Manufacturing (Sayre PA). NOT a programmer — plain language, click-by-click, define jargon in one sentence. Terse all-caps input; resolve intent without over-asking. ITAR work: part/drawing data stays on-device; AI calls sit behind confirm gates. End every response with the current rev line + a token estimate.',
 'QUICK COMMANDS: DL CP · DL INST · DL PFMEA · dl both · up both · AUDIT · VIEW · DL (app file)',
 'CONTROLLING DOCUMENT: CAMCO Control Plan Instructions Rev-92 (project files) governs all Control Plan content — never edit it without asking first.',
+'',
+'ARCHITECTURE MAP (Rev-567 snapshot — verify against CHANGE_LOG for anything newer):',
+'\u00b7 PER-OPERATION PLANS: a part carries one plan per routing op. Plan id = part::rev::OPnnn (legacy plans keep part::rev). p.opNum on each project; Control Plans list groups by part with header bars (+ Add Op / \ud83d\udcc4 Traveller); op rows render as \u21b3 OP-nnn subsections.',
+'\u00b7 PART-FIRST CREATION: New CP = part fields + REQUIRED traveller (image/PDF, stored via _idbPutDrawing under key PART::TRAVELLER, ghPushDrawing-synced) + first op. cpPartInfo (localStorage) holds per-part rev/owner/customer/QL. + Add Op prefills + LOCKS part fields, hides traveller (cpAddOpToPart, window._cpTravWaive).',
+'\u00b7 VALIDATION KEYING: injected validation part name = cpMvKey(p) = partNum + " OP-nnn". ALL parent writeback channels resolve via cpMvFindProject (accepts keyed OR bare part): cpMvSaveRefImage(part,op,bubble,image,edit) stores p.valRefImages + p.valRefEdits[bubble]; cpMvGetRefEdit(part,bubble) returns saved edit state; cpMvApplyRowEdit(part,bubble,fields) whitelisted row edits.',
+'\u00b7 FEATURE DRAWING EDITOR (embedded val openOdsMarker): modes crop/highlight/white-out \u00b7 wheel zoom \u00b7 right-drag pan \u00b7 Enter zooms-and-stays then Enter saves \u00b7 white-outs are selectable objects (click activates, click-drag draws new, fresh boxes auto-active, edge grips + active-edge arrows w/ hold-acceleration, Delete removes) \u00b7 highlight click-select/Delete/drag/wheel-resize \u00b7 modal owns the keyboard (capture-phase) \u00b7 Esc backs out of the action only \u00b7 saveOdsCrop writes image+edit state to the PROJECT (direct parent call w/ green \u2713 confirmation) and reopening restores zoomed into the crop.',
+'\u00b7 CUSTOMER CP: \ud83d\udce4 Customer CP button opens a full-screen editable L3Harris-format sheet (cpCustomerExport) combining ALL ops of the part in routing order; edits stored once per part in p.custCP; \u21bb Rebuild regenerates from plans; \u2b07 Download builds .xlsx via ExcelJS (cdnjs, on-device). CAMCO plan (working, revs forever) vs Customer CP (submitted once) are separate documents.',
+'\u00b7 EDIT/INSPECT open with an animated curtain until the app posts cpValLanded.',
 '',
 'SAVED PLANS ON THIS DEVICE (' + projects.length + '):',
 projLines,
