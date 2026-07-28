@@ -687,7 +687,7 @@
           <tr style="background:#9DC3E6;">
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:45px;">Doc #</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:50px;">Bubble #</th>
-            <th rowspan="2" style="padding:2px; border:1px solid #5a8bb5; width:22px;" title="Green dot = this balloon's position is pinned on the drawing (zoom-to-bubble works)">📍</th>
+            <th rowspan="2" style="padding:2px; border:1px solid #5a8bb5; width:22px;" title="Row done for the STEP you are on — ● filled from the data, ✓ marked by hand. Click a dot to mark or un-mark a row.">✔</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:260px;">Control Type ID</th>
             <!-- Rev-614: the four Master List levels, so a control type can be narrowed down
                  the same way the Master List is organised instead of hunted in one long list -->
@@ -1536,7 +1536,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-641";
+const APP_REV = "Rev-642";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1669,6 +1669,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-642", type: "App", changes: ["THE DOT IS NOW A SWITCH (Rev-642) \u2014 click the dot on any row to mark it done for the step you are on, and click again to un-mark it. A hand-marked row counts toward that step\u2019s completion, the percentage and the gate to the next step, so the QE\u2019s judgement carries the same weight as the data test. THE TWO ARE KEPT APART ON PURPOSE: a row the data already satisfies shows a plain green \u25cf, a row marked by hand shows a green \u2713. Anyone reading the plan later can tell which rows were FILLED IN from those that were JUDGED complete \u2014 that distinction matters on a controlled document, and one indistinguishable green dot would have thrown it away. Every mark is written to the action log with its step and balloon. Ghost rows keep \ud83d\udc7b and are not clickable. The column heading changed from \ud83d\udccd to \u2714 since it no longer means \u2018pinned\u2019 alone."] },
   { ts: "2026-07-28", rev: "App Rev-641", type: "App", changes: ["THE DOT FOLLOWS THE STEP + AN APPROXIMATE WORKING REV (Rev-641) \u2014 (1) THE GREEN DOT now answers \u2018is this row done for the step I am on\u2019 rather than one fixed question. On Step 1 it means the balloon is pinned on the drawing; on Step 2 that a control type has been chosen; on Step 3 that the measurement method and reaction plan are set. Every row showing green while the Control Type column read \u2014 not set \u2014 was the dot answering a question nobody was asking on that screen. Hovering says which test it applied, and notes if the balloon is still unpinned. Ghost rows keep their \ud83d\udc7b. (2) THE CP REV IS NOW APPROXIMATE, as asked: it advances on Save to Project, on creating a new operation, AND automatically every 100 edits \u2014 so a plan being worked climbs on its own instead of sitting at Rev-1 all week. Saving resets the counter and clears the \u25cf pending mark."] },
   { ts: "2026-07-28", rev: "App Rev-640", type: "App", changes: ["CP REV NOW SHOWS WHEN THERE ARE UNISSUED EDITS (Rev-640) \u2014 the Control Plan revision looked stuck because it advances on an explicit SAVE TO PROJECT, not on every edit. That is deliberate and matches CP-1: a revision is an ISSUE of the document, and the builder auto-saves on every keystroke \u2014 counting those would put a fourteen-row plan at Rev-4000 by lunchtime and make the number worthless for traceability. What was missing was any sign that edits existed beyond the last issued revision, so the figure simply looked broken. An amber \u25cf now appears beside the rev whenever auto-saved edits sit past it, and hovering explains: the edits are safe on this device, and Save to Project issues the next revision. Press Save and the dot clears as the number advances."] },
   { ts: "2026-07-28", rev: "App Rev-639", type: "App", changes: ["CREATING AN OPERATION RETURNS TO THE PART (Rev-639) \u2014 saving a new operation dropped you straight into the builder with a blank skeleton open on the first row. Creating an operation and ballooning it are different jobs: the five construction steps are the map, and landing inside Step 3 skipped past 1 and 2 without acknowledging them and hid the rest of the part, so a second operation could not be seen next to the first. A new operation now saves and returns to THAT PART\u2019S OPERATIONS \u2014 the screen showing both ops, their steps and their progress \u2014 with a note confirming what was created and that Step 3 assigns the bubbles. The plan is auto-saved before the move, and the new op opens with no row expanded, per Rev-608."] },
@@ -2183,7 +2184,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "4:16 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "4:32 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3286,14 +3287,18 @@ function cpStepProgress(p){
   // balloon that is NOT on the drawing, so it can never be pinned.
   const feats = (p && p.builderState && Array.isArray(p.builderState.features)) ? p.builderState.features : [];
   const isPinned = (b) => feats.some(f => String(f.n) === String(b));
+  // Rev-642: a row marked done by hand counts, on any step. The dot is the QE saying
+  // 'this row is settled'; the data test is the shortcut, not the only route.
+  const marked = (r, step) => !!(r.stepDone && r.stepDone[step]);
   const s1Left = rows.filter(r => {
     if(r.ghost) return false;
+    if(marked(r, '1')) return false;
     if(!String(r.bubble || '').trim()) return true;
     return !isPinned(r.bubble);
   }).length;
-  const s2Left = rows.filter(r => !String(r.controlTypeId || '').trim()).length;
+  const s2Left = rows.filter(r => !marked(r, '2') && !String(r.controlTypeId || '').trim()).length;
   // Rev-597: step 3 is done when every row carries a machinist method and a reaction plan
-  const s3Left = rows.filter(r => !String(r.measMethod || '').trim() || !String(r.reactionPlan || '').trim()).length;
+  const s3Left = rows.filter(r => !marked(r, '3') && (!String(r.measMethod || '').trim() || !String(r.reactionPlan || '').trim())).length;
   return {
     total,
     s1Done: total > 0 && s1Left === 0,
@@ -5953,8 +5958,38 @@ function renderCPBuilder(){
       _ok = _pinned;
       _why = _ok ? 'Pinned — zoom-to-bubble works for this balloon' : 'Not pinned yet — click the balloon on the drawing';
     }
-    tdPin.innerHTML = row.ghost ? '<span style="font-size:' + (focused?'14px':'11px') + '; line-height:1;" title="Ghost — balloon not on the drawing">👻</span>' : (_ok ? '<span style="color:#1e8449; font-size:' + (focused?'16px':'12px') + '; line-height:1;">●</span>' : '<span style="color:#c9c9c9; font-size:' + (focused?'14px':'10px') + '; line-height:1;">○</span>');
-    tdPin.title = _why + (_step !== '1' && !_pinned ? '  ·  (this balloon is not pinned on the drawing)' : '');
+    // Rev-642: the dot is now a SWITCH. Click it to mark this row done for the step you
+    // are on. A row the data already satisfies shows a plain green dot; a row marked by
+    // hand shows a green tick, so the two are never confused on an audit — the plan can
+    // still be read back to see which rows were judged complete rather than filled in.
+    const _manual = !!(row.stepDone && row.stepDone[_step]);
+    const _size = focused ? '15px' : '12px';
+    if(row.ghost){
+      tdPin.innerHTML = '<span style="font-size:' + (focused?'14px':'11px') + '; line-height:1;" title="Ghost — balloon not on the drawing">👻</span>';
+    } else if(_ok){
+      tdPin.innerHTML = '<span style="color:#1e8449; font-size:' + _size + '; line-height:1;">●</span>';
+    } else if(_manual){
+      tdPin.innerHTML = '<span style="color:#1e8449; font-size:' + _size + '; line-height:1;">\u2713</span>';
+    } else {
+      tdPin.innerHTML = '<span style="color:#c9c9c9; font-size:' + _size + '; line-height:1;">○</span>';
+    }
+    if(!row.ghost){
+      tdPin.style.cursor = 'pointer';
+      tdPin.title = (_ok ? _why + '  ·  click to un-mark' :
+                    (_manual ? 'Marked done by hand for this step \u2014 click to un-mark.\n(' + _why + ')'
+                             : _why + '  \u00b7  click to mark this row done for this step'))
+                  + (_step !== '1' && !_pinned ? '\n(this balloon is not pinned on the drawing)' : '');
+      tdPin.onclick = (e) => {
+        e.stopPropagation();
+        if(!row.stepDone) row.stepDone = {};
+        row.stepDone[_step] = !row.stepDone[_step];
+        try{ logAct('row-mark', 'step ' + _step + ' \u00b7 balloon ' + (row.bubble||'') + ' \u2192 ' + (row.stepDone[_step] ? 'done' : 'cleared')); }catch(e){}
+        renderCPBuilder();
+        try{ cpAutoSaveProject(); }catch(e){}
+      };
+    } else {
+      tdPin.title = 'Ghost — balloon not on the drawing';
+    }
     tr.appendChild(tdPin);
 
     if(focused){
