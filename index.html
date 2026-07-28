@@ -63,7 +63,7 @@
   header .spacer{flex:1}
 
   .setup{padding:16px 24px;max-width:1100px;margin:0 auto;width:100%}
-  .setup.wide{max-width:1600px}
+  .setup.wide{max-width:2080px}   /* Rev-618: 30% wider — 1600 -> 2080 */
   #masterListScreen.setup.wide{max-width:none;padding-left:8px;padding-right:8px}
   /* Rev-324: hide the six Tolerance Band columns by collapsing them to ZERO WIDTH rather than
      display:none. Keeping the cells present (just empty and 0-wide) preserves the table's column
@@ -209,6 +209,17 @@
   .cp-step-lock{ background:#f2efe9; color:#8a8279; border:1px dashed #c2b9ab; }
   .cp-pill{ display:inline-block; font-size:10px; font-weight:800; letter-spacing:.05em;
     padding:4px 10px; border-radius:11px; white-space:nowrap; }
+  /* Rev-618: a real progress bar under the three steps. The filled part is green; while a
+     plan is unfinished the leading edge pulses so an in-progress plan is obvious across a
+     room, and a finished one sits solid and still. */
+  .cp-prog{ position:relative; height:9px; border-radius:5px; background:#ddd6cc; overflow:hidden; margin-top:7px; }
+  .cp-prog-fill{ position:absolute; inset:0 auto 0 0; border-radius:5px; background:#2c6e49; transition:width .35s ease; }
+  .cp-prog-fill.live{ background:linear-gradient(90deg,#2c6e49 0%,#3fa063 70%,#57c47d 100%); animation:cpPulse 1.25s ease-in-out infinite; }
+  @keyframes cpPulse{ 0%,100%{ opacity:.72; } 50%{ opacity:1; } }
+  .cp-prog-ticks{ position:absolute; inset:0; display:flex; }
+  .cp-prog-ticks span{ flex:1 1 0; border-right:2px solid #efe9df; }
+  .cp-prog-ticks span:last-child{ border-right:none; }
+  .cp-pct{ font-size:19px; font-weight:800; letter-spacing:.02em; line-height:1.1; white-space:nowrap; }
   .cp-rev{ font-size:11px; font-weight:700; color:#8a8279; letter-spacing:.03em; white-space:nowrap; }
   .btn-ghost:active{transform:translateY(2px);background:var(--panel-2);box-shadow:0 0 0 var(--line-strong), 0 1px 2px rgba(0,0,0,.15), inset 0 2px 4px rgba(0,0,0,.12)}
 
@@ -1480,7 +1491,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-617";
+const APP_REV = "Rev-618";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1494,6 +1505,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-618", type: "App", changes: ["PROGRESS BAR, PERCENTAGE AND A WIDER SCREEN (Rev-618) \u2014 (1) A PROGRESS BAR now runs the full width beneath the three construction-step buttons, split into three segments, one per step. The filled part is green; while the plan is unfinished the leading edge PULSES, so an operation still being worked reads across a room, and a finished one sits solid and still. (2) PERCENTAGE MOVED TO THE FAR RIGHT, past every button: the last column now leads with how far along that operation is in large type \u2014 grey at 0%, amber while under way, dark green at 100% \u2014 with the CP rev in small text beneath it. (3) The percentage counts each step as a THIRD AND COUNTS ITS OWN ROWS, so a step half done reads half rather than nothing; the bar moves as you work instead of jumping in three lurches. Hovering it lists what is outstanding in each step. (4) The screen is 30% wider \u2014 1600px to 2080px \u2014 so the steps, buttons and percentage sit on one line with room to spare."] },
   { ts: "2026-07-28", rev: "App Rev-617", type: "App", changes: ["\ud83d\udcbe SAVE CHANGES ON THE MASTER LIST (Rev-617) \u2014 Master List edits have always written to the device as they were made, so nothing was ever at risk, but there was no way to say \u2018I am done\u2019 and no confirmation that the change had reached GitHub \u2014 you had to take it on trust. A Save Changes button now sits beside \u2795 Add Row: it closes whatever row is open (so a half-finished edit is committed rather than abandoned), writes the list, redraws, and pushes to GitHub, then reports which of those actually happened \u2014 saved and pushed with the control-type count, saved but the push FAILED, or saved on this device only because GitHub is not set up here. The button does not replace auto-save; it makes the state visible."] },
   { ts: "2026-07-28", rev: "App Rev-616", type: "App", changes: ["MASTER LIST EDIT ROW BROUGHT BACK DOWN TO SIZE (Rev-616) \u2014 the row being edited had been deliberately enlarged by 50% (12px cell padding, 9px input padding, 14px text, 90px minimum field width) and ended up towering over the grid it sits inside, pushing the tolerance-band columns wide and making the whole screen look coarse. Cell padding 12\u21923px, input padding 9\u21924px, text 14\u219212px, and the 90px minimum field width removed so narrow columns like the tolerance bands stay narrow. The \u2716 cancel button and its auto-saves note were scaled to match, and the \u25be caret moved in to suit the shorter box. The edit row is now the height of a normal row instead of three of them."] },
   { ts: "2026-07-28", rev: "App Rev-615", type: "App", changes: ["MASTER LIST VALUE LISTS OPEN ON THE FIRST CLICK (Rev-615) \u2014 on Workcenter, Feature Type, 2nd Level and 3rd Level (and every other value field on the Master List) the list of existing values opened ONLY from the small \u25be caret at the right-hand edge of the box. Clicking the field itself did nothing but place the cursor, so it took two clicks and the field looked broken. Focusing or clicking the field now opens the list immediately; the caret and the Down-arrow key still work. The click-away handler was taught to ignore clicks on the field itself, which would otherwise have closed the list at the very moment it opened."] },
@@ -1984,7 +1996,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:58 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "1:58 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2946,6 +2958,16 @@ function cpViewOpOds(p){
   document.getElementById('cpOpOdsClose').onclick = () => v.remove();
   v.onclick = (e) => { if(e.target === v) v.remove(); };
 }
+// Rev-618: how far along an operation is, as a share of the three construction steps.
+// Each step is worth a third and counts its own rows, so a step half done reads half,
+// not nothing — the bar moves while you work rather than jumping in three lurches.
+function cpPlanPercent(p){
+  const pr = cpStepProgress(p);
+  if(!pr.total) return 0;
+  const share = (left) => Math.max(0, Math.min(1, (pr.total - left) / pr.total));
+  const pct = (share(pr.s1Left) + share(pr.s2Left) + share(pr.s3Left)) / 3 * 100;
+  return Math.round(pct);
+}
 // Rev-597: what COMPLETE actually means. The badge used to read straight off the
 // manual under-construction switch, so a plan with no operation number, no traveller
 // and no measurement methods still announced itself COMPLETE. It now has to earn it.
@@ -3267,6 +3289,25 @@ function renderProjects(){
           ? ('STEP 2 \u2014 pick the Control Type for each balloon; the methods fill themselves from the Master List.\n' + prog.s2Note + '.' + stepNote)
           : ('LOCKED \u2014 finish Step 1 first. ' + prog.s1Note + '. A control type cannot be chosen for a balloon that does not exist yet.'),
         () => openAt('2'), prog.total - prog.s2Left, prog.total);
+      // Rev-618: a bar under the steps, one segment each, filling as they complete
+      const bar = document.createElement('div');
+      bar.className = 'cp-prog';
+      bar.style.width = '100%';
+      const fill = document.createElement('div');
+      const pctNow = cpPlanPercent(p);
+      fill.className = 'cp-prog-fill' + (pctNow > 0 && pctNow < 100 ? ' live' : '');
+      fill.style.width = pctNow + '%';
+      const ticks = document.createElement('div');
+      ticks.className = 'cp-prog-ticks';
+      ticks.innerHTML = '<span></span><span></span><span></span>';
+      bar.appendChild(fill); bar.appendChild(ticks);
+      bar.title = pctNow + '% \u2014 ' + prog.s1Note + ' \u00b7 ' + prog.s2Note + ' \u00b7 ' + prog.s3Note;
+      const barWrap = document.createElement('div');
+      barWrap.style.cssText = 'flex:1 1 100%; min-width:100%;';
+      barWrap.appendChild(bar);
+      stepWrap.style.flexWrap = 'wrap';
+      setTimeout(() => { try{ stepWrap.appendChild(barWrap); }catch(e){} }, 0);
+
       mkStep(3, 'MEASUREMENT METHODS', prog.s2Done ? (prog.s3Done ? 'done' : 'todo') : 'lock',
         prog.s2Done
           ? ('STEP 3 \u2014 review the measurement methods, set any special gage, confirm the reaction plan.\n' + prog.s3Note + '.' + stepNote)
@@ -3287,11 +3328,17 @@ function renderProjects(){
     }
     // Rev-584: the Control Plan rev has its own right-aligned column now, so it can no
     // longer be pushed off the edge by a long row of buttons
+    // Rev-618: the far-right column now leads with HOW FAR ALONG this operation is, as a
+    // percentage across the three construction steps; the CP rev sits under it in small text.
     const tdCpRev = document.createElement('td');
     tdCpRev.style.cssText = 'text-align:right; white-space:nowrap;';
-    tdCpRev.innerHTML = '<span class="cp-rev" title="Control Plan revision \u2014 how many times this plan has been saved'
+    const _pc = (typeof cpPlanPercent === 'function') ? cpPlanPercent(p) : 0;
+    const _pcCol = _pc >= 100 ? '#1f5133' : (_pc > 0 ? '#8a6a12' : '#a49a8d');
+    tdCpRev.innerHTML =
+        '<div class="cp-pct" style="color:' + _pcCol + ';" title="Share of the three construction steps finished on this operation">' + _pc + '%</div>'
+      + '<div class="cp-rev" title="Control Plan revision \u2014 how many times this plan has been saved'
       + (p.rev ? ('&#10;Part / drawing rev: ' + String(p.rev).replace(/"/g,'')) : '') + '">Rev-'
-      + (parseInt(p.cpRevNum, 10) || 1) + '</span>';
+      + (parseInt(p.cpRevNum, 10) || 1) + '</div>';
     tr.className = 'cp-op-row';
     tr.appendChild(tdPart); tr.appendChild(tdStatus); tr.appendChild(tdDate); tr.appendChild(tdSteps); tr.appendChild(tdActions); tr.appendChild(tdCpRev);
     tbody.appendChild(tr);
