@@ -256,6 +256,12 @@
   @keyframes cpGapPulse{ 0%,100%{ box-shadow:inset 0 0 0 2px #c0392b; }
     50%{ box-shadow:inset 0 0 0 3px #e74c3c, 0 0 8px rgba(192,57,43,.55); } }
   @media (prefers-reduced-motion: reduce){ .cp-gap{ animation:none; } }
+  /* Rev-652: the dot doubles in size and springs back when it is clicked, so a change
+     three rows down the grid is impossible to miss */
+  .cp-dot{ display:inline-block; transition:color .15s ease; }
+  .cp-dot.cp-pop{ animation:cpDotPop .34s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes cpDotPop{ 0%{ transform:scale(1); } 45%{ transform:scale(2); } 100%{ transform:scale(1); } }
+  @media (prefers-reduced-motion: reduce){ .cp-dot.cp-pop{ animation:none; } }
   .cp-pct{ font-size:19px; font-weight:800; letter-spacing:.02em; line-height:1.1; white-space:nowrap; }
   .cp-rev{ font-size:11px; font-weight:700; color:#8a8279; letter-spacing:.03em; white-space:nowrap; }
   .btn-ghost:active{transform:translateY(2px);background:var(--panel-2);box-shadow:0 0 0 var(--line-strong), 0 1px 2px rgba(0,0,0,.15), inset 0 2px 4px rgba(0,0,0,.12)}
@@ -1543,7 +1549,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-651";
+const APP_REV = "Rev-652";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1676,6 +1682,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-652", type: "App", changes: ["ONE MARK, AND IT POPS WHEN CLICKED (Rev-652) \u2014 the \u2713 that distinguished a hand-marked row from a data-filled one is gone: it is the same statement either way, and two different green symbols both meaning \u2018done\u2019 read as two states. Every row now shows a grey \u25cb or a green \u25cf, nothing else. Clicking it toggles the row and the dot SPRINGS TO DOUBLE SIZE AND BACK in a third of a second on a slight overshoot, so a change several rows down the grid cannot be missed. Only the dot just clicked animates \u2014 the rest redraw still \u2014 and the pop respects the system reduced-motion setting. NOTE: the audit distinction the \u2713 carried is not lost, only moved. Every mark and un-mark is written to the action log with its step and balloon, so which rows were judged complete rather than filled in can still be read back."] },
   { ts: "2026-07-28", rev: "App Rev-651", type: "App", changes: ["PROPOSED COLUMN REMOVED (Rev-651) \u2014 every row is assigned deliberately now: the four Master List levels resolve the Control Type ID on their own since Rev-646, so a suggested best-match sitting alongside was a second opinion nobody was asking for, and a wide column on an already crowded grid. Gone from both the open row and the closed rows, along with its \u2713 Use button. All twenty remaining data columns were renumbered and the three step views, the header band spans and the methods sub-band remapped to match \u2014 an off-by-one there is exactly what put the PRIOR ROW strip out of line at Rev-650, so the maps were re-derived rather than nudged. \ud83c\udfaf Auto-fill Proposed and \ud83e\udd16 AI Propose Types remain on the toolbar for bulk work; only the per-row column is gone."] },
   { ts: "2026-07-28", rev: "App Rev-650", type: "App", changes: ["PRIOR ROW STRIP NOW LINES UP WITH THE FORM (Rev-650) \u2014 the read-only PRIOR ROW reference above the Add New Control Type fields was drawn from a column list that had \u2018thirdLevel\u2019 missing. One cell short against a nineteen-column grid meant every value from Feature Description rightwards sat one column LEFT of the field it belonged to \u2014 so the strip showed BORE RUN-OUT under Feature Description\u2019s neighbour, the X marks under the wrong bands, and 1 / 10 / NO CHECK / CMM all shifted. Worse than untidy: it is a reference strip, so a misaligned value invites the next row to be filled in from the wrong column. 3rd Level restored to the list and the two rows now match column for column."] },
   { ts: "2026-07-28", rev: "App Rev-649", type: "App", changes: ["ADD NEW CONTROL TYPE INHERITS THE LEVELS YOU ALREADY SET (Rev-649) \u2014 opening the form from the builder made you retype Workcenter and Feature Type even though they were already chosen on the Control Plan row. The levels WERE being handed over on window._cpMasterSeed since Rev-612, but nothing at the receiving end ever read them, so the seed was written and thrown away. openMasterEdit now applies it when adding a new row, and confirms how many levels were carried across. Re-entering the same facts is not just tedious \u2014 it is a chance for the master row and the plan row to disagree, which is exactly what the computed Control Type ID at Rev-646 was meant to end. The \u2795 Add a new \u2026 option on a level picker now carries EVERY level already set on the row rather than only those above it."] },
@@ -2200,7 +2207,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "6:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:08 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6051,27 +6058,30 @@ function renderCPBuilder(){
     // are on. A row the data already satisfies shows a plain green dot; a row marked by
     // hand shows a green tick, so the two are never confused on an audit — the plan can
     // still be read back to see which rows were judged complete rather than filled in.
+    // Rev-652: ONE mark, two states — a grey ring or a green dot. The ✓ that distinguished
+    // a hand-marked row from a data-filled one is gone at your request: it is the same
+    // statement either way, and two green symbols meaning 'done' read as two states.
     const _manual = !!(row.stepDone && row.stepDone[_step]);
+    const _on = _ok || _manual;
     const _size = focused ? '15px' : '12px';
     if(row.ghost){
       tdPin.innerHTML = '<span style="font-size:' + (focused?'14px':'11px') + '; line-height:1;" title="Ghost — balloon not on the drawing">👻</span>';
-    } else if(_ok){
-      tdPin.innerHTML = '<span style="color:#1e8449; font-size:' + _size + '; line-height:1;">●</span>';
-    } else if(_manual){
-      tdPin.innerHTML = '<span style="color:#1e8449; font-size:' + _size + '; line-height:1;">\u2713</span>';
     } else {
-      tdPin.innerHTML = '<span style="color:#c9c9c9; font-size:' + _size + '; line-height:1;">○</span>';
+      const _pop = (window._cpPopRow === idx && window._cpPopStep === _step) ? ' cp-pop' : '';
+      tdPin.innerHTML = '<span class="cp-dot' + _pop + '" style="color:' + (_on ? '#1e8449' : '#c9c9c9')
+        + '; font-size:' + _size + '; line-height:1;">' + (_on ? '●' : '○') + '</span>';
+      if(_pop){ window._cpPopRow = null; window._cpPopStep = null; }
     }
     if(!row.ghost){
       tdPin.style.cursor = 'pointer';
-      tdPin.title = (_ok ? _why + '  ·  click to un-mark' :
-                    (_manual ? 'Marked done by hand for this step \u2014 click to un-mark.\n(' + _why + ')'
-                             : _why + '  \u00b7  click to mark this row done for this step'))
+      tdPin.title = (_on ? 'Done for this step \u2014 click to clear.\n(' + _why + ')'
+                         : _why + '  \u00b7  click to mark this row done')
                   + (_step !== '1' && !_pinned ? '\n(this balloon is not pinned on the drawing)' : '');
       tdPin.onclick = (e) => {
         e.stopPropagation();
         if(!row.stepDone) row.stepDone = {};
         row.stepDone[_step] = !row.stepDone[_step];
+        window._cpPopRow = idx; window._cpPopStep = _step;   // Rev-652: pop this one on redraw
         try{ logAct('row-mark', 'step ' + _step + ' \u00b7 balloon ' + (row.bubble||'') + ' \u2192 ' + (row.stepDone[_step] ? 'done' : 'cleared')); }catch(e){}
         renderCPBuilder();
         try{ cpAutoSaveProject(); }catch(e){}
