@@ -793,7 +793,6 @@
       <tr class="cp-plan-head" id="cpPlanHeadRow">
         <th>Part Number</th>
         <th>Status</th>
-        <th>ODS Drawing</th>
         <th style="border-left:2px solid #c9c0b4;">Construction Steps</th>
         <th style="border-left:2px solid #c9c0b4;">Actions</th>
         <th style="text-align:right;">CP Rev</th>
@@ -1491,7 +1490,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-619";
+const APP_REV = "Rev-620";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1505,6 +1504,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-620", type: "App", changes: ["PROGRESS TRACK RUNS THE FULL LINE (Rev-620) \u2014 three fixes to the five-step row. (1) THE BAR STARTS UNDER THE OP # and runs the whole width: it now sits on its OWN row directly beneath the operation instead of being boxed inside the Construction Steps column. (2) THE ODS DRAWING COLUMN IS GONE \u2014 Step 2 IS the ODS drawing, so a separate column for it was the same thing said twice, and losing it gives the five step buttons the width to sit in ONE ROW instead of stacking into a tower. (3) A LATER STEP CAN NO LONGER READ DONE WHILE AN EARLIER ONE IS NOT: Step 5 was announcing \u2713 DONE while Step 4 still said DO THIS NEXT, because the methods band fills itself from the Master List \u2014 true of the cells, nonsense as a sequence. A step now shows DONE only when everything before it is done as well."] },
   { ts: "2026-07-28", rev: "App Rev-619", type: "App", changes: ["FIVE CONSTRUCTION STEPS ON ONE TRACK (Rev-619) \u2014 the three build steps were only part of the job: an operation is not usable until it has been NUMBERED and has its ODS DRAWING loaded, and both of those were being done somewhere else entirely, so the row could read 74% while having no drawing at all. All five now sit in order in ONE ROW with the progress bar running underneath: 1 EDIT OP # \u00b7 2 UPLOAD ODS \u00b7 3 ASSIGN BUBBLES \u00b7 4 ASSIGN CONTROL TYPES \u00b7 5 ASSIGN MEASUREMENT TYPES. Each is gated on the one before \u2014 no ODS until the operation is numbered, no ballooning until the ODS is loaded \u2014 and each opens the right screen: step 1 the operation window, step 2 the ODS capture screen (browse, drag or Ctrl+V, any PDF), steps 3\u20135 the builder at that step. STEP 2 IS NEW WORK, not a relabel: the ODS drawing can now be loaded or replaced for an existing operation straight from this list, which previously meant rebuilding the plan. The bar has five segments and the percentage counts all five \u2014 the two setup stages all-or-nothing, the three build steps by their own row counts."] },
   { ts: "2026-07-28", rev: "App Rev-618", type: "App", changes: ["PROGRESS BAR, PERCENTAGE AND A WIDER SCREEN (Rev-618) \u2014 (1) A PROGRESS BAR now runs the full width beneath the three construction-step buttons, split into three segments, one per step. The filled part is green; while the plan is unfinished the leading edge PULSES, so an operation still being worked reads across a room, and a finished one sits solid and still. (2) PERCENTAGE MOVED TO THE FAR RIGHT, past every button: the last column now leads with how far along that operation is in large type \u2014 grey at 0%, amber while under way, dark green at 100% \u2014 with the CP rev in small text beneath it. (3) The percentage counts each step as a THIRD AND COUNTS ITS OWN ROWS, so a step half done reads half rather than nothing; the bar moves as you work instead of jumping in three lurches. Hovering it lists what is outstanding in each step. (4) The screen is 30% wider \u2014 1600px to 2080px \u2014 so the steps, buttons and percentage sit on one line with room to spare."] },
   { ts: "2026-07-28", rev: "App Rev-617", type: "App", changes: ["\ud83d\udcbe SAVE CHANGES ON THE MASTER LIST (Rev-617) \u2014 Master List edits have always written to the device as they were made, so nothing was ever at risk, but there was no way to say \u2018I am done\u2019 and no confirmation that the change had reached GitHub \u2014 you had to take it on trust. A Save Changes button now sits beside \u2795 Add Row: it closes whatever row is open (so a half-finished edit is committed rather than abandoned), writes the list, redraws, and pushes to GitHub, then reports which of those actually happened \u2014 saved and pushed with the control-type count, saved but the push FAILED, or saved on this device only because GitHub is not set up here. The button does not replace auto-save; it makes the state visible."] },
@@ -1997,7 +1997,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "2:34 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3132,7 +3132,6 @@ function renderProjects(){
   if(head) head.innerHTML =
       '<th>Operation</th>'
     + '<th>Status</th>'
-    + '<th>ODS Drawing</th>'
     + '<th style="border-left:2px solid #c9c0b4;">Construction Steps</th>'
     + '<th style="border-left:2px solid #c9c0b4;">Actions</th>'
     + '<th style="text-align:right;">CP Rev</th>';
@@ -3148,7 +3147,7 @@ function renderProjects(){
       // they lined up with nothing. The bar is two cells: the part name spans the first
       // four columns, the buttons start exactly where Actions begins.
       const hNameTd = document.createElement('td');
-      hNameTd.colSpan = 4;
+      hNameTd.colSpan = 3;   // Rev-620: one column fewer
       hNameTd.style.cssText = 'background:#e4ded4; border-top:2px solid #7a1a1c; border-bottom:1px solid #cfc6b8; padding:8px 10px;';
       const htd = document.createElement('td');
       htd.colSpan = 2;
@@ -3246,26 +3245,11 @@ function renderProjects(){
           + ' <span style="font-weight:700; opacity:.8;">(' + st.missing.length + ')</span></span>';
       }
     }
-    // Rev-599: the date told you nothing you could act on. This column now carries the
-    // ODS drawing for THIS operation — each op has its own; the traveller belongs to the part.
-    const tdDate = document.createElement('td');
-    const odsImg = cpOpOdsImage(p);
-    if(odsImg){
-      const ob = document.createElement('button');
-      ob.className = 'cp-btn cp-btn-quiet';
-      ob.textContent = 'View ODS';
-      ob.style.width = '104px';
-      ob.title = 'The ODS drawing loaded for this operation';
-      ob.onclick = (e) => { e.stopPropagation(); cpViewOpOds(p); };
-      tdDate.appendChild(ob);
-    } else {
-      const s = document.createElement('span');
-      s.textContent = 'none loaded';
-      s.style.cssText = 'font-size:11px; color:#a49a8d;';
-      tdDate.appendChild(s);
-    }
+    // Rev-620: the ODS cell used to live here — Step 2 owns the ODS drawing now, so the
+    // column was dropped and this cell with it.
     // Rev-588: the three construction steps live in their own column under their own
     // heading; the supporting actions keep theirs
+    let _cpBarFor = null;   // Rev-620: this operation's progress track, hung below
     const tdSteps = document.createElement('td');
     tdSteps.style.borderLeft = '2px solid #e2ddd4';
     const stepWrap = document.createElement('div');
@@ -3336,7 +3320,10 @@ function renderProjects(){
         stepWrap.appendChild(b);
         return b;
       };
-      const stateOf = (s) => s.done ? 'done' : (s.open ? 'todo' : 'lock');
+      // Rev-620: a step only reads DONE if everything before it is done too. Step 5 was
+      // announcing DONE while Step 4 still said DO THIS NEXT, because the methods band
+      // fills itself from the master — true of the cells, but nonsense as a sequence.
+      const stateOf = (s) => (s.done && s.open) ? 'done' : (s.open ? 'todo' : 'lock');
       const frac = (s) => (s.total ? ('  ' + (s.total - s.left) + '/' + s.total) : '');
 
       mkStep(1, 'EDIT OP #', stateOf(st.s1),
@@ -3365,22 +3352,21 @@ function renderProjects(){
                    : 'LOCKED \u2014 finish the control types first. The methods band is filled BY the control type.',
         () => openAt('3'));
 
-      // one track under all five, a segment per step
-      const bar = document.createElement('div');
-      bar.className = 'cp-prog';
-      const fill = document.createElement('div');
-      const pctNow = cpPlanPercent(p);
-      fill.className = 'cp-prog-fill' + (pctNow > 0 && pctNow < 100 ? ' live' : '');
-      fill.style.width = pctNow + '%';
-      const ticks = document.createElement('div');
-      ticks.className = 'cp-prog-ticks';
-      ticks.innerHTML = '<span></span><span></span><span></span><span></span><span></span>';
-      bar.appendChild(fill); bar.appendChild(ticks);
-      bar.title = pctNow + '% complete \u2014 ' + st.labelSummary;
-      const barWrap = document.createElement('div');
-      barWrap.style.cssText = 'flex:1 1 100%; min-width:100%;';
-      barWrap.appendChild(bar);
-      stepWrap.appendChild(barWrap);
+      // Rev-620: built here, hung on its own row below
+      _cpBarFor = (() => {
+        const bar = document.createElement('div');
+        bar.className = 'cp-prog';
+        const fill = document.createElement('div');
+        const pctNow = cpPlanPercent(p);
+        fill.className = 'cp-prog-fill' + (pctNow > 0 && pctNow < 100 ? ' live' : '');
+        fill.style.width = pctNow + '%';
+        const ticks = document.createElement('div');
+        ticks.className = 'cp-prog-ticks';
+        ticks.innerHTML = '<span></span><span></span><span></span><span></span><span></span>';
+        bar.appendChild(fill); bar.appendChild(ticks);
+        bar.title = pctNow + '% complete \u2014 ' + st.labelSummary;
+        return bar;
+      })();
 
       _target = actWrap;
       mkBtn('Inspect', 'go', 84, 'Machinist: start a real inspection run for this plan (readings are saved)'
@@ -3409,8 +3395,21 @@ function renderProjects(){
       + (p.rev ? ('&#10;Part / drawing rev: ' + String(p.rev).replace(/"/g,'')) : '') + '">Rev-'
       + (parseInt(p.cpRevNum, 10) || 1) + '</div>';
     tr.className = 'cp-op-row';
-    tr.appendChild(tdPart); tr.appendChild(tdStatus); tr.appendChild(tdDate); tr.appendChild(tdSteps); tr.appendChild(tdActions); tr.appendChild(tdCpRev);
+    // Rev-620: the ODS column is gone — Step 2 IS the ODS drawing now
+    tr.appendChild(tdPart); tr.appendChild(tdStatus); tr.appendChild(tdSteps); tr.appendChild(tdActions); tr.appendChild(tdCpRev);
     tbody.appendChild(tr);
+    // Rev-620: the progress track gets its OWN full-width row directly beneath the
+    // operation, so it starts under the OP # and runs the whole line
+    if(_cpBarFor){
+      const btr = document.createElement('tr');
+      btr.className = 'cp-op-row';
+      const btd = document.createElement('td');
+      btd.colSpan = 5;
+      btd.style.cssText = 'padding:0 10px 10px 10px; border-bottom:1px solid #e2ddd4;';
+      btd.appendChild(_cpBarFor);
+      btr.appendChild(btd);
+      tbody.appendChild(btr);
+    }
   });
 }
 
