@@ -1118,6 +1118,23 @@
   <h1>Admin Settings</h1>
   <p class="sub">Data management, backup, sync &amp; API</p>
 
+  <!-- Rev-624: ROLLING ACTION LOG -->
+  <div style="border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:22px; background:#fff;">
+    <div style="font-size:12px; font-weight:800; letter-spacing:.14em; margin:0 0 6px;">ACTION LOG</div>
+    <p style="font-size:11.5px; margin:0 0 10px; color:var(--ink-dim); line-height:1.5;">
+      Everything you do in the app — which screens you open, which buttons you press, which fields you type in,
+      saves, and any error — recorded on THIS machine only (last 600 entries). Field <i>names</i> are recorded,
+      never what you typed, so no part or drawing data is in here. When something misbehaves, press
+      <b>Copy log</b> and paste it into the chat.
+    </p>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+      <button class="cp-btn cp-btn-primary" id="cpLogCopy" style="width:120px;">Copy log</button>
+      <button class="cp-btn cp-btn-quiet" id="cpLogDl" style="width:130px;">Download .txt</button>
+      <button class="cp-btn cp-btn-danger" id="cpLogClear" style="width:96px;">Clear</button>
+    </div>
+    <pre id="cpLogView" style="max-height:260px; overflow:auto; border:1px solid var(--line); background:#fbfaf7; padding:8px; font-size:10.5px; line-height:1.5; margin:0; white-space:pre-wrap;"></pre>
+  </div>
+
   <!-- Rev-511: reference screens moved off the home menu into Admin -->
   <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:24px;">
     <button class="menu-btn" id="mMasterList" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
@@ -1502,7 +1519,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-623";
+const APP_REV = "Rev-624";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1515,7 +1532,97 @@ function setDeviceMode(v){
 }
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
+// ===== Rev-624: ROLLING ACTION LOG ==============================================
+// Everything done in the app is recorded on THIS MACHINE only — navigation, clicks,
+// which field was typed in, saves, and every uncaught error with its file and line.
+// Nothing leaves the device, so it is ITAR-safe: no part, drawing or feature data is
+// written, only the NAME of the control that was used. When something misbehaves the
+// log is copied out of Admin and pasted into the chat, and the exact sequence that led
+// to the failure can be read back instead of guessed at — which is what several of
+// today's faults cost hours for.
+const CP_LOG_KEY = 'cpActionLog';          // own key: apps on this origin must not share one
+const CP_LOG_CAP = 600;
+function logAct(kind, detail){
+  try{
+    const L = JSON.parse(localStorage.getItem(CP_LOG_KEY) || '[]');
+    const iso = new Date().toISOString();
+    L.push({ t: iso.slice(11, 19), d: iso.slice(0, 10), k: kind, x: String(detail || '').slice(0, 160) });
+    while(L.length > CP_LOG_CAP) L.shift();
+    localStorage.setItem(CP_LOG_KEY, JSON.stringify(L));
+  }catch(e){}                               // a full or blocked localStorage must never break the app
+}
+const _cpTypeLogAt = {};
+window.addEventListener('error', e =>
+  logAct('ERROR', (e.message || '') + ' @ ' + String(e.filename || '').split('/').pop() + ':' + (e.lineno || '')));
+window.addEventListener('unhandledrejection', e =>
+  logAct('PROMISE-ERR', String((e.reason && e.reason.message) || e.reason).slice(0, 160)));
+// capture phase, so a handler that stops propagation cannot hide the click
+document.addEventListener('click', e => {
+  const b = e.target && e.target.closest && e.target.closest('button, a, .tab, .menu-btn, [role=button]');
+  if(!b) return;
+  logAct('click', (b.id ? '#' + b.id + ' ' : '') + String(b.textContent || '').trim().slice(0, 40));
+}, true);
+// which field was typed in — never WHAT was typed (ITAR), and one entry per field per 3s
+document.addEventListener('input', e => {
+  const el = e.target && e.target.closest && e.target.closest('input, textarea, select, [contenteditable=true]');
+  if(!el) return;
+  const key = el.id || el.name || (el.dataset && el.dataset.field) || el.tagName;
+  const now = Date.now();
+  if(_cpTypeLogAt[key] && now - _cpTypeLogAt[key] < 3000) return;
+  _cpTypeLogAt[key] = now;
+  logAct('type', key);
+}, true);
+function logDump(){
+  let L = [];
+  try{ L = JSON.parse(localStorage.getItem(CP_LOG_KEY) || '[]'); }catch(e){}
+  const head = 'CONTROL PLAN GENERATOR ' + (typeof APP_REV !== 'undefined' ? APP_REV : '') +
+    '  ·  action log  ·  ' + L.length + ' entries\n' + '-'.repeat(72) + '\n';
+  return head + L.map(e => e.d + ' ' + e.t + '  ' + String(e.k).toUpperCase().padEnd(11) + ' ' + e.x).join('\n');
+}
+// Rev-624: every screen change is logged by wrapping the show* functions after they are
+// defined — one place, rather than a line edited into twenty functions that would drift.
+function cpWireNavLogging(){
+  ['showMenu','showProjects','showNewCP','showCPBuilder','showGages','showMasterList',
+   'showCustomers','showInstructions','showSettings','showAdmin','showAppInstructions',
+   'showRecentChanges','showInspectionReports','showHistory'].forEach(fn => {
+    try{
+      const orig = window[fn];
+      if(typeof orig !== 'function' || orig._cpLogged) return;
+      const wrapped = function(){ logAct('nav', fn.replace(/^show/, '')); return orig.apply(this, arguments); };
+      wrapped._cpLogged = true;
+      window[fn] = wrapped;
+    }catch(e){}
+  });
+}
+function renderActionLogPanel(){
+  const lv = document.getElementById('cpLogView');
+  if(!lv) return;
+  const txt = logDump();
+  const lines = txt.split('\n');
+  lv.textContent = lines.length > 3 ? lines.slice(-60).join('\n') : '(no entries yet)';
+  lv.scrollTop = lv.scrollHeight;
+  const c = document.getElementById('cpLogCopy');
+  if(c) c.onclick = async () => {
+    try{ await navigator.clipboard.writeText(logDump()); flash('\u2713 Action log copied \u2014 paste it into the chat.'); }
+    catch(e){ flash('Copy was blocked by the browser \u2014 use Download .txt instead.', true); }
+  };
+  const d = document.getElementById('cpLogDl');
+  if(d) d.onclick = () => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([logDump()], { type: 'text/plain' }));
+    a.download = 'cp-action-log.txt'; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  };
+  const x = document.getElementById('cpLogClear');
+  if(x) x.onclick = () => {
+    if(!confirm('Clear the action log on this device?')) return;
+    try{ localStorage.removeItem(CP_LOG_KEY); }catch(e){}
+    renderActionLogPanel();
+  };
+}
+
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-624", type: "App", changes: ["ROLLING ACTION LOG ADDED (Rev-624) \u2014 the app now records what was actually done, on this machine only: every screen opened, every button pressed, the NAME of every field typed in (never its contents), and every uncaught error with its file and line number. Kept in localStorage under cpActionLog, capped at 600 entries, oldest dropped first. ADMIN \u2192 ACTION LOG shows the last 60 with Copy log / Download .txt / Clear. ITAR-safe by design: field names are logged, never values, so no part, drawing or feature data can enter it, and nothing is transmitted anywhere. Built to survive editing \u2014 the listeners are in capture phase so a handler that stops propagation cannot hide an event, navigation is logged by wrapping the show* functions once at boot rather than by a line pasted into twenty functions that would drift apart, and every write is try/caught so a full localStorage degrades silently instead of breaking the app. THE HANDOFF PROMPT AND THE NEW-APP RECIPE WERE BOTH UPDATED, so future chats are told to ASK FOR THE LOG FIRST when a fault is reported, and any new CAMCO app is built with this from the start. Several faults today \u2014 the vanishing plan, the silent upload, the rename that deleted its own plan \u2014 cost hours of guesswork that one log would have settled in a minute."] },
   { ts: "2026-07-28", rev: "App Rev-623", type: "App", changes: ["UNDER CONSTRUCTION BANNER + FULL-WIDTH PROGRESS BAR (Rev-623) \u2014 both of the marked-up changes. (1) An operation that is not finished now carries an UNDER CONSTRUCTION banner in shop-floor hazard stripes across the full width of its line, reading UNDER CONSTRUCTION \u2014 84% COMPLETE, with the outstanding work named on hover. It disappears by itself at 100%, so a finished operation is quiet and only the unfinished ones shout. (2) THE PROGRESS BAR NOW REALLY DOES RUN THE FULL WIDTH: its cell was set to span five columns, a number that silently stops being right the moment a column is added or removed \u2014 so the bar was ending short. It now spans 99, which every browser clamps to however many columns the table actually has, and the bar itself is set to fill its cell. The bar was also thickened slightly (9px to 11px) to sit under the banner without looking like an afterthought."] },
   { ts: "2026-07-28", rev: "App Rev-622", type: "App", changes: ["STEP BUTTONS STOP OVERLAPPING (Rev-622) \u2014 with the five steps finally on one line, ASSIGN CONTROL TYPES and ASSIGN MEASUREMENT TYPES were printing over each other: every button was pinned to a fixed 138px, which the longer labels simply do not fit in, so the text spilled straight out of its own button and over the next one. Width now FOLLOWS THE WORDS with a 132px floor, so short steps stay a sensible size and long ones get the room they need. The buttons are also told not to shrink and to clip rather than spill, so no future label can leak across a neighbour. ALSO ASKED: the ODS step has not gone \u2014 it is STEP 2 \u00b7 UPLOAD ODS. The separate ODS DRAWING column was removed at Rev-620 because Step 2 does that job; click Step 2 to view or replace the drawing."] },
   { ts: "2026-07-28", rev: "App Rev-621", type: "App", changes: ["STEPS GO HORIZONTAL, SCREEN GOES FULL WIDTH (Rev-621) \u2014 the five construction steps were still stacking into a vertical tower. Two causes, both fixed. (1) THE SCREEN was a centred column: the Control Plans list was never given the wide class at all, so it sat at 1100px while everything was being asked to fit inside it. It now uses the FULL width of the monitor, like the Master List and the builder already do. (2) THE STEPS CELL was free to wrap: the flex row still carried wrap:wrap, left over from when the progress bar was a child of the same row \u2014 the bar has had its own row since Rev-620, so the wrap was doing nothing but breaking the buttons onto separate lines. The steps cell is now no-wrap and sized to its content, and the actions cell is no-wrap too, so neither band can be squeezed into stacking again."] },
@@ -2012,7 +2119,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:28 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -10831,6 +10938,7 @@ function downloadHistory(){
 
 function showAdmin(){
   console.log('showAdmin called');
+  setTimeout(() => { try{ renderActionLogPanel(); }catch(e){} }, 0);   // Rev-624
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.add('hidden');
   $('projectsScreen').classList.add('hidden');
@@ -14633,6 +14741,7 @@ function buildCpSpecific(){
 'HOW CLAUDE SHIPS CHANGES: read the CHANGE_LOG at the top of the main script FIRST (authoritative feature history). On any change: bump APP_REV +1, set BUILD_DATE/BUILD_TIME, add a most-recent-first CHANGE_LOG entry, node --check the largest script block, push the file to BOTH targets (cp-generator-data/cp_app.html AND cp-app/index.html) via GitHub Contents API with the claude-push token, then read both back and confirm the rev. Devices self-update (open / 60s / every tap / tab-return) with a never-downgrade guard. NEVER hand the user files unless a push fails or they say DL.',
 'TOKEN: the user must paste the CURRENT claude-push fine-grained token into the new chat (never stored in this text). Regenerating it kills all older copies everywhere. ONE CHAT PUSHES REVS AT A TIME.',
 'BROKEN REV RECOVERY: roll FORWARD — re-issue the last good codebase under a HIGHER rev number.',
+'ACTION LOG (Rev-624): the app records what the user did — nav, clicks, typed-in field NAMES (never their contents), saves and every uncaught error with file:line — into localStorage key cpActionLog, capped at 600 entries, on that machine only. Admin → ACTION LOG has Copy log / Download .txt / Clear. WHEN THE USER REPORTS A FAULT, ASK FOR THE LOG FIRST and read the sequence rather than guessing; several faults this era cost hours of guesswork that one log would have settled. Keep it working when editing: logAct() early in the main script, error + capture-phase click/input listeners beside it, cpWireNavLogging() wrapping the show* functions at boot, renderActionLogPanel() called from showAdmin. Add logAct(kind, detail) at any new save/export/AI point. Every write is try/caught so logging can never break the app, and NOTHING may be logged that contains part, drawing or feature data (ITAR).',
 '',
 'USER: Rich Arnold, quality engineer, CAMCO Manufacturing (Sayre PA). NOT a programmer — plain language, click-by-click, define jargon in one sentence. Terse all-caps input; resolve intent without over-asking. ITAR work: part/drawing data stays on-device; AI calls sit behind confirm gates. End every response with the current rev line + a token estimate.',
 'QUICK COMMANDS: DL CP · DL INST · DL PFMEA · dl both · up both · AUDIT · VIEW · DL (app file)',
@@ -14972,6 +15081,7 @@ if($('cpWorkcenter')) $('cpWorkcenter').addEventListener('input', updateEditExis
 
 if($('mSaveApp')) $('mSaveApp').onclick = saveThisApp;
 try{   // Rev-521: boot-tail guard — any failure below REPORTS itself instead of silently dying
+try{ cpWireNavLogging(); logAct('nav', 'app-start ' + (typeof APP_REV !== 'undefined' ? APP_REV : '')); }catch(e){}   // Rev-624
 $('mProjects').onclick = showProjects;
 if($('masterSaveBtn')) $('masterSaveBtn').onclick = cpMasterSaveChanges;   // Rev-617
 if($('mGages')) $('mGages').onclick = showGages;
@@ -15688,7 +15798,29 @@ Follow for every new app.
 · LOCAL FILE HYGIENE: master copy lives in Documents as "<APP NAME>.html" (never Downloads), rev shown in-app not in filename; Claude-delivered file is the source of truth, auto-push is a mirror.
 
 · ITAR GATES: every off-device action (AI calls, GitHub push, Pages publish) behind a per-action confirm gate listing exactly what will be sent, to which service, before anything leaves the device.
-`;
+
+
+PART 9 — ROLLING ACTION LOG (build this in from the start)
+
+Every CAMCO app records what the user did, on that machine only, so a fault
+report can be read instead of guessed at.
+
+  - localStorage key <name>ActionLog, capped at 600 entries.
+  - logAct(kind, detail) near the TOP of the main script, so the error
+    listeners are live before anything else runs.
+  - window 'error' and 'unhandledrejection' listeners -> logAct('ERROR' /
+    'PROMISE-ERR', message @ file:line).
+  - document 'click' and 'input' listeners in CAPTURE phase, so a handler that
+    stops propagation cannot hide the event.
+  - Log the field NAME that was typed in, throttled to one entry per field per
+    3 seconds. NEVER log what was typed: part, drawing and feature data must
+    not enter the log (ITAR).
+  - Wrap the screen-show functions once at boot to log 'nav'.
+  - Admin panel: Copy log / Download .txt / Clear, showing the last 60 entries.
+  - Every write try/caught: a full or blocked localStorage must degrade
+    silently, never break the app.
+  - Rename the key per app — apps sharing richarnoldcamco.github.io share
+    localStorage and would otherwise overwrite each other's logs.`;
   (function(){
     const b = $('cpRecipeBtn'); if(!b) return;
     b.onclick = () => {
