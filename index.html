@@ -1472,7 +1472,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-605";
+const APP_REV = "Rev-606";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1486,6 +1486,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-606", type: "App", changes: ["A DELETION CAN NO LONGER ERASE A PLAN THAT IS STILL BEING WORKED ON (Rev-606) \u2014 912767-M was repaired on GitHub at Rev-605 but stayed missing, because the false deletion marker written at 12:14 was still sitting on the device and deletions were absolute: the merge removed any plan whose id matched a marker, no matter how old the marker or how recently the plan had been edited. The drafts merge has always been smarter (\u2018a draft re-saved after its deletion survives\u2019); projects now follow the same rule \u2014 a deletion only wins over a plan older than itself, so a plan edited AFTER the marker was written stays. That closes the whole failure mode, not just this instance: one stale marker can no longer wipe live work off every device. The specific 12:14 marker is also ignored outright, since it came from the false-rename bug fixed at Rev-605 rather than from anyone deleting anything."] },
   { ts: "2026-07-28", rev: "App Rev-605", type: "App", changes: ["THE PLAN-EATING BUG FOUND (Rev-605) \u2014 912767-M kept disappearing and the pencil\u2019s op number would not stick. Cause found in the saved data: a DELETION had been recorded for 912767-M::Rev-1::OP030 at 12:14 today. It was not a mis-click. saveProject carries a rename rule from Rev-336: if the plan\u2019s id changed since it was opened, tombstone the old id so the old name cannot come back. That was written when an id was part::rev. Since per-operation plans the id ALSO carries the op number \u2014 so giving a plan its op number changed its id, the rename rule fired, and the app recorded a deletion OF THE PLAN ITSELF, which then propagated to every device. Three fixes: (1) only a changed PART NUMBER or REV counts as a rename now; an op-number change moves the same plan and never leaves a tombstone. (2) Opening a plan copies its op number and description into the builder, so the builder can no longer hold a blank op while the saved plan has one and compute a different id on the next save. (3) The pencil updates the builder\u2019s record of which saved plan it came from at the same time it changes the id. The lost plan and its false deletion marker were repaired in the synced data."] },
   { ts: "2026-07-28", rev: "App Rev-604", type: "App", changes: ["PART BUTTONS MOVED UNDER ACTIONS (Rev-604) \u2014 Add Operation and View / Upload Traveller sat immediately after the part number on the header bar, floating over the Status and ODS Drawing columns and lining up with nothing. The header bar is now two cells: the part number spans the first four columns, and its buttons begin exactly where the ACTIONS column begins, directly above the operation row\u2019s own buttons. Everything that acts on a row \u2014 part-level or operation-level \u2014 now lives in one vertical band, and the part name no longer needs its fixed-width spacer to keep things aligned."] },
   { ts: "2026-07-28", rev: "App Rev-603", type: "App", changes: ["A PART-FILLED STEP NOW SAYS IN PROGRESS (Rev-603) \u2014 Step 2 read DO THIS NEXT on a plan where 3 of its 14 rows already had a control type, which is simply untrue: the step had been started. An unfinished step that has already been part-filled now reads STEP n \u2013 IN PROGRESS with the count (e.g. STEP 2 \u2013 IN PROGRESS 3/14); DO THIS NEXT is reserved for a step where nothing has been done yet. Applies to all three steps, so a glance down the list distinguishes untouched work from work already underway."] },
@@ -1964,7 +1965,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:58 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:12 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2496,7 +2497,9 @@ function updateHomeScreen(){
 // again on the very next pull. These keys are therefore ignored as tombstones — but only
 // if the deletion is older than the cutoff, so the plan can still be deleted deliberately
 // later and that newer deletion will stick.
-const CP_TOMB_IGNORE = { '912767-M::Rev-1::OP030': '2026-07-28T01:30:00.000Z' };
+// Rev-606: the cutoff now covers today's 12:14 marker too — that one was written by the
+// false-rename bug fixed at Rev-605, not by anybody deleting anything.
+const CP_TOMB_IGNORE = { '912767-M::Rev-1::OP030': '2026-07-28T14:00:00.000Z' };
 function cpTombLives(t){
   if(!t || !t.key) return false;
   const cutoff = CP_TOMB_IGNORE[t.key];
@@ -11093,9 +11096,19 @@ function mergeRestore(backup){
       const key = p.id || ((p.partNum||'?') + '::' + (p.rev||'?') + '::' + (p.created||''));
       byKey[key] = p; // always take incoming
     });
-    // Remove anything that was explicitly deleted on any device
+    // Remove anything that was explicitly deleted on any device.
+    // Rev-606: UNLESS the plan has been worked on SINCE the deletion was recorded. The
+    // drafts merge has always had this rule ('a draft re-saved after its deletion
+    // survives'); projects never did, so one stale marker could erase a plan that was
+    // still being edited, on every device, permanently. A deletion only wins over a plan
+    // older than itself.
     Object.keys(byKey).forEach(key => {
-      if(tombstoneKeys.has(key)) delete byKey[key];
+      const t = tombByKey[key];
+      if(!t) return;
+      const p = byKey[key];
+      const touched = String((p && (p.updated || p.created)) || '');
+      if(touched && touched > String(t.deletedAt || '')) return;   // edited after deletion — keep it
+      delete byKey[key];
     });
     const merged = Object.values(byKey);
     localStorage.setItem('cpProjects', JSON.stringify(merged));
