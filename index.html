@@ -1558,7 +1558,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-664";
+const APP_REV = "Rev-665";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1691,6 +1691,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-665", type: "App", changes: ["\u2018UNISSUED CP REVS\u2019 REWORDED \u2014 IT WAS READING AS UNSAVED WORK (Rev-665) \u2014 the note said \u2018n plan(s) have edits past their last issued rev\u2019, which on a handoff panel reads as \u2018there is work here that will be lost\u2019, and led to being told to press Save to Project before moving. That advice was wrong: every edit is already written to the device and pushed to GitHub by auto-save. The only thing Save to Project adds is ADVANCING THE REVISION NUMBER \u2014 a document-control act under CP-1, not a data-safety one. Renamed to CP REV NOT ISSUED and the note now states outright that the work IS saved and pushed, and that Save to Project is only needed if the rev number should advance. A warning that implies risk where there is none is as harmful as one that misses real risk: it spends the reader\u2019s attention and teaches them to distrust the panel."] },
   { ts: "2026-07-28", rev: "App Rev-664", type: "App", changes: ["PASS MEANS PASS (Rev-664) \u2014 \u2018PASS \u2014 WITH NOTES\u2019 read as a qualified pass, which is a fail with manners. It is not: a note is something worth knowing that costs nothing, and using it to hedge the verdict makes you distrust a green banner. The banner now says PASS, in green, whenever there is nothing blocking \u2014 with or without notes \u2014 and DO NOT MOVE YET in red when there is. Notes are counted separately beside it rather than folded into the verdict: \u20180 blockers / 2 notes\u2019, which also replaces the old \u2018n of 9 checks passed\u2019 score that had been treating every note as a failed check. The sub-line spells out the consequence either way \u2014 \u2018Safe to move. 2 notes below \u2014 worth reading, but nothing that loses work\u2019, or \u2018Fix the 1 blocker below, then run the check again\u2019. The copied report and the report footer use the same wording."] },
   { ts: "2026-07-28", rev: "App Rev-663", type: "App", changes: ["THE CHECK NOW SAYS PASS OR DO NOT MOVE YET (Rev-663) \u2014 step 1 answered the one question it exists to answer \u2014 is this machine safe to leave \u2014 with a sentence set in the same weight as everything else, so the answer had to be inferred from the wording. It now leads with a BANNER: a large \u2713 or \u2717, the word PASS, PASS \u2014 WITH NOTES, or DO NOT MOVE YET, a plain line saying what that means for you, and the score (\u20188 of 9 checks passed\u2019) so a silently skipped check cannot hide. Green for a clean pass, amber for pass-with-notes, red for stop \u2014 and the amber case says outright that the notes will not lose any work, because \u2018READY WITH NOTES\u2019 read like a warning when it is not one. The copied report gets the same headline so it is unambiguous when pasted into a chat."] },
   { ts: "2026-07-28", rev: "App Rev-662", type: "App", changes: ["HANDOFF CHECK WAS READING THE WRONG AI KEY (Rev-662) \u2014 the AI KEY check looked in localStorage for \u2018anthropicKey\u2019 or \u2018aiKey\u2019. The app has never written either: it stores the key as \u2018anthropicApiKey\u2019. So the check reported \u2018none stored \u2014 AI Propose Types will not run\u2019 no matter how many keys were saved, on every machine, forever. A check reading the wrong key is worse than no check at all \u2014 it trains you to ignore a warning that is always present, and the next time it means something you will scroll past it. Now reads the key the app actually uses, with the two old names kept as fallbacks, and reports its length so \u2018present\u2019 is evidence rather than a claim. The other warning on that panel \u2014 UNISSUED CP REVS on 1000237620 OP-030 \u2014 is correct: that plan has auto-saved edits past its last Save to Project, exactly as the \u25cf beside its rev has been showing."] },
@@ -2228,7 +2229,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:56 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:08 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -15253,8 +15254,15 @@ async function hcRunChecks(){
   try{
     const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
     const dirty = projects.filter(p => p.cpRevDirty);
-    if(dirty.length) add('warn', 'UNISSUED CP REVS', dirty.length + ' plan(s) have edits past their last issued rev: ' + dirty.map(p => (p.partNum||'') + (p.opNum ? ' OP-' + p.opNum : '')).join(', '));
-    else add(true, 'UNISSUED CP REVS', 'every plan is at its issued revision');
+    // Rev-665: this note was being read as UNSAVED WORK. It is not, and the wording has
+    // to say so: every edit is already written to the device and pushed. All this flags
+    // is that the plan's REVISION NUMBER has not been advanced — a document-control act,
+    // not a data one. Nothing is at risk if you move with this outstanding.
+    if(dirty.length) add('warn', 'CP REV NOT ISSUED',
+      dirty.length + ' plan(s) have edits past their last issued rev: '
+      + dirty.map(p => (p.partNum||'') + (p.opNum ? ' OP-' + p.opNum : '')).join(', ')
+      + ' — the work IS saved and pushed; press Save to Project only if you want the rev number advanced');
+    else add(true, 'CP REV NOT ISSUED', 'every plan is at its issued revision');
   }catch(e){ add('warn', 'UNISSUED CP REVS', 'could not read the plans'); }
 
   // 4 — DELETION MARKERS. Earned its place today: a stale tombstone erased live work twice.
