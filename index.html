@@ -1536,7 +1536,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-640";
+const APP_REV = "Rev-641";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1669,6 +1669,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-641", type: "App", changes: ["THE DOT FOLLOWS THE STEP + AN APPROXIMATE WORKING REV (Rev-641) \u2014 (1) THE GREEN DOT now answers \u2018is this row done for the step I am on\u2019 rather than one fixed question. On Step 1 it means the balloon is pinned on the drawing; on Step 2 that a control type has been chosen; on Step 3 that the measurement method and reaction plan are set. Every row showing green while the Control Type column read \u2014 not set \u2014 was the dot answering a question nobody was asking on that screen. Hovering says which test it applied, and notes if the balloon is still unpinned. Ghost rows keep their \ud83d\udc7b. (2) THE CP REV IS NOW APPROXIMATE, as asked: it advances on Save to Project, on creating a new operation, AND automatically every 100 edits \u2014 so a plan being worked climbs on its own instead of sitting at Rev-1 all week. Saving resets the counter and clears the \u25cf pending mark."] },
   { ts: "2026-07-28", rev: "App Rev-640", type: "App", changes: ["CP REV NOW SHOWS WHEN THERE ARE UNISSUED EDITS (Rev-640) \u2014 the Control Plan revision looked stuck because it advances on an explicit SAVE TO PROJECT, not on every edit. That is deliberate and matches CP-1: a revision is an ISSUE of the document, and the builder auto-saves on every keystroke \u2014 counting those would put a fourteen-row plan at Rev-4000 by lunchtime and make the number worthless for traceability. What was missing was any sign that edits existed beyond the last issued revision, so the figure simply looked broken. An amber \u25cf now appears beside the rev whenever auto-saved edits sit past it, and hovering explains: the edits are safe on this device, and Save to Project issues the next revision. Press Save and the dot clears as the number advances."] },
   { ts: "2026-07-28", rev: "App Rev-639", type: "App", changes: ["CREATING AN OPERATION RETURNS TO THE PART (Rev-639) \u2014 saving a new operation dropped you straight into the builder with a blank skeleton open on the first row. Creating an operation and ballooning it are different jobs: the five construction steps are the map, and landing inside Step 3 skipped past 1 and 2 without acknowledging them and hid the rest of the part, so a second operation could not be seen next to the first. A new operation now saves and returns to THAT PART\u2019S OPERATIONS \u2014 the screen showing both ops, their steps and their progress \u2014 with a note confirming what was created and that Step 3 assigns the bubbles. The plan is auto-saved before the move, and the new op opens with no row expanded, per Rev-608."] },
   { ts: "2026-07-28", rev: "App Rev-638", type: "App", changes: ["PART NUMBER AND OPERATION LINE 75% LARGER (Rev-638) \u2014 the part number goes 19px \u2192 33px and the operation line 13px \u2192 23px, with its description 12px \u2192 21px. These two lines are what you look for when scanning the screen, and they were the smallest thing on a row that also carries five step buttons and six action buttons. The \u21b3 (no op number) rows were scaled to match so both kinds of operation row read the same, and the \u270f\ufe0f edit pencil was enlarged with them \u2014 left at 12px it would have become a speck beside 23px text and an awkward tap target."] },
@@ -2182,7 +2183,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "4:04 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "4:16 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4630,6 +4631,7 @@ function saveProject(partNum, rev, base64Data, customerName, qualityLevel){
     // Rev-583: the Control Plan's OWN revision — how many times this plan has been saved
     entry.cpRevNum = (parseInt(projects[existingIdx].cpRevNum, 10) || 1) + 1;
     entry.cpRevDirty = false;      // Rev-640: this rev now matches what is saved
+    entry.cpEdits = 0;             // Rev-641: the 100-edit counter restarts at each save
     projects[existingIdx] = entry;
   } else {
     entry.cpRevNum = 1;
@@ -5662,7 +5664,16 @@ function cpAutoSaveProject(){
       bs.srcId = id;
       if(i >= 0){ projects[i].builderState = bs; projects[i].underConstruction = !!cpBuildState.underConstruction; projects[i].updated = new Date().toISOString();
         if(!projects[i].cpRevNum) projects[i].cpRevNum = 1;
-        projects[i].cpRevDirty = true; }   // Rev-640: changed since the last issued rev
+        projects[i].cpRevDirty = true;
+        // Rev-641: an APPROXIMATE working revision — every 100 edits rolls it over, so a
+        // plan being worked on climbs on its own instead of sitting at Rev-1 all week.
+        // Pressing Save to Project still advances it immediately and resets the count.
+        projects[i].cpEdits = (parseInt(projects[i].cpEdits, 10) || 0) + 1;
+        if(projects[i].cpEdits >= 100){
+          projects[i].cpEdits = 0;
+          projects[i].cpRevNum = (parseInt(projects[i].cpRevNum, 10) || 1) + 1;
+          try{ logAct('cp-rev', (projects[i].partNum||'') + (projects[i].opNum?' OP-'+projects[i].opNum:'') + ' \u2192 Rev-' + projects[i].cpRevNum + ' (100 edits)'); }catch(e){}
+        } }
       else projects.push({ id, partNum: cpBuildState.partNum, rev: cpBuildState.rev,
         opNum: cpBuildState.opNum || '', opDesc: cpBuildState.opDesc || '',
         customer: cpBuildState.customerName || '', qualityLevel: cpBuildState.qualityLevel || '',
@@ -5924,9 +5935,26 @@ function renderCPBuilder(){
     // Rev-342: thin pin-status column — green dot when this balloon's position is pinned
     const tdPin = document.createElement('td');
     tdPin.style.cssText = 'padding:0; border:1px solid var(--line); text-align:center; width:22px;';
-    const pinned = (typeof cpFeatureForBubble === 'function') && cpFeatureForBubble(row.bubble);
-    tdPin.innerHTML = row.ghost ? '<span style="font-size:' + (focused?'14px':'11px') + '; line-height:1;" title="Ghost — balloon not on the drawing">👻</span>' : (pinned ? '<span style="color:#1e8449; font-size:' + (focused?'16px':'12px') + '; line-height:1;">●</span>' : '<span style="color:#c9c9c9; font-size:' + (focused?'14px':'10px') + '; line-height:1;">○</span>');
-    tdPin.title = pinned ? 'Pinned — zoom-to-bubble works for this balloon' : 'Not pinned yet — use 📍 Pin Manually';
+    // Rev-641: the dot answers "is THIS ROW done for the step I am on", not one fixed
+    // question. On Step 1 that is the balloon being pinned; on Step 2 it is the control
+    // type being chosen; on Step 3 the measurement method and reaction plan. Every row
+    // showing green while the Control Type column read "not set" was the dot answering
+    // a question nobody was asking on that screen.
+    const _step = (typeof cpGetStep === 'function') ? cpGetStep() : '1';
+    const _pinned = (typeof cpFeatureForBubble === 'function') && !!cpFeatureForBubble(row.bubble);
+    let _ok, _why;
+    if(_step === '2'){
+      _ok = !!String(row.controlTypeId || '').trim();
+      _why = _ok ? 'Control type chosen for this row' : 'No control type on this row yet';
+    } else if(_step === '3'){
+      _ok = !!String(row.measMethod || '').trim() && !!String(row.reactionPlan || '').trim();
+      _why = _ok ? 'Measurement method and reaction plan set' : 'Still needs a measurement method / reaction plan';
+    } else {
+      _ok = _pinned;
+      _why = _ok ? 'Pinned — zoom-to-bubble works for this balloon' : 'Not pinned yet — click the balloon on the drawing';
+    }
+    tdPin.innerHTML = row.ghost ? '<span style="font-size:' + (focused?'14px':'11px') + '; line-height:1;" title="Ghost — balloon not on the drawing">👻</span>' : (_ok ? '<span style="color:#1e8449; font-size:' + (focused?'16px':'12px') + '; line-height:1;">●</span>' : '<span style="color:#c9c9c9; font-size:' + (focused?'14px':'10px') + '; line-height:1;">○</span>');
+    tdPin.title = _why + (_step !== '1' && !_pinned ? '  ·  (this balloon is not pinned on the drawing)' : '');
     tr.appendChild(tdPin);
 
     if(focused){
