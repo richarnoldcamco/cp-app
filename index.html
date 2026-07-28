@@ -1472,7 +1472,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-610";
+const APP_REV = "Rev-611";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1486,6 +1486,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-611", type: "App", changes: ["PART NUMBERS BLACK, BOLD AND BIGGER (Rev-611) \u2014 part numbers were dark red at 14\u201316px, which on a shop screen sat back rather than leading. They now read BLACK, weight 800, at 19px in all three places they appear: the parts list, the breadcrumb above an opened part, and the part header bar over its operations. The part number is the first thing anyone looks for on this screen, so it should be the loudest thing on it; the dark red is kept for headings, where it belongs."] },
   { ts: "2026-07-28", rev: "App Rev-610", type: "App", changes: ["RENAME EXTENDED TO EVERY SAVED CONTROL PLAN (Rev-610) \u2014 Rev-609 renamed HARDINGE LATHE to LATHE in the Master List only. The sweep now also rewrites the Workcenter on every SAVED PLAN: the plan-level workcenter and every feature row, across saved projects, drafts, the working copy and whatever is open in the builder. Plan rows are a snapshot taken when the row was written rather than a live link to the Master List, so they would otherwise have kept the old wording forever. Each plan it touches gets its updated stamp refreshed, which matters after Rev-606: a plan edited more recently than any deletion marker cannot be wiped by a stale one. Two supporting fixes: the SEEDED master list itself said Hardinge Lathe on all 65 rows, so a fresh device would have re-introduced the old name \u2014 the seed now says LATHE; and an empty master list no longer stops the sweep, since saved plans still need it. The open Control Plans list and builder redraw immediately, and the result pushes to GitHub."] },
   { ts: "2026-07-28", rev: "App Rev-609", type: "App", changes: ["WORKCENTER RENAMED: HARDINGE LATHE \u2192 LATHE (Rev-609) \u2014 every Master List row whose Workcenter read HARDINGE LATHE now reads LATHE. Done as a one-time sweep in the app rather than by editing the synced file directly: the Master List lives on each device and is pushed up from there, so a hand-edit on GitHub would have been overwritten by the next push \u2014 the same trap that cost 912767-M twice today. The sweep runs once per device, is flagged so it never repeats, reports how many rows it changed, and pushes the result straight to GitHub. It runs again after a data pull in case the rows arrive from GitHub after start-up, and it also rewrites any stored pick-list entry still naming the old value. Rows with any other Workcenter are untouched. NOTE: this only renames what is IN the Master List \u2014 Control Plans already built keep whatever workcenter was written onto their rows at the time."] },
   { ts: "2026-07-28", rev: "App Rev-608", type: "App", changes: ["NO ROW IS OPENED UNTIL YOU CLICK ONE (Rev-608) \u2014 the builder always had a row expanded: opening a plan opened row 1, and switching step re-opened whichever row was last active. That row takes several times the height of a normal one and pushes the rest of the list down, which is pure noise when you are reading the grid rather than editing a feature. Opening a plan and switching between steps now leave EVERY row collapsed \u2014 the full list is visible \u2014 and a row opens up only when you click it. Deleting a row now closes the editor instead of jumping the open state onto its neighbour. Nothing else changes: the opened row behaves exactly as before once you click into it."] },
@@ -1969,7 +1970,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:08 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:20 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2558,7 +2559,8 @@ function renderPartsIndex(tbody, combined){
         td.style.cssText = 'text-align:' + (align || 'left') + ';' + (extra || '');
         td.innerHTML = html; return td; };
 
-      tr.appendChild(cell('<b style="font-size:15px; letter-spacing:.04em; color:#5c1416;">'
+      // Rev-611: part numbers read black, bold and larger everywhere they appear
+      tr.appendChild(cell('<b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">'
         + (g.part || '') + '</b>'));
 
       const opLabels = g.ops.map(o => o.data.opNum ? ('OP-' + o.data.opNum) : null).filter(Boolean);
@@ -2808,7 +2810,7 @@ function renderProjects(){
     back.onclick = cpBackToParts;
     crumb.appendChild(back);
     const t = document.createElement('span');
-    t.innerHTML = '<b style="font-size:16px; letter-spacing:.04em; color:#5c1416;">' + (filtered[0].data.partNum || '')
+    t.innerHTML = '<b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">' + (filtered[0].data.partNum || '')
       + '</b> <span style="font-size:12px; color:#6b6257;">\u2014 ' + filtered.length + ' operation'
       + (filtered.length === 1 ? '' : 's') + '</span>';
     crumb.appendChild(t);
@@ -2842,7 +2844,7 @@ function renderProjects(){
       hb.textContent = item.data.partNum || '';
       // Rev-569: fixed-width name block so every part's buttons start on the same
       // vertical line instead of stepping in and out with the part-number length
-      hb.style.cssText = 'font-size:14px; font-weight:800; letter-spacing:.05em; color:#5c1416; vertical-align:middle;';
+      hb.style.cssText = 'font-size:19px; font-weight:800; letter-spacing:.03em; color:#000; vertical-align:middle;';
       hNameTd.appendChild(hb);
       const addOp = document.createElement('button');
       addOp.className = 'btn-ghost';
