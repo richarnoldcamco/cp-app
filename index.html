@@ -440,6 +440,9 @@
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
   <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-467 · Jul 15, 2026</span>
+  <!-- Rev-660: handoff subsystem -->
+  <button id="hcWizBtn" title="Move this work to a fresh chat — guided and verified" onclick="hcOpenWizard()" style="background:#2F6FAF; color:#fff; border:1px solid #1E4C7C; border-radius:6px; padding:6px 12px; font-family:monospace; font-size:10.5px; font-weight:800; letter-spacing:.08em; cursor:pointer; white-space:nowrap; margin-right:6px;">💬 NEW CHAT PROMPT</button>
+  <button id="hcChkBtn" title="Is this machine safe to leave?" onclick="hcOpenCheck()" style="background:#1E7A34; color:#fff; border:1px solid #124A1F; border-radius:6px; padding:6px 12px; font-family:monospace; font-size:10.5px; font-weight:800; letter-spacing:.08em; cursor:pointer; white-space:nowrap; margin-right:8px;">✓ HANDOFF CHECK</button>
   <button id="headerPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-right:8px;">⬆️ Push App</button>
   <button class="ob-back hidden" id="headerBack">← Back</button>
 </header>
@@ -1554,7 +1557,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-659";
+const APP_REV = "Rev-660";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1687,6 +1690,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-660", type: "App", changes: ["HANDOFF SUBSYSTEM \u2014 CHECK, QUIZ AND WIZARD (Rev-660) \u2014 moving CP work to a fresh chat was \u2018paste something and hope\u2019. CP already had the prompt generator (Rev-514); what was missing was PROOF. Two header buttons: \u2713 HANDOFF CHECK runs nine checks against this machine and prints a \u2713 / \u26a0 / \u2717 report with a verdict, and \ud83d\udcac NEW CHAT PROMPT opens a seven-step wizard that copies the prompt the instant it opens, runs the check, and walks through token \u2192 new chat \u2192 paste \u2192 QUIZ. THE QUIZ IS THE HALF THAT WAS MISSING: it tests the NEW Claude \u2014 the current rev (only the repo can supply it), what CP-2C says about the Master List, where the data physically lives, and which document may never be edited without asking. A silently truncated paste is the real failure mode and it looks exactly like a good one. CHECKS WRITTEN AGAINST CP\u2019S ACTUAL MODEL, not ported blind: CP has no service worker, so the source design\u2019s two cache checks were OMITTED rather than faked \u2014 a check that cannot fail is worse than no check. In their place, checks that matter here: repo rev vs running rev, plans edited on this device but not yet synced, unissued CP revisions, and DELETION MARKERS IN THE LAST 24 HOURS \u2014 which earned its place today, when a stale tombstone erased live work twice. Every check is individually wrapped so one failure degrades to \u26a0 instead of taking the panel down."] },
   { ts: "2026-07-28", rev: "App Rev-659", type: "App", changes: ["\u2795 ADD A NEW \u2026 IS THE FIRST ITEM (Rev-659) \u2014 on the builder\u2019s level pickers the add option sat at the BOTTOM, under every existing value. On Feature Type that is twenty entries and a scrollbar, so the one option you need when a value is missing was the one you had to scroll to find \u2014 and the longer the list, the more likely something is missing from it. It is now the first item on every level picker, above \u2014 any \u2014 and the values. The Master List\u2019s own value panels were checked for the same ordering."] },
   { ts: "2026-07-28", rev: "App Rev-658", type: "App", changes: ["ADD-NEW APPEARS ON EVERY VALUE LIST (Rev-658) \u2014 Rev-657 only offered \u2795 Add once an unmatched value had already been typed, which is no help when the whole difficulty is not knowing you are allowed to type one. It also made the lists inconsistent: a column holding unmatched text showed the option while an empty 3rd Level offered nothing but CALIPER and looked closed. The option is now the first item on EVERY value list, on every column. With nothing typed it reads \u2795 Add a new 3rd Level\u2026 and clears the field ready for the new value; with an unmatched value already typed it reads \u2795 Add \u201cMICROMETER\u201d as a new 3rd Level and keeps it. Same list, same behaviour, every column."] },
   { ts: "2026-07-28", rev: "App Rev-657", type: "App", changes: ["ADDING A NEW LEVEL VALUE IS NOW OBVIOUS (Rev-657) \u2014 these cells have always been free text: the value list is a shortcut, not the set of allowed answers. But after Rev-655 narrowed the lists to what matches the levels above, a 3rd Level showing only CALIPER looked like the only thing permitted, and there was no way to tell that typing a new one was fine. Two additions, no behaviour change: every value list now ends with \u2018Not listed? Type it in and press Enter \u2014 new values are allowed.\u2019, and if what has been typed is not in the list, the panel offers \u2795 Add \u201cX\u201d as a new 3rd Level at the top. Narrowing a list is only helpful if the way out of it is visible."] },
@@ -2219,7 +2223,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:44 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:04 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -15176,6 +15180,282 @@ function enhanceBoxBlurGray(src, w, h, radius){
 // (Old whole-image openEnhanceModal/reRunEnhance/acceptEnhance removed — superseded by the sectioned engine above)
 
 // ===== NEW CHAT HANDOFF PROMPT =====
+// ===== Rev-660: HANDOFF SUBSYSTEM ==============================================
+// Moving CP work to a fresh chat used to be "paste something and hope". Three parts
+// make it a verified procedure. CP already had the prompt generator (Rev-514), so what
+// was missing is proof: the CHECK proves this machine is safe to leave, and the QUIZ
+// proves the new Claude actually received the prompt — a silently truncated paste is
+// the real failure mode, and it looks exactly like a working one.
+//
+// Checks are written against CP's ACTUAL model, not a ported list: CP has no service
+// worker, so the two cache checks from the source design are omitted rather than
+// faked — a check that cannot fail is worse than no check.
+const HC_QUIZ =
+  "VERIFY YOURSELF: fetch the CP app source from richarnoldcamco/cp-app (index.html), then answer in 4 short lines:\n" +
+  "1. Current APP_REV\n" +
+  "2. What CP-2C says about the Master List, in one sentence\n" +
+  "3. Where does my Control Plan data physically live right now\n" +
+  "4. Which document must you never edit without asking me first\n" +
+  "If you cannot fetch the repo, just say FAILED.";
+function hcQuizAnswers(){
+  return [
+    '1. ' + APP_REV,
+    '2. The Master List is the single source of truth for the methods band — those columns are never hand-edited to disagree with it.',
+    '3. localStorage on this device (plans, master list, settings) plus drawings in IndexedDB, synced to cp_data.json in the PRIVATE cp-generator-data repo.',
+    '4. The CAMCO Control Plan Instructions (Rev-92) — never edited without asking first.'
+  ];
+}
+async function hcRunChecks(){
+  const R = [];
+  const add = (ok, name, note) => R.push({ ok, name, note });
+  const runningRev = parseInt(String(APP_REV).replace(/[^0-9]/g, ''), 10) || 0;
+
+  // 1 — APP REVISION vs the repo. Public read, no token. The single most valuable check.
+  try{
+    const r = await fetch('https://api.github.com/repos/richarnoldcamco/cp-app/commits?path=index.html&per_page=1&cb=' + Date.now(),
+      { cache: 'no-store', headers: { 'Accept': 'application/vnd.github+json' } });
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    const msg = (j && j[0] && j[0].commit && j[0].commit.message) || '';
+    const m = /Rev-(\d+)/.exec(msg);
+    const repoRev = m ? parseInt(m[1], 10) : 0;
+    if(!repoRev) add('warn', 'APP REVISION', 'could not read a rev from the latest commit message');
+    else if(repoRev === runningRev) add(true, 'APP REVISION', 'running Rev-' + runningRev + ', repo Rev-' + repoRev);
+    else if(repoRev > runningRev) add(false, 'APP REVISION', 'repo is Rev-' + repoRev + ', this machine is Rev-' + runningRev + ' — UPDATE BEFORE MOVING');
+    else add('warn', 'APP REVISION', 'this machine is Rev-' + runningRev + ', ahead of the repo Rev-' + repoRev + ' — push before moving');
+  }catch(e){ add('warn', 'APP REVISION', 'could not reach GitHub: ' + (e && e.message || e)); }
+
+  // 2 — UNPUSHED WORK. CP's equivalent of "unsaved work that would die with this chat":
+  // plans edited on this device more recently than the copy in the synced file.
+  try{
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    let newest = '', newestName = '';
+    projects.forEach(p => { const t = String(p.updated || p.created || ''); if(t > newest){ newest = t; newestName = (p.partNum||'') + (p.opNum ? ' OP-' + p.opNum : ''); } });
+    const tok = localStorage.getItem('ghToken') || '';
+    if(!tok){ add('warn', 'UNPUSHED WORK', projects.length + ' plan(s) here; no token stored so the synced copy cannot be compared'); }
+    else {
+      const r = await fetch('https://api.github.com/repos/richarnoldcamco/cp-generator-data/contents/cp_data.json?cb=' + Date.now(),
+        { cache: 'no-store', headers: { 'Authorization': 'Bearer ' + tok, 'Accept': 'application/vnd.github.raw' } });
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const remote = String(d.timestamp || '');
+      if(newest && remote && newest > remote) add(false, 'UNPUSHED WORK', newestName + ' was edited here at ' + newest.slice(0,19) + ', newer than the synced copy (' + remote.slice(0,19) + ') — PUSH BEFORE MOVING');
+      else add(true, 'UNPUSHED WORK', projects.length + ' plan(s), synced copy is current');
+    }
+  }catch(e){ add('warn', 'UNPUSHED WORK', 'could not compare with the synced file: ' + (e && e.message || e)); }
+
+  // 3 — UNISSUED CP REVISIONS. Auto-saved edits sitting past the last Save to Project.
+  try{
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    const dirty = projects.filter(p => p.cpRevDirty);
+    if(dirty.length) add('warn', 'UNISSUED CP REVS', dirty.length + ' plan(s) have edits past their last issued rev: ' + dirty.map(p => (p.partNum||'') + (p.opNum ? ' OP-' + p.opNum : '')).join(', '));
+    else add(true, 'UNISSUED CP REVS', 'every plan is at its issued revision');
+  }catch(e){ add('warn', 'UNISSUED CP REVS', 'could not read the plans'); }
+
+  // 4 — DELETION MARKERS. Earned its place today: a stale tombstone erased live work twice.
+  try{
+    const tombs = JSON.parse(localStorage.getItem('deletedProjectKeys') || '[]');
+    const recent = tombs.filter(t => String(t.deletedAt || '') > new Date(Date.now() - 864e5).toISOString());
+    if(recent.length) add('warn', 'DELETION MARKERS', recent.length + ' plan deletion(s) recorded in the last 24h: ' + recent.map(t => t.key).join(', '));
+    else add(true, 'DELETION MARKERS', tombs.length + ' historic, none in the last 24h');
+  }catch(e){ add('warn', 'DELETION MARKERS', 'could not read the deletion list'); }
+
+  // 5 — SESSION. Proves which job was open when the report was taken.
+  try{
+    let where = 'Menu';
+    ['cpBuilderScreen','projectsScreen','masterListScreen','gagesScreen','adminScreen','newCPScreen']
+      .forEach(id => { const e = document.getElementById(id); if(e && !e.classList.contains('hidden')) where = id.replace('Screen',''); });
+    const open = (typeof cpBuildState !== 'undefined' && cpBuildState && cpBuildState.partNum)
+      ? (cpBuildState.partNum + (cpBuildState.opNum ? ' OP-' + cpBuildState.opNum : '') + ' · ' + ((cpBuildState.rows||[]).length) + ' rows') : 'no plan open';
+    add(true, 'SESSION', where + ' · ' + open);
+  }catch(e){ add('warn', 'SESSION', 'could not read the current screen'); }
+
+  // 6 — MASTER LIST HEALTH. The library every methods band reads from.
+  try{
+    const md = JSON.parse(localStorage.getItem('masterList') || '[]');
+    const noId = md.filter(r => !String(r.controlTypeId || '').trim()).length;
+    const seen = {}, dupes = [];
+    md.forEach(r => { const k = String(r.h || '').trim(); if(!k) return; if(seen[k]) dupes.push(k); seen[k] = 1; });
+    if(!md.length) add(false, 'MASTER LIST', 'EMPTY on this device — every methods band would be unfillable');
+    else if(noId || dupes.length) add('warn', 'MASTER LIST', md.length + ' rows; ' + noId + ' with no Control Type ID' + (dupes.length ? ', duplicate H#: ' + [...new Set(dupes)].join(', ') : ''));
+    else add(true, 'MASTER LIST', md.length + ' control types, all with IDs, no duplicate H#');
+  }catch(e){ add('warn', 'MASTER LIST', 'could not read the master list'); }
+
+  // 7 — GITHUB TOKEN
+  try{
+    const tok = localStorage.getItem('ghToken') || '';
+    if(!tok) add('warn', 'GITHUB TOKEN', 'none stored here — REGENERATE ONE FOR THE NEW CHAT REGARDLESS');
+    else {
+      const r = await fetch('https://api.github.com/rate_limit', { cache: 'no-store', headers: { 'Authorization': 'Bearer ' + tok } });
+      if(r.ok) add(true, 'GITHUB TOKEN', 'valid — but REGENERATE BEFORE THE NEW CHAT; the one in this chat dies with it');
+      else add(false, 'GITHUB TOKEN', 'stored token was REJECTED (HTTP ' + r.status + ') — regenerate it');
+    }
+  }catch(e){ add('warn', 'GITHUB TOKEN', 'could not validate: ' + (e && e.message || e)); }
+
+  // 8 — AI KEY
+  try{
+    const k = localStorage.getItem('anthropicKey') || localStorage.getItem('aiKey') || '';
+    add(k ? true : 'warn', 'AI KEY', k ? 'present' : 'none stored — AI Propose Types will not run');
+  }catch(e){ add('warn', 'AI KEY', 'could not read'); }
+
+  // 9 — ACTION LOG
+  try{
+    const L = JSON.parse(localStorage.getItem(CP_LOG_KEY) || '[]');
+    if(!L.length) add('warn', 'ACTION LOG', 'no entries — logging may not be running');
+    else add(true, 'ACTION LOG', L.length + ' entries, latest ' + L[L.length-1].d + ' ' + L[L.length-1].t);
+  }catch(e){ add('warn', 'ACTION LOG', 'could not read the log'); }
+
+  return R;
+}
+function hcVerdict(R){
+  const bad = R.filter(x => x.ok === false).length;
+  const warn = R.filter(x => x.ok === 'warn').length;
+  return bad ? 'NOT READY — fix the ✗ items before moving.'
+       : warn ? 'READY WITH NOTES — the ⚠ items are worth a look but will not lose data.'
+              : 'READY — everything on this machine checks out.';
+}
+function hcReportText(R){
+  const mark = x => x.ok === true ? '✓' : x.ok === 'warn' ? '⚠' : '✗';
+  return 'CP HANDOFF CHECK  ·  ' + APP_REV + '  ·  ' + new Date().toLocaleString() + '\n'
+    + '='.repeat(66) + '\n'
+    + R.map(x => mark(x) + '  ' + x.name.padEnd(20) + ' ' + x.note).join('\n')
+    + '\n' + '='.repeat(66) + '\n' + hcVerdict(R) + '\n\n'
+    + 'The machine is only half the job. The other half is proving the NEW chat\n'
+    + 'actually received the prompt. Paste it the quiz; the right answers are:\n'
+    + hcQuizAnswers().map(a => '  ' + a).join('\n') + '\n';
+}
+async function hcOpenCheck(){
+  try{ logAct('handoff', 'check started'); }catch(e){}
+  const old = document.getElementById('hcBg'); if(old) old.remove();
+  const bg = document.createElement('div');
+  bg.id = 'hcBg';
+  bg.style.cssText = 'position:fixed; inset:0; z-index:300; background:rgba(20,12,12,.72); display:flex; align-items:center; justify-content:center; padding:16px;';
+  bg.innerHTML = '<div style="background:#fff; border-radius:10px; width:min(860px,96vw); max-height:92vh; display:flex; flex-direction:column; overflow:hidden;">'
+    + '<div style="background:#1E7A34; color:#fff; font-family:monospace; font-size:12px; font-weight:800; letter-spacing:.16em; padding:11px 16px; display:flex; align-items:center; gap:12px;">'
+      + '<span style="flex:1 1 auto;">HANDOFF CHECK</span>'
+      + '<button id="hcClose" style="background:#a02020; color:#fff; border:2px solid #7a1414; border-radius:6px; padding:5px 14px; font-weight:800; cursor:pointer;">✕ Close</button>'
+    + '</div>'
+    + '<pre id="hcOut" style="flex:1 1 auto; margin:0; padding:14px 16px; overflow:auto; font-size:12px; line-height:1.6; white-space:pre-wrap;">Running checks…</pre>'
+    + '<div style="background:#f1ede6; padding:10px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid #ddd6cc;">'
+      + '<button id="hcCopy" class="cp-btn cp-btn-primary" style="width:150px;">Copy report</button>'
+      + '<button id="hcQuiz" class="cp-btn cp-btn-quiet" style="width:170px;">Copy new-chat quiz</button>'
+    + '</div></div>';
+  document.body.appendChild(bg);
+  document.getElementById('hcClose').onclick = () => bg.remove();
+  bg.onclick = (e) => { if(e.target === bg) bg.remove(); };
+  const R = await hcRunChecks();
+  const txt = hcReportText(R);
+  const out = document.getElementById('hcOut');
+  if(out) out.textContent = txt;
+  try{ logAct('handoff', 'verdict: ' + hcVerdict(R)); }catch(e){}
+  document.getElementById('hcCopy').onclick = async () => {
+    try{ await navigator.clipboard.writeText(txt); flash('✓ Report copied.'); }catch(e){ flash('Copy blocked — select the text and copy manually.', true); }
+  };
+  document.getElementById('hcQuiz').onclick = async () => {
+    try{ await navigator.clipboard.writeText(HC_QUIZ); flash('✓ Quiz copied — paste it to the NEW chat.'); }catch(e){ flash('Copy blocked.', true); }
+  };
+  return R;
+}
+// ---- the wizard -----------------------------------------------------------
+let _hcStep = 1, _hcResult = null;
+async function hcOpenWizard(){
+  try{ logAct('handoff', 'wizard opened'); }catch(e){}
+  _hcStep = 1; _hcResult = null;
+  const old = document.getElementById('hcWiz'); if(old) old.remove();
+  const bg = document.createElement('div');
+  bg.id = 'hcWiz';
+  bg.style.cssText = 'position:fixed; inset:0; z-index:290; background:rgba(20,12,12,.72); display:flex; align-items:center; justify-content:center; padding:16px;';
+  bg.innerHTML = '<div style="background:#fff; border-radius:10px; width:min(680px,94vw); max-height:92vh; display:flex; flex-direction:column; overflow:hidden;">'
+    + '<div style="background:#2F6FAF; color:#fff; font-family:monospace; font-size:12px; font-weight:800; letter-spacing:.16em; padding:11px 16px; display:flex; gap:12px;">'
+      + '<span style="flex:1 1 auto;">MOVE TO A NEW CHAT</span><span id="hcStepNo">STEP 1 OF 7</span>'
+    + '</div>'
+    + '<div id="hcBody" style="flex:1 1 auto; padding:16px; overflow:auto; font-size:13px; line-height:1.6;"></div>'
+    + '<div style="background:#f1ede6; padding:10px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid #ddd6cc;">'
+      + '<button id="hcCancel" style="padding:8px 16px; font-weight:700; cursor:pointer;">Cancel</button>'
+      + '<button id="hcBack" class="cp-btn cp-btn-quiet" style="width:90px;">← Back</button>'
+      + '<button id="hcNext" class="cp-btn cp-btn-primary" style="width:110px;">Next →</button>'
+    + '</div></div>';
+  document.body.appendChild(bg);
+  const close = () => bg.remove();
+  document.getElementById('hcCancel').onclick = close;
+  bg.onclick = (e) => { if(e.target === bg) close(); };
+  // the clipboard is loaded from the first second, before any step is read
+  try{ await hcCopyPrompt(); }catch(e){}
+  hcRunChecks().then(R => { _hcResult = R; if(_hcStep === 1) hcRenderStep(); });
+  document.getElementById('hcBack').onclick = () => { if(_hcStep > 1){ _hcStep--; hcRenderStep(); } };
+  document.getElementById('hcNext').onclick = () => {
+    if(_hcStep >= 7){ try{ logAct('handoff', 'wizard finished'); }catch(e){} close(); return; }
+    _hcStep++; hcRenderStep();
+  };
+  hcRenderStep();
+}
+function hcRenderStep(){
+  const b = document.getElementById('hcBody'); if(!b) return;
+  document.getElementById('hcStepNo').textContent = 'STEP ' + _hcStep + ' OF 7';
+  const nx = document.getElementById('hcNext'); if(nx) nx.textContent = _hcStep >= 7 ? 'Finish ✓' : 'Next →';
+  const H = (t) => '<div style="font-weight:800; font-size:15px; margin-bottom:8px;">' + t + '</div>';
+  let html = '';
+  if(_hcStep === 1){
+    if(!_hcResult) html = H('MACHINE CHECK — AUTOMATIC') + '<p>Running…</p>';
+    else {
+      const v = hcVerdict(_hcResult);
+      const bad = _hcResult.filter(x => x.ok === false);
+      const warn = _hcResult.filter(x => x.ok === 'warn');
+      const col = bad.length ? '#a11' : warn.length ? '#8a6a12' : '#1f5133';
+      html = H('MACHINE CHECK — AUTOMATIC')
+        + '<p style="font-weight:800; color:' + col + ';">' + v + '</p>'
+        + (bad.concat(warn).length ? '<ul style="margin:6px 0 10px 18px;">' + bad.concat(warn).map(x => '<li>' + (x.ok === false ? '✗' : '⚠') + ' <b>' + x.name + '</b> — ' + x.note + '</li>').join('') + '</ul>' : '')
+        + (bad.length ? '<p style="color:#a11; font-weight:700;">Fix the ✗ item(s) before continuing.</p>' : '')
+        + '<button id="hcFull" class="cp-btn cp-btn-quiet" style="width:150px;">Full report</button>';
+    }
+  } else if(_hcStep === 2){
+    html = H('THE PROMPT IS ON YOUR CLIPBOARD')
+      + '<p>It was copied the moment this window opened. <b>Do not paste it anywhere yet.</b></p>'
+      + '<button id="hcAgain" class="cp-btn cp-btn-quiet" style="width:170px;">Copy it again</button>';
+  } else if(_hcStep === 3){
+    html = H('HAVE YOUR GITHUB TOKEN READY')
+      + '<p>Regenerate <code>claude-push</code> at github.com/settings/personal-access-tokens → Fine-grained tokens → claude-push → Regenerate.</p>'
+      + '<p>The token in this chat dies with it. Regenerating kills every older copy everywhere — that is the point.</p>';
+  } else if(_hcStep === 4){
+    html = H('START THE NEW CHAT')
+      + '<p>Start it <b>inside this same Claude project</b>, so the project files and memory carry over.</p>'
+      + '<p>Leave this app open.</p>';
+  } else if(_hcStep === 5){
+    html = H('PASTE INTO THE NEW CHAT')
+      + '<p>Paste the prompt first, then the token on its own line at the end of the <b>same</b> message. Send it.</p>';
+  } else if(_hcStep === 6){
+    html = H('QUIZ THE NEW CLAUDE')
+      + '<p>This is the half the prompt cannot prove. Paste the quiz and check all four answers.</p>'
+      + '<button id="hcQuiz2" class="cp-btn cp-btn-primary" style="width:170px;">Copy the quiz</button>'
+      + '<div style="margin-top:10px; font-size:12px; background:#f6f2ea; border:1px solid #ddd6cc; border-radius:6px; padding:10px;">'
+      + hcQuizAnswers().map(a => '<div style="margin-bottom:4px;">' + a + '</div>').join('') + '</div>';
+  } else {
+    html = H('DONE')
+      + '<p>All four right → carry on in the new chat.</p>'
+      + '<p><b>Any answer wrong, or FAILED?</b> The paste did not take. Go back to step 2, copy again, re-paste. One re-paste fixes it — a partial paste is the usual cause and it looks exactly like a good one.</p>';
+  }
+  b.innerHTML = html;
+  const f = document.getElementById('hcFull'); if(f) f.onclick = () => hcOpenCheck();
+  const a = document.getElementById('hcAgain'); if(a) a.onclick = async () => { try{ await copyNewChatPrompt(true); flash('✓ Prompt copied again.'); }catch(e){} };
+  const q = document.getElementById('hcQuiz2'); if(q) q.onclick = async () => {
+    try{ await navigator.clipboard.writeText(HC_QUIZ); flash('✓ Quiz copied.'); }catch(e){ flash('Copy blocked.', true); }
+  };
+}
+
+// Rev-660: copy the handoff prompt WITHOUT opening the modal — the wizard loads the
+// clipboard before its first step is even read. Uses the same builder the modal uses,
+// so the two can never drift apart.
+async function hcCopyPrompt(){
+  let txt = '';
+  try{ txt = buildNewChatPrompt(); }catch(e){}
+  if(!txt) return false;
+  try{ await navigator.clipboard.writeText(txt); return true; }
+  catch(e){
+    try{ const ta = document.getElementById('newChatText'); if(ta){ ta.value = txt; ta.select(); document.execCommand('copy'); return true; } }catch(e2){}
+    return false;
+  }
+}
+
 // ===== NEW CHAT PROMPT =====
 // The COMMON block is shared across all CAMCO apps and lives on GitHub so it can be
 // edited in ONE place. We fetch it live (raw host + cache-buster; github.io is blocked),
