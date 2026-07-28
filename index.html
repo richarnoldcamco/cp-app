@@ -703,7 +703,6 @@
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:110px;">Feature Type</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:100px;">2nd Level</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:100px;">3rd Level</th>
-            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:180px;">Proposed<br><span style="font-weight:400; font-size:9px;">(best match — ✓ to use)</span></th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:180px;">Feature / Process Description</th>
             <!-- Rev-207: Process Step / Operation ID# / Machine / Process columns hidden on-screen; values still fill the xlsx per CP-2 -->
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:120px;">Product / Process Spec / Tol</th>
@@ -1544,7 +1543,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-650";
+const APP_REV = "Rev-651";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1677,6 +1676,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-651", type: "App", changes: ["PROPOSED COLUMN REMOVED (Rev-651) \u2014 every row is assigned deliberately now: the four Master List levels resolve the Control Type ID on their own since Rev-646, so a suggested best-match sitting alongside was a second opinion nobody was asking for, and a wide column on an already crowded grid. Gone from both the open row and the closed rows, along with its \u2713 Use button. All twenty remaining data columns were renumbered and the three step views, the header band spans and the methods sub-band remapped to match \u2014 an off-by-one there is exactly what put the PRIOR ROW strip out of line at Rev-650, so the maps were re-derived rather than nudged. \ud83c\udfaf Auto-fill Proposed and \ud83e\udd16 AI Propose Types remain on the toolbar for bulk work; only the per-row column is gone."] },
   { ts: "2026-07-28", rev: "App Rev-650", type: "App", changes: ["PRIOR ROW STRIP NOW LINES UP WITH THE FORM (Rev-650) \u2014 the read-only PRIOR ROW reference above the Add New Control Type fields was drawn from a column list that had \u2018thirdLevel\u2019 missing. One cell short against a nineteen-column grid meant every value from Feature Description rightwards sat one column LEFT of the field it belonged to \u2014 so the strip showed BORE RUN-OUT under Feature Description\u2019s neighbour, the X marks under the wrong bands, and 1 / 10 / NO CHECK / CMM all shifted. Worse than untidy: it is a reference strip, so a misaligned value invites the next row to be filled in from the wrong column. 3rd Level restored to the list and the two rows now match column for column."] },
   { ts: "2026-07-28", rev: "App Rev-649", type: "App", changes: ["ADD NEW CONTROL TYPE INHERITS THE LEVELS YOU ALREADY SET (Rev-649) \u2014 opening the form from the builder made you retype Workcenter and Feature Type even though they were already chosen on the Control Plan row. The levels WERE being handed over on window._cpMasterSeed since Rev-612, but nothing at the receiving end ever read them, so the seed was written and thrown away. openMasterEdit now applies it when adding a new row, and confirms how many levels were carried across. Re-entering the same facts is not just tedious \u2014 it is a chance for the master row and the plan row to disagree, which is exactly what the computed Control Type ID at Rev-646 was meant to end. The \u2795 Add a new \u2026 option on a level picker now carries EVERY level already set on the row rather than only those above it."] },
   { ts: "2026-07-28", rev: "App Rev-648", type: "App", changes: ["ADD NEW CONTROL TYPE \u2014 FIELDS OPEN ON THE FIRST CLICK (Rev-648) \u2014 moving from one field to the next needed two clicks: the first appeared to do nothing. Cause: leaving a field schedules its value list to close 150ms later, and that close was unconditional. Click the next field and it opened its own list immediately \u2014 then the previous field\u2019s timer fired and shut it, because both share one panel. The list really did open on the first click; it was closed again a moment later by the field you had just left. A panel now records which field owns it, and the delayed close only fires if that field\u2019s own panel is still the one showing. Rev-615 fixed the same symptom on the Master List grid; this is the Add New Control Type form, which has its own picker."] },
@@ -2200,7 +2200,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "6:36 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "6:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5810,15 +5810,21 @@ const CP_STEPS = {
   //  7 3rd Level  8 Proposed  9 Feature/Process Description  10 Spec/Tol  11 Upper  12 Lower
   //  13 Class  14 Meas(Machinist)  15 #Rec  16 FREQ(Every)  17 FREQ(QE)  18 Meas(CMM)
   //  19 Special Gage  20 Reaction Plan
+  // Rev-651: the Proposed column was removed, so every data column after it shifts down
+  // by one. Columns now run:
+  //  0 Doc#  1 Bubble#  2 done-dot  3 Control Type ID  4 Workcenter  5 Feature Type
+  //  6 2nd Level  7 3rd Level  8 Feature/Process Description  9 Spec/Tol  10 Upper
+  //  11 Lower  12 Class  13 Meas(Machinist)  14 #Rec  15 FREQ(Every)  16 FREQ(QE)
+  //  17 Meas(CMM)  18 Special Gage  19 Reaction Plan
   '1': { label: '1 \u00b7 Bubble Numbers',
          hint: 'Give every ODS balloon its row, then pin each one on the drawing \u2014 the step is done when every row shows a green dot.',
-         cols: [0,1,2,9,10,11,12,13] },
+         cols: [0,1,2,8,9,10,11,12] },
   '2': { label: '2 \u00b7 Control Type',
-         hint: 'Narrow it down with Workcenter \u2192 Feature Type \u2192 2nd / 3rd Level, then pick the Control Type. The methods fill themselves from the Master List.',
-         cols: [0,1,2,3,4,5,6,7,8,9,10,13] },
+         hint: 'Narrow it down with Workcenter \u2192 Feature Type \u2192 2nd / 3rd Level. The Control Type ID resolves itself, and the methods fill from the Master List.',
+         cols: [0,1,2,3,4,5,6,7,8,9,12] },
   '3': { label: '3 \u00b7 Measurement Methods',
          hint: 'Review what the master filled in, set any special gage, and confirm the reaction plan.',
-         cols: [0,1,3,9,10,13,14,15,16,17,18,19,20] },
+         cols: [0,1,3,8,9,12,13,14,15,16,17,18,19] },
   'A': { label: 'All columns',
          hint: 'Every column at once \u2014 the old single-screen view.',
          cols: null }
@@ -5864,19 +5870,19 @@ function cpApplyStepView(){
   const head = table.tHead;
   if(head && head.rows[0]){
     const r0 = head.rows[0].cells;
-    const topMap = [0,1,2,3,4,5,6,7,8,9,10,11,12,13];   // Rev-614: cell index -> data column
+    const topMap = [0,1,2,3,4,5,6,7,8,9,10,11,12];   // Rev-651: cell index -> data column
     for(let c = 0; c < topMap.length && c < r0.length; c++) r0[c].style.display = show(topMap[c]) ? '' : 'none';
-    const methodCols = [14,15,16,17,18].filter(show).length;
-    if(r0[14]){
-      r0[14].style.display = methodCols ? '' : 'none';
-      if(methodCols) r0[14].colSpan = methodCols;
+    const methodCols = [13,14,15,16,17].filter(show).length;
+    if(r0[13]){
+      r0[13].style.display = methodCols ? '' : 'none';
+      if(methodCols) r0[13].colSpan = methodCols;
     }
-    if(r0[15]) r0[15].style.display = show(19) ? '' : 'none';   // Special Gage
-    if(r0[16]) r0[16].style.display = show(20) ? '' : 'none';   // Reaction Plan
+    if(r0[14]) r0[14].style.display = show(18) ? '' : 'none';   // Special Gage
+    if(r0[15]) r0[15].style.display = show(19) ? '' : 'none';   // Reaction Plan
   }
   if(head && head.rows[1]){
     const r1 = head.rows[1].cells;
-    [14,15,16,17,18].forEach((dataCol, idx) => { if(r1[idx]) r1[idx].style.display = show(dataCol) ? '' : 'none'; });
+    [13,14,15,16,17].forEach((dataCol, idx) => { if(r1[idx]) r1[idx].style.display = show(dataCol) ? '' : 'none'; });
   }
 
   // --- body. Operation grouping rows span the whole grid (one cell) and are left alone.
@@ -6167,36 +6173,10 @@ tr.appendChild(tdCT);
       // Rev-614: the four Master List levels, as live pickers on the open row
       for(let li = 0; li < CP_LEVELS.length; li++) tr.appendChild(cpLevelCell(idx, row, li, true));
 
-      // Rev-264: PROPOSED control type (local best match) with an accept button
-      const tdProp = document.createElement('td');
-      tdProp.style.cssText = 'padding:6px; border:1px solid var(--line); text-align:center; vertical-align:middle;';
-      const prop = cpRowProposal(row);
-      if(prop && prop.id === row.controlTypeId){
-        const ok = document.createElement('div'); ok.textContent = '✓ using this';
-        ok.style.cssText = 'font-size:11px; color:#1f7a4d; font-weight:700;'; tdProp.appendChild(ok);
-      } else if(prop){
-        const name = document.createElement('div'); name.textContent = (prop.source === 'ai' ? '🤖 ' : prop.source === 'learned' ? '📌 ' : '') + prop.id;
-        name.style.cssText = 'font-size:11px; color:#1a5276; margin-bottom:5px; white-space:normal; word-break:break-word;'; tdProp.appendChild(name);
-        const use = document.createElement('button'); use.textContent = row.controlTypeId ? '✓ Use instead' : '✓ Use';
-        use.style.cssText = 'font-size:11px; font-weight:700; padding:5px 10px; border-radius:5px; border:1px solid #154360; background:#1a5276; color:#fff; cursor:pointer;';
-        use.onclick = (e) => { e.stopPropagation(); applyControlType(idx, prop.id); };
-        tdProp.appendChild(use);
-      } else {
-        const dash = document.createElement('div'); dash.textContent = '— no match —';
-        dash.style.cssText = 'font-size:10px; color:var(--ink-faint);'; tdProp.appendChild(dash);
-      }
-      // Rev-358: REJECT the AI suggestion for this row — clears the proposed control type and blanks
-      // any description the AI auto-wrote (text you typed yourself is left alone). Shown whenever there's
-      // an AI proposal you haven't adopted, or an unconfirmed AI-written description sitting in the row.
-      if((row.aiProp && row.aiProp !== row.controlTypeId) || row._aiDesc){
-        const rej = document.createElement('button');
-        rej.textContent = '✗ Reject AI';
-        rej.title = 'Dismiss the AI suggestion for this balloon — clears the proposed control type and blanks the AI-written description so you can fill it in yourself. Text you typed is kept.';
-        rej.style.cssText = 'display:block; margin:6px auto 0; font-size:10px; font-weight:700; padding:4px 9px; border-radius:5px; border:1px solid #8a2a2a; background:#fff; color:#8a2a2a; cursor:pointer;';
-        rej.onclick = (e) => { e.stopPropagation(); cpRejectAiSuggestion(idx); };
-        tdProp.appendChild(rej);
-      }
-      tr.appendChild(tdProp);
+      // Rev-651: the PROPOSED column was removed. Every row is assigned deliberately now
+      // — via the four Master List levels, which resolve the Control Type ID on their own
+      // (Rev-646) — so a suggested best-match sitting beside it was a second opinion
+      // nobody was asking for, and one more column of width on an already wide grid.
 
       tr.appendChild(editableCell(idx, 'featureDesc', row.featureDesc, 'left', true));
       // Rev-207: four columns hidden on-screen (values persist on the row for the xlsx build)
@@ -6288,13 +6268,6 @@ tr.appendChild(tdCT);
       tr.appendChild(compactCell(row.controlTypeId || '— not set —', 'left'));
       // Rev-614: the four Master List levels, read-only on a closed row
       for(let li = 0; li < CP_LEVELS.length; li++) tr.appendChild(cpLevelCell(idx, row, li, false));
-      // Rev-264: proposed control type (compact) — shown greyed for rows with no type yet
-      const propC = row.controlTypeId ? null : cpRowProposal(row);
-      const tdPropC = document.createElement('td');
-      tdPropC.style.cssText = 'padding:' + pad + '; border:1px solid var(--line); font-size:' + fsz + '; text-align:left; color:#1a5276; overflow:hidden; text-overflow:ellipsis; max-width:0; white-space:nowrap;';
-      tdPropC.textContent = propC ? ((propC.source === 'ai' ? '🤖 ' : propC.source === 'learned' ? '📌 ' : '') + propC.id) : (row.controlTypeId ? '' : '—');
-      if(propC) tdPropC.title = 'Proposed: ' + propC.id + ' — click the row, then ✓ Use';
-      tr.appendChild(tdPropC);
       tr.appendChild(compactCell(row.featureDesc, 'left'));
       // Rev-207: four columns hidden on-screen
       tr.appendChild(compactCell(row.spec, 'center'));
