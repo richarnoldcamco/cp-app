@@ -1522,7 +1522,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-625";
+const APP_REV = "Rev-626";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1625,6 +1625,7 @@ function renderActionLogPanel(){
 }
 
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-626", type: "App", changes: ["CONSTRUCTION VISUALS STAY IN THE CONSTRUCTION AREA (Rev-626) \u2014 the UNDER CONSTRUCTION banner and the progress bar were spanning the entire table, so they ran straight through the Inspect / Validation / Customer CP / Download / Rename / Delete buttons and under the CP REV figure. Those are not construction: hazard stripes across them read as if the buttons themselves were unavailable, and the wording was being obscured by the buttons in return. The banner and bar now span only the three construction columns \u2014 Operation, Status and Construction Steps \u2014 and stop at the rule before ACTIONS, which stays clear. Rev-623 had used a span of 99 to make the bar full-width; that was the right fix for the bar ending short, but the wrong extent."] },
   { ts: "2026-07-28", rev: "App Rev-625", type: "App", changes: ["PARTS LIST NARROWED TO HALF THE SCREEN (Rev-625) \u2014 the Control Plans screen was given the full width of the monitor at Rev-621 so the five construction steps and six action buttons could sit on one line. That is the OPERATIONS view; the PARTS list underneath it is six short columns and was left stretched across the whole screen with the Open button marooned two feet from the part number. The parts list now uses HALF the width, and the operations view keeps the full width \u2014 the same screen sizes itself to what it is showing, switched as the list is drawn rather than by a second screen."] },
   { ts: "2026-07-28", rev: "App Rev-624", type: "App", changes: ["ROLLING ACTION LOG ADDED (Rev-624) \u2014 the app now records what was actually done, on this machine only: every screen opened, every button pressed, the NAME of every field typed in (never its contents), and every uncaught error with its file and line number. Kept in localStorage under cpActionLog, capped at 600 entries, oldest dropped first. ADMIN \u2192 ACTION LOG shows the last 60 with Copy log / Download .txt / Clear. ITAR-safe by design: field names are logged, never values, so no part, drawing or feature data can enter it, and nothing is transmitted anywhere. Built to survive editing \u2014 the listeners are in capture phase so a handler that stops propagation cannot hide an event, navigation is logged by wrapping the show* functions once at boot rather than by a line pasted into twenty functions that would drift apart, and every write is try/caught so a full localStorage degrades silently instead of breaking the app. THE HANDOFF PROMPT AND THE NEW-APP RECIPE WERE BOTH UPDATED, so future chats are told to ASK FOR THE LOG FIRST when a fault is reported, and any new CAMCO app is built with this from the start. Several faults today \u2014 the vanishing plan, the silent upload, the rename that deleted its own plan \u2014 cost hours of guesswork that one log would have settled in a minute."] },
   { ts: "2026-07-28", rev: "App Rev-623", type: "App", changes: ["UNDER CONSTRUCTION BANNER + FULL-WIDTH PROGRESS BAR (Rev-623) \u2014 both of the marked-up changes. (1) An operation that is not finished now carries an UNDER CONSTRUCTION banner in shop-floor hazard stripes across the full width of its line, reading UNDER CONSTRUCTION \u2014 84% COMPLETE, with the outstanding work named on hover. It disappears by itself at 100%, so a finished operation is quiet and only the unfinished ones shout. (2) THE PROGRESS BAR NOW REALLY DOES RUN THE FULL WIDTH: its cell was set to span five columns, a number that silently stops being right the moment a column is added or removed \u2014 so the bar was ending short. It now spans 99, which every browser clamps to however many columns the table actually has, and the bar itself is set to fill its cell. The bar was also thickened slightly (9px to 11px) to sit under the banner without looking like an afterthought."] },
@@ -2123,7 +2124,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "4:12 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "4:24 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3539,10 +3540,12 @@ function renderProjects(){
       const btr = document.createElement('tr');
       btr.className = 'cp-op-row';
       const btd = document.createElement('td');
-      // Rev-623: 99 is clamped by the browser to however many columns the table has, so
-      // this cell always spans the FULL width no matter how the columns change later.
-      btd.colSpan = 99;
-      btd.style.cssText = 'padding:2px 10px 10px 10px; border-bottom:1px solid #e2ddd4; width:100%;';
+      // Rev-626: the banner and bar belong to the CONSTRUCTION half of the row only.
+      // Spanning the whole table put them straight through the Actions buttons and the
+      // CP REV figure, which are not construction and should not be under a hazard
+      // stripe. Three columns — Operation, Status, Construction Steps — and stop.
+      btd.colSpan = 3;
+      btd.style.cssText = 'padding:2px 10px 10px 10px; border-bottom:1px solid #e2ddd4;';
       // Rev-623: an operation that is not finished says so, in shop-floor hazard stripes
       const _pcRow = cpPlanPercent(p);
       if(_pcRow < 100){
@@ -3554,6 +3557,11 @@ function renderProjects(){
       }
       btd.appendChild(_cpBarFor);
       btr.appendChild(btd);
+      // Rev-626: the Actions / CP REV side of the line stays clear
+      const bpad = document.createElement('td');
+      bpad.colSpan = 2;
+      bpad.style.cssText = 'border-bottom:1px solid #e2ddd4; border-left:2px solid #e2ddd4;';
+      btr.appendChild(bpad);
       tbody.appendChild(btr);
     }
   });
