@@ -1472,7 +1472,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-608";
+const APP_REV = "Rev-609";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1486,6 +1486,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-609", type: "App", changes: ["WORKCENTER RENAMED: HARDINGE LATHE \u2192 LATHE (Rev-609) \u2014 every Master List row whose Workcenter read HARDINGE LATHE now reads LATHE. Done as a one-time sweep in the app rather than by editing the synced file directly: the Master List lives on each device and is pushed up from there, so a hand-edit on GitHub would have been overwritten by the next push \u2014 the same trap that cost 912767-M twice today. The sweep runs once per device, is flagged so it never repeats, reports how many rows it changed, and pushes the result straight to GitHub. It runs again after a data pull in case the rows arrive from GitHub after start-up, and it also rewrites any stored pick-list entry still naming the old value. Rows with any other Workcenter are untouched. NOTE: this only renames what is IN the Master List \u2014 Control Plans already built keep whatever workcenter was written onto their rows at the time."] },
   { ts: "2026-07-28", rev: "App Rev-608", type: "App", changes: ["NO ROW IS OPENED UNTIL YOU CLICK ONE (Rev-608) \u2014 the builder always had a row expanded: opening a plan opened row 1, and switching step re-opened whichever row was last active. That row takes several times the height of a normal one and pushes the rest of the list down, which is pure noise when you are reading the grid rather than editing a feature. Opening a plan and switching between steps now leave EVERY row collapsed \u2014 the full list is visible \u2014 and a row opens up only when you click it. Deleting a row now closes the editor instead of jumping the open state onto its neighbour. Nothing else changes: the opened row behaves exactly as before once you click into it."] },
   { ts: "2026-07-28", rev: "App Rev-607", type: "App", changes: ["VIEWER CONTROLS MOVED TO THE TOP, CLOSE IS RED (Rev-607) \u2014 the full-screen drawing viewers put Close UNDER the image, which on a laptop sat below the fold: you had to scroll past a full-size print to get out of it. All three viewers \u2014 ODS drawing, traveller and gage drawing \u2014 now carry a bar across the TOP with the title on the left and the buttons on the right, and the image fills the space beneath (now 86vh instead of 80\u201384vh, since the bar is more compact than the old caption plus button row). CLOSE IS NOW RED (#a02020) in all three, per the standard: a close button reads as a close button. \u2b06 Replace sits beside it in the traveller and gage viewers. Clicking the dark background still closes, as before."] },
   { ts: "2026-07-28", rev: "App Rev-606", type: "App", changes: ["A DELETION CAN NO LONGER ERASE A PLAN THAT IS STILL BEING WORKED ON (Rev-606) \u2014 912767-M was repaired on GitHub at Rev-605 but stayed missing, because the false deletion marker written at 12:14 was still sitting on the device and deletions were absolute: the merge removed any plan whose id matched a marker, no matter how old the marker or how recently the plan had been edited. The drafts merge has always been smarter (\u2018a draft re-saved after its deletion survives\u2019); projects now follow the same rule \u2014 a deletion only wins over a plan older than itself, so a plan edited AFTER the marker was written stays. That closes the whole failure mode, not just this instance: one stale marker can no longer wipe live work off every device. The specific 12:14 marker is also ignored outright, since it came from the false-rename bug fixed at Rev-605 rather than from anyone deleting anything."] },
@@ -1967,7 +1968,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:38 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:56 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2598,6 +2599,44 @@ function renderPartsIndex(tbody, combined){
       tbody.appendChild(tr);
     });
 }
+// ===== Rev-609: WORKCENTER RENAME — HARDINGE LATHE → LATHE ======================
+// A one-time sweep over the Master List. It runs once per device (flagged), rewrites the
+// Workcenter on every row that reads HARDINGE LATHE, and leaves everything else alone.
+// Done in code rather than by hand-editing the synced file because the Master List lives
+// on each device and is pushed up from there — editing GitHub directly would simply be
+// overwritten by the next push, which is exactly what happened with 912767-M.
+function cpMigrateWorkcenterNames(){
+  try{
+    if(localStorage.getItem('cpWcRename_v1')) return;
+    const d = JSON.parse(localStorage.getItem('masterList') || '[]');
+    if(!Array.isArray(d) || !d.length) return;   // nothing seeded yet; try again next launch
+    let n = 0;
+    d.forEach(r => {
+      if(String(r.workcenter || '').trim().toUpperCase() === 'HARDINGE LATHE'){ r.workcenter = 'LATHE'; n++; }
+    });
+    if(n){
+      localStorage.setItem('masterList', JSON.stringify(d));
+      try{ flash('\u2713 Workcenter renamed to LATHE on ' + n + ' Master List rows.'); }catch(e){}
+      try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
+    }
+    localStorage.setItem('cpWcRename_v1', new Date().toISOString());
+    // the pick-lists are built from the rows, but a stored list may still name the old value
+    try{
+      const lk = 'cpLevelValues';
+      const lv = JSON.parse(localStorage.getItem(lk) || 'null');
+      if(lv && typeof lv === 'object'){
+        let ch = false;
+        Object.keys(lv).forEach(k => {
+          if(!Array.isArray(lv[k])) return;
+          lv[k] = lv[k].map(v => (String(v).trim().toUpperCase() === 'HARDINGE LATHE' ? 'LATHE' : v));
+          ch = true;
+        });
+        if(ch) localStorage.setItem(lk, JSON.stringify(lv));
+      }
+    }catch(e){}
+  }catch(e){}
+}
+try{ cpMigrateWorkcenterNames(); }catch(e){}
 // Rev-599: an operation's ODS drawing. The plan carries its own copy; if the GitHub
 // sync stripped it, fall back to the per-part drawing store.
 function cpOpOdsImage(p){
@@ -11224,6 +11263,9 @@ function mergeRestore(backup){
     cpGagesSet(out);
     summary.push(Object.keys(out).length + ' gages');
   }
+
+  // Rev-609: rows can land from GitHub after start-up, so sweep again once they are here
+  try{ cpMigrateWorkcenterNames(); }catch(e){}
 
   return summary;
 }
