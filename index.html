@@ -1558,7 +1558,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-662";
+const APP_REV = "Rev-663";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1691,6 +1691,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-663", type: "App", changes: ["THE CHECK NOW SAYS PASS OR DO NOT MOVE YET (Rev-663) \u2014 step 1 answered the one question it exists to answer \u2014 is this machine safe to leave \u2014 with a sentence set in the same weight as everything else, so the answer had to be inferred from the wording. It now leads with a BANNER: a large \u2713 or \u2717, the word PASS, PASS \u2014 WITH NOTES, or DO NOT MOVE YET, a plain line saying what that means for you, and the score (\u20188 of 9 checks passed\u2019) so a silently skipped check cannot hide. Green for a clean pass, amber for pass-with-notes, red for stop \u2014 and the amber case says outright that the notes will not lose any work, because \u2018READY WITH NOTES\u2019 read like a warning when it is not one. The copied report gets the same headline so it is unambiguous when pasted into a chat."] },
   { ts: "2026-07-28", rev: "App Rev-662", type: "App", changes: ["HANDOFF CHECK WAS READING THE WRONG AI KEY (Rev-662) \u2014 the AI KEY check looked in localStorage for \u2018anthropicKey\u2019 or \u2018aiKey\u2019. The app has never written either: it stores the key as \u2018anthropicApiKey\u2019. So the check reported \u2018none stored \u2014 AI Propose Types will not run\u2019 no matter how many keys were saved, on every machine, forever. A check reading the wrong key is worse than no check at all \u2014 it trains you to ignore a warning that is always present, and the next time it means something you will scroll past it. Now reads the key the app actually uses, with the two old names kept as fallbacks, and reports its length so \u2018present\u2019 is evidence rather than a claim. The other warning on that panel \u2014 UNISSUED CP REVS on 1000237620 OP-030 \u2014 is correct: that plan has auto-saved edits past its last Save to Project, exactly as the \u25cf beside its rev has been showing."] },
   { ts: "2026-07-28", rev: "App Rev-661", type: "App", changes: ["TWO BUTTONS, SAME NAME \u2014 FIXED, AND AN EMPTY PUSH RECOVERED (Rev-661) \u2014 pressing \ud83d\udcac New Chat Prompt showed the old plain text box and none of the new steps: Rev-660 put its wizard button in the HEADER while the original sat on the HOME SCREEN, still wired to the old modal. Two buttons, same label, different behaviour \u2014 the same confusion as the twin \u2018add new\u2019 lists earlier today. The HOME button now opens the wizard, since that is the one actually pressed, and the duplicate header button was REMOVED rather than left as a second door to the same room. \u2713 HANDOFF CHECK stays in the header; it does a different job. The raw prompt text is still reachable from step 2 via SEE THE TEXT. ALSO: the previous build attempt shipped an EMPTY index.html \u2014 the packaging step opened its payload file for writing BEFORE reading the source, so when the source read failed it left a zero-byte payload and pushed that over the live site, taking the app down. Recovered by rolling FORWARD as the standing rule requires. The payload is now size-checked before any push can run."] },
   { ts: "2026-07-28", rev: "App Rev-660", type: "App", changes: ["HANDOFF SUBSYSTEM \u2014 CHECK, QUIZ AND WIZARD (Rev-660) \u2014 moving CP work to a fresh chat was \u2018paste something and hope\u2019. CP already had the prompt generator (Rev-514); what was missing was PROOF. Two header buttons: \u2713 HANDOFF CHECK runs nine checks against this machine and prints a \u2713 / \u26a0 / \u2717 report with a verdict, and \ud83d\udcac NEW CHAT PROMPT opens a seven-step wizard that copies the prompt the instant it opens, runs the check, and walks through token \u2192 new chat \u2192 paste \u2192 QUIZ. THE QUIZ IS THE HALF THAT WAS MISSING: it tests the NEW Claude \u2014 the current rev (only the repo can supply it), what CP-2C says about the Master List, where the data physically lives, and which document may never be edited without asking. A silently truncated paste is the real failure mode and it looks exactly like a good one. CHECKS WRITTEN AGAINST CP\u2019S ACTUAL MODEL, not ported blind: CP has no service worker, so the source design\u2019s two cache checks were OMITTED rather than faked \u2014 a check that cannot fail is worse than no check. In their place, checks that matter here: repo rev vs running rev, plans edited on this device but not yet synced, unissued CP revisions, and DELETION MARKERS IN THE LAST 24 HOURS \u2014 which earned its place today, when a stale tombstone erased live work twice. Every check is individually wrapped so one failure degrades to \u26a0 instead of taking the panel down."] },
@@ -2226,7 +2227,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:32 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -15326,7 +15327,10 @@ function hcReportText(R){
   return 'CP HANDOFF CHECK  ·  ' + APP_REV + '  ·  ' + new Date().toLocaleString() + '\n'
     + '='.repeat(66) + '\n'
     + R.map(x => mark(x) + '  ' + x.name.padEnd(20) + ' ' + x.note).join('\n')
-    + '\n' + '='.repeat(66) + '\n' + hcVerdict(R) + '\n\n'
+    + '\n' + '='.repeat(66) + '\n'
+    + (R.filter(x => x.ok === false).length ? '*** DO NOT MOVE YET ***  ' : '*** PASS ***  ')
+    + R.filter(x => x.ok === true).length + ' of ' + R.length + ' checks passed\n'
+    + hcVerdict(R) + '\n\n'
     + 'The machine is only half the job. The other half is proving the NEW chat\n'
     + 'actually received the prompt. Paste it the quiz; the right answers are:\n'
     + hcQuizAnswers().map(a => '  ' + a).join('\n') + '\n';
@@ -15405,14 +15409,32 @@ function hcRenderStep(){
   if(_hcStep === 1){
     if(!_hcResult) html = H('MACHINE CHECK — AUTOMATIC') + '<p>Running…</p>';
     else {
-      const v = hcVerdict(_hcResult);
+      // Rev-663: lead with PASS or DO NOT MOVE YET, as a banner, with the score. The
+      // verdict was a sentence in the same weight as everything else, so the one thing
+      // the step exists to answer — can I leave this machine — had to be inferred.
       const bad = _hcResult.filter(x => x.ok === false);
       const warn = _hcResult.filter(x => x.ok === 'warn');
-      const col = bad.length ? '#a11' : warn.length ? '#8a6a12' : '#1f5133';
+      const pass = _hcResult.filter(x => x.ok === true).length;
+      const head = bad.length
+        ? { icon: '\u2717', word: 'DO NOT MOVE YET', bg: '#fdecea', bd: '#c0392b', fg: '#8e2019',
+            sub: 'Fix the \u2717 item' + (bad.length > 1 ? 's' : '') + ' below, then run the check again.' }
+        : warn.length
+          ? { icon: '\u2713', word: 'PASS \u2014 WITH NOTES', bg: '#fdf4e0', bd: '#e6a817', fg: '#6b5314',
+              sub: 'Safe to move. The \u26a0 notes below will not lose any work.' }
+          : { icon: '\u2713', word: 'PASS', bg: '#dcecdf', bd: '#2c6e49', fg: '#1f5133',
+              sub: 'Safe to move \u2014 everything on this machine checks out.' };
       html = H('MACHINE CHECK — AUTOMATIC')
-        + '<p style="font-weight:800; color:' + col + ';">' + v + '</p>'
+        + '<div style="display:flex; align-items:center; gap:14px; background:' + head.bg + '; border:2px solid ' + head.bd
+          + '; border-radius:8px; padding:12px 14px; margin-bottom:10px;">'
+          + '<div style="font-size:30px; line-height:1; color:' + head.fg + '; font-weight:800;">' + head.icon + '</div>'
+          + '<div style="flex:1 1 auto;">'
+            + '<div style="font-size:17px; font-weight:800; letter-spacing:.04em; color:' + head.fg + ';">' + head.word + '</div>'
+            + '<div style="font-size:12px; color:' + head.fg + ';">' + head.sub + '</div>'
+          + '</div>'
+          + '<div style="text-align:right; font-size:12px; font-weight:700; color:' + head.fg + '; white-space:nowrap;">'
+            + pass + ' of ' + _hcResult.length + ' checks<br>passed</div>'
+        + '</div>'
         + (bad.concat(warn).length ? '<ul style="margin:6px 0 10px 18px;">' + bad.concat(warn).map(x => '<li>' + (x.ok === false ? '✗' : '⚠') + ' <b>' + x.name + '</b> — ' + x.note + '</li>').join('') + '</ul>' : '')
-        + (bad.length ? '<p style="color:#a11; font-weight:700;">Fix the ✗ item(s) before continuing.</p>' : '')
         + '<button id="hcFull" class="cp-btn cp-btn-quiet" style="width:150px;">Full report</button>';
     }
   } else if(_hcStep === 2){
