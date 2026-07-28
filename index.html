@@ -1554,7 +1554,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-658";
+const APP_REV = "Rev-659";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1687,6 +1687,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-659", type: "App", changes: ["\u2795 ADD A NEW \u2026 IS THE FIRST ITEM (Rev-659) \u2014 on the builder\u2019s level pickers the add option sat at the BOTTOM, under every existing value. On Feature Type that is twenty entries and a scrollbar, so the one option you need when a value is missing was the one you had to scroll to find \u2014 and the longer the list, the more likely something is missing from it. It is now the first item on every level picker, above \u2014 any \u2014 and the values. The Master List\u2019s own value panels were checked for the same ordering."] },
   { ts: "2026-07-28", rev: "App Rev-658", type: "App", changes: ["ADD-NEW APPEARS ON EVERY VALUE LIST (Rev-658) \u2014 Rev-657 only offered \u2795 Add once an unmatched value had already been typed, which is no help when the whole difficulty is not knowing you are allowed to type one. It also made the lists inconsistent: a column holding unmatched text showed the option while an empty 3rd Level offered nothing but CALIPER and looked closed. The option is now the first item on EVERY value list, on every column. With nothing typed it reads \u2795 Add a new 3rd Level\u2026 and clears the field ready for the new value; with an unmatched value already typed it reads \u2795 Add \u201cMICROMETER\u201d as a new 3rd Level and keeps it. Same list, same behaviour, every column."] },
   { ts: "2026-07-28", rev: "App Rev-657", type: "App", changes: ["ADDING A NEW LEVEL VALUE IS NOW OBVIOUS (Rev-657) \u2014 these cells have always been free text: the value list is a shortcut, not the set of allowed answers. But after Rev-655 narrowed the lists to what matches the levels above, a 3rd Level showing only CALIPER looked like the only thing permitted, and there was no way to tell that typing a new one was fine. Two additions, no behaviour change: every value list now ends with \u2018Not listed? Type it in and press Enter \u2014 new values are allowed.\u2019, and if what has been typed is not in the list, the panel offers \u2795 Add \u201cX\u201d as a new 3rd Level at the top. Narrowing a list is only helpful if the way out of it is visible."] },
   { ts: "2026-07-28", rev: "App Rev-656", type: "App", changes: ["COLUMN FILTERS NOW OFFER ONLY WHAT EXISTS (Rev-656) \u2014 with Feature Type filtered to C\u2019BORE and one row showing, the 2nd Level filter still listed all fourteen values ever used in the master \u2014 ANGLE, DEPTH, FINISH, RUN-OUT and the rest \u2014 almost none of which return anything under C\u2019BORE. A menu of dead ends: pick one and the grid empties. Each filter dropdown now lists only values present in the rows that pass the OTHER active filters. A column ignores its own filter when building its list, otherwise it would offer nothing but the value already chosen and could never be changed, and a selected value is kept in the list even if the other filters exclude it so the dropdown can always show its own state and be cleared. Rev-655 did this for the inline EDIT lists; this is the FILTER row, a separate control that needed the same treatment."] },
@@ -2218,7 +2219,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:32 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3108,15 +3109,18 @@ function cpLevelCell(idx, row, li, focused){
   const mk = (v, label) => { const o = document.createElement('option'); o.value = v; o.textContent = label; return o; };
   // Rev-645: the column heading already says which level this is — repeating it inside
   // the box just pushed the text under the arrow
+  // Rev-659: the add option goes FIRST. Buried under twenty existing values it was below
+  // the fold on every list long enough to scroll — exactly the lists where a value is most
+  // likely to be missing.
+  sel.appendChild(mk('__ADD__', '\u2795 Add a new ' + L.label + '\u2026'));
   sel.appendChild(mk('', '— any —'));
   opts.forEach(v => sel.appendChild(mk(v, v)));
   const cur = String(row[L.key] || '');
   if(cur && !opts.some(v => cpLvNorm(v) === cpLvNorm(cur))) sel.appendChild(mk(cur, cur + ' (no match)'));
-  // Rev-630: a level that does not exist yet is a MISSING CONTROL TYPE, not a missing
-  // word. These lists are read from the Master List, so a value typed in here alone
-  // would resolve to no master row and could never fill the methods band. This option
-  // takes you to the Master List with the levels chosen so far already filled in.
-  sel.appendChild(mk('__ADD__', '\u2795 Add a new ' + L.label + '\u2026'));
+  // Rev-630/659: a level that does not exist yet is a MISSING CONTROL TYPE, not a missing
+  // word — these lists come from the Master List, so a value invented here alone would
+  // resolve to no master row. The ➕ option (now the first item, above) takes you to the
+  // Master List with the levels chosen so far already filled in.
   sel.value = cur;
   sel.onchange = () => {
     // Rev-653: choosing a Workcenter sets the default for the whole operation
@@ -10071,17 +10075,6 @@ function buildEditingRow(row, idx){
         ilPanel._addHint = true;   // Rev-657
         ilPanel.style.cssText = 'position:fixed; z-index:10090; background:#fff; border:1px solid var(--line); border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.25); max-height:60vh; overflow:auto;';
         const isLevel = (col.key === 'workcenter' || col.key === 'featureType' || col.key === 'secondLevel' || col.key === 'thirdLevel');
-        if(isLevel && li > 0){
-          const cap = document.createElement('div');
-          cap.textContent = _narrowed ? 'matching the levels above' : 'no match above \u2014 showing all';
-          cap.style.cssText = 'padding:5px 12px; font-size:10px; font-weight:700; letter-spacing:.05em; color:'
-            + (_narrowed ? '#1f7a4d' : '#a35400') + '; border-bottom:1px solid var(--line);';
-          ilPanel.appendChild(cap);
-        }
-        // Rev-657: the list is a SHORTCUT, not the whole set of allowed values — these
-        // cells have always been free text. Nothing said so, so a level that did not exist
-        // yet looked impossible to add. If what is typed is not in the list, offer it
-        // outright; either way, say plainly that a new value can be typed.
         // Rev-658: the add option is ALWAYS there, on every value list, whether or not
         // anything has been typed. Rev-657 only showed it once you had already typed an
         // unmatched value — which is no use when the whole difficulty is not knowing you
@@ -10108,6 +10101,17 @@ function buildEditingRow(row, idx){
           };
           ilPanel.appendChild(add);
         }
+        if(isLevel && li > 0){
+          const cap = document.createElement('div');
+          cap.textContent = _narrowed ? 'matching the levels above' : 'no match above \u2014 showing all';
+          cap.style.cssText = 'padding:5px 12px; font-size:10px; font-weight:700; letter-spacing:.05em; color:'
+            + (_narrowed ? '#1f7a4d' : '#a35400') + '; border-bottom:1px solid var(--line);';
+          ilPanel.appendChild(cap);
+        }
+        // Rev-657: the list is a SHORTCUT, not the whole set of allowed values — these
+        // cells have always been free text. Nothing said so, so a level that did not exist
+        // yet looked impossible to add. If what is typed is not in the list, offer it
+        // outright; either way, say plainly that a new value can be typed.
         vals.forEach(v => {
           const it = document.createElement('div');
           it.style.cssText = 'padding:8px 12px; cursor:pointer; font-size:13px; text-transform:none; white-space:nowrap; display:flex; align-items:center; gap:8px;';
