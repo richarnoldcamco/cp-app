@@ -1544,7 +1544,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-643";
+const APP_REV = "Rev-644";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1677,6 +1677,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-644", type: "App", changes: ["THE RED FLAG MOVED TO THE CELL THAT IS ACTUALLY WRONG (Rev-644) \u2014 Rev-643 lit up Feature Type and 2nd Level, the cells that were correctly filled, while WORKCENTER \u2014 the one genuinely missing, and the one you have to go and fix \u2014 sat plain. That is the symptom highlighted instead of the cause, and it points the eye at the wrong place. A level cell now pulses red when it is BLANK and a level BELOW it holds a value, and the tooltip reads \u2018Workcenter is BLANK, but Feature Type and 2nd Level below it are filled \u2014 fill this in, or clear the level(s) below it.\u2019 One cell is flagged per gap, and it is the empty one."] },
   { ts: "2026-07-28", rev: "App Rev-643", type: "App", changes: ["A LEVEL FILLED OUT OF ORDER NOW FLAGS RED (Rev-643) \u2014 a row could carry a Feature Type and a 2nd Level with the Workcenter above them blank, and nothing said a word. That is not a cosmetic gap: the Master List is a hierarchy, so a 2nd Level with nothing above it can never resolve to a control type, and the methods band would stay unfillable while the row looked populated. Any level that holds a value while a level ABOVE it is empty now pulses red, and hovering names exactly which one is missing \u2014 \u2018Feature Type is set, but Workcenter above it is blank\u2019. The check reads the master row behind a chosen control type as well as what is typed on the row, so a row filled from the master is not flagged for gaps it does not actually have. The pulse respects the system reduced-motion setting."] },
   { ts: "2026-07-28", rev: "App Rev-642", type: "App", changes: ["THE DOT IS NOW A SWITCH (Rev-642) \u2014 click the dot on any row to mark it done for the step you are on, and click again to un-mark it. A hand-marked row counts toward that step\u2019s completion, the percentage and the gate to the next step, so the QE\u2019s judgement carries the same weight as the data test. THE TWO ARE KEPT APART ON PURPOSE: a row the data already satisfies shows a plain green \u25cf, a row marked by hand shows a green \u2713. Anyone reading the plan later can tell which rows were FILLED IN from those that were JUDGED complete \u2014 that distinction matters on a controlled document, and one indistinguishable green dot would have thrown it away. Every mark is written to the action log with its step and balloon. Ghost rows keep \ud83d\udc7b and are not clickable. The column heading changed from \ud83d\udccd to \u2714 since it no longer means \u2018pinned\u2019 alone."] },
   { ts: "2026-07-28", rev: "App Rev-641", type: "App", changes: ["THE DOT FOLLOWS THE STEP + AN APPROXIMATE WORKING REV (Rev-641) \u2014 (1) THE GREEN DOT now answers \u2018is this row done for the step I am on\u2019 rather than one fixed question. On Step 1 it means the balloon is pinned on the drawing; on Step 2 that a control type has been chosen; on Step 3 that the measurement method and reaction plan are set. Every row showing green while the Control Type column read \u2014 not set \u2014 was the dot answering a question nobody was asking on that screen. Hovering says which test it applied, and notes if the balloon is still unpinned. Ghost rows keep their \ud83d\udc7b. (2) THE CP REV IS NOW APPROXIMATE, as asked: it advances on Save to Project, on creating a new operation, AND automatically every 100 edits \u2014 so a plan being worked climbs on its own instead of sitting at Rev-1 all week. Saving resets the counter and clears the \u25cf pending mark."] },
@@ -2193,7 +2194,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "4:48 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "5:04 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2973,15 +2974,19 @@ function cpLevelCell(idx, row, li, focused){
     if(own) return own;
     return _mrow ? String(_mrow[K.field] || '').trim() : '';
   };
-  let _gap = false, _missing = [];
-  if(_valAt(li)){
-    for(let j = 0; j < li; j++) if(!_valAt(j)) _missing.push(CP_LEVELS[j].label);
-    _gap = _missing.length > 0;
+  // Rev-644 FIX: the flag belongs on the EMPTY cell, not the filled ones. Rev-643 lit up
+  // Feature Type and 2nd Level — the cells that were correctly filled — while Workcenter,
+  // the one actually missing and the one you have to go and fix, sat plain. The cell that
+  // needs the work is the cell that should be shouting.
+  let _gap = false, _below = [];
+  if(!_valAt(li)){
+    for(let j = li + 1; j < CP_LEVELS.length; j++) if(_valAt(j)) _below.push(CP_LEVELS[j].label);
+    _gap = _below.length > 0;
   }
   if(_gap){
     td.classList.add('cp-gap');
-    td.title = L.label + ' is set, but ' + _missing.join(' and ') + ' above it '
-      + (_missing.length > 1 ? 'are' : 'is') + ' blank. The Master List is a hierarchy — fill the level(s) above, or clear this one.';
+    td.title = L.label + ' is BLANK, but ' + _below.join(' and ') + ' below it '
+      + (_below.length > 1 ? 'are' : 'is') + ' filled. The Master List is a hierarchy — fill this in, or clear the level(s) below it.';
   }
   if(!focused){
     // a row that already has a control type shows the master's values, greyed
