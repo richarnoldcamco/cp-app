@@ -1536,7 +1536,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-637";
+const APP_REV = "Rev-638";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1669,6 +1669,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-638", type: "App", changes: ["PART NUMBER AND OPERATION LINE 75% LARGER (Rev-638) \u2014 the part number goes 19px \u2192 33px and the operation line 13px \u2192 23px, with its description 12px \u2192 21px. These two lines are what you look for when scanning the screen, and they were the smallest thing on a row that also carries five step buttons and six action buttons. The \u21b3 (no op number) rows were scaled to match so both kinds of operation row read the same, and the \u270f\ufe0f edit pencil was enlarged with them \u2014 left at 12px it would have become a speck beside 23px text and an awkward tap target."] },
   { ts: "2026-07-28", rev: "App Rev-637", type: "App", changes: ["BANNER AND PROGRESS BAR DOUBLED IN HEIGHT (Rev-637) \u2014 the UNDER CONSTRUCTION banner goes 15px \u2192 30px and the progress bar 7px \u2192 14px. The stripe pitch and the wording were scaled with them (stripes 9px \u2192 14px, text 8.5px \u2192 11px, chip padding widened), because doubling only the height would have produced fatter stripes wrapped round the same small text \u2014 taller without being any more readable. The stripe animation was slowed to match the coarser pitch so it crawls at the same apparent speed, and the bar\u2019s corner radius follows its new height."] },
   { ts: "2026-07-28", rev: "App Rev-636", type: "App", changes: ["ADDING A SECOND OPERATION NO LONGER LOOKS LIKE OVERWRITING THE PART (Rev-636) \u2014 saving OP-040 onto a part that already had OP-030 raised \u2018A Control Plan already exists \u2014 this OVERWRITES the existing plan\u2019. Cause: the clash test compared PART NUMBER + REVISION only. That was right when a part had one Control Plan; since Rev-561 a part carries one plan PER ROUTING OPERATION, and the operation number is part of a plan\u2019s identity everywhere else in the app \u2014 it was simply missing from this one test. So the very thing \u2795 Add Operation exists to do was blocked behind an overwrite warning, and the safe-looking answer (Open the existing plan) would have sent you back into OP-030. Only the same part, the same rev AND the same operation is a clash now. The warning also names the operation, so when it does fire it is clear which plan is at risk rather than implying the whole part is."] },
   { ts: "2026-07-28", rev: "App Rev-635", type: "App", changes: ["THE PERCENTAGE SHOWS ITS WORKING (Rev-635) \u2014 partial credit within a stage was already there (10 of 30 rows earns a third of that stage\u2019s weight), but a bare figure gives no way to check it. Hovering the percentage now itemises it: each stage, its weight, its row fraction and the points it contributed, with the total underneath \u2014 e.g. \u2018Control types (worth 30): 10 of 30 = 33% \u2192 10 pts\u2019. The UNDER CONSTRUCTION banner also names the stage actually in progress and its count, so the line reads UNDER CONSTRUCTION \u2014 46% COMPLETE \u00b7 CONTROL TYPES 3/14 rather than a percentage on its own. Nothing about the calculation changed; it is now checkable rather than taken on trust."] },
@@ -2179,7 +2180,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:28 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:40 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3390,7 +3391,8 @@ function renderProjects(){
       hb.textContent = item.data.partNum || '';
       // Rev-569: fixed-width name block so every part's buttons start on the same
       // vertical line instead of stepping in and out with the part-number length
-      hb.style.cssText = 'font-size:19px; font-weight:800; letter-spacing:.03em; color:#000; vertical-align:middle;';
+      // Rev-638: part number and operation line both 75% larger
+      hb.style.cssText = 'font-size:33px; font-weight:800; letter-spacing:.02em; color:#000; vertical-align:middle; line-height:1.15;';
       hNameTd.appendChild(hb);
       const addOp = document.createElement('button');
       addOp.className = 'btn-ghost';
@@ -3428,17 +3430,17 @@ function renderProjects(){
       tdPart.style.cssText = 'padding-left:68px; white-space:nowrap;';
       const b = document.createElement('strong');
       b.textContent = '\u21b3 OP-' + p.opNum;
-      b.style.cssText = 'font-weight:800; letter-spacing:.03em;';
+      b.style.cssText = 'font-weight:800; letter-spacing:.03em; font-size:23px;';   // Rev-638
       tdPart.appendChild(b);
       const d = document.createElement('span');
       const desc = String(p.opDesc || p.operation || '').trim();
       d.textContent = desc ? ('  \u2014  ' + desc) : '  \u2014  no description';
-      d.style.cssText = 'font-size:12px; color:' + (desc ? '#5a5148' : '#a49a8d') + '; font-weight:600;';
+      d.style.cssText = 'font-size:21px; color:' + (desc ? '#5a5148' : '#a49a8d') + '; font-weight:600;';   // Rev-638
       tdPart.appendChild(d);
       const ed = document.createElement('button');
       ed.textContent = '\u270f\ufe0f';
       ed.title = 'Set what this operation is (e.g. TURN COMPLETE)';
-      ed.style.cssText = 'margin-left:8px; border:none; background:none; cursor:pointer; font-size:12px; opacity:.55;';
+      ed.style.cssText = 'margin-left:10px; border:none; background:none; cursor:pointer; font-size:18px; opacity:.55;';   // Rev-638
       ed.onclick = (e) => { e.stopPropagation(); cpSetOpDesc(p); };
       tdPart.appendChild(ed);
     } else {
@@ -3449,7 +3451,7 @@ function renderProjects(){
       tdPart.style.cssText = 'padding-left:68px; white-space:nowrap;';
       const b = document.createElement('strong');
       b.textContent = '\u21b3 (no op number)';
-      b.style.cssText = 'font-weight:700; color:#a49a8d; letter-spacing:.03em;';
+      b.style.cssText = 'font-weight:700; color:#a49a8d; letter-spacing:.03em; font-size:23px;';   // Rev-638
       tdPart.appendChild(b);
       const d = document.createElement('span');
       const desc = String(p.opDesc || p.operation || '').trim();
@@ -3461,7 +3463,7 @@ function renderProjects(){
       const ed = document.createElement('button');
       ed.textContent = '\u270f\ufe0f';
       ed.title = 'Give this plan its operation number and description';
-      ed.style.cssText = 'margin-left:8px; border:none; background:none; cursor:pointer; font-size:12px; opacity:.55;';
+      ed.style.cssText = 'margin-left:10px; border:none; background:none; cursor:pointer; font-size:18px; opacity:.55;';   // Rev-638
       ed.onclick = (e) => { e.stopPropagation(); cpSetOpDesc(p); };
       tdPart.appendChild(ed);
     }
