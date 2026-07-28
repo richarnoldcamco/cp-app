@@ -1478,7 +1478,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-614";
+const APP_REV = "Rev-615";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1492,6 +1492,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-615", type: "App", changes: ["MASTER LIST VALUE LISTS OPEN ON THE FIRST CLICK (Rev-615) \u2014 on Workcenter, Feature Type, 2nd Level and 3rd Level (and every other value field on the Master List) the list of existing values opened ONLY from the small \u25be caret at the right-hand edge of the box. Clicking the field itself did nothing but place the cursor, so it took two clicks and the field looked broken. Focusing or clicking the field now opens the list immediately; the caret and the Down-arrow key still work. The click-away handler was taught to ignore clicks on the field itself, which would otherwise have closed the list at the very moment it opened."] },
   { ts: "2026-07-28", rev: "App Rev-614", type: "App", changes: ["PICK A CONTROL TYPE BY NARROWING IT DOWN (Rev-614) \u2014 choosing a control type meant scanning one long list of 65, which is the wrong shape for the job. The Master List is already organised WORKCENTER \u2192 FEATURE TYPE \u2192 2ND LEVEL \u2192 3RD LEVEL, so those four are now COLUMNS on the builder, sitting right after Control Type ID and shown in Step 2. On the open row they are live pickers; setting any of them cuts the Control Type list to what actually fits, on top of the existing Size / Tol bands. Each picker only offers values that still exist after the ones above it, so no combination can be chosen that matches nothing, and changing a level clears the levels below it rather than leaving a stale contradiction. On a closed row the four columns show the Master List values behind whatever control type that row is using \u2014 so the whole grid can be read at a glance to see what kind of control each balloon carries. The step column maps and the header band spans were re-numbered for the four new columns (data columns now run 0\u201320)."] },
   { ts: "2026-07-28", rev: "App Rev-613", type: "App", changes: ["HARDINGE LATHE RENAME MADE TO STICK (Rev-613) \u2014 the rename ran at Rev-609, set a run-once flag, and then a GitHub pull brought the old Master List straight back \u2014 incoming always wins on a pull \u2014 while the flag stopped the sweep ever running again. So the old name reappeared and stayed, and the Rev-610 plan sweep never ran either, because it was guarded by the same spent flag. THE FLAG IS GONE. The sweep is idempotent and now runs on EVERY start-up, after EVERY data pull, and again whenever the Master List screen is drawn. It costs nothing when there is nothing to change and pushes only when it actually changed something, so however stale the data arriving from GitHub is, it corrects itself instead of depending on one lucky moment. Matching also normalises whitespace, so HARDINGE\u2007\u2007LATHE with a double space is caught too. The old flag is deleted on start-up so no device is left half-applied."] },
   { ts: "2026-07-28", rev: "App Rev-612", type: "App", changes: ["EDIT A PART NUMBER FROM THE PARTS LIST (Rev-612) \u2014 renaming lived only on an operation row and touched only THAT plan, so a part with three operations had to be renamed three times and sat inconsistent in between. A \u270f\ufe0f now sits beside every part number on the parts list and renames the part in ONE action: every operation plan, the gages keyed to those operations (and their drawings), the stored ODS drawings, the traveller, and the part\u2019s own record all move to the new name. Proper window rather than browser prompts \u2014 part number and rev side by side in mandatory yellow, red Close in the title bar, Enter saves, Esc cancels, and a clash with an existing part is reported in the window instead of thrown away. Each renamed plan gets a fresh updated stamp so the Rev-606 rule protects it. FIX ALONGSIDE: the per-plan Rename built its new id WITHOUT the operation number, so a renamed plan silently lost its per-operation identity and could collide with another op of the same part; it now keeps the op in the key."] },
@@ -1979,7 +1980,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:34 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -9368,7 +9369,8 @@ function buildEditingRow(row, idx){
           ilPanel.style.maxHeight = Math.max(140, above) + 'px';
         }
       };
-      const ilOutside = ev => { if(ev.target !== ilCaret && (!ilPanel || !ilPanel.contains(ev.target))) ilClose(); };
+      // Rev-615: clicking the field itself must not count as clicking away
+      const ilOutside = ev => { if(ev.target !== ilCaret && ev.target !== input && (!ilPanel || !ilPanel.contains(ev.target))) ilClose(); };
       const ilClose = () => {
         if(ilPanel){ ilPanel.remove(); ilPanel = null; }
         document.removeEventListener('pointerdown', ilOutside, true);
@@ -9421,6 +9423,11 @@ function buildEditingRow(row, idx){
       ilCaret.onpointerdown = ev => { ev.preventDefault(); ev.stopPropagation(); if(ilPanel){ ilClose(); } else { input.focus(); ilOpen(); } };
       td.appendChild(ilCaret);
       input.addEventListener('keydown', e => { if(e.key === 'ArrowDown' && !ilPanel){ e.preventDefault(); ilOpen(); } });
+      // Rev-615: the list opened ONLY from the ▾ caret, so the first click just put the
+      // cursor in the field and a second click was needed to see anything — the field
+      // looked broken. Focusing or clicking it now opens the list straight away.
+      input.addEventListener('focus', () => { if(!ilPanel) ilOpen(); });
+      input.addEventListener('click', () => { if(!ilPanel) ilOpen(); });
       input.addEventListener('blur', () => setTimeout(ilClose, 150));
     }
 
