@@ -1544,7 +1544,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-649";
+const APP_REV = "Rev-650";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1677,6 +1677,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-650", type: "App", changes: ["PRIOR ROW STRIP NOW LINES UP WITH THE FORM (Rev-650) \u2014 the read-only PRIOR ROW reference above the Add New Control Type fields was drawn from a column list that had \u2018thirdLevel\u2019 missing. One cell short against a nineteen-column grid meant every value from Feature Description rightwards sat one column LEFT of the field it belonged to \u2014 so the strip showed BORE RUN-OUT under Feature Description\u2019s neighbour, the X marks under the wrong bands, and 1 / 10 / NO CHECK / CMM all shifted. Worse than untidy: it is a reference strip, so a misaligned value invites the next row to be filled in from the wrong column. 3rd Level restored to the list and the two rows now match column for column."] },
   { ts: "2026-07-28", rev: "App Rev-649", type: "App", changes: ["ADD NEW CONTROL TYPE INHERITS THE LEVELS YOU ALREADY SET (Rev-649) \u2014 opening the form from the builder made you retype Workcenter and Feature Type even though they were already chosen on the Control Plan row. The levels WERE being handed over on window._cpMasterSeed since Rev-612, but nothing at the receiving end ever read them, so the seed was written and thrown away. openMasterEdit now applies it when adding a new row, and confirms how many levels were carried across. Re-entering the same facts is not just tedious \u2014 it is a chance for the master row and the plan row to disagree, which is exactly what the computed Control Type ID at Rev-646 was meant to end. The \u2795 Add a new \u2026 option on a level picker now carries EVERY level already set on the row rather than only those above it."] },
   { ts: "2026-07-28", rev: "App Rev-648", type: "App", changes: ["ADD NEW CONTROL TYPE \u2014 FIELDS OPEN ON THE FIRST CLICK (Rev-648) \u2014 moving from one field to the next needed two clicks: the first appeared to do nothing. Cause: leaving a field schedules its value list to close 150ms later, and that close was unconditional. Click the next field and it opened its own list immediately \u2014 then the previous field\u2019s timer fired and shut it, because both share one panel. The list really did open on the first click; it was closed again a moment later by the field you had just left. A panel now records which field owns it, and the delayed close only fires if that field\u2019s own panel is still the one showing. Rev-615 fixed the same symptom on the Master List grid; this is the Add New Control Type form, which has its own picker."] },
   { ts: "2026-07-28", rev: "App Rev-647", type: "App", changes: ["EVERY ROW RESOLVES, NOT JUST THE OPEN ONE (Rev-647) \u2014 Rev-646 computed the Control Type ID inside the focused row only, so a row whose levels were set while it was open went back to reading \u2014 not set \u2014 the moment it closed, and its dot stayed grey. Rows 4 and 5 carried LATHE / FACE GROOVE / TREPAN / OD and still counted as unfinished. Resolution belongs to the data, not to which row happens to be expanded: every row is now settled before the grid is drawn, so any row whose levels and tolerance band point at exactly ONE master row gets that control type applied, its methods band filled and its dot turned green. Rows that are ambiguous or match nothing are left alone \u2014 silence is better than a guess on a controlled document. The pass is guarded against re-entry, since applying a control type triggers its own redraw."] },
@@ -2199,7 +2200,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "6:24 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "6:36 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -10753,7 +10754,10 @@ function saveMasterEdit(){
         set('featureDesc', newRow.featureDesc || '');   // Rev-253: description carries too
         BANDS.forEach(k => set(k, missing.indexOf(k) !== -1 ? 'X' : ''));
         // Rev-249: show the row JUST SAVED as a read-only reference above the inputs
-        const ORDER = ['h','workcenter','featureType','secondLevel','featureDesc','controlTypeId',
+        // Rev-650: 'thirdLevel' was MISSING from this list, so the reference strip had one
+        // cell fewer than the form it sits above — every value from Feature Description
+        // rightwards was drawn one column to the left of the field it belongs to.
+        const ORDER = ['h','workcenter','featureType','secondLevel','thirdLevel','featureDesc','controlTypeId',
           'below500','above500','below0006','band0006','band0015','above003',
           'measMethod','numRecorded','freqEvery','freqQE','measMethodCMM','classification','futureImprovement'];
         const SKINNY = ['below500','above500','below0006','band0006','band0015','above003','numRecorded','freqEvery','classification'];
