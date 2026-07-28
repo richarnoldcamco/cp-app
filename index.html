@@ -1491,7 +1491,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-618";
+const APP_REV = "Rev-619";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1505,6 +1505,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-619", type: "App", changes: ["FIVE CONSTRUCTION STEPS ON ONE TRACK (Rev-619) \u2014 the three build steps were only part of the job: an operation is not usable until it has been NUMBERED and has its ODS DRAWING loaded, and both of those were being done somewhere else entirely, so the row could read 74% while having no drawing at all. All five now sit in order in ONE ROW with the progress bar running underneath: 1 EDIT OP # \u00b7 2 UPLOAD ODS \u00b7 3 ASSIGN BUBBLES \u00b7 4 ASSIGN CONTROL TYPES \u00b7 5 ASSIGN MEASUREMENT TYPES. Each is gated on the one before \u2014 no ODS until the operation is numbered, no ballooning until the ODS is loaded \u2014 and each opens the right screen: step 1 the operation window, step 2 the ODS capture screen (browse, drag or Ctrl+V, any PDF), steps 3\u20135 the builder at that step. STEP 2 IS NEW WORK, not a relabel: the ODS drawing can now be loaded or replaced for an existing operation straight from this list, which previously meant rebuilding the plan. The bar has five segments and the percentage counts all five \u2014 the two setup stages all-or-nothing, the three build steps by their own row counts."] },
   { ts: "2026-07-28", rev: "App Rev-618", type: "App", changes: ["PROGRESS BAR, PERCENTAGE AND A WIDER SCREEN (Rev-618) \u2014 (1) A PROGRESS BAR now runs the full width beneath the three construction-step buttons, split into three segments, one per step. The filled part is green; while the plan is unfinished the leading edge PULSES, so an operation still being worked reads across a room, and a finished one sits solid and still. (2) PERCENTAGE MOVED TO THE FAR RIGHT, past every button: the last column now leads with how far along that operation is in large type \u2014 grey at 0%, amber while under way, dark green at 100% \u2014 with the CP rev in small text beneath it. (3) The percentage counts each step as a THIRD AND COUNTS ITS OWN ROWS, so a step half done reads half rather than nothing; the bar moves as you work instead of jumping in three lurches. Hovering it lists what is outstanding in each step. (4) The screen is 30% wider \u2014 1600px to 2080px \u2014 so the steps, buttons and percentage sit on one line with room to spare."] },
   { ts: "2026-07-28", rev: "App Rev-617", type: "App", changes: ["\ud83d\udcbe SAVE CHANGES ON THE MASTER LIST (Rev-617) \u2014 Master List edits have always written to the device as they were made, so nothing was ever at risk, but there was no way to say \u2018I am done\u2019 and no confirmation that the change had reached GitHub \u2014 you had to take it on trust. A Save Changes button now sits beside \u2795 Add Row: it closes whatever row is open (so a half-finished edit is committed rather than abandoned), writes the list, redraws, and pushes to GitHub, then reports which of those actually happened \u2014 saved and pushed with the control-type count, saved but the push FAILED, or saved on this device only because GitHub is not set up here. The button does not replace auto-save; it makes the state visible."] },
   { ts: "2026-07-28", rev: "App Rev-616", type: "App", changes: ["MASTER LIST EDIT ROW BROUGHT BACK DOWN TO SIZE (Rev-616) \u2014 the row being edited had been deliberately enlarged by 50% (12px cell padding, 9px input padding, 14px text, 90px minimum field width) and ended up towering over the grid it sits inside, pushing the tolerance-band columns wide and making the whole screen look coarse. Cell padding 12\u21923px, input padding 9\u21924px, text 14\u219212px, and the 90px minimum field width removed so narrow columns like the tolerance bands stay narrow. The \u2716 cancel button and its auto-saves note were scaled to match, and the \u25be caret moved in to suit the shorter box. The edit row is now the height of a normal row instead of three of them."] },
@@ -1996,7 +1997,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "1:58 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "2:14 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2958,15 +2959,61 @@ function cpViewOpOds(p){
   document.getElementById('cpOpOdsClose').onclick = () => v.remove();
   v.onclick = (e) => { if(e.target === v) v.remove(); };
 }
-// Rev-618: how far along an operation is, as a share of the three construction steps.
-// Each step is worth a third and counts its own rows, so a step half done reads half,
-// not nothing — the bar moves while you work rather than jumping in three lurches.
-function cpPlanPercent(p){
+// ===== Rev-619: THE FIVE STAGES OF AN OPERATION =================================
+// An operation is not usable until it is NUMBERED and has its ODS DRAWING, so those
+// two are now stages 1 and 2 ahead of the three build steps. Each stage reports done /
+// open / locked plus its own row counts, and each is gated on the one before it.
+function cpOpStages(p){
   const pr = cpStepProgress(p);
-  if(!pr.total) return 0;
-  const share = (left) => Math.max(0, Math.min(1, (pr.total - left) / pr.total));
-  const pct = (share(pr.s1Left) + share(pr.s2Left) + share(pr.s3Left)) / 3 * 100;
-  return Math.round(pct);
+  const numbered = !!String(p.opNum || '').trim();
+  let hasOds = false;
+  try{ hasOds = !!cpOpOdsImage(p); }catch(e){}
+  const s1 = { done: numbered, open: true, left: numbered ? 0 : 1, total: 1 };
+  const s2 = { done: hasOds, open: numbered, left: hasOds ? 0 : 1, total: 1 };
+  const s3 = { done: pr.s1Done, open: numbered && hasOds, left: pr.s1Left, total: pr.total };
+  const s4 = { done: pr.s2Done, open: numbered && hasOds && pr.s1Done, left: pr.s2Left, total: pr.total };
+  const s5 = { done: pr.s3Done, open: numbered && hasOds && pr.s2Done, left: pr.s3Left, total: pr.total };
+  const labelSummary = [
+    numbered ? 'numbered' : 'no op number',
+    hasOds ? 'ODS loaded' : 'no ODS drawing',
+    pr.s1Note, pr.s2Note, pr.s3Note
+  ].join(' \u00b7 ');
+  return { s1, s2, s3, s4, s5, labelSummary };
+}
+// Rev-619: percentage across all FIVE stages. The two setup stages are all-or-nothing;
+// the three build steps count their own rows, so the bar creeps as work is done rather
+// than jumping in lurches.
+function cpPlanPercent(p){
+  const st = cpOpStages(p);
+  const share = (s) => { if(s.done) return 1; if(!s.total) return 0; return Math.max(0, Math.min(1, (s.total - s.left) / s.total)); };
+  return Math.round((share(st.s1) + share(st.s2) + share(st.s3) + share(st.s4) + share(st.s5)) / 5 * 100);
+}
+// Load (or replace) the ODS drawing for one operation, from the Control Plans list
+function cpUploadOpOds(p){
+  const part = p.partNum || '', op = String(p.opNum || '');
+  cpImageStudio({
+    title: 'ODS DRAWING \u2014 ' + part + (op ? '  \u00b7  OP-' + op : ''),
+    dropLabel: 'UPLOAD ODS DRAWING',
+    dropHint: 'The ballooned operation drawing. Image or PDF \u2014 any PDF, including a Chrome PDF Document. Ctrl+V pastes a screenshot.',
+    seedKey: cpOdsKey(part, op),
+    saveLabel: 'Save ODS drawing',
+    onSave: (url) => {
+      _idbPutOds(part, op, url, null);
+      try{
+        const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+        let hit = false;
+        projects.forEach(x => {
+          if(String(x.partNum || '') !== String(part) || String(x.opNum || '') !== op) return;
+          if(x.builderState){ x.builderState.odsImage = url; x.updated = new Date().toISOString(); hit = true; }
+        });
+        if(hit) localStorage.setItem('cpProjects', JSON.stringify(projects));
+      }catch(e){}
+      try{ if(cpBuildState && String(cpBuildState.partNum||'') === String(part) && String(cpBuildState.opNum||'') === op) cpBuildState.odsImage = url; }catch(e){}
+      flash('\u2713 ODS drawing saved for ' + part + (op ? ' OP-' + op : '') + '.');
+      renderProjects();
+      try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
+    }
+  });
 }
 // Rev-597: what COMPLETE actually means. The badge used to read straight off the
 // manual under-construction switch, so a plan with no operation number, no traveller
@@ -3252,67 +3299,89 @@ function renderProjects(){
     } else {
       const i = item.idx;
       const has = !!p.builderState;
-      // Rev-587/588/589: the three construction steps, in order, each labelled with its
-      // step number above the job it does.
+      // ===== Rev-619: FIVE CONSTRUCTION STEPS, IN ONE ROW, ON ONE TRACK =========
+      // The three build steps were only part of the job: an operation is not usable
+      // until it has been NUMBERED and has its ODS DRAWING loaded, and both of those
+      // were being done somewhere else entirely. All five now sit in order on one
+      // track, each gated on the one before it, with the bar running underneath.
+      //   1 EDIT OP #            2 UPLOAD ODS          3 ASSIGN BUBBLES
+      //   4 ASSIGN CONTROL TYPES 5 ASSIGN MEASUREMENT TYPES
       const openAt = (s) => { try{ cpSetStep(s); }catch(e){} editProject(i); };
       const stepNote = has ? '' : ' \u2014 saved before editing was supported';
       const prog = cpStepProgress(p);
-      // Rev-603: an unfinished step that has already been part-filled says so, with the
-      // count — 'DO THIS NEXT' on a step with 3 of 14 rows done was plainly wrong.
-      const mkStep = (n, title, state, tip, fn, doneCount, totalCount) => {
+      const st = cpOpStages(p);
+
+      stepWrap.style.flexWrap = 'wrap';
+      stepWrap.style.gap = '6px';
+
+      const mkStep = (n, title, state, tip, fn) => {
         const b = document.createElement('button');
         b.className = 'cp-step cp-step-' + state;
-        b.style.width = '178px';
+        b.style.width = '138px';
+        b.style.padding = '0 8px';
         b.title = tip;
         const l1 = document.createElement('span');
         l1.className = 'cp-step-n';
         let tag;
         if(state === 'done') tag = '  \u2713 DONE';
         else if(state === 'lock') tag = '  \u2013 LOCKED';
-        else if(doneCount > 0 && totalCount) tag = '  \u2013 IN PROGRESS ' + doneCount + '/' + totalCount;
         else tag = '  \u2013 DO THIS NEXT';
         l1.textContent = 'STEP ' + n + tag;
         const l2 = document.createElement('span');
         l2.className = 'cp-step-t';
+        l2.style.fontSize = '11px';
         l2.textContent = title;
         b.appendChild(l1); b.appendChild(l2);
         if(state === 'lock' || !has) b.disabled = true; else b.onclick = fn;
         stepWrap.appendChild(b);
         return b;
       };
-      mkStep(1, 'ASSIGN BUBBLE NUMBERS', prog.s1Done ? 'done' : 'todo',
-        'STEP 1 \u2014 give every ODS balloon its row and pin it on the drawing. Done when every row shows the GREEN DOT in the pin column.\n'
-        + prog.s1Note + '.' + stepNote,
-        () => openAt('1'), prog.total - prog.s1Left, prog.total);
-      mkStep(2, 'SELECT CONTROL TYPE', prog.s1Done ? (prog.s2Done ? 'done' : 'todo') : 'lock',
-        prog.s1Done
-          ? ('STEP 2 \u2014 pick the Control Type for each balloon; the methods fill themselves from the Master List.\n' + prog.s2Note + '.' + stepNote)
-          : ('LOCKED \u2014 finish Step 1 first. ' + prog.s1Note + '. A control type cannot be chosen for a balloon that does not exist yet.'),
-        () => openAt('2'), prog.total - prog.s2Left, prog.total);
-      // Rev-618: a bar under the steps, one segment each, filling as they complete
+      const stateOf = (s) => s.done ? 'done' : (s.open ? 'todo' : 'lock');
+      const frac = (s) => (s.total ? ('  ' + (s.total - s.left) + '/' + s.total) : '');
+
+      mkStep(1, 'EDIT OP #', stateOf(st.s1),
+        st.s1.done ? ('Operation ' + (p.opNum || '') + (p.opDesc ? ' \u00b7 ' + p.opDesc : '') + ' \u2014 click to change it.')
+                   : 'STEP 1 \u2014 give this plan its routing operation number and description, off the traveller.',
+        () => cpSetOpDesc(p));
+
+      mkStep(2, 'UPLOAD ODS', stateOf(st.s2),
+        st.s2.done ? 'The ODS drawing for this operation is loaded \u2014 click to view or replace it.'
+                   : (st.s2.open ? 'STEP 2 \u2014 load the ODS drawing for this operation. Nothing can be ballooned without it.'
+                                 : 'LOCKED \u2014 give the operation its number first.'),
+        () => cpUploadOpOds(p));
+
+      mkStep(3, 'ASSIGN BUBBLES', stateOf(st.s3),
+        st.s3.open ? ('STEP 3 \u2014 give every ODS balloon its row and pin it on the drawing (green dot).\n' + prog.s1Note + '.' + stepNote)
+                   : 'LOCKED \u2014 load the ODS drawing first.',
+        () => openAt('1'));
+
+      mkStep(4, 'ASSIGN CONTROL TYPES', stateOf(st.s4),
+        st.s4.open ? ('STEP 4 \u2014 pick the Control Type for each balloon; the methods fill themselves from the Master List.\n' + prog.s2Note + '.' + stepNote)
+                   : 'LOCKED \u2014 finish the bubble numbers first. A control type cannot be chosen for a balloon that does not exist yet.',
+        () => openAt('2'));
+
+      mkStep(5, 'ASSIGN MEASUREMENT TYPES', stateOf(st.s5),
+        st.s5.open ? ('STEP 5 \u2014 review the measurement methods, set any special gage, confirm the reaction plan.\n' + prog.s3Note + '.' + stepNote)
+                   : 'LOCKED \u2014 finish the control types first. The methods band is filled BY the control type.',
+        () => openAt('3'));
+
+      // one track under all five, a segment per step
       const bar = document.createElement('div');
       bar.className = 'cp-prog';
-      bar.style.width = '100%';
       const fill = document.createElement('div');
       const pctNow = cpPlanPercent(p);
       fill.className = 'cp-prog-fill' + (pctNow > 0 && pctNow < 100 ? ' live' : '');
       fill.style.width = pctNow + '%';
       const ticks = document.createElement('div');
       ticks.className = 'cp-prog-ticks';
-      ticks.innerHTML = '<span></span><span></span><span></span>';
+      ticks.innerHTML = '<span></span><span></span><span></span><span></span><span></span>';
       bar.appendChild(fill); bar.appendChild(ticks);
-      bar.title = pctNow + '% \u2014 ' + prog.s1Note + ' \u00b7 ' + prog.s2Note + ' \u00b7 ' + prog.s3Note;
+      bar.title = pctNow + '% complete \u2014 ' + st.labelSummary;
       const barWrap = document.createElement('div');
       barWrap.style.cssText = 'flex:1 1 100%; min-width:100%;';
       barWrap.appendChild(bar);
-      stepWrap.style.flexWrap = 'wrap';
-      setTimeout(() => { try{ stepWrap.appendChild(barWrap); }catch(e){} }, 0);
+      stepWrap.appendChild(barWrap);
 
-      mkStep(3, 'MEASUREMENT METHODS', prog.s2Done ? (prog.s3Done ? 'done' : 'todo') : 'lock',
-        prog.s2Done
-          ? ('STEP 3 \u2014 review the measurement methods, set any special gage, confirm the reaction plan.\n' + prog.s3Note + '.' + stepNote)
-          : ('LOCKED \u2014 finish Step 2 first. ' + prog.s2Note + '. The methods band is filled BY the control type.'),
-        () => openAt('3'), prog.total - prog.s3Left, prog.total);
       _target = actWrap;
       mkBtn('Inspect', 'go', 84, 'Machinist: start a real inspection run for this plan (readings are saved)'
         + (has ? '' : ' \u2014 no plan data to inspect'), () => inspectMachinistValidation(i), has);
