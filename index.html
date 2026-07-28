@@ -1533,7 +1533,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-632";
+const APP_REV = "Rev-633";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1666,6 +1666,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-633", type: "App", changes: ["ACTION LOG NOW RECORDS THE EVENTS THAT EXPLAIN A FAULT (Rev-633) \u2014 clicks and screens alone say what was pressed, not what the app then did with it. Six app-level events are now logged by name: OPEN-PLAN and SAVE-PLAN (part, op, id and row count), STEP (which construction step was opened), PUSH (a data push starting), DELETE-PLAN (a plan deleted by hand), and TOMBSTONE \u2014 a deletion marker written by the rename path, which is precisely the line that would have identified the Rev-605 plan-eating bug in seconds instead of hours. Part number and operation ARE included on these entries, because without them the log cannot say WHICH plan vanished; tolerances, feature descriptions and gage notes are still never recorded, and nothing is transmitted \u2014 the log leaves the device only when the user copies it out."] },
   { ts: "2026-07-28", rev: "App Rev-632", type: "App", changes: ["OPERATION ROWS INDENTED FURTHER (Rev-632) \u2014 the op line was set in 34px from the left, which at the new 19px part-number size left OP-030 sitting almost level with the part it belongs to. Indent increased by 0.35in to 68px, so an operation reads plainly as a child of its part. Applies to numbered operations and to the \u21b3 (no op number) rows alike."] },
   { ts: "2026-07-28", rev: "App Rev-631", type: "App", changes: ["CONSTRUCTION VISUALS CONFINED TO THE CONSTRUCTION COLUMN (Rev-631) \u2014 Rev-626 pulled the hazard banner and progress bar off the Actions side, but they still ran under OPERATION and STATUS, so the stripes crossed the op number and its status pill. Neither of those is construction either. The banner and bar now sit under the CONSTRUCTION STEPS column alone, between the two rules, lining up exactly with the five step buttons they describe."] },
   { ts: "2026-07-28", rev: "App Rev-630", type: "App", changes: ["ADD A MISSING LEVEL FROM THE BUILDER (Rev-630) \u2014 the Workcenter / Feature Type / 2nd Level / 3rd Level pickers only offer values that already exist in the Master List, which left no way forward when a feature needed something the master does not carry. Each picker now ends with \u2795 Add a new \u2026, which jumps to the MASTER LIST with Add Row open and the levels already chosen filled in. IT DELIBERATELY DOES NOT let a value be typed straight into the builder: these lists are read FROM the Master List, so a level invented on a plan would resolve to no master row, leave the methods band unfillable, and quietly produce a Control Plan line the master can never explain. The missing thing is a control type, not a word \u2014 so the fix belongs where control types live, with its H#, class, measurement method, frequencies and CMM technique filled in properly."] },
@@ -2171,7 +2172,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:32 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "2:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4225,6 +4226,8 @@ function openMachinistValidationPanel(html, part, rev, featCount, hadImage, part
 }
 
 function deleteProject(idx){
+  try{ const _p = (JSON.parse(localStorage.getItem('cpProjects')||'[]')||[])[idx] || {};
+       logAct('DELETE-PLAN', (_p.partNum||'') + (_p.opNum ? ' OP-' + _p.opNum : '') + ' · ' + (_p.id||'')); }catch(e){}   // Rev-633
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   const p = projects[idx];
   if(!p) return;
@@ -4549,6 +4552,7 @@ function saveProject(partNum, rev, base64Data, customerName, qualityLevel){
       const renamed = String(prev.partNum || '') !== String(partNum || '') || String(prev.rev || '') !== String(rev || '');
       if(renamed){
         const tombs = JSON.parse(localStorage.getItem('deletedProjectKeys') || '[]');
+        try{ logAct('TOMBSTONE', 'rename wrote a deletion for ' + cpBuildState.srcId); }catch(e){}   // Rev-633
         tombs.push({ key: cpBuildState.srcId, deletedAt: new Date().toISOString() });
         localStorage.setItem('deletedProjectKeys', JSON.stringify(tombs));
       }
@@ -4557,6 +4561,7 @@ function saveProject(partNum, rev, base64Data, customerName, qualityLevel){
   }
   if(cpBuildState) cpBuildState.srcId = entry.id;   // Rev-336
   if(entry.builderState) entry.builderState.srcId = entry.id;
+  try{ logAct('save-plan', (partNum||'') + (entry.opNum ? ' OP-' + entry.opNum : '') + ' · ' + (entry.id||'') + ' · ' + ((entry.builderState&&entry.builderState.rows||[]).length) + ' rows'); }catch(e){}   // Rev-633
   if(existingIdx >= 0){
     entry.created = projects[existingIdx].created; // keep original created date
     // Rev-583: the Control Plan's OWN revision — how many times this plan has been saved
@@ -4584,6 +4589,7 @@ function editProject(idx){
     flash('This project was saved before editing was supported — only Download is available for it.', true);
     return;
   }
+  try{ logAct('open-plan', (p.partNum||'') + (p.opNum ? ' OP-' + p.opNum : '') + ' · ' + (p.id||'')); }catch(e){}   // Rev-633
   cpBuildState = JSON.parse(JSON.stringify(p.builderState));
   // Rev-605: the saved plan is the authority on its own operation. Without this the
   // builder could hold a blank op number while the stored plan had one, and the next
@@ -5633,6 +5639,7 @@ const CP_STEPS = {
 function cpGetStep(){ const s = localStorage.getItem('cpBuildStep'); return CP_STEPS[s] ? s : '1'; }
 function cpSetStep(s){
   if(!CP_STEPS[s]) s = '1';
+  try{ logAct('step', s + ' \u00b7 ' + ((CP_STEPS[s]||{}).label || '')); }catch(e){}   // Rev-633
   localStorage.setItem('cpBuildStep', s);
   // Rev-608: arriving at a step should show the whole list, not drop you into whichever
   // row happened to be open last time. Click a row when you want to work on it.
@@ -12698,6 +12705,7 @@ async function ghPullApp(silent, autoApply){
 }
 
 async function ghPush(silent){
+  try{ logAct('push', 'data push started'); }catch(e){}   // Rev-633
   if(!ghConfigured()){
     if(!silent) flash('Configure GitHub settings first', true);
     return;
