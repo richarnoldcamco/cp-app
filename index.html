@@ -231,7 +231,7 @@
     border-radius:5px; margin-bottom:5px; overflow:hidden;
     background:repeating-linear-gradient(45deg,#e6a817 0 14px,#171310 14px 28px);
     background-size:39.6px 39.6px; animation:cpStripe 1.35s linear infinite; }
-  .cp-uc b{ position:relative; background:#171310; color:#e6a817; font-size:11px; font-weight:800;
+  .cp-uc b{ position:relative; background:#171310; color:#ffffff; font-size:11px; font-weight:800;
     letter-spacing:.13em; padding:3px 14px; border-radius:3px; white-space:nowrap; }
   @keyframes cpStripe{ from{ background-position:0 0; } to{ background-position:39.6px 0; } }
   /* thinner bar, with a highlight that sweeps along the filled part while work is open */
@@ -1558,7 +1558,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-669";
+const APP_REV = "Rev-670";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1691,6 +1691,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-670", type: "App", changes: ["CONSTRUCTION BANNER WORDING IS NOW WHITE (Rev-670) \u2014 the UNDER CONSTRUCTION line read in amber (#e6a817) on its near-black chip, the same amber as the hazard stripes running behind it. Against black that is legible but dim, and because the text matched the stripes it sat visually INSIDE the barber pole rather than on top of it \u2014 the chip stopped reading as a separate label. The wording is now plain white on the same #171310 chip, which is the strongest contrast available there and separates the sentence from the stripes it is printed over. Only the text colour changed: the chip, the stripes, the crawl animation, the height and the percentage arithmetic are all untouched. This continues the correction started at Rev-628, which moved the wording off the bare stripes onto a solid chip for the same reason \u2014 amber-on-amber-adjacent was the half of that problem left standing."] },
   { ts: "2026-07-28", rev: "App Rev-669", type: "App", changes: ["THE REV NOW ENDS EVERY REPLY IN LARGE TYPE (Rev-669) \u2014 the handoff prompt asked a new chat to finish with \u2018Current: Rev-NNN\u2019 in ordinary body text, which meant the one number worth reading at a glance sat in the same weight as everything around it and had to be hunted for at the bottom of a long answer. The rule now says: token estimate, then the rev on its own line as a level-1 heading, then NOTHING \u2014 no sign-off, no follow-up question. Written into all three places the rule lived: the common handoff block, the USER line, and \u00a79 of the New-App Recipe so the Quoting app and anything else built on this pattern inherits it rather than having the preference re-asked in each new chat. Two guards travel with it, because large type is persuasive: the rev must never be GUESSED \u2014 an unknown rev is stated as unknown and fetched from the repo \u2014 and it is only claimed after being READ BACK from GitHub, so the heading reports what is live rather than what was meant to ship. Prompted by a standing-format note that described this as already being in the app at Rev-668; it was not. Rev-668 was a no-op push-verification rev and changed no prompt text. It is true as of THIS rev."] },
   { ts: "2026-07-28", rev: "App Rev-668", type: "App", changes: ["PUSH PIPELINE VERIFIED \u2014 AND THE BUILD STAMP DRIFTED AGAIN (Rev-668) \u2014 a deliberate no-op rev issued from a fresh chat to prove the two-target push still lands: cp-app/index.html and cp-generator-data/cp_app.html written, then read back and compared by rev. No behaviour changed. What the rebuild DID surface is that the stamp problem Rev-590 fixed has come back: Rev-667 carried 10:36 PM while the actual Eastern time at this build was 07:22 PM \u2014 ahead by more than three hours. The clock was cross-checked against the GitHub server Date header before writing, so 07:22 PM is the real one, which means this rev\u2019s stamp reads EARLIER than the rev before it. Time did not run backwards; Rev-667\u2019s stamp was simply wrong. Nothing in the app keys off the stamp \u2014 the self-update check compares APP_REV and only ever moves forward \u2014 so the ordering of revs is unaffected and 668 still supersedes 667 on every device. Recording it here rather than quietly correcting it, because a stamp that drifts whenever it is typed from estimate is the same fault twice and the next occurrence should be read as a pattern, not an accident."] },
   { ts: "2026-07-28", rev: "App Rev-667", type: "App", changes: ["A CHANGED REV NUMBER PUSHES IMMEDIATELY (Rev-667) \u2014 you are right that the revision number is DATA, not a display detail. It was already being written into cp_data.json alongside every plan (cpRevNum and the pending \u25cf flag both sync), but the automatic 100-edit rollover relied on the ordinary ~90-second push to carry it up. Save to Project and Build .xlsx already pushed on the spot; the rollover did not. Now it does. The window was small but the failure it allowed is nasty: a rev that advanced on the device and then lost the race with a closed tab would leave the device and the synced copy claiming DIFFERENT revisions of the same plan \u2014 worse than either simply being stale, because both look authoritative and there is nothing on screen to say which is right."] },
@@ -2233,7 +2234,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "07:31 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "07:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
