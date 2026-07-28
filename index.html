@@ -1558,7 +1558,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-661";
+const APP_REV = "Rev-662";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1691,6 +1691,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-662", type: "App", changes: ["HANDOFF CHECK WAS READING THE WRONG AI KEY (Rev-662) \u2014 the AI KEY check looked in localStorage for \u2018anthropicKey\u2019 or \u2018aiKey\u2019. The app has never written either: it stores the key as \u2018anthropicApiKey\u2019. So the check reported \u2018none stored \u2014 AI Propose Types will not run\u2019 no matter how many keys were saved, on every machine, forever. A check reading the wrong key is worse than no check at all \u2014 it trains you to ignore a warning that is always present, and the next time it means something you will scroll past it. Now reads the key the app actually uses, with the two old names kept as fallbacks, and reports its length so \u2018present\u2019 is evidence rather than a claim. The other warning on that panel \u2014 UNISSUED CP REVS on 1000237620 OP-030 \u2014 is correct: that plan has auto-saved edits past its last Save to Project, exactly as the \u25cf beside its rev has been showing."] },
   { ts: "2026-07-28", rev: "App Rev-661", type: "App", changes: ["TWO BUTTONS, SAME NAME \u2014 FIXED, AND AN EMPTY PUSH RECOVERED (Rev-661) \u2014 pressing \ud83d\udcac New Chat Prompt showed the old plain text box and none of the new steps: Rev-660 put its wizard button in the HEADER while the original sat on the HOME SCREEN, still wired to the old modal. Two buttons, same label, different behaviour \u2014 the same confusion as the twin \u2018add new\u2019 lists earlier today. The HOME button now opens the wizard, since that is the one actually pressed, and the duplicate header button was REMOVED rather than left as a second door to the same room. \u2713 HANDOFF CHECK stays in the header; it does a different job. The raw prompt text is still reachable from step 2 via SEE THE TEXT. ALSO: the previous build attempt shipped an EMPTY index.html \u2014 the packaging step opened its payload file for writing BEFORE reading the source, so when the source read failed it left a zero-byte payload and pushed that over the live site, taking the app down. Recovered by rolling FORWARD as the standing rule requires. The payload is now size-checked before any push can run."] },
   { ts: "2026-07-28", rev: "App Rev-660", type: "App", changes: ["HANDOFF SUBSYSTEM \u2014 CHECK, QUIZ AND WIZARD (Rev-660) \u2014 moving CP work to a fresh chat was \u2018paste something and hope\u2019. CP already had the prompt generator (Rev-514); what was missing was PROOF. Two header buttons: \u2713 HANDOFF CHECK runs nine checks against this machine and prints a \u2713 / \u26a0 / \u2717 report with a verdict, and \ud83d\udcac NEW CHAT PROMPT opens a seven-step wizard that copies the prompt the instant it opens, runs the check, and walks through token \u2192 new chat \u2192 paste \u2192 QUIZ. THE QUIZ IS THE HALF THAT WAS MISSING: it tests the NEW Claude \u2014 the current rev (only the repo can supply it), what CP-2C says about the Master List, where the data physically lives, and which document may never be edited without asking. A silently truncated paste is the real failure mode and it looks exactly like a good one. CHECKS WRITTEN AGAINST CP\u2019S ACTUAL MODEL, not ported blind: CP has no service worker, so the source design\u2019s two cache checks were OMITTED rather than faked \u2014 a check that cannot fail is worse than no check. In their place, checks that matter here: repo rev vs running rev, plans edited on this device but not yet synced, unissued CP revisions, and DELETION MARKERS IN THE LAST 24 HOURS \u2014 which earned its place today, when a stale tombstone erased live work twice. Every check is individually wrapped so one failure degrades to \u26a0 instead of taking the panel down."] },
   { ts: "2026-07-28", rev: "App Rev-659", type: "App", changes: ["\u2795 ADD A NEW \u2026 IS THE FIRST ITEM (Rev-659) \u2014 on the builder\u2019s level pickers the add option sat at the BOTTOM, under every existing value. On Feature Type that is twenty entries and a scrollbar, so the one option you need when a value is missing was the one you had to scroll to find \u2014 and the longer the list, the more likely something is missing from it. It is now the first item on every level picker, above \u2014 any \u2014 and the values. The Master List\u2019s own value panels were checked for the same ordering."] },
@@ -2225,7 +2226,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:20 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:32 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -15296,8 +15297,12 @@ async function hcRunChecks(){
 
   // 8 — AI KEY
   try{
-    const k = localStorage.getItem('anthropicKey') || localStorage.getItem('aiKey') || '';
-    add(k ? true : 'warn', 'AI KEY', k ? 'present' : 'none stored — AI Propose Types will not run');
+    // Rev-662 FIX: the app stores the key as 'anthropicApiKey'. The check looked for
+    // 'anthropicKey' and 'aiKey' — neither of which the app has ever written — so it
+    // reported NONE STORED however many keys were saved. A check reading the wrong key
+    // is worse than no check: it teaches you to ignore a warning that is always there.
+    const k = localStorage.getItem('anthropicApiKey') || localStorage.getItem('anthropicKey') || localStorage.getItem('aiKey') || '';
+    add(k ? true : 'warn', 'AI KEY', k ? ('present (' + k.length + ' chars)') : 'none stored — AI Propose Types will not run');
   }catch(e){ add('warn', 'AI KEY', 'could not read'); }
 
   // 9 — ACTION LOG
