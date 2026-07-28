@@ -1558,7 +1558,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-665";
+const APP_REV = "Rev-666";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1691,6 +1691,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-666", type: "App", changes: ["BUILDING THE .XLSX NOW ISSUES THE REVISION (Rev-666) \u2014 \u2018your data is saved\u2019 and \u2018your rev is old\u2019 sounded contradictory because the app let those two drift apart. Both were true: every edit was stored and pushed, while the revision NUMBER only advanced when Save to Project was pressed. The number is a label, and a stale label costs nothing \u2014 EXCEPT at the one moment it matters, which is Build .xlsx: the workbook could be stamped Rev-1 in its filename and title block while containing later work, and CP-1 requires that token to be the issued revision. That is a document-control fault on an ITAR deliverable, not a cosmetic one. Build .xlsx now issues the revision first when a plan has edits past its last one \u2014 advancing the number, clearing the \u25cf, pushing, and saying which rev the workbook carries \u2014 so the file that leaves the app is always stamped with the revision it actually contains. Save to Project still issues a rev on demand for anyone who wants one without exporting. The right fix was to stop the two drifting apart, not to explain the drift more clearly."] },
   { ts: "2026-07-28", rev: "App Rev-665", type: "App", changes: ["\u2018UNISSUED CP REVS\u2019 REWORDED \u2014 IT WAS READING AS UNSAVED WORK (Rev-665) \u2014 the note said \u2018n plan(s) have edits past their last issued rev\u2019, which on a handoff panel reads as \u2018there is work here that will be lost\u2019, and led to being told to press Save to Project before moving. That advice was wrong: every edit is already written to the device and pushed to GitHub by auto-save. The only thing Save to Project adds is ADVANCING THE REVISION NUMBER \u2014 a document-control act under CP-1, not a data-safety one. Renamed to CP REV NOT ISSUED and the note now states outright that the work IS saved and pushed, and that Save to Project is only needed if the rev number should advance. A warning that implies risk where there is none is as harmful as one that misses real risk: it spends the reader\u2019s attention and teaches them to distrust the panel."] },
   { ts: "2026-07-28", rev: "App Rev-664", type: "App", changes: ["PASS MEANS PASS (Rev-664) \u2014 \u2018PASS \u2014 WITH NOTES\u2019 read as a qualified pass, which is a fail with manners. It is not: a note is something worth knowing that costs nothing, and using it to hedge the verdict makes you distrust a green banner. The banner now says PASS, in green, whenever there is nothing blocking \u2014 with or without notes \u2014 and DO NOT MOVE YET in red when there is. Notes are counted separately beside it rather than folded into the verdict: \u20180 blockers / 2 notes\u2019, which also replaces the old \u2018n of 9 checks passed\u2019 score that had been treating every note as a failed check. The sub-line spells out the consequence either way \u2014 \u2018Safe to move. 2 notes below \u2014 worth reading, but nothing that loses work\u2019, or \u2018Fix the 1 blocker below, then run the check again\u2019. The copied report and the report footer use the same wording."] },
   { ts: "2026-07-28", rev: "App Rev-663", type: "App", changes: ["THE CHECK NOW SAYS PASS OR DO NOT MOVE YET (Rev-663) \u2014 step 1 answered the one question it exists to answer \u2014 is this machine safe to leave \u2014 with a sentence set in the same weight as everything else, so the answer had to be inferred from the wording. It now leads with a BANNER: a large \u2713 or \u2717, the word PASS, PASS \u2014 WITH NOTES, or DO NOT MOVE YET, a plain line saying what that means for you, and the score (\u20188 of 9 checks passed\u2019) so a silently skipped check cannot hide. Green for a clean pass, amber for pass-with-notes, red for stop \u2014 and the amber case says outright that the notes will not lose any work, because \u2018READY WITH NOTES\u2019 read like a warning when it is not one. The copied report gets the same headline so it is unambiguous when pasted into a chat."] },
@@ -2229,7 +2230,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:08 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:24 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -15944,7 +15945,30 @@ $('appInstructionsBack').onclick = showAdmin;
 $('recentChangesBack').onclick = showMenu;
 $('cpGenerateBtn').onclick = generateCP;
 $('cpSaveDraftBtn').onclick = saveDraft;
-if($('cpBuildXlsxBtn')) $('cpBuildXlsxBtn').onclick = buildCPxlsx;
+// Rev-666: BUILDING THE .XLSX ISSUES THE REVISION. This is the moment the Control Plan
+// becomes a document that leaves the app, and CP-1 requires the rev token in the filename
+// and title block to be the issued one. Until now the workbook could be stamped Rev-1
+// while containing later work, because the number only advanced on Save to Project — and
+// that split is what made 'your data is saved' and 'your rev is old' sound contradictory.
+// They were both true; the fix is to stop the two drifting apart, not to explain it better.
+if($('cpBuildXlsxBtn')) $('cpBuildXlsxBtn').onclick = () => {
+  try{
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    const id = (cpBuildState && cpBuildState.srcId) || '';
+    const i = projects.findIndex(p => p.id === id);
+    if(i >= 0 && projects[i].cpRevDirty){
+      projects[i].cpRevNum = (parseInt(projects[i].cpRevNum, 10) || 1) + 1;
+      projects[i].cpRevDirty = false;
+      projects[i].cpEdits = 0;
+      projects[i].updated = new Date().toISOString();
+      localStorage.setItem('cpProjects', JSON.stringify(projects));
+      try{ logAct('cp-rev', (projects[i].partNum||'') + (projects[i].opNum ? ' OP-' + projects[i].opNum : '') + ' \u2192 Rev-' + projects[i].cpRevNum + ' (issued by Build .xlsx)'); }catch(e){}
+      flash('\u2713 Issued CP Rev-' + projects[i].cpRevNum + ' \u2014 the workbook carries that number.');
+      try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
+    }
+  }catch(e){}
+  buildCPxlsx();
+};
 if($('cpBuilderSaveBtn')) $('cpBuilderSaveBtn').onclick = () => buildCPxlsx(true);
 if($('cpFocusPrev')) $('cpFocusPrev').onclick = () => focusStep(-1);
 if($('cpFocusNext')) $('cpFocusNext').onclick = () => focusStep(1);
