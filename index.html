@@ -601,7 +601,7 @@
   <div style="display:grid; grid-template-columns:1fr 1fr 1.4fr; gap:12px;">
     <button class="btn-ghost" id="cpSaveDraftBtn" style="min-height:52px; font-weight:600; background:#5a6c7d; border:1px solid #4a5a68; color:#fff;">💾 Save Draft</button>
     <button class="btn-ghost" id="cpEditExistingBtn" onclick="cpEditExisting()" disabled="" style="min-height:52px; font-weight:700; background:#9aa4ad; border:1px solid #8a949d; color:#eef2f5; opacity:0.65; cursor:not-allowed;" title="No saved Control Plan matches this Part # + Operation ID# yet">📂 EDIT EXISTING CONTROL PLAN</button>
-    <button class="btn-primary" id="cpGenerateBtn" style="min-height:52px;">GENERATE NEW CONTROL PLAN</button>
+    <button class="btn-primary" id="cpGenerateBtn" style="min-height:52px;">SAVE NEW OPERATION CONTROL PLAN</button>
   </div>
 </div>
 
@@ -1464,7 +1464,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-593";
+const APP_REV = "Rev-594";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1478,6 +1478,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-594", type: "App", changes: ["THE UPLOAD ERROR FOUND AND FIXED (Rev-594) \u2014 the red banner read \u2018Uncaught ReferenceError: handleODSUpload is not defined\u2019, and that was the whole story: the ODS file handler was being CALLED about 7,000 lines before it was DEFINED. Normally harmless, since function declarations are hoisted, but in the installed-app window the picker was reaching it before the binding existed \u2014 so choosing a file did nothing at all, no conversion, no preview, just the file name sitting on the drop zone. That is also why the Rev-593 byte-sniffing fix appeared to do nothing: the code carrying it was never reached. The function now sits directly ABOVE the code that calls it and is exported explicitly, and both call sites use whichever binding exists, so ordering cannot cause this again. BUTTON WORDING: \u2018GENERATE NEW CONTROL PLAN\u2019 now reads \u2018SAVE NEW OPERATION CONTROL PLAN\u2019 \u2014 the screen builds one operation\u2019s plan, not a whole part\u2019s."] },
   { ts: "2026-07-27", rev: "App Rev-593", type: "App", changes: ["ODS PDF NOW CONVERTS \u2014 AND THE DRAWING SHOWS ON THE SCREEN (Rev-593) \u2014 uploading L3H_912767-M_ODS-040_REV-01.pdf left the file name sitting on the drop zone and no drawing anywhere. Cause: the ODS handler decided a file was a PDF only from the browser\u2019s type label, and a PDF saved by Chrome or served from OneDrive frequently carries a different label \u2014 so conversion was skipped and a raw PDF was handed to an <img>, which displays nothing. It now reads the FIRST BYTES: anything starting %PDF is converted whatever the label says, the same fix made for gage drawings at Rev-574. Second, a failed conversion used to blame the internet with one canned sentence; it now reports the real reason on the drop zone, in a toast and in a dialog. Third, the loaded drawing is captioned ODS DRAWING LOADED \u2014 CLICK TO ENLARGE above the preview."] },
   { ts: "2026-07-27", rev: "App Rev-592", type: "App", changes: ["912767-M OP-030 RESTORED (Rev-592) \u2014 the plan was deleted at 8:11 PM tonight; its last good copy (14 rows, all ballooned, 3 control types assigned, 1ST TURN, under construction) was recovered from the 6:52 PM commit of cp_data.json and pushed back, and its deletion marker was cleared from GitHub. THE CODE PART: deletions are tombstoned and the merge unions tombstones from BOTH sides with deletions always winning, so restoring the data alone would have been undone \u2014 any device still holding the tombstone would delete the plan again on its next pull. The key 912767-M::Rev-1::OP030 is now ignored as a tombstone, but ONLY for deletions dated before 2026-07-28T01:30Z: if the plan is deliberately deleted again later, that newer deletion carries a newer date and works normally. Stale copies of the marker are also purged from each device at start-up. Its gage (912767-M::OP030::B7 \u00b7 TEST GAGE) was never deleted and reconnects to the restored plan."] },
   { ts: "2026-07-27", rev: "App Rev-591", type: "App", changes: ["CONTROL PLANS OPENS ON PART NUMBERS, NOT EVERY OPERATION (Rev-591) \u2014 the screen used to show every operation of every part at once: a wall of rows, three step buttons and six action buttons deep, before you had said which part you cared about. It is now two levels. LEVEL ONE is a plain list of PART NUMBERS, one line each, showing how many operations the part has and which (OP-020 \u00b7 OP-030), a progress pill for the part as a whole (NOT STARTED / n OF n READY / ALL STEPS DONE counted across its operations), when it was last touched, its traveller button, and Open. The whole row is clickable. LEVEL TWO opens that one part: a \u2190 All Parts button and the part number at the top, then only that part\u2019s operations with the construction steps and actions exactly as before \u2014 and the first column now reads Operation rather than Part Number, since the part is already named above. + New Control Plan shows on the parts list where it belongs. Control Plans from the main menu always lands on level one."] },
@@ -1944,7 +1945,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:22 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:34 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2264,7 +2265,73 @@ function showNewCP(fresh){
 // Clear any uploaded ODS / Setup / Checksheet files so each new Control Plan starts fresh
 function resetNewCPFiles(){
   currentODSImage = null; currentCleanODSImage = null;
-  ['odsFile', 'setupFile', 'checkFile'].forEach(id => {
+  // Rev-594: MOVED. This lived ~7,000 lines BELOW the code that calls it. That should
+// still work — function declarations are hoisted — but in the installed-app window it
+// was reaching the file picker before the binding existed, giving
+// 'handleODSUpload is not defined' and an upload that silently did nothing. Defined
+// ahead of its caller now, and exported explicitly, so ordering cannot bite again.
+async function handleODSUpload(file){
+  // Rev-593: sniff the first bytes rather than trusting the browser's type label — a
+  // PDF saved by Chrome, or served from OneDrive, often carries a different label, in
+  // which case the old check skipped conversion and handed a raw PDF to an <img>: the
+  // file name appeared but no drawing ever did.
+  let isPdf = (file && file.type === 'application/pdf') || /\.pdf$/i.test((file && file.name) || '');
+  try{
+    const head = new Uint8Array(await file.slice(0, 5).arrayBuffer());
+    if(head.length >= 4 && head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46) isPdf = true;
+  }catch(e){}
+  const z = $('odsZone'); const pz = z ? z.querySelector('p') : null;
+  if(isPdf){
+    flash('Converting PDF page 1 to an image…', false);
+    if(pz) pz.innerHTML = '⏳ <strong>Converting PDF…</strong>';
+    try { file = await convertPdfToImageFile(file); }
+    catch(e){
+      // Rev-593: report the REAL reason instead of one canned guess
+      const msg = String((e && e.message) || e);
+      const help = /offline|Failed to fetch|load/i.test(msg)
+        ? 'the PDF reader could not be downloaded — this needs internet the FIRST time on a device'
+        : msg;
+      if(pz) pz.innerHTML = '⚠ <strong>PDF not converted</strong>';
+      flash('Could not convert the PDF: ' + help, true);
+      alert('Could not convert the PDF.\n\n' + help + '\n\nUpload an image of the drawing, or paste a screenshot with Ctrl+V.');
+      return;
+    }
+  }
+  const reader = new FileReader();
+  reader.onload = async e => {
+    const base64 = e.target.result;
+    currentODSImage = base64; // Store for viewer
+    currentCleanODSImage = base64; // fresh upload IS the clean original
+    updateOdsThumb();
+    seedDrawingRevs(base64, 'Original upload'); // start a fresh revision history
+    const zone = document.getElementById('odsZone');
+    zone.classList.add('has-file');
+    const p = zone.querySelector('p');
+    p.textContent = '✓ ' + (file.name || 'pasted image');
+    if(typeof beFeatures !== 'undefined') beFeatures = []; // new drawing clears prior balloon set
+    saveWorkingCopy(); // auto-persist the fresh (unballooned) working copy
+
+    // Show Add Balloons button if API key is set
+    const hasKey = !!localStorage.getItem('anthropicApiKey');
+    if(hasKey){
+      const btn = $('addBalloonsBtn');
+      if(btn) btn.style.display = 'inline-block';
+    }
+
+    // AI balloon-counting is OPTIONAL — only runs if an API key is set.
+    // Without a key, we keep whatever number is in the Data Rows field.
+    if(hasKey){
+      const count = await analyzeODSBalloons(base64);
+      if(count && count > 0){
+        $('cpRows').value = count;
+      }
+    }
+  };
+  reader.readAsDataURL(file);
+}
+try{ window.handleODSUpload = handleODSUpload; }catch(e){}
+
+['odsFile', 'setupFile', 'checkFile'].forEach(id => {
     const inp = $(id);
     if(inp) inp.value = '';
     const zone = $(id.replace('File', 'Zone'));
@@ -7644,7 +7711,7 @@ function buildCPxlsx(saveOnly){
         $('checkPreview').style.display = 'block';
       } else if(id === 'odsFile'){
         // Store the ODS image for the viewer + optional balloon analysis
-        handleODSUpload(e.target.files[0]);
+        (window.handleODSUpload || handleODSUpload)(e.target.files[0]);
       }
     }
   });
@@ -14472,7 +14539,7 @@ if(odsUploadZone && odsFile){
     e.preventDefault();
     odsUploadZone.classList.remove('has-file');
     if(e.dataTransfer.files.length > 0){
-      handleODSUpload(e.dataTransfer.files[0]);
+      (window.handleODSUpload || handleODSUpload)(e.dataTransfer.files[0]);
     }
   });
   // (odsFile change + paste-button handling is done by the unified handlers above)
@@ -14547,65 +14614,7 @@ async function convertPdfToImageFile(file){
   return new File([blob], (file.name || 'drawing').replace(/\.pdf$/i,'') + '.png', { type: 'image/png' });
 }
 
-async function handleODSUpload(file){
-  // Rev-593: sniff the first bytes rather than trusting the browser's type label — a
-  // PDF saved by Chrome, or served from OneDrive, often carries a different label, in
-  // which case the old check skipped conversion and handed a raw PDF to an <img>: the
-  // file name appeared but no drawing ever did.
-  let isPdf = (file && file.type === 'application/pdf') || /\.pdf$/i.test((file && file.name) || '');
-  try{
-    const head = new Uint8Array(await file.slice(0, 5).arrayBuffer());
-    if(head.length >= 4 && head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46) isPdf = true;
-  }catch(e){}
-  const z = $('odsZone'); const pz = z ? z.querySelector('p') : null;
-  if(isPdf){
-    flash('Converting PDF page 1 to an image…', false);
-    if(pz) pz.innerHTML = '⏳ <strong>Converting PDF…</strong>';
-    try { file = await convertPdfToImageFile(file); }
-    catch(e){
-      // Rev-593: report the REAL reason instead of one canned guess
-      const msg = String((e && e.message) || e);
-      const help = /offline|Failed to fetch|load/i.test(msg)
-        ? 'the PDF reader could not be downloaded — this needs internet the FIRST time on a device'
-        : msg;
-      if(pz) pz.innerHTML = '⚠ <strong>PDF not converted</strong>';
-      flash('Could not convert the PDF: ' + help, true);
-      alert('Could not convert the PDF.\n\n' + help + '\n\nUpload an image of the drawing, or paste a screenshot with Ctrl+V.');
-      return;
-    }
-  }
-  const reader = new FileReader();
-  reader.onload = async e => {
-    const base64 = e.target.result;
-    currentODSImage = base64; // Store for viewer
-    currentCleanODSImage = base64; // fresh upload IS the clean original
-    updateOdsThumb();
-    seedDrawingRevs(base64, 'Original upload'); // start a fresh revision history
-    const zone = document.getElementById('odsZone');
-    zone.classList.add('has-file');
-    const p = zone.querySelector('p');
-    p.textContent = '✓ ' + (file.name || 'pasted image');
-    if(typeof beFeatures !== 'undefined') beFeatures = []; // new drawing clears prior balloon set
-    saveWorkingCopy(); // auto-persist the fresh (unballooned) working copy
 
-    // Show Add Balloons button if API key is set
-    const hasKey = !!localStorage.getItem('anthropicApiKey');
-    if(hasKey){
-      const btn = $('addBalloonsBtn');
-      if(btn) btn.style.display = 'inline-block';
-    }
-
-    // AI balloon-counting is OPTIONAL — only runs if an API key is set.
-    // Without a key, we keep whatever number is in the Data Rows field.
-    if(hasKey){
-      const count = await analyzeODSBalloons(base64);
-      if(count && count > 0){
-        $('cpRows').value = count;
-      }
-    }
-  };
-  reader.readAsDataURL(file);
-}
 
 // (Removed duplicate ODS-only paste handler — paste routing is now handled
 // by the single pasteTarget-aware handler above, so images go to the section
