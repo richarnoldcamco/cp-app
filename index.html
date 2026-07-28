@@ -759,10 +759,11 @@
   <button class="ob-back" id="projectsBack">← Back</button>
   <h1>Control Plans</h1>
   <p class="sub">All Control Plans on this device — drafts and saved projects together</p>
+  <div id="cpPartsCrumb" style="display:none; align-items:center; gap:10px; margin:2px 0 10px;"></div>
   <button id="projectsNewBtn" onclick="showNewCP(true)" style="display:inline-flex; align-items:center; gap:8px; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:8px; padding:12px 20px; font-size:15px; font-weight:800; cursor:pointer; margin:6px 0 16px;">＋ New Control Plan</button>
   <table id="projectsTable">
     <thead>
-      <tr class="cp-plan-head">
+      <tr class="cp-plan-head" id="cpPlanHeadRow">
         <th>Part Number</th>
         <th>Status</th>
         <th>Updated</th>
@@ -1461,7 +1462,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-590";
+const APP_REV = "Rev-591";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1475,6 +1476,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-591", type: "App", changes: ["CONTROL PLANS OPENS ON PART NUMBERS, NOT EVERY OPERATION (Rev-591) \u2014 the screen used to show every operation of every part at once: a wall of rows, three step buttons and six action buttons deep, before you had said which part you cared about. It is now two levels. LEVEL ONE is a plain list of PART NUMBERS, one line each, showing how many operations the part has and which (OP-020 \u00b7 OP-030), a progress pill for the part as a whole (NOT STARTED / n OF n READY / ALL STEPS DONE counted across its operations), when it was last touched, its traveller button, and Open. The whole row is clickable. LEVEL TWO opens that one part: a \u2190 All Parts button and the part number at the top, then only that part\u2019s operations with the construction steps and actions exactly as before \u2014 and the first column now reads Operation rather than Part Number, since the part is already named above. + New Control Plan shows on the parts list where it belongs. Control Plans from the main menu always lands on level one."] },
   { ts: "2026-07-27", rev: "App Rev-590", type: "App", changes: ["BUILD TIME STAMP CORRECTED (Rev-590) \u2014 the header read REV-589 \u00b7 2026-07-27 10:56 PM when the actual time was 8:40 PM. Cause: BUILD_TIME is typed in by hand at build time, and for the last several revs it was written from estimate rather than read off the clock, drifting roughly two hours ahead. Now read from the machine clock converted to Eastern. Revs 578 through 589 carry stamps that are ahead by about two hours; the rev NUMBERS and their order are unaffected, and nothing in the app depends on the stamp \u2014 the update check compares APP_REV, never the time. Going forward the stamp is read, not guessed."] },
   { ts: "2026-07-27", rev: "App Rev-589", type: "App", changes: ["CONSTRUCTION STEP BUTTONS REBUILT (Rev-589) \u2014 the three steps were ordinary one-line buttons reading \u20181 \u00b7 Bubble Numbers\u2019, with the sequence competing with the wording for the same line. They are now proper two-line step buttons, 46px tall and all one width: STEP 1 in small spaced capitals on top, the job in bold underneath \u2014 ASSIGN BUBBLE NUMBERS / SELECT CONTROL TYPE / MEASUREMENT METHODS. The state is carried in the top line rather than by an emoji stuck on the front: a finished step reads STEP 1 \u2713 and turns white with a green outline; a locked one reads STEP 2 \u2013 LOCKED and goes flat grey with a dashed border, which looks unavailable at a glance instead of looking like a button that failed. The step still to do stays solid green. Tooltips are unchanged and still name the outstanding row count."] },
   { ts: "2026-07-27", rev: "App Rev-588", type: "App", changes: ["CONSTRUCTION STEPS COLUMN + THE STEPS NOW RUN IN ORDER (Rev-588) \u2014 the three step buttons moved into their own column headed CONSTRUCTION STEPS, separated by a rule from the supporting ACTIONS column (Inspect, Validation, Customer CP, Download, Rename, Delete). GATING: Step 2 stays locked until every row has a bubble number AND a feature description; Step 3 stays locked until every row has a control type. This matches how the work actually depends on itself \u2014 a control type cannot be chosen for a balloon that does not exist yet, and the methods band is filled BY the control type, so doing them out of order produces rows the master can never resolve. Nothing is hidden and nothing is guessed at: a locked button carries a \ud83d\udd12 and its tooltip says exactly how many rows are outstanding (e.g. \u20184 of 14 rows still need a control type\u2019), and a finished step turns quiet with a \u2713 so the state of every plan reads at a glance down the list."] },
@@ -1938,7 +1940,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:40 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2355,6 +2357,7 @@ function onCustomerSelect(){
 }
 
 function showProjects(){
+  cpPartFilter = null;        // Rev-591: always land on the parts list
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.add('hidden');
   $('projectsScreen').classList.remove('hidden');
@@ -2381,6 +2384,87 @@ function updateHomeScreen(){
   } catch(e){}
 }
 
+// ===== Rev-591: TWO LEVELS — PARTS FIRST, THEN THAT PART'S OPERATIONS ==========
+// Control Plans used to open straight onto every operation of every part, so the
+// screen was a wall of rows and buttons before you had said which part you cared
+// about. It now opens on a plain list of PART NUMBERS; clicking one opens just that
+// part's operations, with the construction steps and actions.
+let cpPartFilter = null;
+function cpOpenPart(part){ cpPartFilter = String(part || '').toUpperCase() || null; renderProjects(); }
+function cpBackToParts(){ cpPartFilter = null; renderProjects(); }
+function renderPartsIndex(tbody, combined){
+  // one line per part number, summarising what is inside it
+  const byPart = {};
+  combined.forEach(it => {
+    const k = String(it.data.partNum || '').toUpperCase();
+    if(!byPart[k]) byPart[k] = { part: it.data.partNum || '', ops: [], latest: '' };
+    byPart[k].ops.push(it);
+    const d = it.data.updated || it.sortDate || '';
+    if(d > byPart[k].latest) byPart[k].latest = d;
+  });
+  const head = document.getElementById('cpPlanHeadRow');
+  if(head) head.innerHTML =
+      '<th>Part Number</th>'
+    + '<th>Operations</th>'
+    + '<th>Progress</th>'
+    + '<th>Last Updated</th>'
+    + '<th style="border-left:2px solid #c9c0b4;">Traveller</th>'
+    + '<th style="text-align:right;">Open</th>';
+
+  Object.keys(byPart).sort((a, b) => (byPart[b].latest || '').localeCompare(byPart[a].latest || ''))
+    .forEach(k => {
+      const g = byPart[k];
+      const tr = document.createElement('tr');
+      tr.className = 'cp-op-row';
+      tr.style.cursor = 'pointer';
+      tr.onclick = () => cpOpenPart(g.part);
+
+      const cell = (html, align, extra) => { const td = document.createElement('td');
+        td.style.cssText = 'text-align:' + (align || 'left') + ';' + (extra || '');
+        td.innerHTML = html; return td; };
+
+      tr.appendChild(cell('<b style="font-size:15px; letter-spacing:.04em; color:#5c1416;">'
+        + (g.part || '') + '</b>'));
+
+      const opLabels = g.ops.map(o => o.data.opNum ? ('OP-' + o.data.opNum) : null).filter(Boolean);
+      tr.appendChild(cell('<b>' + g.ops.length + '</b>'
+        + (opLabels.length ? ' <span style="font-size:11px; color:#6b6257;">' + opLabels.join(' \u00b7 ') + '</span>'
+                           : ' <span style="font-size:11px; color:#a49a8d;">not numbered</span>')));
+
+      // how far along the whole part is, counted across its operations
+      let done = 0, started = 0;
+      g.ops.forEach(o => { const pr = cpStepProgress(o.data); if(pr.s2Done) done++; else if(pr.total) started++; });
+      const tone = done === g.ops.length ? ['#dcecdf','#1f5133','#a9cdb5','ALL STEPS DONE']
+        : (done || started) ? ['#f0e2c0','#5c4708','#d9c48a', done + ' OF ' + g.ops.length + ' READY']
+        : ['#f2efe9','#8a8279','#ddd6cc','NOT STARTED'];
+      tr.appendChild(cell('<span class="cp-pill" style="background:' + tone[0] + '; color:' + tone[1]
+        + '; border:1px solid ' + tone[2] + ';">' + tone[3] + '</span>'));
+
+      tr.appendChild(cell(g.latest ? new Date(g.latest).toLocaleDateString() : ''));
+
+      let hasTrav = false;
+      try{ const d = _idbGetDrawing(k + '::TRAVELLER'); hasTrav = !!(d && d.odsImage); }catch(e){}
+      const tdTrav = cell('', 'left', 'border-left:2px solid #e2ddd4;');
+      const tb = document.createElement('button');
+      tb.className = 'cp-btn ' + (hasTrav ? 'cp-btn-quiet' : 'cp-btn-primary');
+      tb.textContent = hasTrav ? 'View Traveller' : 'Upload Traveller';
+      tb.style.cssText = 'width:140px;' + (hasTrav ? '' : ' background:#7a5c2a; border-color:#63481f;');
+      tb.onclick = (e) => { e.stopPropagation(); hasTrav ? cpViewTraveller(g.part) : cpTravellerPick(g.part); };
+      tdTrav.appendChild(tb);
+      tr.appendChild(tdTrav);
+
+      const tdOpen = cell('', 'right');
+      const ob = document.createElement('button');
+      ob.className = 'cp-btn cp-btn-primary';
+      ob.textContent = 'Open \u2192';
+      ob.style.width = '94px';
+      ob.onclick = (e) => { e.stopPropagation(); cpOpenPart(g.part); };
+      tdOpen.appendChild(ob);
+      tr.appendChild(tdOpen);
+
+      tbody.appendChild(tr);
+    });
+}
 // ===== Rev-588: STEP GATING =====================================================
 // A control type cannot be chosen for a balloon that does not exist yet, and the
 // methods band is filled BY the control type — so the steps genuinely run in order.
@@ -2426,12 +2510,51 @@ function renderProjects(){
 
   if(combined.length === 0){
     $('projectsEmpty').style.display = 'block';
+    if($('cpPartsCrumb')) $('cpPartsCrumb').style.display = 'none';
     return;
   }
   $('projectsEmpty').style.display = 'none';
 
+  // Rev-591: LEVEL ONE — no part chosen yet, so show only the part numbers
+  const crumb = $('cpPartsCrumb');
+  const newBtn = $('projectsNewBtn');
+  if(!cpPartFilter){
+    if(crumb) crumb.style.display = 'none';
+    if(newBtn) newBtn.style.display = '';
+    renderPartsIndex(tbody, combined);
+    return;
+  }
+
+  // LEVEL TWO — one part's operations
+  const filtered = combined.filter(it => String(it.data.partNum || '').toUpperCase() === cpPartFilter);
+  if(!filtered.length){ cpPartFilter = null; renderProjects(); return; }
+  if(newBtn) newBtn.style.display = 'none';
+  if(crumb){
+    crumb.style.display = 'flex';
+    crumb.innerHTML = '';
+    const back = document.createElement('button');
+    back.className = 'cp-btn cp-btn-quiet';
+    back.textContent = '\u2190 All Parts';
+    back.style.width = '116px';
+    back.onclick = cpBackToParts;
+    crumb.appendChild(back);
+    const t = document.createElement('span');
+    t.innerHTML = '<b style="font-size:16px; letter-spacing:.04em; color:#5c1416;">' + (filtered[0].data.partNum || '')
+      + '</b> <span style="font-size:12px; color:#6b6257;">\u2014 ' + filtered.length + ' operation'
+      + (filtered.length === 1 ? '' : 's') + '</span>';
+    crumb.appendChild(t);
+  }
+  const head = $('cpPlanHeadRow');
+  if(head) head.innerHTML =
+      '<th>Operation</th>'
+    + '<th>Status</th>'
+    + '<th>Updated</th>'
+    + '<th style="border-left:2px solid #c9c0b4;">Construction Steps</th>'
+    + '<th style="border-left:2px solid #c9c0b4;">Actions</th>'
+    + '<th style="text-align:right;">CP Rev</th>';
+
   let _lastPartHdr = null;
-  combined.forEach((item) => {
+  filtered.forEach((item) => {
     const _pk = String(item.data.partNum || '').toUpperCase();
     if(_pk !== _lastPartHdr){
       _lastPartHdr = _pk;
