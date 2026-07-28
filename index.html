@@ -1468,7 +1468,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-599";
+const APP_REV = "Rev-600";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1482,6 +1482,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-600", type: "App", changes: ["ONE ODS DRAWING PER OPERATION (Rev-600) \u2014 the drawing store was keyed by PART ALONE, which was correct when a part had a single Control Plan. Since Rev-561 a part carries one plan per routing operation, each with its own ODS \u2014 so loading OP-040\u2019s drawing was overwriting OP-030\u2019s, and both operations would end up showing whichever was saved last. Drawings are now keyed PART::OPnnn through new cpOdsKey / _idbPutOds / _idbGetOds helpers, and every write that knows its operation uses them: saving a project, auto-save, saving a draft, the working copy, and the storage-relief sweep. READS FALL BACK to the bare PART key, so every drawing stored before this rev is still found and nothing has to be re-uploaded; the first save under an op number quietly moves it onto the new key. Plans with no operation number keep the old behaviour exactly."] },
   { ts: "2026-07-28", rev: "App Rev-599", type: "App", changes: ["UPDATED DATE REPLACED BY THE OPERATION\u2019S ODS DRAWING (Rev-599) \u2014 the UPDATED column showed a date nobody acts on. It now carries the ODS DRAWING for that operation: View ODS opens it full-screen, captioned with the part, op number and op description; an operation with nothing loaded reads \u2018none loaded\u2019 in grey. Each operation has its OWN ODS \u2014 the traveller belongs to the part and stays on the part header row, the ODS belongs to the op and now sits on the op row. The image comes from the plan\u2019s own copy, falling back to the per-part drawing store when the GitHub sync has stripped it. NOTE for later: the drawing store is still keyed by PART ALONE, so two operations of one part share a single stored ODS \u2014 harmless while each plan keeps its own copy, worth fixing properly once a part carries several ops with different drawings."] },
   { ts: "2026-07-28", rev: "App Rev-598", type: "App", changes: ["STEP 1 IS DONE WHEN EVERY ROW HAS THE GREEN DOT (Rev-598) \u2014 Step 1 was counting a row as finished once it had a bubble number and a description typed in. That proves nothing: the green dot in the pin column is what says the balloon has actually been LOCATED on the ODS drawing, which is what makes zoom-to-bubble and the drawing crops work. Step 1 now requires the dot on every row \u2014 read from the balloon positions saved with the plan, so it is judged the same way from the Control Plans list as it is inside the builder. GHOST ROWS ARE EXEMPT: a ghost is deliberately a balloon that is NOT on the drawing, so it can never be pinned and must not hold the step open. A feature description no longer gates the step \u2014 the dot is the test. The step-bar hint and the Step 1 tooltip now say so, and the outstanding count reads \u2018n of n rows are not pinned to the drawing yet (no green dot)\u2019."] },
   { ts: "2026-07-28", rev: "App Rev-597", type: "App", changes: ["COMPLETE NOW HAS TO BE EARNED (Rev-597) \u2014 Test1 was announcing itself COMPLETE with no operation number, no traveller and Step 3 untouched. The badge was reading nothing more than the manual under-construction switch: not marked under construction meant COMPLETE, regardless of the state of the work. A plan is now COMPLETE only when it has an operation number, a traveller on file for its part, and all three construction steps finished; anything short of that reads IN PROGRESS with a count, and hovering it lists exactly what is outstanding (\u2018no traveller uploaded for this part\u2019, \u2018Step 3: 6 of 6 rows still need a measurement method and reaction plan\u2019). The manual switch still works, but only to FORCE in-progress \u2014 it can no longer declare a plan finished. STEP 3 CAN ALSO SHOW AS DONE now: it is finished when every row carries a machinist method and a reaction plan, so the button turns white with a \u2713 like the other two instead of staying green forever. The part-level pill on the parts list uses the same rule, so ALL STEPS DONE became COMPLETE and means it."] },
@@ -1954,7 +1955,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:34 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:48 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2589,7 +2590,7 @@ function cpOpOdsImage(p){
   try{
     const bs = p && p.builderState;
     if(bs && bs.odsImage) return bs.odsImage;
-    const d = _idbGetDrawing(String(p.partNum || '').toUpperCase());
+    const d = _idbGetOds(p.partNum, p.opNum || (bs && bs.opNum));   // Rev-600
     if(d && d.odsImage) return d.odsImage;
   }catch(e){}
   return null;
@@ -3822,7 +3823,7 @@ function saveProject(partNum, rev, base64Data, customerName, qualityLevel){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   // Capture the editable builder state so the project can be reopened in the Builder
   const builderState = cpBuildState ? JSON.parse(JSON.stringify(cpBuildState)) : null;
-  if(builderState && _idbReady && builderState.odsImage){ _idbPutDrawing(partNum, builderState.odsImage, builderState.cleanOdsImage); delete builderState.odsImage; delete builderState.cleanOdsImage; builderState._idb = 1; }   // Rev-338
+  if(builderState && _idbReady && builderState.odsImage){ _idbPutOds(partNum, builderState.opNum, builderState.odsImage, builderState.cleanOdsImage); delete builderState.odsImage; delete builderState.cleanOdsImage; builderState._idb = 1; }   // Rev-338
   const _op = (cpBuildState && cpBuildState.opNum) ? String(cpBuildState.opNum) : '';
   const entry = {
     id: partNum + '::' + rev + (_op ? '::OP' + _op : ''), // stable unique key for GitHub sync dedup
@@ -3966,7 +3967,7 @@ function saveDraft(){
   }
   
   // Rev-202: saving clears any draft tombstone for this part so it survives future merges
-  if(_idbReady && currentODSImage) _idbPutDrawing(draft.partNum, currentODSImage, currentCleanODSImage);   // Rev-338
+  if(_idbReady && currentODSImage) _idbPutOds(draft.partNum, draft.opNum, currentODSImage, currentCleanODSImage);   // Rev-338
   const _dt = JSON.parse(localStorage.getItem('deletedDraftKeys') || '[]').filter(t => t.key !== draft.partNum);
   localStorage.setItem('deletedDraftKeys', JSON.stringify(_dt));
   const drafts = JSON.parse(localStorage.getItem('cpDrafts') || '[]');
@@ -4828,7 +4829,7 @@ function cpAutoSaveProject(){
       const id = cpBuildState.partNum + '::' + cpBuildState.rev + (cpBuildState.opNum ? '::OP' + cpBuildState.opNum : '');
       if(typeof beFeatures !== 'undefined' && beFeatures && beFeatures.length) cpBuildState.features = JSON.parse(JSON.stringify(beFeatures));   // Rev-294: save AI-located balloons WITH the plan
       const bs = JSON.parse(JSON.stringify(cpBuildState));
-      if(_idbReady && bs.odsImage){ _idbPutDrawing(bs.partNum, bs.odsImage, bs.cleanOdsImage); delete bs.odsImage; delete bs.cleanOdsImage; bs._idb = 1; }   // Rev-338: drawings live in IndexedDB, not localStorage
+      if(_idbReady && bs.odsImage){ _idbPutOds(bs.partNum, bs.opNum, bs.odsImage, bs.cleanOdsImage); delete bs.odsImage; delete bs.cleanOdsImage; bs._idb = 1; }   // Rev-338: drawings live in IndexedDB, not localStorage
       let i = projects.findIndex(p => p.id === id);
       // Rev-336: RENAME, don't duplicate — if this builder session came from a saved plan whose
       // part#/rev no longer match, rename that entry in place and tombstone the old id so GitHub
@@ -5779,6 +5780,30 @@ function _idbGetDrawing(partNum){
   const P = String(partNum||'').trim().toUpperCase();
   return _idbDrawCache[P] || null;
 }
+// ===== Rev-600: ONE ODS PER OPERATION ==========================================
+// Drawings were stored under the PART alone, which was right when a part had one plan.
+// Now a part carries a plan per routing operation, each with its OWN ODS — so OP-030's
+// drawing was overwriting OP-040's. Drawings are now keyed PART::OPnnn. Reads fall back
+// to the bare PART key so every drawing stored before this rev is still found, and the
+// first save under an op number quietly moves it onto the new key.
+function cpOdsKey(part, op){
+  const P = String(part || '').trim().toUpperCase();
+  const O = String(op || '').trim().toUpperCase();
+  return O ? (P + '::OP' + O) : P;
+}
+function _idbGetOds(part, op){
+  const k = cpOdsKey(part, op);
+  const hit = _idbGetDrawing(k);
+  if(hit && hit.odsImage) return hit;
+  if(k !== String(part || '').trim().toUpperCase()){      // legacy drawing stored per part
+    const old = _idbGetDrawing(part);
+    if(old && old.odsImage) return old;
+  }
+  return null;
+}
+function _idbPutOds(part, op, odsImage, cleanOdsImage){
+  return _idbPutDrawing(cpOdsKey(part, op), odsImage, cleanOdsImage);
+}
 // Rev-575: _idbPutDrawing refuses a blank image (correctly — it guards against wiping a
 // drawing by accident), so removing one needs its own path.
 function _idbDelDrawing(partNum){
@@ -5864,8 +5889,8 @@ async function _idbInit(){
     if(dch) localStorage.setItem('cpDrafts', JSON.stringify(ds));
     const ps = JSON.parse(localStorage.getItem('cpProjects') || '[]');
     let pch = false; ps.forEach(p => {
-      if(p.builderState && p.builderState.odsImage){ _idbPutDrawing(p.partNum, p.builderState.odsImage, p.builderState.cleanOdsImage); delete p.builderState.odsImage; delete p.builderState.cleanOdsImage; p.builderState._idb = 1; pch = true; freed++; }
-      if(p.odsImage){ _idbPutDrawing(p.partNum, p.odsImage, p.cleanOdsImage); delete p.odsImage; delete p.cleanOdsImage; pch = true; freed++; }
+      if(p.builderState && p.builderState.odsImage){ _idbPutOds(p.partNum, p.opNum || p.builderState.opNum, p.builderState.odsImage, p.builderState.cleanOdsImage); delete p.builderState.odsImage; delete p.builderState.cleanOdsImage; p.builderState._idb = 1; pch = true; freed++; }
+      if(p.odsImage){ _idbPutOds(p.partNum, p.opNum, p.odsImage, p.cleanOdsImage); delete p.odsImage; delete p.cleanOdsImage; pch = true; freed++; }
     });
     if(pch) localStorage.setItem('cpProjects', JSON.stringify(ps));
     if(freed) console.log('[IDB] migrated ' + freed + ' embedded drawing(s) out of localStorage');
@@ -5875,7 +5900,8 @@ _idbInit();
 // Re-attach a drawing (from the IndexedDB cache) to an object that was stripped for storage.
 function _idbAttach(o){
   if(!o || o.odsImage) return o;
-  const d = _idbGetDrawing(o.partNum);
+  const d = _idbGetOds(o.partNum, o.opNum);   // Rev-600: this operation's ODS
+
   if(d){ o.odsImage = d.odsImage; if(!o.cleanOdsImage && d.cleanOdsImage) o.cleanOdsImage = d.cleanOdsImage; }
   return o;
 }
@@ -12877,7 +12903,7 @@ function saveWorkingCopy(){
       savedAt: new Date().toISOString()
     };
     const json = JSON.stringify(wc);
-    if(_idbReady && ods) _idbPutDrawing(wc.partNum, ods, (clean && clean !== ods) ? clean : null);   // Rev-338
+    if(_idbReady && ods) _idbPutOds(wc.partNum, wc.opNum, ods, (clean && clean !== ods) ? clean : null);   // Rev-338
     // The working copy (your actual drawing + text changes) has PRIORITY over the revision history.
     try { localStorage.setItem('cpWorkingCopy', json); return; }
     catch(e){ /* quota — free space and retry below */ }
