@@ -219,7 +219,12 @@
   /* Rev-618: a real progress bar under the three steps. The filled part is green; while a
      plan is unfinished the leading edge pulses so an in-progress plan is obvious across a
      room, and a finished one sits solid and still. */
-  .cp-prog{ position:relative; height:9px; border-radius:5px; background:#ddd6cc; overflow:hidden; margin-top:7px; }
+  /* Rev-623: hazard banner for an operation still being built */
+  .cp-uc{ display:flex; align-items:center; justify-content:center; height:22px; border-radius:4px;
+    font-size:11px; font-weight:800; letter-spacing:.16em; color:#3a2c00; margin-bottom:5px;
+    background:repeating-linear-gradient(45deg,#e6a817 0 14px,#171310 14px 28px);
+    text-shadow:0 0 6px #e6a817, 0 0 6px #e6a817, 0 0 4px #e6a817; }
+  .cp-prog{ position:relative; display:block; width:100%; height:11px; border-radius:5px; background:#ddd6cc; overflow:hidden; margin-top:0; }
   .cp-prog-fill{ position:absolute; inset:0 auto 0 0; border-radius:5px; background:#2c6e49; transition:width .35s ease; }
   .cp-prog-fill.live{ background:linear-gradient(90deg,#2c6e49 0%,#3fa063 70%,#57c47d 100%); animation:cpPulse 1.25s ease-in-out infinite; }
   @keyframes cpPulse{ 0%,100%{ opacity:.72; } 50%{ opacity:1; } }
@@ -1497,7 +1502,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-622";
+const APP_REV = "Rev-623";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1511,6 +1516,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-623", type: "App", changes: ["UNDER CONSTRUCTION BANNER + FULL-WIDTH PROGRESS BAR (Rev-623) \u2014 both of the marked-up changes. (1) An operation that is not finished now carries an UNDER CONSTRUCTION banner in shop-floor hazard stripes across the full width of its line, reading UNDER CONSTRUCTION \u2014 84% COMPLETE, with the outstanding work named on hover. It disappears by itself at 100%, so a finished operation is quiet and only the unfinished ones shout. (2) THE PROGRESS BAR NOW REALLY DOES RUN THE FULL WIDTH: its cell was set to span five columns, a number that silently stops being right the moment a column is added or removed \u2014 so the bar was ending short. It now spans 99, which every browser clamps to however many columns the table actually has, and the bar itself is set to fill its cell. The bar was also thickened slightly (9px to 11px) to sit under the banner without looking like an afterthought."] },
   { ts: "2026-07-28", rev: "App Rev-622", type: "App", changes: ["STEP BUTTONS STOP OVERLAPPING (Rev-622) \u2014 with the five steps finally on one line, ASSIGN CONTROL TYPES and ASSIGN MEASUREMENT TYPES were printing over each other: every button was pinned to a fixed 138px, which the longer labels simply do not fit in, so the text spilled straight out of its own button and over the next one. Width now FOLLOWS THE WORDS with a 132px floor, so short steps stay a sensible size and long ones get the room they need. The buttons are also told not to shrink and to clip rather than spill, so no future label can leak across a neighbour. ALSO ASKED: the ODS step has not gone \u2014 it is STEP 2 \u00b7 UPLOAD ODS. The separate ODS DRAWING column was removed at Rev-620 because Step 2 does that job; click Step 2 to view or replace the drawing."] },
   { ts: "2026-07-28", rev: "App Rev-621", type: "App", changes: ["STEPS GO HORIZONTAL, SCREEN GOES FULL WIDTH (Rev-621) \u2014 the five construction steps were still stacking into a vertical tower. Two causes, both fixed. (1) THE SCREEN was a centred column: the Control Plans list was never given the wide class at all, so it sat at 1100px while everything was being asked to fit inside it. It now uses the FULL width of the monitor, like the Master List and the builder already do. (2) THE STEPS CELL was free to wrap: the flex row still carried wrap:wrap, left over from when the progress bar was a child of the same row \u2014 the bar has had its own row since Rev-620, so the wrap was doing nothing but breaking the buttons onto separate lines. The steps cell is now no-wrap and sized to its content, and the actions cell is no-wrap too, so neither band can be squeezed into stacking again."] },
   { ts: "2026-07-28", rev: "App Rev-620", type: "App", changes: ["PROGRESS TRACK RUNS THE FULL LINE (Rev-620) \u2014 three fixes to the five-step row. (1) THE BAR STARTS UNDER THE OP # and runs the whole width: it now sits on its OWN row directly beneath the operation instead of being boxed inside the Construction Steps column. (2) THE ODS DRAWING COLUMN IS GONE \u2014 Step 2 IS the ODS drawing, so a separate column for it was the same thing said twice, and losing it gives the five step buttons the width to sit in ONE ROW instead of stacking into a tower. (3) A LATER STEP CAN NO LONGER READ DONE WHILE AN EARLIER ONE IS NOT: Step 5 was announcing \u2713 DONE while Step 4 still said DO THIS NEXT, because the methods band fills itself from the Master List \u2014 true of the cells, nonsense as a sequence. A step now shows DONE only when everything before it is done as well."] },
@@ -2006,7 +2012,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:28 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3420,8 +3426,19 @@ function renderProjects(){
       const btr = document.createElement('tr');
       btr.className = 'cp-op-row';
       const btd = document.createElement('td');
-      btd.colSpan = 5;
-      btd.style.cssText = 'padding:0 10px 10px 10px; border-bottom:1px solid #e2ddd4;';
+      // Rev-623: 99 is clamped by the browser to however many columns the table has, so
+      // this cell always spans the FULL width no matter how the columns change later.
+      btd.colSpan = 99;
+      btd.style.cssText = 'padding:2px 10px 10px 10px; border-bottom:1px solid #e2ddd4; width:100%;';
+      // Rev-623: an operation that is not finished says so, in shop-floor hazard stripes
+      const _pcRow = cpPlanPercent(p);
+      if(_pcRow < 100){
+        const uc = document.createElement('div');
+        uc.className = 'cp-uc';
+        uc.textContent = 'UNDER CONSTRUCTION \u2014 ' + _pcRow + '% COMPLETE';
+        uc.title = 'This operation is still being built. ' + (typeof cpOpStages === 'function' ? cpOpStages(p).labelSummary : '');
+        btd.appendChild(uc);
+      }
       btd.appendChild(_cpBarFor);
       btr.appendChild(btd);
       tbody.appendChild(btr);
