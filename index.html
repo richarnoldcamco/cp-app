@@ -1554,7 +1554,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-657";
+const APP_REV = "Rev-658";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1687,6 +1687,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-658", type: "App", changes: ["ADD-NEW APPEARS ON EVERY VALUE LIST (Rev-658) \u2014 Rev-657 only offered \u2795 Add once an unmatched value had already been typed, which is no help when the whole difficulty is not knowing you are allowed to type one. It also made the lists inconsistent: a column holding unmatched text showed the option while an empty 3rd Level offered nothing but CALIPER and looked closed. The option is now the first item on EVERY value list, on every column. With nothing typed it reads \u2795 Add a new 3rd Level\u2026 and clears the field ready for the new value; with an unmatched value already typed it reads \u2795 Add \u201cMICROMETER\u201d as a new 3rd Level and keeps it. Same list, same behaviour, every column."] },
   { ts: "2026-07-28", rev: "App Rev-657", type: "App", changes: ["ADDING A NEW LEVEL VALUE IS NOW OBVIOUS (Rev-657) \u2014 these cells have always been free text: the value list is a shortcut, not the set of allowed answers. But after Rev-655 narrowed the lists to what matches the levels above, a 3rd Level showing only CALIPER looked like the only thing permitted, and there was no way to tell that typing a new one was fine. Two additions, no behaviour change: every value list now ends with \u2018Not listed? Type it in and press Enter \u2014 new values are allowed.\u2019, and if what has been typed is not in the list, the panel offers \u2795 Add \u201cX\u201d as a new 3rd Level at the top. Narrowing a list is only helpful if the way out of it is visible."] },
   { ts: "2026-07-28", rev: "App Rev-656", type: "App", changes: ["COLUMN FILTERS NOW OFFER ONLY WHAT EXISTS (Rev-656) \u2014 with Feature Type filtered to C\u2019BORE and one row showing, the 2nd Level filter still listed all fourteen values ever used in the master \u2014 ANGLE, DEPTH, FINISH, RUN-OUT and the rest \u2014 almost none of which return anything under C\u2019BORE. A menu of dead ends: pick one and the grid empties. Each filter dropdown now lists only values present in the rows that pass the OTHER active filters. A column ignores its own filter when building its list, otherwise it would offer nothing but the value already chosen and could never be changed, and a selected value is kept in the list even if the other filters exclude it so the dropdown can always show its own state and be cleared. Rev-655 did this for the inline EDIT lists; this is the FILTER row, a separate control that needed the same treatment."] },
   { ts: "2026-07-28", rev: "App Rev-655", type: "App", changes: ["MASTER LIST LEVEL LISTS FOLLOW THE LEVELS ABOVE THEM (Rev-655) \u2014 editing a row, the 2nd Level list offered every 2nd Level ever used anywhere in the master, including values belonging to a different Workcenter or Feature Type. The Master List is a hierarchy, so that invites a combination describing nothing \u2014 and a master row that describes nothing can never be resolved from a Control Plan. Each level list is now filtered by the levels ABOVE it on the row being edited: 2nd Level shows only what exists under the chosen Workcenter and Feature Type, 3rd Level only under all three. Values are read from the inline inputs rather than the saved row, so the list follows what is being typed rather than what was there before. SAFETY VALVE: if the levels above have no match at all the full list is shown rather than an empty panel, headed \u2018no match above \u2014 showing all\u2019, and a narrowed list is headed \u2018matching the levels above\u2019 so the filtering is visible instead of mysterious."] },
@@ -2217,7 +2218,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:20 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:32 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -10081,17 +10082,31 @@ function buildEditingRow(row, idx){
         // cells have always been free text. Nothing said so, so a level that did not exist
         // yet looked impossible to add. If what is typed is not in the list, offer it
         // outright; either way, say plainly that a new value can be typed.
-        if(isLevel){
+        // Rev-658: the add option is ALWAYS there, on every value list, whether or not
+        // anything has been typed. Rev-657 only showed it once you had already typed an
+        // unmatched value — which is no use when the whole difficulty is not knowing you
+        // are allowed to type one. An empty 3rd Level therefore offered nothing but
+        // CALIPER and looked closed, while columns that happened to hold unmatched text
+        // showed the option: the same list behaving differently column to column.
+        {
           const typed = String(input.value || '').trim();
-          if(typed && !vals.some(v => v.toUpperCase() === typed.toUpperCase())){
-            const add = document.createElement('div');
-            add.style.cssText = 'padding:8px 12px; cursor:pointer; font-size:13px; font-weight:800; color:#1a5276; border-bottom:1px solid var(--line); white-space:nowrap;';
-            add.textContent = '\u2795 Add \u201c' + typed + '\u201d as a new ' + (col.label || col.key);
-            add.onmouseenter = () => add.style.background = '#eef3f8';
-            add.onmouseleave = () => add.style.background = '';
-            add.onpointerdown = ev => { ev.preventDefault(); ilClose(); input.focus(); input.dispatchEvent(new Event('input', { bubbles: true })); };
-            ilPanel.appendChild(add);
-          }
+          const isNew = typed && !vals.some(v => v.toUpperCase() === typed.toUpperCase());
+          const add = document.createElement('div');
+          add.style.cssText = 'padding:8px 12px; cursor:pointer; font-size:13px; font-weight:800; color:#1a5276; border-bottom:1px solid var(--line); white-space:nowrap;';
+          add.textContent = isNew
+            ? ('\u2795 Add \u201c' + typed + '\u201d as a new ' + (col.label || col.key))
+            : ('\u2795 Add a new ' + (col.label || col.key) + '\u2026');
+          add.onmouseenter = () => add.style.background = '#eef3f8';
+          add.onmouseleave = () => add.style.background = '';
+          add.onpointerdown = ev => {
+            ev.preventDefault();
+            ilClose();
+            if(!isNew){ input.value = ''; }      // clear it ready to type the new value
+            input.focus();
+            try{ input.select(); }catch(e){}
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+          };
+          ilPanel.appendChild(add);
         }
         vals.forEach(v => {
           const it = document.createElement('div');
