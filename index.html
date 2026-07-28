@@ -188,7 +188,9 @@
   .cp-btn:hover:not(:disabled){ filter:brightness(1.08); }
   .cp-btn:disabled{ opacity:.4; cursor:not-allowed; }
   .cp-btn-primary{ background:#2c6e49; color:#fff; border:1px solid #24593b; }
-  .cp-btn-go{ background:#1f8a3b; color:#fff; border:1px solid #1a7433; }
+  /* Rev-602: Inspect used a brighter green than everything else for no reason — it now
+     matches the one green the app uses for a filled action button. */
+  .cp-btn-go{ background:#2c6e49; color:#fff; border:1px solid #24593b; }
   .cp-btn-quiet{ background:#fff; color:#3d3831; border:1px solid #c2b9ab; }
   .cp-btn-danger{ background:#fff; color:#9b2c2c; border:1px solid #d3a3a3; }
   /* Rev-589: construction-step buttons carry the step number on their own line above
@@ -200,8 +202,10 @@
   .cp-step:disabled{ opacity:.45; cursor:not-allowed; }
   .cp-step .cp-step-n{ font-size:9px; font-weight:800; letter-spacing:.14em; opacity:.75; line-height:1; }
   .cp-step .cp-step-t{ font-size:12px; font-weight:800; letter-spacing:.03em; line-height:1.1; }
-  .cp-step-todo{ background:#2c6e49; color:#fff; border:1px solid #24593b; }
-  .cp-step-done{ background:#fff; color:#2c6e49; border:1px solid #a9cdb5; }
+  /* Rev-602: three states, read the way people expect them.
+     GREEN FILLED = done. AMBER = this is the one to do now. GREY DASHED = locked. */
+  .cp-step-done{ background:#2c6e49; color:#fff; border:1px solid #24593b; }
+  .cp-step-todo{ background:#fdf4e0; color:#6b5314; border:2px solid #e6a817; }
   .cp-step-lock{ background:#f2efe9; color:#8a8279; border:1px dashed #c2b9ab; }
   .cp-pill{ display:inline-block; font-size:10px; font-weight:800; letter-spacing:.05em;
     padding:4px 10px; border-radius:11px; white-space:nowrap; }
@@ -1468,7 +1472,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-601";
+const APP_REV = "Rev-602";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1482,6 +1486,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-602", type: "App", changes: ["STEP COLOURS TURNED THE RIGHT WAY ROUND (Rev-602) \u2014 the construction steps had it backwards: the step still TO DO was solid green and the FINISHED one was white, so the list read as if the unfinished work were the completed work. Green now means done, as everyone expects, and a third state was added for the step that is available now: DONE is solid green with STEP n \u2713 DONE; DO THIS NEXT is amber (matching the IN PROGRESS pill) reading STEP n \u2013 DO THIS NEXT; LOCKED stays flat grey with a dashed border reading STEP n \u2013 LOCKED. Each state now differs in colour AND in wording, so it survives a bad screen or colour-blindness. Separately, the Inspect button was using a brighter green (#1f8a3b) than any other button for no reason; it now uses the app\u2019s single filled-action green (#2c6e49), so a green button means the same thing everywhere on the row."] },
   { ts: "2026-07-28", rev: "App Rev-601", type: "App", changes: ["NEW SHOP ORDER BUTTON MOVED AND HALVED (Rev-601 \u00b7 embedded validation REV-156 \u2192 REV-157) \u2014 on the Choose shop order window the \u2018+ Inspect on a NEW shop order\u2019 button was a full-width green banner sitting ABOVE the list of existing shop orders, which made the rare action look like the main one. It now sits in the bottom right of the window beside Cancel, at roughly half its former size, reading \u2018+ NEW shop order\u2019. Picking an existing shop order \u2014 the common action \u2014 is now the first thing on the screen."] },
   { ts: "2026-07-28", rev: "App Rev-600", type: "App", changes: ["ONE ODS DRAWING PER OPERATION (Rev-600) \u2014 the drawing store was keyed by PART ALONE, which was correct when a part had a single Control Plan. Since Rev-561 a part carries one plan per routing operation, each with its own ODS \u2014 so loading OP-040\u2019s drawing was overwriting OP-030\u2019s, and both operations would end up showing whichever was saved last. Drawings are now keyed PART::OPnnn through new cpOdsKey / _idbPutOds / _idbGetOds helpers, and every write that knows its operation uses them: saving a project, auto-save, saving a draft, the working copy, and the storage-relief sweep. READS FALL BACK to the bare PART key, so every drawing stored before this rev is still found and nothing has to be re-uploaded; the first save under an op number quietly moves it onto the new key. Plans with no operation number keep the old behaviour exactly."] },
   { ts: "2026-07-28", rev: "App Rev-599", type: "App", changes: ["UPDATED DATE REPLACED BY THE OPERATION\u2019S ODS DRAWING (Rev-599) \u2014 the UPDATED column showed a date nobody acts on. It now carries the ODS DRAWING for that operation: View ODS opens it full-screen, captioned with the part, op number and op description; an operation with nothing loaded reads \u2018none loaded\u2019 in grey. Each operation has its OWN ODS \u2014 the traveller belongs to the part and stays on the part header row, the ODS belongs to the op and now sits on the op row. The image comes from the plan\u2019s own copy, falling back to the per-part drawing store when the GitHub sync has stripped it. NOTE for later: the drawing store is still keyed by PART ALONE, so two operations of one part share a single stored ODS \u2014 harmless while each plan keeps its own copy, worth fixing properly once a part carries several ops with different drawings."] },
@@ -1956,7 +1961,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:02 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:14 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2899,7 +2904,7 @@ function renderProjects(){
         b.title = tip;
         const l1 = document.createElement('span');
         l1.className = 'cp-step-n';
-        l1.textContent = 'STEP ' + n + (state === 'done' ? '  \u2713' : (state === 'lock' ? '  \u2013 LOCKED' : ''));
+        l1.textContent = 'STEP ' + n + (state === 'done' ? '  \u2713 DONE' : (state === 'lock' ? '  \u2013 LOCKED' : '  \u2013 DO THIS NEXT'));
         const l2 = document.createElement('span');
         l2.className = 'cp-step-t';
         l2.textContent = title;
