@@ -1472,7 +1472,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-607";
+const APP_REV = "Rev-608";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1486,6 +1486,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-608", type: "App", changes: ["NO ROW IS OPENED UNTIL YOU CLICK ONE (Rev-608) \u2014 the builder always had a row expanded: opening a plan opened row 1, and switching step re-opened whichever row was last active. That row takes several times the height of a normal one and pushes the rest of the list down, which is pure noise when you are reading the grid rather than editing a feature. Opening a plan and switching between steps now leave EVERY row collapsed \u2014 the full list is visible \u2014 and a row opens up only when you click it. Deleting a row now closes the editor instead of jumping the open state onto its neighbour. Nothing else changes: the opened row behaves exactly as before once you click into it."] },
   { ts: "2026-07-28", rev: "App Rev-607", type: "App", changes: ["VIEWER CONTROLS MOVED TO THE TOP, CLOSE IS RED (Rev-607) \u2014 the full-screen drawing viewers put Close UNDER the image, which on a laptop sat below the fold: you had to scroll past a full-size print to get out of it. All three viewers \u2014 ODS drawing, traveller and gage drawing \u2014 now carry a bar across the TOP with the title on the left and the buttons on the right, and the image fills the space beneath (now 86vh instead of 80\u201384vh, since the bar is more compact than the old caption plus button row). CLOSE IS NOW RED (#a02020) in all three, per the standard: a close button reads as a close button. \u2b06 Replace sits beside it in the traveller and gage viewers. Clicking the dark background still closes, as before."] },
   { ts: "2026-07-28", rev: "App Rev-606", type: "App", changes: ["A DELETION CAN NO LONGER ERASE A PLAN THAT IS STILL BEING WORKED ON (Rev-606) \u2014 912767-M was repaired on GitHub at Rev-605 but stayed missing, because the false deletion marker written at 12:14 was still sitting on the device and deletions were absolute: the merge removed any plan whose id matched a marker, no matter how old the marker or how recently the plan had been edited. The drafts merge has always been smarter (\u2018a draft re-saved after its deletion survives\u2019); projects now follow the same rule \u2014 a deletion only wins over a plan older than itself, so a plan edited AFTER the marker was written stays. That closes the whole failure mode, not just this instance: one stale marker can no longer wipe live work off every device. The specific 12:14 marker is also ignored outright, since it came from the false-rename bug fixed at Rev-605 rather than from anyone deleting anything."] },
   { ts: "2026-07-28", rev: "App Rev-605", type: "App", changes: ["THE PLAN-EATING BUG FOUND (Rev-605) \u2014 912767-M kept disappearing and the pencil\u2019s op number would not stick. Cause found in the saved data: a DELETION had been recorded for 912767-M::Rev-1::OP030 at 12:14 today. It was not a mis-click. saveProject carries a rename rule from Rev-336: if the plan\u2019s id changed since it was opened, tombstone the old id so the old name cannot come back. That was written when an id was part::rev. Since per-operation plans the id ALSO carries the op number \u2014 so giving a plan its op number changed its id, the rename rule fired, and the app recorded a deletion OF THE PLAN ITSELF, which then propagated to every device. Three fixes: (1) only a changed PART NUMBER or REV counts as a rename now; an op-number change moves the same plan and never leaves a tombstone. (2) Opening a plan copies its op number and description into the builder, so the builder can no longer hold a blank op while the saved plan has one and compute a different id on the next save. (3) The pencil updates the builder\u2019s record of which saved plan it came from at the same time it changes the id. The lost plan and its false deletion marker were repaired in the synced data."] },
@@ -1966,7 +1967,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:26 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:38 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3929,7 +3930,7 @@ function editProject(idx){
   if(p.opDesc && !cpBuildState.opDesc) cpBuildState.opDesc = p.opDesc;
   _idbAttach(cpBuildState);   // Rev-338: re-attach drawing from IndexedDB
   cpBuildState.srcId = p.id || ((p.partNum||'') + '::' + (p.rev||''));   // Rev-336: remember which saved plan this is, so a part-number change RENAMES it instead of creating a duplicate
-  if(typeof cpBuildState.focusIdx !== 'number') cpBuildState.focusIdx = 0;
+  cpBuildState.focusIdx = -1;   // Rev-608: open with NO row opened up — one is chosen by clicking it
   showCPBuilder();
 }
 
@@ -4966,6 +4967,14 @@ function cpGetStep(){ const s = localStorage.getItem('cpBuildStep'); return CP_S
 function cpSetStep(s){
   if(!CP_STEPS[s]) s = '1';
   localStorage.setItem('cpBuildStep', s);
+  // Rev-608: arriving at a step should show the whole list, not drop you into whichever
+  // row happened to be open last time. Click a row when you want to work on it.
+  try{
+    if(cpBuildState && cpBuildState.focusIdx !== -1){
+      cpBuildState.focusIdx = -1;
+      if(typeof renderCPBuilder === 'function' && document.getElementById('cpBuilderTbody')){ renderCPBuilder(); return; }
+    }
+  }catch(e){}
   cpApplyStepView();
 }
 function cpApplyStepView(){
@@ -5030,7 +5039,8 @@ function renderCPBuilder(){
   document.querySelectorAll('.ctPick').forEach(e => e.remove());   // Rev-270: drop any orphaned control-type panel
   tbody.innerHTML = '';
   const options = getControlTypeOptions();
-  if(typeof cpBuildState.focusIdx !== 'number') cpBuildState.focusIdx = 0;
+  // Rev-608: -1 means NO row is opened up. Only a click opens one.
+  if(typeof cpBuildState.focusIdx !== 'number') cpBuildState.focusIdx = -1;
 
   cpBuildState.rows.forEach((row, idx) => {
     const focused = idx === cpBuildState.focusIdx;
@@ -5111,7 +5121,7 @@ function renderCPBuilder(){
         e.stopPropagation();
         if(!confirm('Delete row ' + (idx+1) + ' (balloon ' + row.bubble + ') from this control plan?')) return;
         cpBuildState.rows.splice(idx, 1);
-        if(cpBuildState.focusIdx >= cpBuildState.rows.length) cpBuildState.focusIdx = Math.max(0, cpBuildState.rows.length - 1);
+        if(cpBuildState.focusIdx >= cpBuildState.rows.length) cpBuildState.focusIdx = -1;   // Rev-608: close, don't jump to another row
         cpPinHidePreview();
         renderCPBuilder();
         if(typeof cpAutoSaveProject === 'function') cpAutoSaveProject();
