@@ -1533,7 +1533,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-628";
+const APP_REV = "Rev-629";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1666,6 +1666,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-629", type: "App", changes: ["BACK GOES ONE STEP BACK (Rev-629) \u2014 leaving a construction step returned to the FULL PARTS LIST, because the handler called showProjects() and that clears the part filter by design (Rev-591 made the screen always open on the parts list). So finishing a step on 1000237620 dumped you at the top level and you had to find the part again \u2014 several times per operation. \u2190 BACK now returns to THAT PART\u2019S OPERATIONS, one level up, exactly where the step was launched from. \u2190 All Parts on that screen is still the way out to the top level."] },
   { ts: "2026-07-28", rev: "App Rev-628", type: "App", changes: ["SMALLER BANNER, ANIMATED BAR (Rev-628) \u2014 the hazard banner was 22px of shouting for a line of text; it is now 15px with finer stripes, and the progress bar dropped from 11px to 7px, so the pair reads as a status strip rather than roadworks. TWO PIECES OF MOTION, both meaning something: the hazard stripes CRAWL along the banner, and a highlight SWEEPS along the filled part of the bar \u2014 but only while the operation is unfinished. A finished operation has no banner and a still bar, so movement on the screen always means work outstanding. The banner wording also moved onto a solid dark chip: white-on-stripes was being read straight off the barber pole and losing, and no amount of text-shadow fixes a background that alternates black and amber every nine pixels. Both animations respect the system reduced-motion setting."] },
   { ts: "2026-07-28", rev: "App Rev-627", type: "App", changes: ["THE BUILD STAMP NOW CORRECTS ITSELF (Rev-627) \u2014 the header read 4:12 PM when it was 1:41 PM. Same cause as Rev-590: BUILD_TIME is typed in by hand at build time, and it was written from estimate rather than read off the clock. Apologising for it once and promising to be careful evidently was not a fix, so the guessing has been removed from the loop. On start-up the app now asks GitHub when index.html was actually committed \u2014 a public read, no token, nothing leaves the device \u2014 and displays THAT time, converted to Eastern, on the badge, the menu card, the header and the footer. The typed-in constant remains only as an offline fallback for a device with no network. The stamp now says when the code you are running was really published, which is the thing worth knowing, and no longer depends on anybody remembering to look at a clock. The constant was also corrected to the true 1:41 PM."] },
   { ts: "2026-07-28", rev: "App Rev-626", type: "App", changes: ["CONSTRUCTION VISUALS STAY IN THE CONSTRUCTION AREA (Rev-626) \u2014 the UNDER CONSTRUCTION banner and the progress bar were spanning the entire table, so they ran straight through the Inspect / Validation / Customer CP / Download / Rename / Delete buttons and under the CP REV figure. Those are not construction: hazard stripes across them read as if the buttons themselves were unavailable, and the wording was being obscured by the buttons in return. The banner and bar now span only the three construction columns \u2014 Operation, Status and Construction Steps \u2014 and stop at the rule before ACTIONS, which stays clear. Rev-623 had used a span of 99 to make the bar full-width; that was the right fix for the bar ending short, but the wrong extent."] },
@@ -2167,7 +2168,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "1:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "2:02 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -15283,9 +15284,16 @@ if($('odsLightboxScroll')) $('odsLightboxScroll').addEventListener('wheel', (e) 
 // Rev-524: SMART BACK — a builder session opened from a SAVED plan returns to the
 // Control Plans list; only a brand-new build returns to the New Control Plan form.
 if($('cpBuilderBack')) $('cpBuilderBack').onclick = () => {
+  // Rev-629: BACK means ONE STEP BACK. It called showProjects(), which clears the part
+  // filter and lands on the full parts list — so leaving a step threw away which part
+  // you were working on and you had to find it again. Return to THAT PART's operations.
   $('cpBuilderScreen').classList.add('hidden');
   const nvb=$('newerVersionBanner'); if(nvb && window._nvbWasVisible) nvb.style.display='flex';
-  if(cpBuildState && cpBuildState.srcId && typeof showProjects === 'function') showProjects();
+  if(cpBuildState && cpBuildState.srcId && typeof showProjects === 'function'){
+    const backTo = String((cpBuildState && cpBuildState.partNum) || '').toUpperCase();
+    showProjects();
+    if(backTo && typeof cpOpenPart === 'function'){ try{ cpOpenPart(backTo); }catch(e){} }
+  }
   else showNewCP();
 };
 // Rev-306: Master List keyword search — filter rows live as you type
