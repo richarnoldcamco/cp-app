@@ -204,7 +204,7 @@
      the job name, so the sequence reads before the wording does */
   .cp-step{ height:46px; border-radius:6px; cursor:pointer; padding:0 14px; font-family:inherit;
     display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
-    white-space:nowrap; transition:filter .12s ease; }
+    white-space:nowrap; overflow:hidden; flex:0 0 auto; transition:filter .12s ease; }
   .cp-step:hover:not(:disabled){ filter:brightness(1.08); }
   .cp-step:disabled{ opacity:.45; cursor:not-allowed; }
   .cp-step .cp-step-n{ font-size:9px; font-weight:800; letter-spacing:.14em; opacity:.75; line-height:1; }
@@ -1497,7 +1497,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-621";
+const APP_REV = "Rev-622";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1511,6 +1511,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-622", type: "App", changes: ["STEP BUTTONS STOP OVERLAPPING (Rev-622) \u2014 with the five steps finally on one line, ASSIGN CONTROL TYPES and ASSIGN MEASUREMENT TYPES were printing over each other: every button was pinned to a fixed 138px, which the longer labels simply do not fit in, so the text spilled straight out of its own button and over the next one. Width now FOLLOWS THE WORDS with a 132px floor, so short steps stay a sensible size and long ones get the room they need. The buttons are also told not to shrink and to clip rather than spill, so no future label can leak across a neighbour. ALSO ASKED: the ODS step has not gone \u2014 it is STEP 2 \u00b7 UPLOAD ODS. The separate ODS DRAWING column was removed at Rev-620 because Step 2 does that job; click Step 2 to view or replace the drawing."] },
   { ts: "2026-07-28", rev: "App Rev-621", type: "App", changes: ["STEPS GO HORIZONTAL, SCREEN GOES FULL WIDTH (Rev-621) \u2014 the five construction steps were still stacking into a vertical tower. Two causes, both fixed. (1) THE SCREEN was a centred column: the Control Plans list was never given the wide class at all, so it sat at 1100px while everything was being asked to fit inside it. It now uses the FULL width of the monitor, like the Master List and the builder already do. (2) THE STEPS CELL was free to wrap: the flex row still carried wrap:wrap, left over from when the progress bar was a child of the same row \u2014 the bar has had its own row since Rev-620, so the wrap was doing nothing but breaking the buttons onto separate lines. The steps cell is now no-wrap and sized to its content, and the actions cell is no-wrap too, so neither band can be squeezed into stacking again."] },
   { ts: "2026-07-28", rev: "App Rev-620", type: "App", changes: ["PROGRESS TRACK RUNS THE FULL LINE (Rev-620) \u2014 three fixes to the five-step row. (1) THE BAR STARTS UNDER THE OP # and runs the whole width: it now sits on its OWN row directly beneath the operation instead of being boxed inside the Construction Steps column. (2) THE ODS DRAWING COLUMN IS GONE \u2014 Step 2 IS the ODS drawing, so a separate column for it was the same thing said twice, and losing it gives the five step buttons the width to sit in ONE ROW instead of stacking into a tower. (3) A LATER STEP CAN NO LONGER READ DONE WHILE AN EARLIER ONE IS NOT: Step 5 was announcing \u2713 DONE while Step 4 still said DO THIS NEXT, because the methods band fills itself from the Master List \u2014 true of the cells, nonsense as a sequence. A step now shows DONE only when everything before it is done as well."] },
   { ts: "2026-07-28", rev: "App Rev-619", type: "App", changes: ["FIVE CONSTRUCTION STEPS ON ONE TRACK (Rev-619) \u2014 the three build steps were only part of the job: an operation is not usable until it has been NUMBERED and has its ODS DRAWING loaded, and both of those were being done somewhere else entirely, so the row could read 74% while having no drawing at all. All five now sit in order in ONE ROW with the progress bar running underneath: 1 EDIT OP # \u00b7 2 UPLOAD ODS \u00b7 3 ASSIGN BUBBLES \u00b7 4 ASSIGN CONTROL TYPES \u00b7 5 ASSIGN MEASUREMENT TYPES. Each is gated on the one before \u2014 no ODS until the operation is numbered, no ballooning until the ODS is loaded \u2014 and each opens the right screen: step 1 the operation window, step 2 the ODS capture screen (browse, drag or Ctrl+V, any PDF), steps 3\u20135 the builder at that step. STEP 2 IS NEW WORK, not a relabel: the ODS drawing can now be loaded or replaced for an existing operation straight from this list, which previously meant rebuilding the plan. The bar has five segments and the percentage counts all five \u2014 the two setup stages all-or-nothing, the three build steps by their own row counts."] },
@@ -2005,7 +2006,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:54 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:14 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3312,8 +3313,11 @@ function renderProjects(){
       const mkStep = (n, title, state, tip, fn) => {
         const b = document.createElement('button');
         b.className = 'cp-step cp-step-' + state;
-        b.style.width = '138px';
-        b.style.padding = '0 8px';
+        // Rev-622: a FIXED 138px could not hold ASSIGN MEASUREMENT TYPES, so the label
+        // spilled out of its own button and printed over the one beside it. Width now
+        // follows the words, with a floor so short steps do not look stunted.
+        b.style.minWidth = '132px';
+        b.style.padding = '0 12px';
         b.title = tip;
         const l1 = document.createElement('span');
         l1.className = 'cp-step-n';
@@ -3325,6 +3329,7 @@ function renderProjects(){
         const l2 = document.createElement('span');
         l2.className = 'cp-step-t';
         l2.style.fontSize = '11px';
+        l2.style.whiteSpace = 'nowrap';
         l2.textContent = title;
         b.appendChild(l1); b.appendChild(l2);
         if(state === 'lock' || !has) b.disabled = true; else b.onclick = fn;
