@@ -1558,7 +1558,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-663";
+const APP_REV = "Rev-664";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1691,6 +1691,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-664", type: "App", changes: ["PASS MEANS PASS (Rev-664) \u2014 \u2018PASS \u2014 WITH NOTES\u2019 read as a qualified pass, which is a fail with manners. It is not: a note is something worth knowing that costs nothing, and using it to hedge the verdict makes you distrust a green banner. The banner now says PASS, in green, whenever there is nothing blocking \u2014 with or without notes \u2014 and DO NOT MOVE YET in red when there is. Notes are counted separately beside it rather than folded into the verdict: \u20180 blockers / 2 notes\u2019, which also replaces the old \u2018n of 9 checks passed\u2019 score that had been treating every note as a failed check. The sub-line spells out the consequence either way \u2014 \u2018Safe to move. 2 notes below \u2014 worth reading, but nothing that loses work\u2019, or \u2018Fix the 1 blocker below, then run the check again\u2019. The copied report and the report footer use the same wording."] },
   { ts: "2026-07-28", rev: "App Rev-663", type: "App", changes: ["THE CHECK NOW SAYS PASS OR DO NOT MOVE YET (Rev-663) \u2014 step 1 answered the one question it exists to answer \u2014 is this machine safe to leave \u2014 with a sentence set in the same weight as everything else, so the answer had to be inferred from the wording. It now leads with a BANNER: a large \u2713 or \u2717, the word PASS, PASS \u2014 WITH NOTES, or DO NOT MOVE YET, a plain line saying what that means for you, and the score (\u20188 of 9 checks passed\u2019) so a silently skipped check cannot hide. Green for a clean pass, amber for pass-with-notes, red for stop \u2014 and the amber case says outright that the notes will not lose any work, because \u2018READY WITH NOTES\u2019 read like a warning when it is not one. The copied report gets the same headline so it is unambiguous when pasted into a chat."] },
   { ts: "2026-07-28", rev: "App Rev-662", type: "App", changes: ["HANDOFF CHECK WAS READING THE WRONG AI KEY (Rev-662) \u2014 the AI KEY check looked in localStorage for \u2018anthropicKey\u2019 or \u2018aiKey\u2019. The app has never written either: it stores the key as \u2018anthropicApiKey\u2019. So the check reported \u2018none stored \u2014 AI Propose Types will not run\u2019 no matter how many keys were saved, on every machine, forever. A check reading the wrong key is worse than no check at all \u2014 it trains you to ignore a warning that is always present, and the next time it means something you will scroll past it. Now reads the key the app actually uses, with the two old names kept as fallbacks, and reports its length so \u2018present\u2019 is evidence rather than a claim. The other warning on that panel \u2014 UNISSUED CP REVS on 1000237620 OP-030 \u2014 is correct: that plan has auto-saved edits past its last Save to Project, exactly as the \u25cf beside its rev has been showing."] },
   { ts: "2026-07-28", rev: "App Rev-661", type: "App", changes: ["TWO BUTTONS, SAME NAME \u2014 FIXED, AND AN EMPTY PUSH RECOVERED (Rev-661) \u2014 pressing \ud83d\udcac New Chat Prompt showed the old plain text box and none of the new steps: Rev-660 put its wizard button in the HEADER while the original sat on the HOME SCREEN, still wired to the old modal. Two buttons, same label, different behaviour \u2014 the same confusion as the twin \u2018add new\u2019 lists earlier today. The HOME button now opens the wizard, since that is the one actually pressed, and the duplicate header button was REMOVED rather than left as a second door to the same room. \u2713 HANDOFF CHECK stays in the header; it does a different job. The raw prompt text is still reachable from step 2 via SEE THE TEXT. ALSO: the previous build attempt shipped an EMPTY index.html \u2014 the packaging step opened its payload file for writing BEFORE reading the source, so when the source read failed it left a zero-byte payload and pushed that over the live site, taking the app down. Recovered by rolling FORWARD as the standing rule requires. The payload is now size-checked before any push can run."] },
@@ -2227,7 +2228,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:44 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:56 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -15318,9 +15319,10 @@ async function hcRunChecks(){
 function hcVerdict(R){
   const bad = R.filter(x => x.ok === false).length;
   const warn = R.filter(x => x.ok === 'warn').length;
-  return bad ? 'NOT READY — fix the ✗ items before moving.'
-       : warn ? 'READY WITH NOTES — the ⚠ items are worth a look but will not lose data.'
-              : 'READY — everything on this machine checks out.';
+  // Rev-664: pass is pass. Notes are counted, not used to qualify the verdict.
+  return bad ? ('DO NOT MOVE YET — ' + bad + ' blocker' + (bad === 1 ? '' : 's') + ' to fix first.')
+       : warn ? ('PASS — safe to move. ' + warn + ' note' + (warn === 1 ? '' : 's') + ' worth reading; none of them lose work.')
+              : 'PASS — everything on this machine checks out.';
 }
 function hcReportText(R){
   const mark = x => x.ok === true ? '✓' : x.ok === 'warn' ? '⚠' : '✗';
@@ -15329,7 +15331,7 @@ function hcReportText(R){
     + R.map(x => mark(x) + '  ' + x.name.padEnd(20) + ' ' + x.note).join('\n')
     + '\n' + '='.repeat(66) + '\n'
     + (R.filter(x => x.ok === false).length ? '*** DO NOT MOVE YET ***  ' : '*** PASS ***  ')
-    + R.filter(x => x.ok === true).length + ' of ' + R.length + ' checks passed\n'
+    + R.filter(x => x.ok === false).length + ' blocker(s), ' + R.filter(x => x.ok === 'warn').length + ' note(s)\n'
     + hcVerdict(R) + '\n\n'
     + 'The machine is only half the job. The other half is proving the NEW chat\n'
     + 'actually received the prompt. Paste it the quiz; the right answers are:\n'
@@ -15415,14 +15417,17 @@ function hcRenderStep(){
       const bad = _hcResult.filter(x => x.ok === false);
       const warn = _hcResult.filter(x => x.ok === 'warn');
       const pass = _hcResult.filter(x => x.ok === true).length;
+      // Rev-664: the verdict is PASS or it is not — ‘PASS — WITH NOTES’ reads like a
+      // qualified pass, i.e. a fail with manners. Notes are not failures: they are things
+      // worth knowing that cost nothing. So the banner says PASS, in green, either way,
+      // and the notes are counted separately beside it.
       const head = bad.length
         ? { icon: '\u2717', word: 'DO NOT MOVE YET', bg: '#fdecea', bd: '#c0392b', fg: '#8e2019',
-            sub: 'Fix the \u2717 item' + (bad.length > 1 ? 's' : '') + ' below, then run the check again.' }
-        : warn.length
-          ? { icon: '\u2713', word: 'PASS \u2014 WITH NOTES', bg: '#fdf4e0', bd: '#e6a817', fg: '#6b5314',
-              sub: 'Safe to move. The \u26a0 notes below will not lose any work.' }
-          : { icon: '\u2713', word: 'PASS', bg: '#dcecdf', bd: '#2c6e49', fg: '#1f5133',
-              sub: 'Safe to move \u2014 everything on this machine checks out.' };
+            sub: 'Fix the ' + bad.length + ' blocker' + (bad.length > 1 ? 's' : '') + ' below, then run the check again.' }
+        : { icon: '\u2713', word: 'PASS', bg: '#dcecdf', bd: '#2c6e49', fg: '#1f5133',
+            sub: warn.length
+              ? ('Safe to move. ' + warn.length + ' note' + (warn.length > 1 ? 's' : '') + ' below \u2014 worth reading, but nothing that loses work.')
+              : 'Safe to move \u2014 everything on this machine checks out.' };
       html = H('MACHINE CHECK — AUTOMATIC')
         + '<div style="display:flex; align-items:center; gap:14px; background:' + head.bg + '; border:2px solid ' + head.bd
           + '; border-radius:8px; padding:12px 14px; margin-bottom:10px;">'
@@ -15432,7 +15437,8 @@ function hcRenderStep(){
             + '<div style="font-size:12px; color:' + head.fg + ';">' + head.sub + '</div>'
           + '</div>'
           + '<div style="text-align:right; font-size:12px; font-weight:700; color:' + head.fg + '; white-space:nowrap;">'
-            + pass + ' of ' + _hcResult.length + ' checks<br>passed</div>'
+            + '<span style="font-size:15px;">' + bad.length + '</span> blocker' + (bad.length === 1 ? '' : 's')
+            + '<br><span style="font-size:15px;">' + warn.length + '</span> note' + (warn.length === 1 ? '' : 's') + '</div>'
         + '</div>'
         + (bad.concat(warn).length ? '<ul style="margin:6px 0 10px 18px;">' + bad.concat(warn).map(x => '<li>' + (x.ok === false ? '✗' : '⚠') + ' <b>' + x.name + '</b> — ' + x.note + '</li>').join('') + '</ul>' : '')
         + '<button id="hcFull" class="cp-btn cp-btn-quiet" style="width:150px;">Full report</button>';
