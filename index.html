@@ -1533,7 +1533,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-633";
+const APP_REV = "Rev-634";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1666,6 +1666,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-634", type: "App", changes: ["PERCENTAGE NOW REFLECTS THE WORK (Rev-634) \u2014 an operation with Step 4 barely started and Step 5 untouched was reading 84% complete. Two faults, both flattering the figure. (1) EVERY STAGE WAS WORTH A FLAT 20%. Typing an op number and loading a drawing are two clicks; ballooning fourteen features, choosing fourteen control types and settling fourteen measurement methods is the actual job \u2014 yet those two clicks carried 40% of the plan. Weighting is now 5 / 5 / 30 / 30 / 30. (2) A LOCKED STAGE STILL SCORED: the methods band auto-fills from the Master List as soon as a control type lands, so Step 5 was banking credit for rows whose control types had not been chosen. Work that cannot be started yet is not work done \u2014 a locked stage now counts zero. The same operation now reads about 46%, which matches what is actually finished."] },
   { ts: "2026-07-28", rev: "App Rev-633", type: "App", changes: ["ACTION LOG NOW RECORDS THE EVENTS THAT EXPLAIN A FAULT (Rev-633) \u2014 clicks and screens alone say what was pressed, not what the app then did with it. Six app-level events are now logged by name: OPEN-PLAN and SAVE-PLAN (part, op, id and row count), STEP (which construction step was opened), PUSH (a data push starting), DELETE-PLAN (a plan deleted by hand), and TOMBSTONE \u2014 a deletion marker written by the rename path, which is precisely the line that would have identified the Rev-605 plan-eating bug in seconds instead of hours. Part number and operation ARE included on these entries, because without them the log cannot say WHICH plan vanished; tolerances, feature descriptions and gage notes are still never recorded, and nothing is transmitted \u2014 the log leaves the device only when the user copies it out."] },
   { ts: "2026-07-28", rev: "App Rev-632", type: "App", changes: ["OPERATION ROWS INDENTED FURTHER (Rev-632) \u2014 the op line was set in 34px from the left, which at the new 19px part-number size left OP-030 sitting almost level with the part it belongs to. Indent increased by 0.35in to 68px, so an operation reads plainly as a child of its part. Applies to numbered operations and to the \u21b3 (no op number) rows alike."] },
   { ts: "2026-07-28", rev: "App Rev-631", type: "App", changes: ["CONSTRUCTION VISUALS CONFINED TO THE CONSTRUCTION COLUMN (Rev-631) \u2014 Rev-626 pulled the hazard banner and progress bar off the Actions side, but they still ran under OPERATION and STATUS, so the stripes crossed the op number and its status pill. Neither of those is construction either. The banner and bar now sit under the CONSTRUCTION STEPS column alone, between the two rules, lining up exactly with the five step buttons they describe."] },
@@ -2172,7 +2173,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:44 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "2:56 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3171,13 +3172,27 @@ function cpOpStages(p){
   ].join(' \u00b7 ');
   return { s1, s2, s3, s4, s5, labelSummary };
 }
-// Rev-619: percentage across all FIVE stages. The two setup stages are all-or-nothing;
-// the three build steps count their own rows, so the bar creeps as work is done rather
-// than jumping in lurches.
+// Rev-634: percentage that reflects the WORK, not the step count. Two faults in the
+// old sum, both of which flattered the figure:
+//   1. Every stage was worth a flat 20%. Typing an op number and loading a drawing are
+//      two clicks; ballooning fourteen features and choosing fourteen control types is
+//      the actual job. Those two clicks were carrying 40% of the plan.
+//   2. A LOCKED stage still scored, because the methods band auto-fills from the Master
+//      List the moment a control type lands — so Step 5 was banking credit for rows
+//      whose control types had not been chosen yet. Work that cannot be started yet is
+//      not work done: a locked stage now counts ZERO.
+const CP_STAGE_WEIGHTS = { s1: 5, s2: 5, s3: 30, s4: 30, s5: 30 };   // sums to 100
 function cpPlanPercent(p){
   const st = cpOpStages(p);
-  const share = (s) => { if(s.done) return 1; if(!s.total) return 0; return Math.max(0, Math.min(1, (s.total - s.left) / s.total)); };
-  return Math.round((share(st.s1) + share(st.s2) + share(st.s3) + share(st.s4) + share(st.s5)) / 5 * 100);
+  let pct = 0;
+  ['s1','s2','s3','s4','s5'].forEach(k => {
+    const s = st[k], w = CP_STAGE_WEIGHTS[k];
+    if(!s || !s.open) return;                 // locked: earns nothing
+    if(s.done){ pct += w; return; }
+    if(!s.total) return;
+    pct += w * Math.max(0, Math.min(1, (s.total - s.left) / s.total));
+  });
+  return Math.round(pct);
 }
 // Load (or replace) the ODS drawing for one operation, from the Control Plans list
 function cpUploadOpOds(p){
