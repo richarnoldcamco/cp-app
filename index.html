@@ -810,6 +810,8 @@
 
   <div style="display:flex; gap:8px; margin-bottom:8px; align-items:center; flex-wrap:wrap;">
     <button class="btn-ghost" id="masterAddRowBtn" style="padding:6px 12px; font-size:12px; min-height:34px; background:#1e8449; color:#fff; border:1px solid #196f3d; font-weight:700;">➕ Add Row</button>
+    <!-- Rev-617: edits already auto-save to the device; this closes the open row and PUSHES -->
+    <button class="btn-ghost" id="masterSaveBtn" title="Close the row being edited, save the Master List and push it to GitHub" style="padding:6px 12px; font-size:12px; min-height:34px; background:#2c6e49; color:#fff; border:1px solid #24593b; font-weight:700;">💾 Save Changes</button>
     <button class="btn-ghost" id="masterLevelsBtn" onclick="openLevelManager()" style="padding:6px 14px; font-size:12px; min-height:34px; background:#1a5276; color:#fff; border:1px solid #154360;">✏️ Edit Dropdown Values</button>
     <button class="btn-ghost" id="masterTallyBtn" onclick="toggleFeatureTypeTally()" style="padding:6px 12px; font-size:12px; min-height:34px; background:#5b2c83; color:#fff; border:1px solid #47216a; font-weight:600;" title="Live count of rows per Feature Type — auto-refreshes every 60s and flags case-variant duplicates">📊 Feature Type Tally</button>
     <input type="text" id="masterSearchBox" autocomplete="off" placeholder="🔍  Search all columns…" title="Type a keyword to show only rows that contain it (searches every column)" style="padding:6px 12px; font-size:12px; min-height:34px; border:1px solid var(--line); border-radius:6px; min-width:240px; outline:none;">
@@ -1478,7 +1480,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-616";
+const APP_REV = "Rev-617";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1492,6 +1494,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-617", type: "App", changes: ["\ud83d\udcbe SAVE CHANGES ON THE MASTER LIST (Rev-617) \u2014 Master List edits have always written to the device as they were made, so nothing was ever at risk, but there was no way to say \u2018I am done\u2019 and no confirmation that the change had reached GitHub \u2014 you had to take it on trust. A Save Changes button now sits beside \u2795 Add Row: it closes whatever row is open (so a half-finished edit is committed rather than abandoned), writes the list, redraws, and pushes to GitHub, then reports which of those actually happened \u2014 saved and pushed with the control-type count, saved but the push FAILED, or saved on this device only because GitHub is not set up here. The button does not replace auto-save; it makes the state visible."] },
   { ts: "2026-07-28", rev: "App Rev-616", type: "App", changes: ["MASTER LIST EDIT ROW BROUGHT BACK DOWN TO SIZE (Rev-616) \u2014 the row being edited had been deliberately enlarged by 50% (12px cell padding, 9px input padding, 14px text, 90px minimum field width) and ended up towering over the grid it sits inside, pushing the tolerance-band columns wide and making the whole screen look coarse. Cell padding 12\u21923px, input padding 9\u21924px, text 14\u219212px, and the 90px minimum field width removed so narrow columns like the tolerance bands stay narrow. The \u2716 cancel button and its auto-saves note were scaled to match, and the \u25be caret moved in to suit the shorter box. The edit row is now the height of a normal row instead of three of them."] },
   { ts: "2026-07-28", rev: "App Rev-615", type: "App", changes: ["MASTER LIST VALUE LISTS OPEN ON THE FIRST CLICK (Rev-615) \u2014 on Workcenter, Feature Type, 2nd Level and 3rd Level (and every other value field on the Master List) the list of existing values opened ONLY from the small \u25be caret at the right-hand edge of the box. Clicking the field itself did nothing but place the cursor, so it took two clicks and the field looked broken. Focusing or clicking the field now opens the list immediately; the caret and the Down-arrow key still work. The click-away handler was taught to ignore clicks on the field itself, which would otherwise have closed the list at the very moment it opened."] },
   { ts: "2026-07-28", rev: "App Rev-614", type: "App", changes: ["PICK A CONTROL TYPE BY NARROWING IT DOWN (Rev-614) \u2014 choosing a control type meant scanning one long list of 65, which is the wrong shape for the job. The Master List is already organised WORKCENTER \u2192 FEATURE TYPE \u2192 2ND LEVEL \u2192 3RD LEVEL, so those four are now COLUMNS on the builder, sitting right after Control Type ID and shown in Step 2. On the open row they are live pickers; setting any of them cuts the Control Type list to what actually fits, on top of the existing Size / Tol bands. Each picker only offers values that still exist after the ones above it, so no combination can be chosen that matches nothing, and changing a level clears the levels below it rather than leaving a stale contradiction. On a closed row the four columns show the Master List values behind whatever control type that row is using \u2014 so the whole grid can be read at a glance to see what kind of control each balloon carries. The step column maps and the header band spans were re-numbered for the four new columns (data columns now run 0\u201320)."] },
@@ -1981,7 +1984,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:46 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:58 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2694,6 +2697,30 @@ function cpMigrateWorkcenterNames(){
 }
 try{ localStorage.removeItem('cpWcRename_v1'); }catch(e){}   // Rev-613: the flag is gone
 try{ cpMigrateWorkcenterNames(); }catch(e){}
+// ===== Rev-617: SAVE CHANGES on the Master List =================================
+// Edits already write to the device as they are made, so nothing was ever lost — but
+// there was no way to say "I am done" and no confirmation that the change had reached
+// GitHub. This closes whatever row is open, writes the list, and pushes, telling you
+// which of those happened.
+function cpMasterSaveChanges(){
+  let closed = false;
+  try{
+    if(document.getElementById('inline_h') && typeof saveInlineEdit === 'function'){ saveInlineEdit(); closed = true; }
+  }catch(e){}
+  let rows = 0;
+  try{ rows = (JSON.parse(localStorage.getItem('masterList') || '[]') || []).length; }catch(e){}
+  try{ if(typeof renderMasterList === 'function') renderMasterList(); }catch(e){}
+  if(typeof ghConfigured === 'function' && ghConfigured()){
+    flash('Saving ' + rows + ' control types\u2026');
+    Promise.resolve()
+      .then(() => ghPush(true))
+      .then(() => flash('\u2713 Master List saved and pushed to GitHub \u2014 ' + rows + ' control types'
+        + (closed ? ' (open row closed first)' : '') + '.'))
+      .catch(() => flash('Saved on this device, but the push to GitHub FAILED \u2014 use Admin \u2192 Push Data.', true));
+  } else {
+    flash('\u2713 Saved on this device \u2014 ' + rows + ' control types. GitHub is not set up here, so it is not shared yet.', true);
+  }
+}
 // ===== Rev-614: NARROW A CONTROL TYPE BY THE MASTER LIST'S OWN LEVELS ============
 // Picking a control type meant scanning one long list. The Master List is already
 // organised Workcenter -> Feature Type -> 2nd Level -> 3rd Level, so those four are now
@@ -14798,6 +14825,7 @@ if($('cpWorkcenter')) $('cpWorkcenter').addEventListener('input', updateEditExis
 if($('mSaveApp')) $('mSaveApp').onclick = saveThisApp;
 try{   // Rev-521: boot-tail guard — any failure below REPORTS itself instead of silently dying
 $('mProjects').onclick = showProjects;
+if($('masterSaveBtn')) $('masterSaveBtn').onclick = cpMasterSaveChanges;   // Rev-617
 if($('mGages')) $('mGages').onclick = showGages;
 if($('gagesBack')) $('gagesBack').onclick = showMenu;
 if($('gagesRefresh')) $('gagesRefresh').onclick = renderGages;
