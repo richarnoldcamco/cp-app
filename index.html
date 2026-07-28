@@ -649,6 +649,12 @@
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:50px;">Bubble #</th>
             <th rowspan="2" style="padding:2px; border:1px solid #5a8bb5; width:22px;" title="Green dot = this balloon's position is pinned on the drawing (zoom-to-bubble works)">📍</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:260px;">Control Type ID</th>
+            <!-- Rev-614: the four Master List levels, so a control type can be narrowed down
+                 the same way the Master List is organised instead of hunted in one long list -->
+            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:110px;">Workcenter</th>
+            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:110px;">Feature Type</th>
+            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:100px;">2nd Level</th>
+            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:100px;">3rd Level</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:180px;">Proposed<br><span style="font-weight:400; font-size:9px;">(best match — ✓ to use)</span></th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:180px;">Feature / Process Description</th>
             <!-- Rev-207: Process Step / Operation ID# / Machine / Process columns hidden on-screen; values still fill the xlsx per CP-2 -->
@@ -1472,7 +1478,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-613";
+const APP_REV = "Rev-614";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1486,6 +1492,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-614", type: "App", changes: ["PICK A CONTROL TYPE BY NARROWING IT DOWN (Rev-614) \u2014 choosing a control type meant scanning one long list of 65, which is the wrong shape for the job. The Master List is already organised WORKCENTER \u2192 FEATURE TYPE \u2192 2ND LEVEL \u2192 3RD LEVEL, so those four are now COLUMNS on the builder, sitting right after Control Type ID and shown in Step 2. On the open row they are live pickers; setting any of them cuts the Control Type list to what actually fits, on top of the existing Size / Tol bands. Each picker only offers values that still exist after the ones above it, so no combination can be chosen that matches nothing, and changing a level clears the levels below it rather than leaving a stale contradiction. On a closed row the four columns show the Master List values behind whatever control type that row is using \u2014 so the whole grid can be read at a glance to see what kind of control each balloon carries. The step column maps and the header band spans were re-numbered for the four new columns (data columns now run 0\u201320)."] },
   { ts: "2026-07-28", rev: "App Rev-613", type: "App", changes: ["HARDINGE LATHE RENAME MADE TO STICK (Rev-613) \u2014 the rename ran at Rev-609, set a run-once flag, and then a GitHub pull brought the old Master List straight back \u2014 incoming always wins on a pull \u2014 while the flag stopped the sweep ever running again. So the old name reappeared and stayed, and the Rev-610 plan sweep never ran either, because it was guarded by the same spent flag. THE FLAG IS GONE. The sweep is idempotent and now runs on EVERY start-up, after EVERY data pull, and again whenever the Master List screen is drawn. It costs nothing when there is nothing to change and pushes only when it actually changed something, so however stale the data arriving from GitHub is, it corrects itself instead of depending on one lucky moment. Matching also normalises whitespace, so HARDINGE\u2007\u2007LATHE with a double space is caught too. The old flag is deleted on start-up so no device is left half-applied."] },
   { ts: "2026-07-28", rev: "App Rev-612", type: "App", changes: ["EDIT A PART NUMBER FROM THE PARTS LIST (Rev-612) \u2014 renaming lived only on an operation row and touched only THAT plan, so a part with three operations had to be renamed three times and sat inconsistent in between. A \u270f\ufe0f now sits beside every part number on the parts list and renames the part in ONE action: every operation plan, the gages keyed to those operations (and their drawings), the stored ODS drawings, the traveller, and the part\u2019s own record all move to the new name. Proper window rather than browser prompts \u2014 part number and rev side by side in mandatory yellow, red Close in the title bar, Enter saves, Esc cancels, and a clash with an existing part is reported in the window instead of thrown away. Each renamed plan gets a fresh updated stamp so the Rev-606 rule protects it. FIX ALONGSIDE: the per-plan Rename built its new id WITHOUT the operation number, so a renamed plan silently lost its per-operation identity and could collide with another op of the same part; it now keeps the op in the key."] },
   { ts: "2026-07-28", rev: "App Rev-611", type: "App", changes: ["PART NUMBERS BLACK, BOLD AND BIGGER (Rev-611) \u2014 part numbers were dark red at 14\u201316px, which on a shop screen sat back rather than leading. They now read BLACK, weight 800, at 19px in all three places they appear: the parts list, the breadcrumb above an opened part, and the part header bar over its operations. The part number is the first thing anyone looks for on this screen, so it should be the loudest thing on it; the dark red is kept for headings, where it belongs."] },
@@ -1972,7 +1979,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:52 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:14 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2685,6 +2692,82 @@ function cpMigrateWorkcenterNames(){
 }
 try{ localStorage.removeItem('cpWcRename_v1'); }catch(e){}   // Rev-613: the flag is gone
 try{ cpMigrateWorkcenterNames(); }catch(e){}
+// ===== Rev-614: NARROW A CONTROL TYPE BY THE MASTER LIST'S OWN LEVELS ============
+// Picking a control type meant scanning one long list. The Master List is already
+// organised Workcenter -> Feature Type -> 2nd Level -> 3rd Level, so those four are now
+// columns on the builder: set them on a row and the control type list is cut to what
+// actually fits. Each picker only offers values that still exist after the ones above
+// it, so no combination can be chosen that matches nothing.
+const CP_LEVELS = [
+  { key: 'lvWc',  field: 'workcenter',  label: 'Workcenter' },
+  { key: 'lvFt',  field: 'featureType', label: 'Feature Type' },
+  { key: 'lvL2',  field: 'secondLevel', label: '2nd Level' },
+  { key: 'lvL3',  field: 'thirdLevel',  label: '3rd Level' }
+];
+function cpLvNorm(v){ return String(v == null ? '' : v).replace(/\s+/g, ' ').trim().toUpperCase(); }
+function cpLevelMatch(row, mrow, upto){
+  const n = (typeof upto === 'number') ? upto : CP_LEVELS.length;
+  for(let i = 0; i < n; i++){
+    const L = CP_LEVELS[i];
+    const want = cpLvNorm(row[L.key]);
+    if(!want) continue;
+    if(cpLvNorm(mrow[L.field]) !== want) return false;
+  }
+  return true;
+}
+// the master row behind whatever control type this row is using
+function cpMasterRowFor(row){
+  try{
+    const id = String(row.controlTypeId || '').trim();
+    if(!id) return null;
+    return getMasterData().find(r => String(r.controlTypeId || '').trim() === id) || null;
+  }catch(e){ return null; }
+}
+function cpLevelCell(idx, row, li, focused){
+  const L = CP_LEVELS[li];
+  const td = document.createElement('td');
+  td.style.cssText = 'padding:4px; border:1px solid var(--line); font-size:11px; text-align:center; vertical-align:middle;';
+  if(!focused){
+    // a row that already has a control type shows the master's values, greyed
+    const m = cpMasterRowFor(row);
+    const v = m ? String(m[L.field] || '') : String(row[L.key] || '');
+    td.textContent = v;
+    if(!m && v) td.style.color = '#8a8279';
+    if(!v) td.style.color = '#c2b9ab';
+    return td;
+  }
+  const sel = document.createElement('select');
+  sel.title = L.label + ' — narrows the Control Type list';
+  sel.style.cssText = 'width:100%; font-size:11px; padding:5px 4px; border:1px solid var(--line); border-radius:4px; background:#FFFDE0; text-transform:none;';
+  let opts = [];
+  try{
+    const seen = {};
+    getMasterData().forEach(r => {
+      if(!String(r.controlTypeId || '').trim()) return;
+      if(!cpLevelMatch(row, r, li)) return;          // only what survives the levels above
+      const v = String(r[L.field] || '').trim();
+      if(!v) return;
+      const k = cpLvNorm(v);
+      if(!seen[k]){ seen[k] = true; opts.push(v); }
+    });
+  }catch(e){}
+  opts.sort((a, b) => a.localeCompare(b));
+  const mk = (v, label) => { const o = document.createElement('option'); o.value = v; o.textContent = label; return o; };
+  sel.appendChild(mk('', L.label.toUpperCase() + ': any'));
+  opts.forEach(v => sel.appendChild(mk(v, v)));
+  const cur = String(row[L.key] || '');
+  if(cur && !opts.some(v => cpLvNorm(v) === cpLvNorm(cur))) sel.appendChild(mk(cur, cur + ' (no match)'));
+  sel.value = cur;
+  sel.onchange = () => {
+    row[L.key] = sel.value;
+    // clearing or changing a level invalidates the ones below it
+    for(let j = li + 1; j < CP_LEVELS.length; j++) row[CP_LEVELS[j].key] = '';
+    renderCPBuilder();
+    try{ cpAutoSaveProject(); }catch(e){}
+  };
+  td.appendChild(sel);
+  return td;
+}
 // ===== Rev-612: RENAME A PART, ACROSS ALL ITS OPERATIONS =========================
 // Rename lived only on an operation row and only touched THAT plan, so a part with
 // three operations had to be renamed three times and was inconsistent in between.
@@ -5159,15 +5242,20 @@ function reflectUnderConstruction(){
 //  6 Spec/Tol  7 Upper  8 Lower  9 Class  10 Meas(Machinist)  11 #Recorded  12 FREQ(Every)
 //  13 FREQ(QE)  14 Meas(CMM)  15 Special Gage  16 Reaction Plan
 const CP_STEPS = {
+  // Rev-614: four Master List level columns inserted at 4\u20137, everything after shifts by four.
+  //  0 Doc#  1 Bubble#  2 pin  3 Control Type ID  4 Workcenter  5 Feature Type  6 2nd Level
+  //  7 3rd Level  8 Proposed  9 Feature/Process Description  10 Spec/Tol  11 Upper  12 Lower
+  //  13 Class  14 Meas(Machinist)  15 #Rec  16 FREQ(Every)  17 FREQ(QE)  18 Meas(CMM)
+  //  19 Special Gage  20 Reaction Plan
   '1': { label: '1 \u00b7 Bubble Numbers',
          hint: 'Give every ODS balloon its row, then pin each one on the drawing \u2014 the step is done when every row shows a green dot.',
-         cols: [0,1,2,5,6,7,8,9] },
+         cols: [0,1,2,9,10,11,12,13] },
   '2': { label: '2 \u00b7 Control Type',
-         hint: 'Pick the Control Type for each balloon. The methods fill themselves from the Master List.',
-         cols: [0,1,2,3,4,5,6,9] },
+         hint: 'Narrow it down with Workcenter \u2192 Feature Type \u2192 2nd / 3rd Level, then pick the Control Type. The methods fill themselves from the Master List.',
+         cols: [0,1,2,3,4,5,6,7,8,9,10,13] },
   '3': { label: '3 \u00b7 Measurement Methods',
          hint: 'Review what the master filled in, set any special gage, and confirm the reaction plan.',
-         cols: [0,1,3,5,6,9,10,11,12,13,14,15,16] },
+         cols: [0,1,3,9,10,13,14,15,16,17,18,19,20] },
   'A': { label: 'All columns',
          hint: 'Every column at once \u2014 the old single-screen view.',
          cols: null }
@@ -5212,19 +5300,19 @@ function cpApplyStepView(){
   const head = table.tHead;
   if(head && head.rows[0]){
     const r0 = head.rows[0].cells;
-    const topMap = [0,1,2,3,4,5,6,7,8,9];          // cell index -> data column
+    const topMap = [0,1,2,3,4,5,6,7,8,9,10,11,12,13];   // Rev-614: cell index -> data column
     for(let c = 0; c < topMap.length && c < r0.length; c++) r0[c].style.display = show(topMap[c]) ? '' : 'none';
-    const methodCols = [10,11,12,13,14].filter(show).length;
-    if(r0[10]){
-      r0[10].style.display = methodCols ? '' : 'none';
-      if(methodCols) r0[10].colSpan = methodCols;
+    const methodCols = [14,15,16,17,18].filter(show).length;
+    if(r0[14]){
+      r0[14].style.display = methodCols ? '' : 'none';
+      if(methodCols) r0[14].colSpan = methodCols;
     }
-    if(r0[11]) r0[11].style.display = show(15) ? '' : 'none';   // Special Gage
-    if(r0[12]) r0[12].style.display = show(16) ? '' : 'none';   // Reaction Plan
+    if(r0[15]) r0[15].style.display = show(19) ? '' : 'none';   // Special Gage
+    if(r0[16]) r0[16].style.display = show(20) ? '' : 'none';   // Reaction Plan
   }
   if(head && head.rows[1]){
     const r1 = head.rows[1].cells;
-    [10,11,12,13,14].forEach((dataCol, idx) => { if(r1[idx]) r1[idx].style.display = show(dataCol) ? '' : 'none'; });
+    [14,15,16,17,18].forEach((dataCol, idx) => { if(r1[idx]) r1[idx].style.display = show(dataCol) ? '' : 'none'; });
   }
 
   // --- body. Operation grouping rows span the whole grid (one cell) and are left alone.
@@ -5423,7 +5511,10 @@ function renderCPBuilder(){
       };
       const ctOpen = () => {
         if(ctPanel){ ctClose(); return; }
-        const all = getControlTypeOptions();   // FRESH read — {id,h,row}; new control types appear immediately
+        let all = getControlTypeOptions();   // FRESH read — {id,h,row}; new control types appear immediately
+        // Rev-614: narrow by the four Master List levels first — that is how the master is
+        // organised, so it is how the list should be cut down
+        all = all.filter(o => cpLevelMatch(row, o.row));
         const zoneMatch = o => {
           if(row.sizeBand && String(o.row[row.sizeBand] || '').trim().toUpperCase() !== 'X') return false;
           if(row.tolBand  && String(o.row[row.tolBand]  || '').trim().toUpperCase() !== 'X') return false;
@@ -5466,6 +5557,8 @@ function renderCPBuilder(){
       trigger.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown'){ e.preventDefault(); ctOpen(); } else if(e.key === 'Escape'){ ctClose(); } };
       tdCT.appendChild(trigger);
       tr.appendChild(tdCT);
+      // Rev-614: the four Master List levels, as live pickers on the open row
+      for(let li = 0; li < CP_LEVELS.length; li++) tr.appendChild(cpLevelCell(idx, row, li, true));
 
       // Rev-264: PROPOSED control type (local best match) with an accept button
       const tdProp = document.createElement('td');
@@ -5586,6 +5679,8 @@ function renderCPBuilder(){
         return td;
       };
       tr.appendChild(compactCell(row.controlTypeId || '— not set —', 'left'));
+      // Rev-614: the four Master List levels, read-only on a closed row
+      for(let li = 0; li < CP_LEVELS.length; li++) tr.appendChild(cpLevelCell(idx, row, li, false));
       // Rev-264: proposed control type (compact) — shown greyed for rows with no type yet
       const propC = row.controlTypeId ? null : cpRowProposal(row);
       const tdPropC = document.createElement('td');
@@ -6343,7 +6438,7 @@ function cpPinShowPreview(x, y, bubble){
   const tr = document.createElement('tr');
   tr.id = 'cpPinPreviewRow';
   const td = document.createElement('td');
-  td.colSpan = 24;
+  td.colSpan = 28;   // Rev-614: four level columns added
   td.style.cssText = 'padding:6px 8px 8px 60px; background:#f2f8f3; border:1px solid var(--line);';
   const box = document.createElement('div');
   box.style.cssText = 'width:' + W + 'px; border:2px solid #1e8449; border-radius:8px; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,0.25); background:#fff;';
