@@ -222,15 +222,26 @@
   /* Rev-618: a real progress bar under the three steps. The filled part is green; while a
      plan is unfinished the leading edge pulses so an in-progress plan is obvious across a
      room, and a finished one sits solid and still. */
-  /* Rev-623: hazard banner for an operation still being built */
-  .cp-uc{ display:flex; align-items:center; justify-content:center; height:22px; border-radius:4px;
-    font-size:11px; font-weight:800; letter-spacing:.16em; color:#3a2c00; margin-bottom:5px;
-    background:repeating-linear-gradient(45deg,#e6a817 0 14px,#171310 14px 28px);
-    text-shadow:0 0 6px #e6a817, 0 0 6px #e6a817, 0 0 4px #e6a817; }
-  .cp-prog{ position:relative; display:block; width:100%; height:11px; border-radius:5px; background:#ddd6cc; overflow:hidden; margin-top:0; }
-  .cp-prog-fill{ position:absolute; inset:0 auto 0 0; border-radius:5px; background:#2c6e49; transition:width .35s ease; }
-  .cp-prog-fill.live{ background:linear-gradient(90deg,#2c6e49 0%,#3fa063 70%,#57c47d 100%); animation:cpPulse 1.25s ease-in-out infinite; }
-  @keyframes cpPulse{ 0%,100%{ opacity:.72; } 50%{ opacity:1; } }
+  /* Rev-628: smaller hazard banner — the stripes CRAWL, and the wording sits on a solid
+     chip instead of being read straight off the stripes, which it was losing against. */
+  .cp-uc{ position:relative; display:flex; align-items:center; justify-content:center; height:15px;
+    border-radius:3px; margin-bottom:4px; overflow:hidden;
+    background:repeating-linear-gradient(45deg,#e6a817 0 9px,#171310 9px 18px);
+    background-size:25.46px 25.46px; animation:cpStripe 1.1s linear infinite; }
+  .cp-uc b{ position:relative; background:#171310; color:#e6a817; font-size:8.5px; font-weight:800;
+    letter-spacing:.13em; padding:1px 9px; border-radius:2px; white-space:nowrap; }
+  @keyframes cpStripe{ from{ background-position:0 0; } to{ background-position:25.46px 0; } }
+  /* thinner bar, with a highlight that sweeps along the filled part while work is open */
+  .cp-prog{ position:relative; display:block; width:100%; height:7px; border-radius:4px; background:#ddd6cc; overflow:hidden; margin-top:0; }
+  .cp-prog-fill{ position:absolute; inset:0 auto 0 0; border-radius:4px; background:#2c6e49; overflow:hidden; transition:width .45s ease; }
+  .cp-prog-fill.live{ background:linear-gradient(90deg,#2c6e49 0%,#3fa063 70%,#57c47d 100%); }
+  .cp-prog-fill.live::after{ content:''; position:absolute; inset:0; border-radius:4px;
+    background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.55) 50%,rgba(255,255,255,0) 100%);
+    transform:translateX(-100%); animation:cpSweep 1.6s ease-in-out infinite; }
+  @keyframes cpSweep{ 0%{ transform:translateX(-100%); } 60%,100%{ transform:translateX(100%); } }
+  @media (prefers-reduced-motion: reduce){
+    .cp-uc{ animation:none; } .cp-prog-fill.live::after{ animation:none; opacity:0; }
+  }
   .cp-prog-ticks{ position:absolute; inset:0; display:flex; }
   .cp-prog-ticks span{ flex:1 1 0; border-right:2px solid #efe9df; }
   .cp-prog-ticks span:last-child{ border-right:none; }
@@ -1522,7 +1533,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-627";
+const APP_REV = "Rev-628";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1655,6 +1666,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-628", type: "App", changes: ["SMALLER BANNER, ANIMATED BAR (Rev-628) \u2014 the hazard banner was 22px of shouting for a line of text; it is now 15px with finer stripes, and the progress bar dropped from 11px to 7px, so the pair reads as a status strip rather than roadworks. TWO PIECES OF MOTION, both meaning something: the hazard stripes CRAWL along the banner, and a highlight SWEEPS along the filled part of the bar \u2014 but only while the operation is unfinished. A finished operation has no banner and a still bar, so movement on the screen always means work outstanding. The banner wording also moved onto a solid dark chip: white-on-stripes was being read straight off the barber pole and losing, and no amount of text-shadow fixes a background that alternates black and amber every nine pixels. Both animations respect the system reduced-motion setting."] },
   { ts: "2026-07-28", rev: "App Rev-627", type: "App", changes: ["THE BUILD STAMP NOW CORRECTS ITSELF (Rev-627) \u2014 the header read 4:12 PM when it was 1:41 PM. Same cause as Rev-590: BUILD_TIME is typed in by hand at build time, and it was written from estimate rather than read off the clock. Apologising for it once and promising to be careful evidently was not a fix, so the guessing has been removed from the loop. On start-up the app now asks GitHub when index.html was actually committed \u2014 a public read, no token, nothing leaves the device \u2014 and displays THAT time, converted to Eastern, on the badge, the menu card, the header and the footer. The typed-in constant remains only as an offline fallback for a device with no network. The stamp now says when the code you are running was really published, which is the thing worth knowing, and no longer depends on anybody remembering to look at a clock. The constant was also corrected to the true 1:41 PM."] },
   { ts: "2026-07-28", rev: "App Rev-626", type: "App", changes: ["CONSTRUCTION VISUALS STAY IN THE CONSTRUCTION AREA (Rev-626) \u2014 the UNDER CONSTRUCTION banner and the progress bar were spanning the entire table, so they ran straight through the Inspect / Validation / Customer CP / Download / Rename / Delete buttons and under the CP REV figure. Those are not construction: hazard stripes across them read as if the buttons themselves were unavailable, and the wording was being obscured by the buttons in return. The banner and bar now span only the three construction columns \u2014 Operation, Status and Construction Steps \u2014 and stop at the rule before ACTIONS, which stays clear. Rev-623 had used a span of 99 to make the bar full-width; that was the right fix for the bar ending short, but the wrong extent."] },
   { ts: "2026-07-28", rev: "App Rev-625", type: "App", changes: ["PARTS LIST NARROWED TO HALF THE SCREEN (Rev-625) \u2014 the Control Plans screen was given the full width of the monitor at Rev-621 so the five construction steps and six action buttons could sit on one line. That is the OPERATIONS view; the PARTS list underneath it is six short columns and was left stretched across the whole screen with the Open button marooned two feet from the part number. The parts list now uses HALF the width, and the operations view keeps the full width \u2014 the same screen sizes itself to what it is showing, switched as the list is drawn rather than by a second screen."] },
@@ -2155,7 +2167,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "1:41 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "1:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3582,7 +3594,7 @@ function renderProjects(){
       if(_pcRow < 100){
         const uc = document.createElement('div');
         uc.className = 'cp-uc';
-        uc.textContent = 'UNDER CONSTRUCTION \u2014 ' + _pcRow + '% COMPLETE';
+        uc.innerHTML = '<b>UNDER CONSTRUCTION \u2014 ' + _pcRow + '% COMPLETE</b>';
         uc.title = 'This operation is still being built. ' + (typeof cpOpStages === 'function' ? cpOpStages(p).labelSummary : '');
         btd.appendChild(uc);
       }
