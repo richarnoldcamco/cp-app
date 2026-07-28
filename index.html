@@ -1522,7 +1522,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-626";
+const APP_REV = "Rev-627";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1624,7 +1624,38 @@ function renderActionLogPanel(){
   };
 }
 
+// ===== Rev-627: THE BUILD STAMP CORRECTS ITSELF ================================
+// BUILD_TIME is typed in by hand at build time and has now been wrong twice, drifting
+// hours ahead, because a human (or an AI) guessed instead of reading a clock. The one
+// authority that cannot be guessed is GitHub: the commit that published this file. On
+// start-up the app asks the public repo when index.html was last committed and shows
+// THAT, converted to Eastern. The typed-in constant stays as an offline fallback, so a
+// device with no network still shows something sensible — it just is not trusted when
+// the truth is one request away. Public read: no token, no data leaves the device.
+async function cpSyncBuildStamp(){
+  try{
+    const r = await fetch('https://api.github.com/repos/richarnoldcamco/cp-app/commits?path=index.html&per_page=1&cb=' + Date.now(),
+      { cache: 'no-store', headers: { 'Accept': 'application/vnd.github+json' } });
+    if(!r.ok) return;
+    const j = await r.json();
+    const iso = j && j[0] && j[0].commit && j[0].commit.committer && j[0].commit.committer.date;
+    if(!iso) return;
+    const d = new Date(iso);
+    const date = d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' });          // YYYY-MM-DD
+    const time = d.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
+    const stamp = date + ' ' + time;
+    const put = (id, html) => { const e = document.getElementById(id); if(e) e.innerHTML = html; };
+    put('brandRev', APP_REV.toUpperCase() + ' <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">' + stamp + '</span>');
+    const cr = document.getElementById('cpCardRev'); if(cr) cr.textContent = APP_REV.toUpperCase() + ' \u00b7 ' + stamp;
+    const rf = document.getElementById('revFooter'); if(rf) rf.textContent = 'App ' + APP_REV + ' \u00b7 Published ' + stamp + ' ET';
+    const hr = document.getElementById('headerRev'); if(hr) hr.textContent = APP_REV + ' \u00b7 ' + stamp;
+    window._cpPublishedStamp = stamp;
+    logAct('nav', 'build stamp from GitHub: ' + stamp);
+  }catch(e){}
+}
+try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-627", type: "App", changes: ["THE BUILD STAMP NOW CORRECTS ITSELF (Rev-627) \u2014 the header read 4:12 PM when it was 1:41 PM. Same cause as Rev-590: BUILD_TIME is typed in by hand at build time, and it was written from estimate rather than read off the clock. Apologising for it once and promising to be careful evidently was not a fix, so the guessing has been removed from the loop. On start-up the app now asks GitHub when index.html was actually committed \u2014 a public read, no token, nothing leaves the device \u2014 and displays THAT time, converted to Eastern, on the badge, the menu card, the header and the footer. The typed-in constant remains only as an offline fallback for a device with no network. The stamp now says when the code you are running was really published, which is the thing worth knowing, and no longer depends on anybody remembering to look at a clock. The constant was also corrected to the true 1:41 PM."] },
   { ts: "2026-07-28", rev: "App Rev-626", type: "App", changes: ["CONSTRUCTION VISUALS STAY IN THE CONSTRUCTION AREA (Rev-626) \u2014 the UNDER CONSTRUCTION banner and the progress bar were spanning the entire table, so they ran straight through the Inspect / Validation / Customer CP / Download / Rename / Delete buttons and under the CP REV figure. Those are not construction: hazard stripes across them read as if the buttons themselves were unavailable, and the wording was being obscured by the buttons in return. The banner and bar now span only the three construction columns \u2014 Operation, Status and Construction Steps \u2014 and stop at the rule before ACTIONS, which stays clear. Rev-623 had used a span of 99 to make the bar full-width; that was the right fix for the bar ending short, but the wrong extent."] },
   { ts: "2026-07-28", rev: "App Rev-625", type: "App", changes: ["PARTS LIST NARROWED TO HALF THE SCREEN (Rev-625) \u2014 the Control Plans screen was given the full width of the monitor at Rev-621 so the five construction steps and six action buttons could sit on one line. That is the OPERATIONS view; the PARTS list underneath it is six short columns and was left stretched across the whole screen with the Open button marooned two feet from the part number. The parts list now uses HALF the width, and the operations view keeps the full width \u2014 the same screen sizes itself to what it is showing, switched as the list is drawn rather than by a second screen."] },
   { ts: "2026-07-28", rev: "App Rev-624", type: "App", changes: ["ROLLING ACTION LOG ADDED (Rev-624) \u2014 the app now records what was actually done, on this machine only: every screen opened, every button pressed, the NAME of every field typed in (never its contents), and every uncaught error with its file and line number. Kept in localStorage under cpActionLog, capped at 600 entries, oldest dropped first. ADMIN \u2192 ACTION LOG shows the last 60 with Copy log / Download .txt / Clear. ITAR-safe by design: field names are logged, never values, so no part, drawing or feature data can enter it, and nothing is transmitted anywhere. Built to survive editing \u2014 the listeners are in capture phase so a handler that stops propagation cannot hide an event, navigation is logged by wrapping the show* functions once at boot rather than by a line pasted into twenty functions that would drift apart, and every write is try/caught so a full localStorage degrades silently instead of breaking the app. THE HANDOFF PROMPT AND THE NEW-APP RECIPE WERE BOTH UPDATED, so future chats are told to ASK FOR THE LOG FIRST when a fault is reported, and any new CAMCO app is built with this from the start. Several faults today \u2014 the vanishing plan, the silent upload, the rename that deleted its own plan \u2014 cost hours of guesswork that one log would have settled in a minute."] },
@@ -2124,7 +2155,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "4:24 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "1:41 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
