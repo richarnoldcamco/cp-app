@@ -495,9 +495,22 @@
         <b style="font-size:15px;">📊 REPORTS</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">EVERY INSPECTION RUN, EVERY STATION</small>
       </button>
+      <!-- Rev-654: the three reference screens sit on the main menu, not two taps deep -->
+      <button class="menu-btn" id="mMasterList" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
+        <b style="font-size:15px;">📚 MASTER LIST</b><br>
+        <small style="font-size:11px; color:var(--ink-dim);">CONTROL TYPES — THE SOURCE FOR EVERY METHODS BAND</small>
+      </button>
+      <button class="menu-btn" id="mCustomers" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
+        <b style="font-size:15px;">🏢 CUSTOMER LIST</b><br>
+        <small style="font-size:11px; color:var(--ink-dim);">CUSTOMERS &amp; QUALITY LEVELS</small>
+      </button>
+      <button class="menu-btn" id="mInstructions" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
+        <b style="font-size:15px;">📄 INSTRUCTIONS</b><br>
+        <small style="font-size:11px; color:var(--ink-dim);">CAMCO CONTROL PLAN INSTRUCTIONS — UPLOAD &amp; DOWNLOAD</small>
+      </button>
       <button class="menu-btn" id="mAdmin" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
         <b style="font-size:15px;">⚙️ ADMIN</b><br>
-        <small style="font-size:11px; color:var(--ink-dim);">MASTER LIST · CUSTOMERS · INSTRUCTIONS · CHANGES · SYNC · SETTINGS</small>
+        <small style="font-size:11px; color:var(--ink-dim);">ACTION LOG · RECENT CHANGES · SYNC · SETTINGS · BACKUP</small>
       </button>
       <button class="menu-btn" id="mPullAll" onclick="cpPullCodeAndData()" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; display:block;">
         <b style="font-size:15px;">↻ PULL CODE &amp; DATA</b><br>
@@ -1167,15 +1180,7 @@
 
   <!-- Rev-511: reference screens moved off the home menu into Admin -->
   <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:24px;">
-    <button class="menu-btn" id="mMasterList" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
-      <div style="font-size:22px;">📚</div><b style="font-size:13px;">Master List</b><small style="font-size:10px; color:var(--ink-dim);">Control Types</small>
-    </button>
-    <button class="menu-btn" id="mCustomers" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
-      <div style="font-size:22px;">🏢</div><b style="font-size:13px;">Customer List</b><small style="font-size:10px; color:var(--ink-dim);">Customers &amp; Levels</small>
-    </button>
-    <button class="menu-btn" id="mInstructions" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
-      <div style="font-size:22px;">📄</div><b style="font-size:13px;">Instructions</b><small style="font-size:10px; color:var(--ink-dim);">Upload &amp; Download</small>
-    </button>
+    <!-- Rev-654: Master List / Customer List / Instructions moved to the MAIN MENU -->
     <button class="menu-btn" id="mRecentChanges" style="border-radius:10px; padding:12px; flex-direction:column; align-items:center; text-align:center;">
       <div style="font-size:22px;">📋</div><b style="font-size:13px;">Recent Changes</b><small style="font-size:10px; color:var(--ink-dim);">App &amp; document change log</small>
     </button>
@@ -1549,7 +1554,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-653";
+const APP_REV = "Rev-654";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1682,6 +1687,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-654", type: "App", changes: ["MASTER LIST, CUSTOMER LIST AND INSTRUCTIONS MOVED TO THE MAIN MENU (Rev-654) \u2014 all three were tucked inside Admin (put there at Rev-511), which is the wrong place for the Master List in particular: it is the source every methods band reads from and it gets edited constantly while building a plan, so it was two taps away from work that needs it. They now sit as full-width buttons on the home menu above ADMIN, in the same style as the rest, each saying what it is for. Admin keeps Recent Changes, the action log, sync, settings and backup, and its subtitle was corrected to match what is actually left in there."] },
   { ts: "2026-07-28", rev: "App Rev-653", type: "App", changes: ["WORKCENTER FILLS ITSELF AFTER THE FIRST ROW (Rev-653) \u2014 the workcenter is a property of the OPERATION, not of each balloon: every feature on OP-030 is cut on the same machine, so typing LATHE fourteen times was fourteen chances to typo one of them. Set it on any row and it now carries to every other row of the plan that has none. On opening a plan the default is worked out from the rows already filled in (the most common workcenter, or the plan\u2019s own workcenter field if none), so existing plans inherit it without being touched. IT ONLY EVER FILLS AN EMPTY CELL \u2014 a workcenter already chosen is never overwritten, and a row can still be set individually where a routing genuinely splits across machines. The other three levels are deliberately NOT carried: Feature Type, 2nd and 3rd Level describe the feature, and copying those would put a wrong control type on every row instead of leaving them blank."] },
   { ts: "2026-07-28", rev: "App Rev-652", type: "App", changes: ["ONE MARK, AND IT POPS WHEN CLICKED (Rev-652) \u2014 the \u2713 that distinguished a hand-marked row from a data-filled one is gone: it is the same statement either way, and two different green symbols both meaning \u2018done\u2019 read as two states. Every row now shows a grey \u25cb or a green \u25cf, nothing else. Clicking it toggles the row and the dot SPRINGS TO DOUBLE SIZE AND BACK in a third of a second on a slight overshoot, so a change several rows down the grid cannot be missed. Only the dot just clicked animates \u2014 the rest redraw still \u2014 and the pop respects the system reduced-motion setting. NOTE: the audit distinction the \u2713 carried is not lost, only moved. Every mark and un-mark is written to the action log with its step and balloon, so which rows were judged complete rather than filled in can still be read back."] },
   { ts: "2026-07-28", rev: "App Rev-651", type: "App", changes: ["PROPOSED COLUMN REMOVED (Rev-651) \u2014 every row is assigned deliberately now: the four Master List levels resolve the Control Type ID on their own since Rev-646, so a suggested best-match sitting alongside was a second opinion nobody was asking for, and a wide column on an already crowded grid. Gone from both the open row and the closed rows, along with its \u2713 Use button. All twenty remaining data columns were renumbered and the three step views, the header band spans and the methods sub-band remapped to match \u2014 an off-by-one there is exactly what put the PRIOR ROW strip out of line at Rev-650, so the maps were re-derived rather than nudged. \ud83c\udfaf Auto-fill Proposed and \ud83e\udd16 AI Propose Types remain on the toolbar for bulk work; only the per-row column is gone."] },
@@ -2208,7 +2214,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:24 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:36 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
