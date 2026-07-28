@@ -606,6 +606,16 @@
     <span id="cpBuilderInfo" style="display:none;"></span><span id="cpAiBar" style="display:none;"></span>
   </div>
 
+  <!-- Rev-586: three steps instead of one wall of columns -->
+  <div id="cpStepBar" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 8px;">
+    <span style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">STEP</span>
+    <button id="cpStepBtn1" onclick="cpSetStep('1')" class="cp-btn" style="border:1px solid #c2b9ab; background:#fff; color:#5c5349;">1 · Bubble Numbers</button>
+    <button id="cpStepBtn2" onclick="cpSetStep('2')" class="cp-btn" style="border:1px solid #c2b9ab; background:#fff; color:#5c5349;">2 · Control Type</button>
+    <button id="cpStepBtn3" onclick="cpSetStep('3')" class="cp-btn" style="border:1px solid #c2b9ab; background:#fff; color:#5c5349;">3 · Measurement Methods</button>
+    <button id="cpStepBtnA" onclick="cpSetStep('A')" class="cp-btn" style="border:1px solid #c2b9ab; background:#fff; color:#5c5349;">All columns</button>
+    <span id="cpStepHint" style="font-size:12px; color:#6b6257;"></span>
+  </div>
+
   <div id="cpUnderConstructionBanner" style="display:none; background:#e6a817; color:#3a2c00; font-weight:800; text-align:center; padding:7px 12px; border-radius:6px; margin-bottom:6px; letter-spacing:0.5px;">🚧 UNDER CONSTRUCTION — THIS CONTROL PLAN IS STILL IN PROGRESS</div>
 
   <div style="display:flex; gap:12px; align-items:flex-start;">
@@ -1438,7 +1448,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-585";
+const APP_REV = "Rev-586";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1452,6 +1462,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-586", type: "App", changes: ["THE BUILDER IS NOW THREE STEPS (Rev-586) \u2014 all seventeen columns used to be on screen at once, so assigning balloons, choosing control types and setting measurement methods happened in the same crowded grid. A STEP bar now sits above the table: STEP 1 \u00b7 BUBBLE NUMBERS shows Doc#, Bubble#, pin, Feature/Process Description, Spec/Tol, Upper, Lower and Class \u2014 just enough to give every ODS balloon its row. STEP 2 \u00b7 CONTROL TYPE shows Doc#, Bubble#, pin, Control Type ID, Proposed, Feature, Spec and Class, and is the only step showing the \ud83c\udfaf Auto-fill Proposed and \ud83e\udd16 AI Propose Types buttons, which belong to this job and nothing else. STEP 3 \u00b7 MEASUREMENT METHODS shows the whole methods band, Special Gage / Fixture and Reaction Plan alongside the balloon and feature for reference. ALL COLUMNS restores the old single-screen view. This is a VIEW only \u2014 no data moves, nothing is locked, and steps can be switched at any time in any order without losing a thing; the chosen step is remembered per device. Assign Bubble Numbers on the Control Plans list now lands on Step 1."] },
   { ts: "2026-07-27", rev: "App Rev-585", type: "App", changes: ["EDIT PLAN RENAMED TO ASSIGN BUBBLE NUMBERS (Rev-585) \u2014 the green button on each operation row now reads Assign Bubble Numbers, which is what that screen is actually for: giving every ODS balloon its row, control type and methods. Tooltip spells out the full job. Widened to 176px; the rest of the row keeps its alignment. SECOND CHANGE \u2014 naming an operation pushed to GitHub without checking the result, so a failed push looked identical to a lost edit (which is exactly the symptom chased at Rev-583). The push is now awaited and reports: a success confirms it reached GitHub, a failure says the edit is on this device only and the next sync may undo it, and an unconfigured GitHub says so plainly rather than silently doing nothing."] },
   { ts: "2026-07-27", rev: "App Rev-584", type: "App", changes: ["CONTROL PLANS LIST CLEANED UP (Rev-584) \u2014 the list had seven buttons in six different colours, each a different width, so no two rows lined up and the CP Rev label was being shoved off the right edge. Rebuilt on one system: (1) ONE BUTTON STYLE \u2014 every action is the same height with a fixed width per role, so the columns line up straight down the page. (2) THREE COLOURS INSTEAD OF SIX \u2014 filled green for the two things you actually do (Edit Plan, Inspect), outlined neutral for supporting actions (Validation, Customer CP, Download, Rename), outlined red for Delete. Colour now means something. (3) EMOJI REMOVED from the action buttons and status pills; labels shortened (Edit Control Plan \u2192 Edit Plan, Edit Machinist Validation \u2192 Validation) with the full meaning kept in the hover tooltip. (4) STATUS PILLS \u2014 UNDER CONSTRUCTION / SAVED became IN PROGRESS / COMPLETE in matched soft tones rather than a hard amber and a hard green. (5) CP REV GOT ITS OWN RIGHT-ALIGNED COLUMN so a long row of buttons can never clip it again. (6) Proper table styling throughout: uppercase column headings on a tinted band, consistent row padding, hairline row separators, a hover highlight, and the part header bar squared up with its buttons on one baseline."] },
   { ts: "2026-07-27", rev: "App Rev-583", type: "App", changes: ["EDITS STOPPED VANISHING + CONTROL PLAN REV REPLACES PART REV (Rev-583) \u2014 (1) THE BUG: naming an operation appeared to do nothing. The edit WAS written to this device, but the GitHub merge takes the incoming copy for every project unconditionally, and a pull runs on open, every 60 seconds and on every tap \u2014 so the server copy (with no op number) overwrote the edit seconds later. The edit now pushes to GitHub immediately, so it IS the copy that comes back, and the entry\u2019s sync id follows its op number instead of being keyed to the old one. (2) A related latent fault: the auto-save id was part::rev with NO operation, so two operations on one part would have overwritten each other on every keystroke; it now carries the op, and auto-save records opNum / opDesc. (3) PART REV COLUMN REPLACED: the column held the customer\u2019s drawing rev, which is not what the list is about. It is gone. In its place the CONTROL PLAN\u2019S OWN revision \u2014 a count of how many times that plan has been saved \u2014 now sits at the FAR RIGHT after the buttons in small grey text as CP Rev-N. Hovering it still shows the part / drawing rev."] },
@@ -1910,7 +1921,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:53 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:14 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2502,8 +2513,9 @@ function renderProjects(){
     } else {
       const i = item.idx;
       const has = !!p.builderState;
-      mkBtn('Assign Bubble Numbers', 'primary', 176, 'Open the builder and assign this operation\u2019s ODS balloon numbers, control types and methods'
-        + (has ? '' : ' \u2014 saved before editing was supported'), () => editProject(i), has);
+      mkBtn('Assign Bubble Numbers', 'primary', 176, 'Open the builder at Step 1 \u2014 give every ODS balloon its row. Control types and methods are Steps 2 and 3.'
+        + (has ? '' : ' \u2014 saved before editing was supported'),
+        () => { try{ cpSetStep('1'); }catch(e){} editProject(i); }, has);
       mkBtn('Inspect', 'go', 92, 'Machinist: start a real inspection run for this plan (readings are saved)'
         + (has ? '' : ' \u2014 no plan data to inspect'), () => inspectMachinistValidation(i), has);
       mkBtn('Validation', 'quiet', 106, (mvIsCreated(p)
@@ -4469,6 +4481,91 @@ function reflectUnderConstruction(){
   }
 }
 
+// ===== Rev-586: THREE STEPS INSTEAD OF ONE WALL OF COLUMNS =====================
+// The builder showed all seventeen columns at once, so assigning balloons, choosing
+// control types and setting measurement methods all happened in the same crowded grid.
+// The plan data is unchanged — this only decides WHICH COLUMNS ARE ON SCREEN, so a step
+// can be switched at any time and nothing is ever lost by moving between them.
+//
+// Data column order (0-based) as built by renderCPBuilder:
+//  0 Doc#  1 Bubble#  2 pin  3 Control Type ID  4 Proposed  5 Feature/Process Description
+//  6 Spec/Tol  7 Upper  8 Lower  9 Class  10 Meas(Machinist)  11 #Recorded  12 FREQ(Every)
+//  13 FREQ(QE)  14 Meas(CMM)  15 Special Gage  16 Reaction Plan
+const CP_STEPS = {
+  '1': { label: '1 \u00b7 Bubble Numbers',
+         hint: 'Give every ODS balloon its row: bubble number, what the feature is, and its tolerance.',
+         cols: [0,1,2,5,6,7,8,9] },
+  '2': { label: '2 \u00b7 Control Type',
+         hint: 'Pick the Control Type for each balloon. The methods fill themselves from the Master List.',
+         cols: [0,1,2,3,4,5,6,9] },
+  '3': { label: '3 \u00b7 Measurement Methods',
+         hint: 'Review what the master filled in, set any special gage, and confirm the reaction plan.',
+         cols: [0,1,3,5,6,9,10,11,12,13,14,15,16] },
+  'A': { label: 'All columns',
+         hint: 'Every column at once \u2014 the old single-screen view.',
+         cols: null }
+};
+function cpGetStep(){ const s = localStorage.getItem('cpBuildStep'); return CP_STEPS[s] ? s : '1'; }
+function cpSetStep(s){
+  if(!CP_STEPS[s]) s = '1';
+  localStorage.setItem('cpBuildStep', s);
+  cpApplyStepView();
+}
+function cpApplyStepView(){
+  const step = cpGetStep(), def = CP_STEPS[step];
+  const show = def.cols ? (n) => def.cols.indexOf(n) >= 0 : () => true;
+
+  // step bar buttons + hint line
+  Object.keys(CP_STEPS).forEach(k => {
+    const b = document.getElementById('cpStepBtn' + k);
+    if(!b) return;
+    const on = (k === step);
+    b.style.background = on ? '#7a1a1c' : '#fff';
+    b.style.color = on ? '#fff' : '#5c5349';
+    b.style.borderColor = on ? '#5c1416' : '#c2b9ab';
+    b.style.fontWeight = on ? '800' : '600';
+  });
+  const hint = document.getElementById('cpStepHint');
+  if(hint) hint.textContent = def.hint;
+
+  const table = document.getElementById('cpBuilderTable');
+  if(!table) return;
+
+  // --- header, top row. Its cells are not 1:1 with data columns: the METHODS band is
+  // one cell spanning five, so it is hidden only when all five are hidden and its
+  // colspan is retuned to however many survive.
+  const head = table.tHead;
+  if(head && head.rows[0]){
+    const r0 = head.rows[0].cells;
+    const topMap = [0,1,2,3,4,5,6,7,8,9];          // cell index -> data column
+    for(let c = 0; c < topMap.length && c < r0.length; c++) r0[c].style.display = show(topMap[c]) ? '' : 'none';
+    const methodCols = [10,11,12,13,14].filter(show).length;
+    if(r0[10]){
+      r0[10].style.display = methodCols ? '' : 'none';
+      if(methodCols) r0[10].colSpan = methodCols;
+    }
+    if(r0[11]) r0[11].style.display = show(15) ? '' : 'none';   // Special Gage
+    if(r0[12]) r0[12].style.display = show(16) ? '' : 'none';   // Reaction Plan
+  }
+  if(head && head.rows[1]){
+    const r1 = head.rows[1].cells;
+    [10,11,12,13,14].forEach((dataCol, idx) => { if(r1[idx]) r1[idx].style.display = show(dataCol) ? '' : 'none'; });
+  }
+
+  // --- body. Operation grouping rows span the whole grid (one cell) and are left alone.
+  const tb = document.getElementById('cpBuilderTbody');
+  if(tb) Array.prototype.forEach.call(tb.rows, (tr) => {
+    if(tr.cells.length <= 1) return;
+    Array.prototype.forEach.call(tr.cells, (td, n) => { td.style.display = show(n) ? '' : 'none'; });
+  });
+
+  // tools that belong to one step only
+  const ap = document.getElementById('cpAcceptAllBtn'), ai = document.getElementById('cpAiProposeBtn');
+  const typeStep = (step === '2' || step === 'A');
+  if(ap) ap.style.display = typeStep ? '' : 'none';
+  if(ai) ai.style.display = typeStep ? '' : 'none';
+}
+
 function renderCPBuilder(){
   if(typeof reflectUnderConstruction === 'function') reflectUnderConstruction();   // Rev-319: keep banner/button in sync
   const tbody = $('cpBuilderTbody');
@@ -4871,6 +4968,7 @@ function renderCPBuilder(){
     tbody.appendChild(tr);
   });
   updateOdsPanel();
+  cpApplyStepView();     // Rev-586: show only the columns this step is about
   cpAutoSaveProject();   // Rev-224: continuous save on every redraw/edit
 }
 
