@@ -1536,7 +1536,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-639";
+const APP_REV = "Rev-640";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1669,6 +1669,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-640", type: "App", changes: ["CP REV NOW SHOWS WHEN THERE ARE UNISSUED EDITS (Rev-640) \u2014 the Control Plan revision looked stuck because it advances on an explicit SAVE TO PROJECT, not on every edit. That is deliberate and matches CP-1: a revision is an ISSUE of the document, and the builder auto-saves on every keystroke \u2014 counting those would put a fourteen-row plan at Rev-4000 by lunchtime and make the number worthless for traceability. What was missing was any sign that edits existed beyond the last issued revision, so the figure simply looked broken. An amber \u25cf now appears beside the rev whenever auto-saved edits sit past it, and hovering explains: the edits are safe on this device, and Save to Project issues the next revision. Press Save and the dot clears as the number advances."] },
   { ts: "2026-07-28", rev: "App Rev-639", type: "App", changes: ["CREATING AN OPERATION RETURNS TO THE PART (Rev-639) \u2014 saving a new operation dropped you straight into the builder with a blank skeleton open on the first row. Creating an operation and ballooning it are different jobs: the five construction steps are the map, and landing inside Step 3 skipped past 1 and 2 without acknowledging them and hid the rest of the part, so a second operation could not be seen next to the first. A new operation now saves and returns to THAT PART\u2019S OPERATIONS \u2014 the screen showing both ops, their steps and their progress \u2014 with a note confirming what was created and that Step 3 assigns the bubbles. The plan is auto-saved before the move, and the new op opens with no row expanded, per Rev-608."] },
   { ts: "2026-07-28", rev: "App Rev-638", type: "App", changes: ["PART NUMBER AND OPERATION LINE 75% LARGER (Rev-638) \u2014 the part number goes 19px \u2192 33px and the operation line 13px \u2192 23px, with its description 12px \u2192 21px. These two lines are what you look for when scanning the screen, and they were the smallest thing on a row that also carries five step buttons and six action buttons. The \u21b3 (no op number) rows were scaled to match so both kinds of operation row read the same, and the \u270f\ufe0f edit pencil was enlarged with them \u2014 left at 12px it would have become a speck beside 23px text and an awkward tap target."] },
   { ts: "2026-07-28", rev: "App Rev-637", type: "App", changes: ["BANNER AND PROGRESS BAR DOUBLED IN HEIGHT (Rev-637) \u2014 the UNDER CONSTRUCTION banner goes 15px \u2192 30px and the progress bar 7px \u2192 14px. The stripe pitch and the wording were scaled with them (stripes 9px \u2192 14px, text 8.5px \u2192 11px, chip padding widened), because doubling only the height would have produced fatter stripes wrapped round the same small text \u2014 taller without being any more readable. The stripe animation was slowed to match the coarser pitch so it crawls at the same apparent speed, and the bar\u2019s corner radius follows its new height."] },
@@ -2181,7 +2182,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "4:04 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3642,9 +3643,13 @@ function renderProjects(){
     try{ _pcTip = cpPercentBreakdown(p); }catch(e){}
     tdCpRev.innerHTML =
         '<div class="cp-pct" style="color:' + _pcCol + ';" title="' + String(_pcTip).replace(/"/g, '') + '">' + _pc + '%</div>'
-      + '<div class="cp-rev" title="Control Plan revision \u2014 how many times this plan has been saved'
+      // Rev-640: the rev advances when the plan is SAVED, not on every keystroke. A dot
+      // shows there are auto-saved edits sitting beyond the last issued revision.
+      + '<div class="cp-rev" title="Control Plan revision \u2014 advances each time you press Save to Project.'
+      + (p.cpRevDirty ? '&#10;\u25cf There are edits since Rev-' + (parseInt(p.cpRevNum, 10) || 1) + ' \u2014 they are saved on this device; press Save to Project to issue the next revision.' : '&#10;No edits since this revision was issued.')
       + (p.rev ? ('&#10;Part / drawing rev: ' + String(p.rev).replace(/"/g,'')) : '') + '">Rev-'
-      + (parseInt(p.cpRevNum, 10) || 1) + '</div>';
+      + (parseInt(p.cpRevNum, 10) || 1)
+      + (p.cpRevDirty ? ' <span style="color:#a35400;">\u25cf</span>' : '') + '</div>';
     tr.className = 'cp-op-row';
     // Rev-620: the ODS column is gone — Step 2 IS the ODS drawing now
     tr.appendChild(tdPart); tr.appendChild(tdStatus); tr.appendChild(tdSteps); tr.appendChild(tdActions); tr.appendChild(tdCpRev);
@@ -4624,9 +4629,11 @@ function saveProject(partNum, rev, base64Data, customerName, qualityLevel){
     entry.created = projects[existingIdx].created; // keep original created date
     // Rev-583: the Control Plan's OWN revision — how many times this plan has been saved
     entry.cpRevNum = (parseInt(projects[existingIdx].cpRevNum, 10) || 1) + 1;
+    entry.cpRevDirty = false;      // Rev-640: this rev now matches what is saved
     projects[existingIdx] = entry;
   } else {
     entry.cpRevNum = 1;
+    entry.cpRevDirty = false;
     projects.push(entry);
   }
   localStorage.setItem('cpProjects', JSON.stringify(projects));
@@ -5654,7 +5661,8 @@ function cpAutoSaveProject(){
       cpBuildState.srcId = id;   // Rev-336: keep tracking under the (possibly new) id
       bs.srcId = id;
       if(i >= 0){ projects[i].builderState = bs; projects[i].underConstruction = !!cpBuildState.underConstruction; projects[i].updated = new Date().toISOString();
-        if(!projects[i].cpRevNum) projects[i].cpRevNum = 1; }
+        if(!projects[i].cpRevNum) projects[i].cpRevNum = 1;
+        projects[i].cpRevDirty = true; }   // Rev-640: changed since the last issued rev
       else projects.push({ id, partNum: cpBuildState.partNum, rev: cpBuildState.rev,
         opNum: cpBuildState.opNum || '', opDesc: cpBuildState.opDesc || '',
         customer: cpBuildState.customerName || '', qualityLevel: cpBuildState.qualityLevel || '',
