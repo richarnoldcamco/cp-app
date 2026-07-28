@@ -1438,7 +1438,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-584";
+const APP_REV = "Rev-585";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1452,6 +1452,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-585", type: "App", changes: ["EDIT PLAN RENAMED TO ASSIGN BUBBLE NUMBERS (Rev-585) \u2014 the green button on each operation row now reads Assign Bubble Numbers, which is what that screen is actually for: giving every ODS balloon its row, control type and methods. Tooltip spells out the full job. Widened to 176px; the rest of the row keeps its alignment. SECOND CHANGE \u2014 naming an operation pushed to GitHub without checking the result, so a failed push looked identical to a lost edit (which is exactly the symptom chased at Rev-583). The push is now awaited and reports: a success confirms it reached GitHub, a failure says the edit is on this device only and the next sync may undo it, and an unconfigured GitHub says so plainly rather than silently doing nothing."] },
   { ts: "2026-07-27", rev: "App Rev-584", type: "App", changes: ["CONTROL PLANS LIST CLEANED UP (Rev-584) \u2014 the list had seven buttons in six different colours, each a different width, so no two rows lined up and the CP Rev label was being shoved off the right edge. Rebuilt on one system: (1) ONE BUTTON STYLE \u2014 every action is the same height with a fixed width per role, so the columns line up straight down the page. (2) THREE COLOURS INSTEAD OF SIX \u2014 filled green for the two things you actually do (Edit Plan, Inspect), outlined neutral for supporting actions (Validation, Customer CP, Download, Rename), outlined red for Delete. Colour now means something. (3) EMOJI REMOVED from the action buttons and status pills; labels shortened (Edit Control Plan \u2192 Edit Plan, Edit Machinist Validation \u2192 Validation) with the full meaning kept in the hover tooltip. (4) STATUS PILLS \u2014 UNDER CONSTRUCTION / SAVED became IN PROGRESS / COMPLETE in matched soft tones rather than a hard amber and a hard green. (5) CP REV GOT ITS OWN RIGHT-ALIGNED COLUMN so a long row of buttons can never clip it again. (6) Proper table styling throughout: uppercase column headings on a tinted band, consistent row padding, hairline row separators, a hover highlight, and the part header bar squared up with its buttons on one baseline."] },
   { ts: "2026-07-27", rev: "App Rev-583", type: "App", changes: ["EDITS STOPPED VANISHING + CONTROL PLAN REV REPLACES PART REV (Rev-583) \u2014 (1) THE BUG: naming an operation appeared to do nothing. The edit WAS written to this device, but the GitHub merge takes the incoming copy for every project unconditionally, and a pull runs on open, every 60 seconds and on every tap \u2014 so the server copy (with no op number) overwrote the edit seconds later. The edit now pushes to GitHub immediately, so it IS the copy that comes back, and the entry\u2019s sync id follows its op number instead of being keyed to the old one. (2) A related latent fault: the auto-save id was part::rev with NO operation, so two operations on one part would have overwritten each other on every keystroke; it now carries the op, and auto-save records opNum / opDesc. (3) PART REV COLUMN REPLACED: the column held the customer\u2019s drawing rev, which is not what the list is about. It is gone. In its place the CONTROL PLAN\u2019S OWN revision \u2014 a count of how many times that plan has been saved \u2014 now sits at the FAR RIGHT after the buttons in small grey text as CP Rev-N. Hovering it still shows the part / drawing rev."] },
   { ts: "2026-07-27", rev: "App Rev-582", type: "App", changes: ["PROPER OPERATION WINDOW REPLACES THE BROWSER PROMPTS (Rev-582) \u2014 naming an operation fired two stacked browser prompt() boxes: black, unstyled, browser-branded, one question at a time with no way to see or correct the first answer while typing the second. Replaced with a real window matching the rest of the app: OP # and OP DESCRIPTION side by side, both mandatory-yellow (fafa96) per the Camco UI standards, Enter saves, Esc cancels, clicking outside closes. A duplicate operation number is reported IN the window in red and the window stays open so it can be corrected, instead of an alert throwing the work away. Layout fix alongside: the Part Number cell was wrapping \u2018(no op number)\u2019 onto three lines and squashing the column \u2014 operation rows no longer wrap."] },
@@ -1909,7 +1910,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:26 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:53 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2501,7 +2502,7 @@ function renderProjects(){
     } else {
       const i = item.idx;
       const has = !!p.builderState;
-      mkBtn('Edit Plan', 'primary', 104, 'Open this Control Plan in the builder'
+      mkBtn('Assign Bubble Numbers', 'primary', 176, 'Open the builder and assign this operation\u2019s ODS balloon numbers, control types and methods'
         + (has ? '' : ' \u2014 saved before editing was supported'), () => editProject(i), has);
       mkBtn('Inspect', 'go', 92, 'Machinist: start a real inspection run for this plan (readings are saved)'
         + (has ? '' : ' \u2014 no plan data to inspect'), () => inspectMachinistValidation(i), has);
@@ -3765,7 +3766,19 @@ function cpSetOpDesc(p){
     // Rev-583 FIX: the GitHub merge takes the incoming copy for every project, so a
     // local-only edit is wiped by the next pull (which runs on open, every 60s, and on
     // every tap). Push straight away so this edit IS the copy that comes back.
-    try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
+    // Rev-585: and SAY so — a silent failed push used to look exactly like a lost edit.
+    (async () => {
+      try{
+        if(typeof ghConfigured !== 'function' || !ghConfigured()){
+          flash('Saved on this device only \u2014 GitHub is not set up, so another device could overwrite it.', true);
+          return;
+        }
+        await ghPush(true);
+        flash('\u2713 Operation saved and pushed to GitHub.');
+      }catch(e){
+        flash('Saved here, but the push to GitHub FAILED \u2014 the next sync may undo it. Use Admin \u2192 Push Data.', true);
+      }
+    })();
   };
   bg.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){ e.preventDefault(); close(); }
