@@ -1448,7 +1448,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-586";
+const APP_REV = "Rev-587";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1462,6 +1462,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-587", type: "App", changes: ["THE THREE STEPS ARE NOW BUTTONS ON THE CONTROL PLANS LIST (Rev-587) \u2014 Rev-586 put the steps inside the builder, so the job still had to be chosen after opening the plan. Each operation row now carries the three steps directly: 1 \u00b7 BUBBLE NUMBERS, 2 \u00b7 CONTROL TYPE and 3 \u00b7 METHODS, each opening the builder already on that step. A hairline separates them from the supporting actions (Inspect, Validation, Customer CP, Download, Rename, Delete), which were trimmed slightly so the row still fits on one line. Each button\u2019s tooltip says what that step covers. The step bar inside the builder stays \u2014 it is still the way to switch step without going back to the list."] },
   { ts: "2026-07-27", rev: "App Rev-586", type: "App", changes: ["THE BUILDER IS NOW THREE STEPS (Rev-586) \u2014 all seventeen columns used to be on screen at once, so assigning balloons, choosing control types and setting measurement methods happened in the same crowded grid. A STEP bar now sits above the table: STEP 1 \u00b7 BUBBLE NUMBERS shows Doc#, Bubble#, pin, Feature/Process Description, Spec/Tol, Upper, Lower and Class \u2014 just enough to give every ODS balloon its row. STEP 2 \u00b7 CONTROL TYPE shows Doc#, Bubble#, pin, Control Type ID, Proposed, Feature, Spec and Class, and is the only step showing the \ud83c\udfaf Auto-fill Proposed and \ud83e\udd16 AI Propose Types buttons, which belong to this job and nothing else. STEP 3 \u00b7 MEASUREMENT METHODS shows the whole methods band, Special Gage / Fixture and Reaction Plan alongside the balloon and feature for reference. ALL COLUMNS restores the old single-screen view. This is a VIEW only \u2014 no data moves, nothing is locked, and steps can be switched at any time in any order without losing a thing; the chosen step is remembered per device. Assign Bubble Numbers on the Control Plans list now lands on Step 1."] },
   { ts: "2026-07-27", rev: "App Rev-585", type: "App", changes: ["EDIT PLAN RENAMED TO ASSIGN BUBBLE NUMBERS (Rev-585) \u2014 the green button on each operation row now reads Assign Bubble Numbers, which is what that screen is actually for: giving every ODS balloon its row, control type and methods. Tooltip spells out the full job. Widened to 176px; the rest of the row keeps its alignment. SECOND CHANGE \u2014 naming an operation pushed to GitHub without checking the result, so a failed push looked identical to a lost edit (which is exactly the symptom chased at Rev-583). The push is now awaited and reports: a success confirms it reached GitHub, a failure says the edit is on this device only and the next sync may undo it, and an unconfigured GitHub says so plainly rather than silently doing nothing."] },
   { ts: "2026-07-27", rev: "App Rev-584", type: "App", changes: ["CONTROL PLANS LIST CLEANED UP (Rev-584) \u2014 the list had seven buttons in six different colours, each a different width, so no two rows lined up and the CP Rev label was being shoved off the right edge. Rebuilt on one system: (1) ONE BUTTON STYLE \u2014 every action is the same height with a fixed width per role, so the columns line up straight down the page. (2) THREE COLOURS INSTEAD OF SIX \u2014 filled green for the two things you actually do (Edit Plan, Inspect), outlined neutral for supporting actions (Validation, Customer CP, Download, Rename), outlined red for Delete. Colour now means something. (3) EMOJI REMOVED from the action buttons and status pills; labels shortened (Edit Control Plan \u2192 Edit Plan, Edit Machinist Validation \u2192 Validation) with the full meaning kept in the hover tooltip. (4) STATUS PILLS \u2014 UNDER CONSTRUCTION / SAVED became IN PROGRESS / COMPLETE in matched soft tones rather than a hard amber and a hard green. (5) CP REV GOT ITS OWN RIGHT-ALIGNED COLUMN so a long row of buttons can never clip it again. (6) Proper table styling throughout: uppercase column headings on a tinted band, consistent row padding, hairline row separators, a hover highlight, and the part header bar squared up with its buttons on one baseline."] },
@@ -1921,7 +1922,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:28 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2492,6 +2493,9 @@ function renderProjects(){
     const tdActions = document.createElement('td');
     const actWrap = document.createElement('div');
     actWrap.className = 'cp-act';
+    // Rev-587: a hairline after the three step buttons separates "build the plan"
+    // from the supporting actions
+    actWrap.dataset.divideAfter = '3';
     tdActions.appendChild(actWrap);
     // Rev-584: every action button is built the same way — same height, same weight,
     // fixed width per role so the columns line up down the whole list.
@@ -2503,6 +2507,11 @@ function renderProjects(){
       b.style.width = width + 'px';
       if(enabled === false){ b.disabled = true; }
       else b.onclick = fn;
+      if(actWrap.dataset.divideAfter && actWrap.children.length === +actWrap.dataset.divideAfter){
+        const sep = document.createElement('span');
+        sep.style.cssText = 'display:inline-block; width:1px; height:22px; background:#cfc6b8; margin:0 4px;';
+        actWrap.appendChild(sep);
+      }
       actWrap.appendChild(b);
       return b;
     };
@@ -2513,20 +2522,30 @@ function renderProjects(){
     } else {
       const i = item.idx;
       const has = !!p.builderState;
-      mkBtn('Assign Bubble Numbers', 'primary', 176, 'Open the builder at Step 1 \u2014 give every ODS balloon its row. Control types and methods are Steps 2 and 3.'
-        + (has ? '' : ' \u2014 saved before editing was supported'),
-        () => { try{ cpSetStep('1'); }catch(e){} editProject(i); }, has);
-      mkBtn('Inspect', 'go', 92, 'Machinist: start a real inspection run for this plan (readings are saved)'
+      // Rev-587: the three steps are their own buttons here, so the job can be picked
+      // from the list instead of opening the builder and switching once inside.
+      const openAt = (s) => { try{ cpSetStep(s); }catch(e){} editProject(i); };
+      const stepNote = has ? '' : ' \u2014 saved before editing was supported';
+      mkBtn('1 \u00b7 Bubble Numbers', 'primary', 148,
+        'STEP 1 \u2014 give every ODS balloon its row: bubble number, feature description and tolerance.' + stepNote,
+        () => openAt('1'), has);
+      mkBtn('2 \u00b7 Control Type', 'primary', 132,
+        'STEP 2 \u2014 pick the Control Type for each balloon; the methods fill themselves from the Master List.' + stepNote,
+        () => openAt('2'), has);
+      mkBtn('3 \u00b7 Methods', 'primary', 116,
+        'STEP 3 \u2014 review the measurement methods, set any special gage, confirm the reaction plan.' + stepNote,
+        () => openAt('3'), has);
+      mkBtn('Inspect', 'go', 84, 'Machinist: start a real inspection run for this plan (readings are saved)'
         + (has ? '' : ' \u2014 no plan data to inspect'), () => inspectMachinistValidation(i), has);
-      mkBtn('Validation', 'quiet', 106, (mvIsCreated(p)
+      mkBtn('Validation', 'quiet', 94, (mvIsCreated(p)
         ? 'Open / edit the Machinist Validation for this Control Plan'
         : 'Create a Machinist Validation inspection from this Control Plan')
         + (has ? '' : ' \u2014 no plan data to build a validation from'), () => createMachinistValidation(i), has);
-      mkBtn('Customer CP', 'quiet', 116, 'Build the L3Harris-format Control Plan xlsx for customer submittal'
+      mkBtn('Customer CP', 'quiet', 106, 'Build the L3Harris-format Control Plan xlsx for customer submittal'
         + (has ? '' : ' \u2014 no plan data to export'), () => cpCustomerExport(i), has);
-      mkBtn('Download', 'quiet', 98, 'Download this plan\u2019s .xlsx', () => downloadProject(i));
-      mkBtn('Rename', 'quiet', 88, 'Change this plan\u2019s part number (and rev) IN PLACE \u2014 no duplicate is created', () => renameProject(i));
-      mkBtn('Delete', 'danger', 82, 'Delete this Control Plan', () => deleteProject(i));
+      mkBtn('Download', 'quiet', 90, 'Download this plan\u2019s .xlsx', () => downloadProject(i));
+      mkBtn('Rename', 'quiet', 80, 'Change this plan\u2019s part number (and rev) IN PLACE \u2014 no duplicate is created', () => renameProject(i));
+      mkBtn('Delete', 'danger', 74, 'Delete this Control Plan', () => deleteProject(i));
     }
     // Rev-584: the Control Plan rev has its own right-aligned column now, so it can no
     // longer be pushed off the edge by a long row of buttons
