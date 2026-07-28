@@ -248,6 +248,14 @@
   .cp-prog-ticks{ position:absolute; inset:0; display:flex; }
   .cp-prog-ticks span{ flex:1 1 0; border-right:2px solid #efe9df; }
   .cp-prog-ticks span:last-child{ border-right:none; }
+  /* Rev-643: a level filled while an earlier one is blank is an ERROR, not a style
+     choice — the Master List is a hierarchy, so a 2nd Level with no Feature Type above
+     it can never resolve to a control type. Pulses red until it is put right. */
+  .cp-gap{ position:relative; background:#fdecea !important; box-shadow:inset 0 0 0 2px #c0392b;
+    border-radius:4px; animation:cpGapPulse 1.1s ease-in-out infinite; }
+  @keyframes cpGapPulse{ 0%,100%{ box-shadow:inset 0 0 0 2px #c0392b; }
+    50%{ box-shadow:inset 0 0 0 3px #e74c3c, 0 0 8px rgba(192,57,43,.55); } }
+  @media (prefers-reduced-motion: reduce){ .cp-gap{ animation:none; } }
   .cp-pct{ font-size:19px; font-weight:800; letter-spacing:.02em; line-height:1.1; white-space:nowrap; }
   .cp-rev{ font-size:11px; font-weight:700; color:#8a8279; letter-spacing:.03em; white-space:nowrap; }
   .btn-ghost:active{transform:translateY(2px);background:var(--panel-2);box-shadow:0 0 0 var(--line-strong), 0 1px 2px rgba(0,0,0,.15), inset 0 2px 4px rgba(0,0,0,.12)}
@@ -1536,7 +1544,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-642";
+const APP_REV = "Rev-643";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1669,6 +1677,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-643", type: "App", changes: ["A LEVEL FILLED OUT OF ORDER NOW FLAGS RED (Rev-643) \u2014 a row could carry a Feature Type and a 2nd Level with the Workcenter above them blank, and nothing said a word. That is not a cosmetic gap: the Master List is a hierarchy, so a 2nd Level with nothing above it can never resolve to a control type, and the methods band would stay unfillable while the row looked populated. Any level that holds a value while a level ABOVE it is empty now pulses red, and hovering names exactly which one is missing \u2014 \u2018Feature Type is set, but Workcenter above it is blank\u2019. The check reads the master row behind a chosen control type as well as what is typed on the row, so a row filled from the master is not flagged for gaps it does not actually have. The pulse respects the system reduced-motion setting."] },
   { ts: "2026-07-28", rev: "App Rev-642", type: "App", changes: ["THE DOT IS NOW A SWITCH (Rev-642) \u2014 click the dot on any row to mark it done for the step you are on, and click again to un-mark it. A hand-marked row counts toward that step\u2019s completion, the percentage and the gate to the next step, so the QE\u2019s judgement carries the same weight as the data test. THE TWO ARE KEPT APART ON PURPOSE: a row the data already satisfies shows a plain green \u25cf, a row marked by hand shows a green \u2713. Anyone reading the plan later can tell which rows were FILLED IN from those that were JUDGED complete \u2014 that distinction matters on a controlled document, and one indistinguishable green dot would have thrown it away. Every mark is written to the action log with its step and balloon. Ghost rows keep \ud83d\udc7b and are not clickable. The column heading changed from \ud83d\udccd to \u2714 since it no longer means \u2018pinned\u2019 alone."] },
   { ts: "2026-07-28", rev: "App Rev-641", type: "App", changes: ["THE DOT FOLLOWS THE STEP + AN APPROXIMATE WORKING REV (Rev-641) \u2014 (1) THE GREEN DOT now answers \u2018is this row done for the step I am on\u2019 rather than one fixed question. On Step 1 it means the balloon is pinned on the drawing; on Step 2 that a control type has been chosen; on Step 3 that the measurement method and reaction plan are set. Every row showing green while the Control Type column read \u2014 not set \u2014 was the dot answering a question nobody was asking on that screen. Hovering says which test it applied, and notes if the balloon is still unpinned. Ghost rows keep their \ud83d\udc7b. (2) THE CP REV IS NOW APPROXIMATE, as asked: it advances on Save to Project, on creating a new operation, AND automatically every 100 edits \u2014 so a plan being worked climbs on its own instead of sitting at Rev-1 all week. Saving resets the counter and clears the \u25cf pending mark."] },
   { ts: "2026-07-28", rev: "App Rev-640", type: "App", changes: ["CP REV NOW SHOWS WHEN THERE ARE UNISSUED EDITS (Rev-640) \u2014 the Control Plan revision looked stuck because it advances on an explicit SAVE TO PROJECT, not on every edit. That is deliberate and matches CP-1: a revision is an ISSUE of the document, and the builder auto-saves on every keystroke \u2014 counting those would put a fourteen-row plan at Rev-4000 by lunchtime and make the number worthless for traceability. What was missing was any sign that edits existed beyond the last issued revision, so the figure simply looked broken. An amber \u25cf now appears beside the rev whenever auto-saved edits sit past it, and hovering explains: the edits are safe on this device, and Save to Project issues the next revision. Press Save and the dot clears as the number advances."] },
@@ -2184,7 +2193,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "4:32 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "4:48 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2956,6 +2965,24 @@ function cpLevelCell(idx, row, li, focused){
   const L = CP_LEVELS[li];
   const td = document.createElement('td');
   td.style.cssText = 'padding:4px; border:1px solid var(--line); font-size:11px; text-align:center; vertical-align:middle;';
+  // Rev-643: this level has a value but one above it is empty — a gap in the hierarchy
+  const _mrow = cpMasterRowFor(row);
+  const _valAt = (j) => {
+    const K = CP_LEVELS[j];
+    const own = String(row[K.key] || '').trim();
+    if(own) return own;
+    return _mrow ? String(_mrow[K.field] || '').trim() : '';
+  };
+  let _gap = false, _missing = [];
+  if(_valAt(li)){
+    for(let j = 0; j < li; j++) if(!_valAt(j)) _missing.push(CP_LEVELS[j].label);
+    _gap = _missing.length > 0;
+  }
+  if(_gap){
+    td.classList.add('cp-gap');
+    td.title = L.label + ' is set, but ' + _missing.join(' and ') + ' above it '
+      + (_missing.length > 1 ? 'are' : 'is') + ' blank. The Master List is a hierarchy — fill the level(s) above, or clear this one.';
+  }
   if(!focused){
     // a row that already has a control type shows the master's values, greyed
     const m = cpMasterRowFor(row);
