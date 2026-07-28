@@ -68,6 +68,9 @@
   /* Rev-621: the Control Plans list uses the full screen too — five step buttons plus six
      action buttons will not fit inside a centred 2080px column on a wide monitor */
   #projectsScreen.setup.wide{max-width:none;padding-left:10px;padding-right:10px}
+  /* Rev-625: the PARTS LIST is six short columns and does not need the whole monitor;
+     only the operations view (five steps + six actions) does. Half width here. */
+  #projectsScreen.setup.wide.parts-index{max-width:50%;padding-left:10px;padding-right:10px}
   #projectsTable{ table-layout:auto; width:100%; }
   /* the steps live on ONE line, always */
   #projectsTable td.cp-steps-cell{ white-space:nowrap; width:1%; }
@@ -1519,7 +1522,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-624";
+const APP_REV = "Rev-625";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1622,6 +1625,7 @@ function renderActionLogPanel(){
 }
 
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-625", type: "App", changes: ["PARTS LIST NARROWED TO HALF THE SCREEN (Rev-625) \u2014 the Control Plans screen was given the full width of the monitor at Rev-621 so the five construction steps and six action buttons could sit on one line. That is the OPERATIONS view; the PARTS list underneath it is six short columns and was left stretched across the whole screen with the Open button marooned two feet from the part number. The parts list now uses HALF the width, and the operations view keeps the full width \u2014 the same screen sizes itself to what it is showing, switched as the list is drawn rather than by a second screen."] },
   { ts: "2026-07-28", rev: "App Rev-624", type: "App", changes: ["ROLLING ACTION LOG ADDED (Rev-624) \u2014 the app now records what was actually done, on this machine only: every screen opened, every button pressed, the NAME of every field typed in (never its contents), and every uncaught error with its file and line number. Kept in localStorage under cpActionLog, capped at 600 entries, oldest dropped first. ADMIN \u2192 ACTION LOG shows the last 60 with Copy log / Download .txt / Clear. ITAR-safe by design: field names are logged, never values, so no part, drawing or feature data can enter it, and nothing is transmitted anywhere. Built to survive editing \u2014 the listeners are in capture phase so a handler that stops propagation cannot hide an event, navigation is logged by wrapping the show* functions once at boot rather than by a line pasted into twenty functions that would drift apart, and every write is try/caught so a full localStorage degrades silently instead of breaking the app. THE HANDOFF PROMPT AND THE NEW-APP RECIPE WERE BOTH UPDATED, so future chats are told to ASK FOR THE LOG FIRST when a fault is reported, and any new CAMCO app is built with this from the start. Several faults today \u2014 the vanishing plan, the silent upload, the rename that deleted its own plan \u2014 cost hours of guesswork that one log would have settled in a minute."] },
   { ts: "2026-07-28", rev: "App Rev-623", type: "App", changes: ["UNDER CONSTRUCTION BANNER + FULL-WIDTH PROGRESS BAR (Rev-623) \u2014 both of the marked-up changes. (1) An operation that is not finished now carries an UNDER CONSTRUCTION banner in shop-floor hazard stripes across the full width of its line, reading UNDER CONSTRUCTION \u2014 84% COMPLETE, with the outstanding work named on hover. It disappears by itself at 100%, so a finished operation is quiet and only the unfinished ones shout. (2) THE PROGRESS BAR NOW REALLY DOES RUN THE FULL WIDTH: its cell was set to span five columns, a number that silently stops being right the moment a column is added or removed \u2014 so the bar was ending short. It now spans 99, which every browser clamps to however many columns the table actually has, and the bar itself is set to fill its cell. The bar was also thickened slightly (9px to 11px) to sit under the banner without looking like an afterthought."] },
   { ts: "2026-07-28", rev: "App Rev-622", type: "App", changes: ["STEP BUTTONS STOP OVERLAPPING (Rev-622) \u2014 with the five steps finally on one line, ASSIGN CONTROL TYPES and ASSIGN MEASUREMENT TYPES were printing over each other: every button was pinned to a fixed 138px, which the longer labels simply do not fit in, so the text spilled straight out of its own button and over the next one. Width now FOLLOWS THE WORDS with a 132px floor, so short steps stay a sensible size and long ones get the room they need. The buttons are also told not to shrink and to clip rather than spill, so no future label can leak across a neighbour. ALSO ASKED: the ODS step has not gone \u2014 it is STEP 2 \u00b7 UPLOAD ODS. The separate ODS DRAWING column was removed at Rev-620 because Step 2 does that job; click Step 2 to view or replace the drawing."] },
@@ -2119,7 +2123,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "4:12 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3227,9 +3231,11 @@ function renderProjects(){
   if(!cpPartFilter){
     if(crumb) crumb.style.display = 'none';
     if(newBtn) newBtn.style.display = '';
+    try{ $('projectsScreen').classList.add('parts-index'); }catch(e){}   // Rev-625: half width
     renderPartsIndex(tbody, combined);
     return;
   }
+  try{ $('projectsScreen').classList.remove('parts-index'); }catch(e){}   // operations view: full width
 
   // LEVEL TWO — one part's operations
   const filtered = combined.filter(it => String(it.data.partNum || '').toUpperCase() === cpPartFilter);
