@@ -754,7 +754,8 @@
         <th>Part Number</th>
         <th>Status</th>
         <th>Updated</th>
-        <th>Actions</th>
+        <th style="border-left:2px solid #c9c0b4;">Construction Steps</th>
+        <th style="border-left:2px solid #c9c0b4;">Actions</th>
         <th style="text-align:right;">CP Rev</th>
       </tr>
     </thead>
@@ -1448,7 +1449,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-587";
+const APP_REV = "Rev-588";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1462,6 +1463,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-588", type: "App", changes: ["CONSTRUCTION STEPS COLUMN + THE STEPS NOW RUN IN ORDER (Rev-588) \u2014 the three step buttons moved into their own column headed CONSTRUCTION STEPS, separated by a rule from the supporting ACTIONS column (Inspect, Validation, Customer CP, Download, Rename, Delete). GATING: Step 2 stays locked until every row has a bubble number AND a feature description; Step 3 stays locked until every row has a control type. This matches how the work actually depends on itself \u2014 a control type cannot be chosen for a balloon that does not exist yet, and the methods band is filled BY the control type, so doing them out of order produces rows the master can never resolve. Nothing is hidden and nothing is guessed at: a locked button carries a \ud83d\udd12 and its tooltip says exactly how many rows are outstanding (e.g. \u20184 of 14 rows still need a control type\u2019), and a finished step turns quiet with a \u2713 so the state of every plan reads at a glance down the list."] },
   { ts: "2026-07-27", rev: "App Rev-587", type: "App", changes: ["THE THREE STEPS ARE NOW BUTTONS ON THE CONTROL PLANS LIST (Rev-587) \u2014 Rev-586 put the steps inside the builder, so the job still had to be chosen after opening the plan. Each operation row now carries the three steps directly: 1 \u00b7 BUBBLE NUMBERS, 2 \u00b7 CONTROL TYPE and 3 \u00b7 METHODS, each opening the builder already on that step. A hairline separates them from the supporting actions (Inspect, Validation, Customer CP, Download, Rename, Delete), which were trimmed slightly so the row still fits on one line. Each button\u2019s tooltip says what that step covers. The step bar inside the builder stays \u2014 it is still the way to switch step without going back to the list."] },
   { ts: "2026-07-27", rev: "App Rev-586", type: "App", changes: ["THE BUILDER IS NOW THREE STEPS (Rev-586) \u2014 all seventeen columns used to be on screen at once, so assigning balloons, choosing control types and setting measurement methods happened in the same crowded grid. A STEP bar now sits above the table: STEP 1 \u00b7 BUBBLE NUMBERS shows Doc#, Bubble#, pin, Feature/Process Description, Spec/Tol, Upper, Lower and Class \u2014 just enough to give every ODS balloon its row. STEP 2 \u00b7 CONTROL TYPE shows Doc#, Bubble#, pin, Control Type ID, Proposed, Feature, Spec and Class, and is the only step showing the \ud83c\udfaf Auto-fill Proposed and \ud83e\udd16 AI Propose Types buttons, which belong to this job and nothing else. STEP 3 \u00b7 MEASUREMENT METHODS shows the whole methods band, Special Gage / Fixture and Reaction Plan alongside the balloon and feature for reference. ALL COLUMNS restores the old single-screen view. This is a VIEW only \u2014 no data moves, nothing is locked, and steps can be switched at any time in any order without losing a thing; the chosen step is remembered per device. Assign Bubble Numbers on the Control Plans list now lands on Step 1."] },
   { ts: "2026-07-27", rev: "App Rev-585", type: "App", changes: ["EDIT PLAN RENAMED TO ASSIGN BUBBLE NUMBERS (Rev-585) \u2014 the green button on each operation row now reads Assign Bubble Numbers, which is what that screen is actually for: giving every ODS balloon its row, control type and methods. Tooltip spells out the full job. Widened to 176px; the rest of the row keeps its alignment. SECOND CHANGE \u2014 naming an operation pushed to GitHub without checking the result, so a failed push looked identical to a lost edit (which is exactly the symptom chased at Rev-583). The push is now awaited and reports: a success confirms it reached GitHub, a failure says the edit is on this device only and the next sync may undo it, and an unconfigured GitHub says so plainly rather than silently doing nothing."] },
@@ -1922,7 +1924,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:28 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2365,6 +2367,26 @@ function updateHomeScreen(){
   } catch(e){}
 }
 
+// ===== Rev-588: STEP GATING =====================================================
+// A control type cannot be chosen for a balloon that does not exist yet, and the
+// methods band is filled BY the control type — so the steps genuinely run in order.
+// Step 2 unlocks when every row has a bubble number and a feature description;
+// Step 3 unlocks when every row has a control type. Nothing is hidden: a locked
+// button says exactly how many rows are still outstanding.
+function cpStepProgress(p){
+  const rows = (p && p.builderState && Array.isArray(p.builderState.rows)) ? p.builderState.rows : [];
+  const total = rows.length;
+  const s1Left = rows.filter(r => !String(r.bubble || '').trim() || !String(r.featureDesc || '').trim()).length;
+  const s2Left = rows.filter(r => !String(r.controlTypeId || '').trim()).length;
+  return {
+    total,
+    s1Done: total > 0 && s1Left === 0,
+    s2Done: total > 0 && s2Left === 0,
+    s1Left, s2Left,
+    s1Note: total === 0 ? 'no rows yet' : (s1Left ? (s1Left + ' of ' + total + ' rows still need a bubble number and description') : 'all ' + total + ' rows done'),
+    s2Note: total === 0 ? 'no rows yet' : (s2Left ? (s2Left + ' of ' + total + ' rows still need a control type') : 'all ' + total + ' rows done')
+  };
+}
 function renderProjects(){
   const tbody = $('projectsTbody');
   tbody.innerHTML = '';
@@ -2401,7 +2423,7 @@ function renderProjects(){
       _lastPartHdr = _pk;
       const htr = document.createElement('tr');
       const htd = document.createElement('td');
-      htd.colSpan = 5;   // Rev-584: CP Rev has its own column
+      htd.colSpan = 6;   // Rev-588: Construction Steps split out from Actions
       htd.style.cssText = 'background:#e4ded4; border-top:2px solid #7a1a1c; border-bottom:1px solid #cfc6b8; padding:8px 10px;';
       const hb = document.createElement('b');
       hb.textContent = item.data.partNum || '';
@@ -2490,13 +2512,19 @@ function renderProjects(){
     const tdDate = document.createElement('td');
     const dateVal = item.kind === 'draft' ? p.savedAt : p.created;
     tdDate.textContent = dateVal ? new Date(dateVal).toLocaleDateString() : '';
+    // Rev-588: the three construction steps live in their own column under their own
+    // heading; the supporting actions keep theirs
+    const tdSteps = document.createElement('td');
+    tdSteps.style.borderLeft = '2px solid #e2ddd4';
+    const stepWrap = document.createElement('div');
+    stepWrap.className = 'cp-act';
+    tdSteps.appendChild(stepWrap);
     const tdActions = document.createElement('td');
+    tdActions.style.borderLeft = '2px solid #e2ddd4';
     const actWrap = document.createElement('div');
     actWrap.className = 'cp-act';
-    // Rev-587: a hairline after the three step buttons separates "build the plan"
-    // from the supporting actions
-    actWrap.dataset.divideAfter = '3';
     tdActions.appendChild(actWrap);
+    let _target = actWrap;
     // Rev-584: every action button is built the same way — same height, same weight,
     // fixed width per role so the columns line up down the whole list.
     const mkBtn = (label, tone, width, title, fn, enabled) => {
@@ -2507,34 +2535,42 @@ function renderProjects(){
       b.style.width = width + 'px';
       if(enabled === false){ b.disabled = true; }
       else b.onclick = fn;
-      if(actWrap.dataset.divideAfter && actWrap.children.length === +actWrap.dataset.divideAfter){
-        const sep = document.createElement('span');
-        sep.style.cssText = 'display:inline-block; width:1px; height:22px; background:#cfc6b8; margin:0 4px;';
-        actWrap.appendChild(sep);
-      }
-      actWrap.appendChild(b);
+      _target.appendChild(b);
       return b;
     };
 
     if(item.kind === 'draft'){
+      _target = actWrap;
       mkBtn('Resume', 'primary', 96, 'Carry on building this draft', () => { showNewCP(); loadDraft(p.partNum); });
       mkBtn('Delete', 'danger', 82, 'Discard this draft', () => { deleteDraft(p.partNum); renderProjects(); updateHomeScreen(); });
     } else {
       const i = item.idx;
       const has = !!p.builderState;
-      // Rev-587: the three steps are their own buttons here, so the job can be picked
-      // from the list instead of opening the builder and switching once inside.
+      // Rev-587/588: the three steps are their own buttons here, and they run in order
       const openAt = (s) => { try{ cpSetStep(s); }catch(e){} editProject(i); };
       const stepNote = has ? '' : ' \u2014 saved before editing was supported';
-      mkBtn('1 \u00b7 Bubble Numbers', 'primary', 148,
-        'STEP 1 \u2014 give every ODS balloon its row: bubble number, feature description and tolerance.' + stepNote,
+      const prog = cpStepProgress(p);
+      _target = stepWrap;
+      const b1 = mkBtn('1 \u00b7 Bubble Numbers', prog.s1Done ? 'quiet' : 'primary', 148,
+        'STEP 1 \u2014 give every ODS balloon its row: bubble number, feature description and tolerance.\n'
+        + prog.s1Note + '.' + stepNote,
         () => openAt('1'), has);
-      mkBtn('2 \u00b7 Control Type', 'primary', 132,
-        'STEP 2 \u2014 pick the Control Type for each balloon; the methods fill themselves from the Master List.' + stepNote,
-        () => openAt('2'), has);
-      mkBtn('3 \u00b7 Methods', 'primary', 116,
-        'STEP 3 \u2014 review the measurement methods, set any special gage, confirm the reaction plan.' + stepNote,
-        () => openAt('3'), has);
+      const b2 = mkBtn('2 \u00b7 Control Type', prog.s2Done ? 'quiet' : 'primary', 132,
+        prog.s1Done
+          ? ('STEP 2 \u2014 pick the Control Type for each balloon; the methods fill themselves from the Master List.\n' + prog.s2Note + '.' + stepNote)
+          : ('LOCKED \u2014 finish Step 1 first. ' + prog.s1Note + '. A control type cannot be chosen for a balloon that does not exist yet.'),
+        () => openAt('2'), has && prog.s1Done);
+      const b3 = mkBtn('3 \u00b7 Methods', 'primary', 116,
+        prog.s2Done
+          ? ('STEP 3 \u2014 review the measurement methods, set any special gage, confirm the reaction plan.' + stepNote)
+          : ('LOCKED \u2014 finish Step 2 first. ' + prog.s2Note + '. The methods band is filled BY the control type.'),
+        () => openAt('3'), has && prog.s2Done);
+      // a done step gets a tick; a locked one gets a padlock, so the state reads at a glance
+      if(prog.s1Done) b1.textContent = '\u2713 1 \u00b7 Bubble Numbers';
+      if(!prog.s1Done && has) b2.textContent = '\ud83d\udd12 2 \u00b7 Control Type';
+      else if(prog.s2Done) b2.textContent = '\u2713 2 \u00b7 Control Type';
+      if(!prog.s2Done && has) b3.textContent = '\ud83d\udd12 3 \u00b7 Methods';
+      _target = actWrap;
       mkBtn('Inspect', 'go', 84, 'Machinist: start a real inspection run for this plan (readings are saved)'
         + (has ? '' : ' \u2014 no plan data to inspect'), () => inspectMachinistValidation(i), has);
       mkBtn('Validation', 'quiet', 94, (mvIsCreated(p)
@@ -2555,7 +2591,7 @@ function renderProjects(){
       + (p.rev ? ('&#10;Part / drawing rev: ' + String(p.rev).replace(/"/g,'')) : '') + '">Rev-'
       + (parseInt(p.cpRevNum, 10) || 1) + '</span>';
     tr.className = 'cp-op-row';
-    tr.appendChild(tdPart); tr.appendChild(tdStatus); tr.appendChild(tdDate); tr.appendChild(tdActions); tr.appendChild(tdCpRev);
+    tr.appendChild(tdPart); tr.appendChild(tdStatus); tr.appendChild(tdDate); tr.appendChild(tdSteps); tr.appendChild(tdActions); tr.appendChild(tdCpRev);
     tbody.appendChild(tr);
   });
 }
