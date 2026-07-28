@@ -1472,7 +1472,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-612";
+const APP_REV = "Rev-613";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1486,6 +1486,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-613", type: "App", changes: ["HARDINGE LATHE RENAME MADE TO STICK (Rev-613) \u2014 the rename ran at Rev-609, set a run-once flag, and then a GitHub pull brought the old Master List straight back \u2014 incoming always wins on a pull \u2014 while the flag stopped the sweep ever running again. So the old name reappeared and stayed, and the Rev-610 plan sweep never ran either, because it was guarded by the same spent flag. THE FLAG IS GONE. The sweep is idempotent and now runs on EVERY start-up, after EVERY data pull, and again whenever the Master List screen is drawn. It costs nothing when there is nothing to change and pushes only when it actually changed something, so however stale the data arriving from GitHub is, it corrects itself instead of depending on one lucky moment. Matching also normalises whitespace, so HARDINGE\u2007\u2007LATHE with a double space is caught too. The old flag is deleted on start-up so no device is left half-applied."] },
   { ts: "2026-07-28", rev: "App Rev-612", type: "App", changes: ["EDIT A PART NUMBER FROM THE PARTS LIST (Rev-612) \u2014 renaming lived only on an operation row and touched only THAT plan, so a part with three operations had to be renamed three times and sat inconsistent in between. A \u270f\ufe0f now sits beside every part number on the parts list and renames the part in ONE action: every operation plan, the gages keyed to those operations (and their drawings), the stored ODS drawings, the traveller, and the part\u2019s own record all move to the new name. Proper window rather than browser prompts \u2014 part number and rev side by side in mandatory yellow, red Close in the title bar, Enter saves, Esc cancels, and a clash with an existing part is reported in the window instead of thrown away. Each renamed plan gets a fresh updated stamp so the Rev-606 rule protects it. FIX ALONGSIDE: the per-plan Rename built its new id WITHOUT the operation number, so a renamed plan silently lost its per-operation identity and could collide with another op of the same part; it now keeps the op in the key."] },
   { ts: "2026-07-28", rev: "App Rev-611", type: "App", changes: ["PART NUMBERS BLACK, BOLD AND BIGGER (Rev-611) \u2014 part numbers were dark red at 14\u201316px, which on a shop screen sat back rather than leading. They now read BLACK, weight 800, at 19px in all three places they appear: the parts list, the breadcrumb above an opened part, and the part header bar over its operations. The part number is the first thing anyone looks for on this screen, so it should be the loudest thing on it; the dark red is kept for headings, where it belongs."] },
   { ts: "2026-07-28", rev: "App Rev-610", type: "App", changes: ["RENAME EXTENDED TO EVERY SAVED CONTROL PLAN (Rev-610) \u2014 Rev-609 renamed HARDINGE LATHE to LATHE in the Master List only. The sweep now also rewrites the Workcenter on every SAVED PLAN: the plan-level workcenter and every feature row, across saved projects, drafts, the working copy and whatever is open in the builder. Plan rows are a snapshot taken when the row was written rather than a live link to the Master List, so they would otherwise have kept the old wording forever. Each plan it touches gets its updated stamp refreshed, which matters after Rev-606: a plan edited more recently than any deletion marker cannot be wiped by a stale one. Two supporting fixes: the SEEDED master list itself said Hardinge Lathe on all 65 rows, so a fresh device would have re-introduced the old name \u2014 the seed now says LATHE; and an empty master list no longer stops the sweep, since saved plans still need it. The open Control Plans list and builder redraw immediately, and the result pushes to GitHub."] },
@@ -1971,7 +1972,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:36 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:52 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2618,68 +2619,71 @@ function renderPartsIndex(tbody, combined){
 // on each device and is pushed up from there — editing GitHub directly would simply be
 // overwritten by the next push, which is exactly what happened with 912767-M.
 function cpMigrateWorkcenterNames(){
+  // Rev-613: NO run-once flag any more. Rev-609/610 renamed the rows, set a flag, and
+  // then a GitHub pull brought the old Master List straight back — incoming always wins —
+  // and the flag stopped it ever running again, so HARDINGE LATHE reappeared and stuck.
+  // The sweep is now idempotent and runs on EVERY start-up and after every pull: it costs
+  // nothing when there is nothing to change, pushes only when it actually changed
+  // something, and self-corrects however stale the data arriving from GitHub is.
   try{
-    if(localStorage.getItem('cpWcRename_v1')) return;
-    const d = JSON.parse(localStorage.getItem('masterList') || '[]');
-    // Rev-610: an empty master list is no longer a reason to stop — saved plans still need
-    // sweeping. Only wait if there is nothing on the device at all.
-    if((!Array.isArray(d) || !d.length) && !localStorage.getItem('cpProjects')) return;
-    let n = 0;
-    (Array.isArray(d) ? d : []).forEach(r => {
-      if(String(r.workcenter || '').trim().toUpperCase() === 'HARDINGE LATHE'){ r.workcenter = 'LATHE'; n++; }
-    });
-    if(n){
-      localStorage.setItem('masterList', JSON.stringify(d));
-      try{ flash('\u2713 Workcenter renamed to LATHE on ' + n + ' Master List rows.'); }catch(e){}
-      try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
-    }
-    // Rev-610: the same rename across every SAVED CONTROL PLAN — plan rows are a snapshot
-    // taken when the row was written, not a live link to the Master List, so they keep the
-    // old wording until rewritten here. Plan-level workcenter and every feature row.
+    const norm = v => String(v || '').replace(/\s+/g, ' ').trim().toUpperCase();
     const OLD = 'HARDINGE LATHE', NEW = 'LATHE';
-    const fixWc = (o) => { if(o && String(o.workcenter || '').trim().toUpperCase() === OLD){ o.workcenter = NEW; return 1; } return 0; };
+    const fixWc = (o) => { if(o && norm(o.workcenter) === OLD){ o.workcenter = NEW; return 1; } return 0; };
     const sweepPlan = (bs) => { let c = 0; if(!bs) return 0; c += fixWc(bs); (bs.rows || []).forEach(r => { c += fixWc(r); }); return c; };
-    let planFixes = 0;
+    let changed = 0;
+
+    // Master List
+    try{
+      const d = JSON.parse(localStorage.getItem('masterList') || '[]');
+      if(Array.isArray(d) && d.length){
+        let n = 0;
+        d.forEach(r => { n += fixWc(r); });
+        if(n){ localStorage.setItem('masterList', JSON.stringify(d)); changed += n;
+          try{ if(typeof renderMasterList === 'function') renderMasterList(); }catch(e){} }
+      }
+    }catch(e){}
+
+    // Saved plans, drafts, working copy, and whatever is open
     try{
       const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
-      let ch = 0;
-      projects.forEach(p => { const c = fixWc(p) + sweepPlan(p.builderState); if(c){ ch += c; p.updated = new Date().toISOString(); } });
-      if(ch){ localStorage.setItem('cpProjects', JSON.stringify(projects)); planFixes += ch; }
+      let n = 0;
+      projects.forEach(p => { const c = fixWc(p) + sweepPlan(p.builderState); if(c){ n += c; p.updated = new Date().toISOString(); } });
+      if(n){ localStorage.setItem('cpProjects', JSON.stringify(projects)); changed += n; }
     }catch(e){}
     try{
       const drafts = JSON.parse(localStorage.getItem('cpDrafts') || '[]');
-      let ch = 0;
-      drafts.forEach(d => { ch += fixWc(d) + sweepPlan(d); });
-      if(ch){ localStorage.setItem('cpDrafts', JSON.stringify(drafts)); planFixes += ch; }
+      let n = 0;
+      drafts.forEach(d => { n += fixWc(d) + sweepPlan(d); });
+      if(n){ localStorage.setItem('cpDrafts', JSON.stringify(drafts)); changed += n; }
     }catch(e){}
     try{
       const wc = JSON.parse(localStorage.getItem('cpWorkingCopy') || 'null');
-      if(wc && sweepPlan(wc)){ localStorage.setItem('cpWorkingCopy', JSON.stringify(wc)); planFixes++; }
+      if(wc && sweepPlan(wc)){ localStorage.setItem('cpWorkingCopy', JSON.stringify(wc)); changed++; }
     }catch(e){}
-    try{ if(typeof cpBuildState !== 'undefined' && cpBuildState) planFixes += sweepPlan(cpBuildState); }catch(e){}
-    if(planFixes){
-      try{ flash('\u2713 Workcenter renamed to LATHE on ' + planFixes + ' Control Plan rows as well.'); }catch(e){}
+    try{ if(typeof cpBuildState !== 'undefined' && cpBuildState) changed += sweepPlan(cpBuildState); }catch(e){}
+
+    // stored pick-lists can still name the old value
+    try{
+      const lv = JSON.parse(localStorage.getItem('cpLevelValues') || 'null');
+      if(lv && typeof lv === 'object'){
+        let n = 0;
+        Object.keys(lv).forEach(k => {
+          if(!Array.isArray(lv[k])) return;
+          lv[k] = lv[k].map(v => { if(norm(v) === OLD){ n++; return NEW; } return v; });
+        });
+        if(n){ localStorage.setItem('cpLevelValues', JSON.stringify(lv)); changed += n; }
+      }
+    }catch(e){}
+
+    if(changed){
+      try{ flash('\u2713 Workcenter HARDINGE LATHE \u2192 LATHE on ' + changed + ' row(s).'); }catch(e){}
       try{ if(typeof renderProjects === 'function') renderProjects(); }catch(e){}
       try{ if(typeof renderCPBuilder === 'function' && document.getElementById('cpBuilderTbody')) renderCPBuilder(); }catch(e){}
       try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
     }
-    localStorage.setItem('cpWcRename_v1', new Date().toISOString());
-    // the pick-lists are built from the rows, but a stored list may still name the old value
-    try{
-      const lk = 'cpLevelValues';
-      const lv = JSON.parse(localStorage.getItem(lk) || 'null');
-      if(lv && typeof lv === 'object'){
-        let ch = false;
-        Object.keys(lv).forEach(k => {
-          if(!Array.isArray(lv[k])) return;
-          lv[k] = lv[k].map(v => (String(v).trim().toUpperCase() === 'HARDINGE LATHE' ? 'LATHE' : v));
-          ch = true;
-        });
-        if(ch) localStorage.setItem(lk, JSON.stringify(lv));
-      }
-    }catch(e){}
   }catch(e){}
 }
+try{ localStorage.removeItem('cpWcRename_v1'); }catch(e){}   // Rev-613: the flag is gone
 try{ cpMigrateWorkcenterNames(); }catch(e){}
 // ===== Rev-612: RENAME A PART, ACROSS ALL ITS OPERATIONS =========================
 // Rename lived only on an operation row and only touched THAT plan, so a part with
@@ -8979,6 +8983,8 @@ function stopFeatureTypeTally(){
   if(_ftTallyTimer){ clearInterval(_ftTallyTimer); _ftTallyTimer = null; }
 }
 function renderMasterList(){
+  // Rev-613: last line of defence — sweep before the list is drawn
+  try{ if(!window._cpWcSweeping){ window._cpWcSweeping = 1; cpMigrateWorkcenterNames(); window._cpWcSweeping = 0; } }catch(e){ window._cpWcSweeping = 0; }
   document.querySelectorAll('.inlinePick').forEach(e => e.remove());  // Rev-259: drop any orphaned value list
   _normalizeControlTypeIds();   // Rev-291: keep Control Type IDs in the WORKCENTER / FEATURE / 2ND slash format
   const masterData = getMasterData();
