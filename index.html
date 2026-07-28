@@ -1536,7 +1536,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-638";
+const APP_REV = "Rev-639";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1669,6 +1669,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-639", type: "App", changes: ["CREATING AN OPERATION RETURNS TO THE PART (Rev-639) \u2014 saving a new operation dropped you straight into the builder with a blank skeleton open on the first row. Creating an operation and ballooning it are different jobs: the five construction steps are the map, and landing inside Step 3 skipped past 1 and 2 without acknowledging them and hid the rest of the part, so a second operation could not be seen next to the first. A new operation now saves and returns to THAT PART\u2019S OPERATIONS \u2014 the screen showing both ops, their steps and their progress \u2014 with a note confirming what was created and that Step 3 assigns the bubbles. The plan is auto-saved before the move, and the new op opens with no row expanded, per Rev-608."] },
   { ts: "2026-07-28", rev: "App Rev-638", type: "App", changes: ["PART NUMBER AND OPERATION LINE 75% LARGER (Rev-638) \u2014 the part number goes 19px \u2192 33px and the operation line 13px \u2192 23px, with its description 12px \u2192 21px. These two lines are what you look for when scanning the screen, and they were the smallest thing on a row that also carries five step buttons and six action buttons. The \u21b3 (no op number) rows were scaled to match so both kinds of operation row read the same, and the \u270f\ufe0f edit pencil was enlarged with them \u2014 left at 12px it would have become a speck beside 23px text and an awkward tap target."] },
   { ts: "2026-07-28", rev: "App Rev-637", type: "App", changes: ["BANNER AND PROGRESS BAR DOUBLED IN HEIGHT (Rev-637) \u2014 the UNDER CONSTRUCTION banner goes 15px \u2192 30px and the progress bar 7px \u2192 14px. The stripe pitch and the wording were scaled with them (stripes 9px \u2192 14px, text 8.5px \u2192 11px, chip padding widened), because doubling only the height would have produced fatter stripes wrapped round the same small text \u2014 taller without being any more readable. The stripe animation was slowed to match the coarser pitch so it crawls at the same apparent speed, and the bar\u2019s corner radius follows its new height."] },
   { ts: "2026-07-28", rev: "App Rev-636", type: "App", changes: ["ADDING A SECOND OPERATION NO LONGER LOOKS LIKE OVERWRITING THE PART (Rev-636) \u2014 saving OP-040 onto a part that already had OP-030 raised \u2018A Control Plan already exists \u2014 this OVERWRITES the existing plan\u2019. Cause: the clash test compared PART NUMBER + REVISION only. That was right when a part had one Control Plan; since Rev-561 a part carries one plan PER ROUTING OPERATION, and the operation number is part of a plan\u2019s identity everywhere else in the app \u2014 it was simply missing from this one test. So the very thing \u2795 Add Operation exists to do was blocked behind an overwrite warning, and the safe-looking answer (Open the existing plan) would have sent you back into OP-030. Only the same part, the same rev AND the same operation is a clash now. The warning also names the operation, so when it does fire it is clear which plan is at risk rather than implying the whole part is."] },
@@ -2180,7 +2181,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:40 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5536,6 +5537,21 @@ async function generateCPBuild(){
       measMethodCMM: '',
       reactionPlan: 'FOLLOW SHOP NON-CONFORMING PARTS FLOW CHART (CW843-1)'
     });
+  }
+  // Rev-639: creating an operation now returns to THAT PART'S OPERATIONS rather than
+  // dropping straight into the builder. Creating the op and ballooning it are different
+  // jobs — the five construction steps are the map, and landing on Step 3 with the
+  // skeleton already open skipped past steps 1 and 2 and hid the rest of the part.
+  cpBuildState.focusIdx = -1;
+  try{ cpAutoSaveProject(); }catch(e){}
+  try{ logAct('new-op', (partNum || '') + (opNum ? ' OP-' + opNum : '') + ' \u00b7 ' + numRows + ' rows'); }catch(e){}
+  const _newPart = String(partNum || '').toUpperCase();
+  if(_newPart && typeof showProjects === 'function' && typeof cpOpenPart === 'function'){
+    $('newCPScreen').classList.add('hidden');
+    showProjects();
+    cpOpenPart(_newPart);
+    flash('\u2713 ' + (opNum ? 'OP-' + opNum : 'Operation') + ' created with ' + numRows + ' rows \u2014 Step 3 assigns the bubbles.');
+    return;
   }
   showCPBuilder();
 }
