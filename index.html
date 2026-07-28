@@ -65,6 +65,13 @@
   .setup{padding:16px 24px;max-width:1100px;margin:0 auto;width:100%}
   .setup.wide{max-width:2080px}   /* Rev-618: 30% wider — 1600 -> 2080 */
   #masterListScreen.setup.wide{max-width:none;padding-left:8px;padding-right:8px}
+  /* Rev-621: the Control Plans list uses the full screen too — five step buttons plus six
+     action buttons will not fit inside a centred 2080px column on a wide monitor */
+  #projectsScreen.setup.wide{max-width:none;padding-left:10px;padding-right:10px}
+  #projectsTable{ table-layout:auto; width:100%; }
+  /* the steps live on ONE line, always */
+  #projectsTable td.cp-steps-cell{ white-space:nowrap; width:1%; }
+  #projectsTable td.cp-steps-cell .cp-act{ flex-wrap:nowrap; }
   /* Rev-324: hide the six Tolerance Band columns by collapsing them to ZERO WIDTH rather than
      display:none. Keeping the cells present (just empty and 0-wide) preserves the table's column
      count and colspan math, so the MACHINIST / QE / CMM super-headers stay aligned over their real
@@ -782,7 +789,7 @@
 </div>
 
 <!-- PROJECTS SCREEN -->
-<div id="projectsScreen" class="setup hidden">
+<div id="projectsScreen" class="setup wide hidden">
   <button class="ob-back" id="projectsBack">← Back</button>
   <h1>Control Plans</h1>
   <p class="sub">All Control Plans on this device — drafts and saved projects together</p>
@@ -1490,7 +1497,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-620";
+const APP_REV = "Rev-621";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1504,6 +1511,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-621", type: "App", changes: ["STEPS GO HORIZONTAL, SCREEN GOES FULL WIDTH (Rev-621) \u2014 the five construction steps were still stacking into a vertical tower. Two causes, both fixed. (1) THE SCREEN was a centred column: the Control Plans list was never given the wide class at all, so it sat at 1100px while everything was being asked to fit inside it. It now uses the FULL width of the monitor, like the Master List and the builder already do. (2) THE STEPS CELL was free to wrap: the flex row still carried wrap:wrap, left over from when the progress bar was a child of the same row \u2014 the bar has had its own row since Rev-620, so the wrap was doing nothing but breaking the buttons onto separate lines. The steps cell is now no-wrap and sized to its content, and the actions cell is no-wrap too, so neither band can be squeezed into stacking again."] },
   { ts: "2026-07-28", rev: "App Rev-620", type: "App", changes: ["PROGRESS TRACK RUNS THE FULL LINE (Rev-620) \u2014 three fixes to the five-step row. (1) THE BAR STARTS UNDER THE OP # and runs the whole width: it now sits on its OWN row directly beneath the operation instead of being boxed inside the Construction Steps column. (2) THE ODS DRAWING COLUMN IS GONE \u2014 Step 2 IS the ODS drawing, so a separate column for it was the same thing said twice, and losing it gives the five step buttons the width to sit in ONE ROW instead of stacking into a tower. (3) A LATER STEP CAN NO LONGER READ DONE WHILE AN EARLIER ONE IS NOT: Step 5 was announcing \u2713 DONE while Step 4 still said DO THIS NEXT, because the methods band fills itself from the Master List \u2014 true of the cells, nonsense as a sequence. A step now shows DONE only when everything before it is done as well."] },
   { ts: "2026-07-28", rev: "App Rev-619", type: "App", changes: ["FIVE CONSTRUCTION STEPS ON ONE TRACK (Rev-619) \u2014 the three build steps were only part of the job: an operation is not usable until it has been NUMBERED and has its ODS DRAWING loaded, and both of those were being done somewhere else entirely, so the row could read 74% while having no drawing at all. All five now sit in order in ONE ROW with the progress bar running underneath: 1 EDIT OP # \u00b7 2 UPLOAD ODS \u00b7 3 ASSIGN BUBBLES \u00b7 4 ASSIGN CONTROL TYPES \u00b7 5 ASSIGN MEASUREMENT TYPES. Each is gated on the one before \u2014 no ODS until the operation is numbered, no ballooning until the ODS is loaded \u2014 and each opens the right screen: step 1 the operation window, step 2 the ODS capture screen (browse, drag or Ctrl+V, any PDF), steps 3\u20135 the builder at that step. STEP 2 IS NEW WORK, not a relabel: the ODS drawing can now be loaded or replaced for an existing operation straight from this list, which previously meant rebuilding the plan. The bar has five segments and the percentage counts all five \u2014 the two setup stages all-or-nothing, the three build steps by their own row counts."] },
   { ts: "2026-07-28", rev: "App Rev-618", type: "App", changes: ["PROGRESS BAR, PERCENTAGE AND A WIDER SCREEN (Rev-618) \u2014 (1) A PROGRESS BAR now runs the full width beneath the three construction-step buttons, split into three segments, one per step. The filled part is green; while the plan is unfinished the leading edge PULSES, so an operation still being worked reads across a room, and a finished one sits solid and still. (2) PERCENTAGE MOVED TO THE FAR RIGHT, past every button: the last column now leads with how far along that operation is in large type \u2014 grey at 0%, amber while under way, dark green at 100% \u2014 with the CP rev in small text beneath it. (3) The percentage counts each step as a THIRD AND COUNTS ITS OWN ROWS, so a step half done reads half rather than nothing; the bar moves as you work instead of jumping in three lurches. Hovering it lists what is outstanding in each step. (4) The screen is 30% wider \u2014 1600px to 2080px \u2014 so the steps, buttons and percentage sit on one line with room to spare."] },
@@ -1997,7 +2005,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:34 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "2:54 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3251,13 +3259,14 @@ function renderProjects(){
     // heading; the supporting actions keep theirs
     let _cpBarFor = null;   // Rev-620: this operation's progress track, hung below
     const tdSteps = document.createElement('td');
+    tdSteps.className = 'cp-steps-cell';   // Rev-621: never wrap the five steps
     tdSteps.style.borderLeft = '2px solid #e2ddd4';
     const stepWrap = document.createElement('div');
     stepWrap.className = 'cp-act';
     stepWrap.style.gap = '8px';
     tdSteps.appendChild(stepWrap);
     const tdActions = document.createElement('td');
-    tdActions.style.borderLeft = '2px solid #e2ddd4';
+    tdActions.style.cssText = 'border-left:2px solid #e2ddd4; white-space:nowrap;';   // Rev-621
     const actWrap = document.createElement('div');
     actWrap.className = 'cp-act';
     tdActions.appendChild(actWrap);
@@ -3295,7 +3304,9 @@ function renderProjects(){
       const prog = cpStepProgress(p);
       const st = cpOpStages(p);
 
-      stepWrap.style.flexWrap = 'wrap';
+      // Rev-621: horizontal, always. The wrap setting was left over from when the bar
+      // was a flex child of this same row; the bar has its own row now.
+      stepWrap.style.flexWrap = 'nowrap';
       stepWrap.style.gap = '6px';
 
       const mkStep = (n, title, state, tip, fn) => {
