@@ -772,7 +772,7 @@
       <tr class="cp-plan-head" id="cpPlanHeadRow">
         <th>Part Number</th>
         <th>Status</th>
-        <th>Updated</th>
+        <th>ODS Drawing</th>
         <th style="border-left:2px solid #c9c0b4;">Construction Steps</th>
         <th style="border-left:2px solid #c9c0b4;">Actions</th>
         <th style="text-align:right;">CP Rev</th>
@@ -1468,7 +1468,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-598";
+const APP_REV = "Rev-599";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1482,6 +1482,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-599", type: "App", changes: ["UPDATED DATE REPLACED BY THE OPERATION\u2019S ODS DRAWING (Rev-599) \u2014 the UPDATED column showed a date nobody acts on. It now carries the ODS DRAWING for that operation: View ODS opens it full-screen, captioned with the part, op number and op description; an operation with nothing loaded reads \u2018none loaded\u2019 in grey. Each operation has its OWN ODS \u2014 the traveller belongs to the part and stays on the part header row, the ODS belongs to the op and now sits on the op row. The image comes from the plan\u2019s own copy, falling back to the per-part drawing store when the GitHub sync has stripped it. NOTE for later: the drawing store is still keyed by PART ALONE, so two operations of one part share a single stored ODS \u2014 harmless while each plan keeps its own copy, worth fixing properly once a part carries several ops with different drawings."] },
   { ts: "2026-07-28", rev: "App Rev-598", type: "App", changes: ["STEP 1 IS DONE WHEN EVERY ROW HAS THE GREEN DOT (Rev-598) \u2014 Step 1 was counting a row as finished once it had a bubble number and a description typed in. That proves nothing: the green dot in the pin column is what says the balloon has actually been LOCATED on the ODS drawing, which is what makes zoom-to-bubble and the drawing crops work. Step 1 now requires the dot on every row \u2014 read from the balloon positions saved with the plan, so it is judged the same way from the Control Plans list as it is inside the builder. GHOST ROWS ARE EXEMPT: a ghost is deliberately a balloon that is NOT on the drawing, so it can never be pinned and must not hold the step open. A feature description no longer gates the step \u2014 the dot is the test. The step-bar hint and the Step 1 tooltip now say so, and the outstanding count reads \u2018n of n rows are not pinned to the drawing yet (no green dot)\u2019."] },
   { ts: "2026-07-28", rev: "App Rev-597", type: "App", changes: ["COMPLETE NOW HAS TO BE EARNED (Rev-597) \u2014 Test1 was announcing itself COMPLETE with no operation number, no traveller and Step 3 untouched. The badge was reading nothing more than the manual under-construction switch: not marked under construction meant COMPLETE, regardless of the state of the work. A plan is now COMPLETE only when it has an operation number, a traveller on file for its part, and all three construction steps finished; anything short of that reads IN PROGRESS with a count, and hovering it lists exactly what is outstanding (\u2018no traveller uploaded for this part\u2019, \u2018Step 3: 6 of 6 rows still need a measurement method and reaction plan\u2019). The manual switch still works, but only to FORCE in-progress \u2014 it can no longer declare a plan finished. STEP 3 CAN ALSO SHOW AS DONE now: it is finished when every row carries a machinist method and a reaction plan, so the button turns white with a \u2713 like the other two instead of staying green forever. The part-level pill on the parts list uses the same rule, so ALL STEPS DONE became COMPLETE and means it."] },
   { ts: "2026-07-27", rev: "App Rev-596", type: "App", changes: ["ODS PDF CONVERTS AT LAST (Rev-596) \u2014 with handleODSUpload reachable after Rev-594, the failure moved one step along: \u2018convertPdfToImageFile is not defined\u2019. Both functions sat in the same stretch of the file, and declarations in that stretch are not reaching the global scope \u2014 which is why moving handleODSUpload out of it fixed that name and exposed the next one. Rather than chase each name in turn, the ODS upload now calls cpPdfPagesToImages, the converter the traveller and gage-drawing screens have been using successfully since Rev-570, and takes page 1; convertPdfToImageFile remains only as a fallback if it happens to be present. Both routes are checked with typeof before use, so a missing binding produces a clear message instead of a raw ReferenceError. The unreachable-declaration region itself is still to be tracked down \u2014 anything else living in it may fail the same way."] },
@@ -1953,7 +1954,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:22 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:34 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2582,6 +2583,32 @@ function renderPartsIndex(tbody, combined){
       tbody.appendChild(tr);
     });
 }
+// Rev-599: an operation's ODS drawing. The plan carries its own copy; if the GitHub
+// sync stripped it, fall back to the per-part drawing store.
+function cpOpOdsImage(p){
+  try{
+    const bs = p && p.builderState;
+    if(bs && bs.odsImage) return bs.odsImage;
+    const d = _idbGetDrawing(String(p.partNum || '').toUpperCase());
+    if(d && d.odsImage) return d.odsImage;
+  }catch(e){}
+  return null;
+}
+function cpViewOpOds(p){
+  const img = cpOpOdsImage(p);
+  if(!img){ alert('No ODS drawing is loaded for this operation yet.'); return; }
+  const old = document.getElementById('cpOpOdsView'); if(old) old.remove();
+  const v = document.createElement('div');
+  v.id = 'cpOpOdsView';
+  v.style.cssText = 'position:fixed; inset:0; z-index:100007; background:rgba(20,15,12,.92); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px;';
+  v.innerHTML = '<div style="color:#fff; font-weight:800; letter-spacing:.05em; margin-bottom:10px;">ODS DRAWING \u2014 '
+      + (p.partNum || '') + (p.opNum ? ('  \u00b7  OP-' + p.opNum) : '') + (p.opDesc ? ('  \u00b7  ' + p.opDesc) : '') + '</div>'
+    + '<img src="' + img + '" style="max-width:96vw; max-height:84vh; background:#fff; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5);">'
+    + '<button id="cpOpOdsClose" style="margin-top:14px; background:#fff; color:#7a1414; border:2px solid #fff; border-radius:8px; padding:9px 26px; font-weight:800; cursor:pointer;">\u2715 Close</button>';
+  document.body.appendChild(v);
+  document.getElementById('cpOpOdsClose').onclick = () => v.remove();
+  v.onclick = (e) => { if(e.target === v) v.remove(); };
+}
 // Rev-597: what COMPLETE actually means. The badge used to read straight off the
 // manual under-construction switch, so a plan with no operation number, no traveller
 // and no measurement methods still announced itself COMPLETE. It now has to earn it.
@@ -2699,7 +2726,7 @@ function renderProjects(){
   if(head) head.innerHTML =
       '<th>Operation</th>'
     + '<th>Status</th>'
-    + '<th>Updated</th>'
+    + '<th>ODS Drawing</th>'
     + '<th style="border-left:2px solid #c9c0b4;">Construction Steps</th>'
     + '<th style="border-left:2px solid #c9c0b4;">Actions</th>'
     + '<th style="text-align:right;">CP Rev</th>';
@@ -2805,9 +2832,24 @@ function renderProjects(){
           + ' <span style="font-weight:700; opacity:.8;">(' + st.missing.length + ')</span></span>';
       }
     }
+    // Rev-599: the date told you nothing you could act on. This column now carries the
+    // ODS drawing for THIS operation — each op has its own; the traveller belongs to the part.
     const tdDate = document.createElement('td');
-    const dateVal = item.kind === 'draft' ? p.savedAt : p.created;
-    tdDate.textContent = dateVal ? new Date(dateVal).toLocaleDateString() : '';
+    const odsImg = cpOpOdsImage(p);
+    if(odsImg){
+      const ob = document.createElement('button');
+      ob.className = 'cp-btn cp-btn-quiet';
+      ob.textContent = 'View ODS';
+      ob.style.width = '104px';
+      ob.title = 'The ODS drawing loaded for this operation';
+      ob.onclick = (e) => { e.stopPropagation(); cpViewOpOds(p); };
+      tdDate.appendChild(ob);
+    } else {
+      const s = document.createElement('span');
+      s.textContent = 'none loaded';
+      s.style.cssText = 'font-size:11px; color:#a49a8d;';
+      tdDate.appendChild(s);
+    }
     // Rev-588: the three construction steps live in their own column under their own
     // heading; the supporting actions keep theirs
     const tdSteps = document.createElement('td');
