@@ -1472,7 +1472,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-606";
+const APP_REV = "Rev-607";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1486,6 +1486,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-607", type: "App", changes: ["VIEWER CONTROLS MOVED TO THE TOP, CLOSE IS RED (Rev-607) \u2014 the full-screen drawing viewers put Close UNDER the image, which on a laptop sat below the fold: you had to scroll past a full-size print to get out of it. All three viewers \u2014 ODS drawing, traveller and gage drawing \u2014 now carry a bar across the TOP with the title on the left and the buttons on the right, and the image fills the space beneath (now 86vh instead of 80\u201384vh, since the bar is more compact than the old caption plus button row). CLOSE IS NOW RED (#a02020) in all three, per the standard: a close button reads as a close button. \u2b06 Replace sits beside it in the traveller and gage viewers. Clicking the dark background still closes, as before."] },
   { ts: "2026-07-28", rev: "App Rev-606", type: "App", changes: ["A DELETION CAN NO LONGER ERASE A PLAN THAT IS STILL BEING WORKED ON (Rev-606) \u2014 912767-M was repaired on GitHub at Rev-605 but stayed missing, because the false deletion marker written at 12:14 was still sitting on the device and deletions were absolute: the merge removed any plan whose id matched a marker, no matter how old the marker or how recently the plan had been edited. The drafts merge has always been smarter (\u2018a draft re-saved after its deletion survives\u2019); projects now follow the same rule \u2014 a deletion only wins over a plan older than itself, so a plan edited AFTER the marker was written stays. That closes the whole failure mode, not just this instance: one stale marker can no longer wipe live work off every device. The specific 12:14 marker is also ignored outright, since it came from the false-rename bug fixed at Rev-605 rather than from anyone deleting anything."] },
   { ts: "2026-07-28", rev: "App Rev-605", type: "App", changes: ["THE PLAN-EATING BUG FOUND (Rev-605) \u2014 912767-M kept disappearing and the pencil\u2019s op number would not stick. Cause found in the saved data: a DELETION had been recorded for 912767-M::Rev-1::OP030 at 12:14 today. It was not a mis-click. saveProject carries a rename rule from Rev-336: if the plan\u2019s id changed since it was opened, tombstone the old id so the old name cannot come back. That was written when an id was part::rev. Since per-operation plans the id ALSO carries the op number \u2014 so giving a plan its op number changed its id, the rename rule fired, and the app recorded a deletion OF THE PLAN ITSELF, which then propagated to every device. Three fixes: (1) only a changed PART NUMBER or REV counts as a rename now; an op-number change moves the same plan and never leaves a tombstone. (2) Opening a plan copies its op number and description into the builder, so the builder can no longer hold a blank op while the saved plan has one and compute a different id on the next save. (3) The pencil updates the builder\u2019s record of which saved plan it came from at the same time it changes the id. The lost plan and its false deletion marker were repaired in the synced data."] },
   { ts: "2026-07-28", rev: "App Rev-604", type: "App", changes: ["PART BUTTONS MOVED UNDER ACTIONS (Rev-604) \u2014 Add Operation and View / Upload Traveller sat immediately after the part number on the header bar, floating over the Status and ODS Drawing columns and lining up with nothing. The header bar is now two cells: the part number spans the first four columns, and its buttons begin exactly where the ACTIONS column begins, directly above the operation row\u2019s own buttons. Everything that acts on a row \u2014 part-level or operation-level \u2014 now lives in one vertical band, and the part name no longer needs its fixed-width spacer to keep things aligned."] },
@@ -1965,7 +1966,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:12 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:26 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2613,11 +2614,15 @@ function cpViewOpOds(p){
   const old = document.getElementById('cpOpOdsView'); if(old) old.remove();
   const v = document.createElement('div');
   v.id = 'cpOpOdsView';
-  v.style.cssText = 'position:fixed; inset:0; z-index:100007; background:rgba(20,15,12,.92); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px;';
-  v.innerHTML = '<div style="color:#fff; font-weight:800; letter-spacing:.05em; margin-bottom:10px;">ODS DRAWING \u2014 '
+  v.style.cssText = 'position:fixed; inset:0; z-index:100007; background:rgba(20,15,12,.92); display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:14px; overflow:auto;';
+  // Rev-607: title and controls at the TOP; Close is red. A Close under a full-height
+  // drawing sat below the fold on a laptop — you had to scroll to leave the picture.
+  v.innerHTML = '<div style="display:flex; align-items:center; gap:12px; width:100%; max-width:1500px; margin-bottom:10px; flex:0 0 auto;">'
+      + '<div style="color:#fff; font-weight:800; letter-spacing:.05em; flex:1 1 auto;">ODS DRAWING \u2014 '
       + (p.partNum || '') + (p.opNum ? ('  \u00b7  OP-' + p.opNum) : '') + (p.opDesc ? ('  \u00b7  ' + p.opDesc) : '') + '</div>'
-    + '<img src="' + img + '" style="max-width:96vw; max-height:84vh; background:#fff; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5);">'
-    + '<button id="cpOpOdsClose" style="margin-top:14px; background:#fff; color:#7a1414; border:2px solid #fff; border-radius:8px; padding:9px 26px; font-weight:800; cursor:pointer;">\u2715 Close</button>';
+      + '<button id="cpOpOdsClose" style="background:#a02020; color:#fff; border:2px solid #7a1414; border-radius:8px; padding:8px 22px; font-weight:800; cursor:pointer;">\u2715 Close</button>'
+    + '</div>'
+    + '<img src="' + img + '" style="max-width:96vw; max-height:86vh; background:#fff; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5);">';
   document.body.appendChild(v);
   document.getElementById('cpOpOdsClose').onclick = () => v.remove();
   v.onclick = (e) => { if(e.target === v) v.remove(); };
@@ -4695,13 +4700,13 @@ async function cpViewTraveller(partNum){
   const old = document.getElementById('travViewPanel'); if(old) old.remove();
   const v = document.createElement('div');
   v.id = 'travViewPanel';
-  v.style.cssText = 'position:fixed; inset:0; z-index:100003; background:rgba(20,15,12,.88); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px;';
-  v.innerHTML = '<div style="color:#fff; font-weight:800; letter-spacing:.05em; margin-bottom:10px;">TRAVELLER \u2014 ' + String(partNum) + '</div>' +
-    '<img src="' + img + '" style="max-width:94vw; max-height:82vh; background:#fff; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5);">' +
-    '<div style="margin-top:14px; display:flex; gap:10px;">' +
-    '<button id="travViewClose" style="background:#fff; color:#7a1414; border:2px solid #fff; border-radius:8px; padding:9px 26px; font-weight:800; cursor:pointer;">\u2715 Close</button>' +
-    '<button id="travViewReplace" style="background:#5a4a2a; color:#fff; border:2px solid #5a4a2a; border-radius:8px; padding:9px 26px; font-weight:800; cursor:pointer;">\u2b06 Replace</button>' +
-    '</div>';
+  v.style.cssText = 'position:fixed; inset:0; z-index:100003; background:rgba(20,15,12,.88); display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:14px; overflow:auto;';
+  v.innerHTML = '<div style="display:flex; align-items:center; gap:12px; width:100%; max-width:1500px; margin-bottom:10px; flex:0 0 auto;">' +
+    '<div style="color:#fff; font-weight:800; letter-spacing:.05em; flex:1 1 auto;">TRAVELLER \u2014 ' + String(partNum) + '</div>' +
+    '<button id="travViewReplace" style="background:#5a4a2a; color:#fff; border:2px solid #47391f; border-radius:8px; padding:8px 22px; font-weight:800; cursor:pointer;">\u2b06 Replace</button>' +
+    '<button id="travViewClose" style="background:#a02020; color:#fff; border:2px solid #7a1414; border-radius:8px; padding:8px 22px; font-weight:800; cursor:pointer;">\u2715 Close</button>' +
+    '</div>' +
+    '<img src="' + img + '" style="max-width:94vw; max-height:86vh; background:#fff; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5);">';
   document.body.appendChild(v);
   document.getElementById('travViewClose').onclick = () => v.remove();
   // Rev-568: swap in a newer routing without leaving the viewer
@@ -5736,12 +5741,13 @@ function cpGageViewDrawing(key){
   const old = document.getElementById('cpGDwgView'); if(old) old.remove();
   const v = document.createElement('div');
   v.id = 'cpGDwgView';
-  v.style.cssText = 'position:fixed; inset:0; z-index:100007; background:rgba(20,15,12,.9); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px;';
-  v.innerHTML = '<div style="color:#fff; font-weight:800; letter-spacing:.05em; margin-bottom:10px;">GAGE DRAWING \u2014 ' + (g.part || '') + ' BALLOON ' + (g.bubble || '') + '</div>' +
-    '<img src="' + img + '" style="max-width:94vw; max-height:80vh; background:#fff; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5);">' +
-    '<div style="margin-top:14px; display:flex; gap:10px;">' +
-    '<button id="cpGDwgClose" style="background:#fff; color:#7a1414; border:2px solid #fff; border-radius:8px; padding:9px 26px; font-weight:800; cursor:pointer;">\u2715 Close</button>' +
-    '<button id="cpGDwgRepl" style="background:#5a4a2a; color:#fff; border:2px solid #5a4a2a; border-radius:8px; padding:9px 26px; font-weight:800; cursor:pointer;">\u2b06 Replace</button></div>';
+  v.style.cssText = 'position:fixed; inset:0; z-index:100007; background:rgba(20,15,12,.9); display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:14px; overflow:auto;';
+  v.innerHTML = '<div style="display:flex; align-items:center; gap:12px; width:100%; max-width:1500px; margin-bottom:10px; flex:0 0 auto;">' +
+    '<div style="color:#fff; font-weight:800; letter-spacing:.05em; flex:1 1 auto;">GAGE DRAWING \u2014 ' + (g.part || '') + ' BALLOON ' + (g.bubble || '') + '</div>' +
+    '<button id="cpGDwgRepl" style="background:#5a4a2a; color:#fff; border:2px solid #47391f; border-radius:8px; padding:8px 22px; font-weight:800; cursor:pointer;">\u2b06 Replace</button>' +
+    '<button id="cpGDwgClose" style="background:#a02020; color:#fff; border:2px solid #7a1414; border-radius:8px; padding:8px 22px; font-weight:800; cursor:pointer;">\u2715 Close</button>' +
+    '</div>' +
+    '<img src="' + img + '" style="max-width:94vw; max-height:86vh; background:#fff; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5);">';
   document.body.appendChild(v);
   document.getElementById('cpGDwgClose').onclick = () => v.remove();
   document.getElementById('cpGDwgRepl').onclick = () => { v.remove(); cpGageListDrawing(key); };
