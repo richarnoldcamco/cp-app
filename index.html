@@ -1472,7 +1472,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-603";
+const APP_REV = "Rev-604";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1486,6 +1486,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-604", type: "App", changes: ["PART BUTTONS MOVED UNDER ACTIONS (Rev-604) \u2014 Add Operation and View / Upload Traveller sat immediately after the part number on the header bar, floating over the Status and ODS Drawing columns and lining up with nothing. The header bar is now two cells: the part number spans the first four columns, and its buttons begin exactly where the ACTIONS column begins, directly above the operation row\u2019s own buttons. Everything that acts on a row \u2014 part-level or operation-level \u2014 now lives in one vertical band, and the part name no longer needs its fixed-width spacer to keep things aligned."] },
   { ts: "2026-07-28", rev: "App Rev-603", type: "App", changes: ["A PART-FILLED STEP NOW SAYS IN PROGRESS (Rev-603) \u2014 Step 2 read DO THIS NEXT on a plan where 3 of its 14 rows already had a control type, which is simply untrue: the step had been started. An unfinished step that has already been part-filled now reads STEP n \u2013 IN PROGRESS with the count (e.g. STEP 2 \u2013 IN PROGRESS 3/14); DO THIS NEXT is reserved for a step where nothing has been done yet. Applies to all three steps, so a glance down the list distinguishes untouched work from work already underway."] },
   { ts: "2026-07-28", rev: "App Rev-602", type: "App", changes: ["STEP COLOURS TURNED THE RIGHT WAY ROUND (Rev-602) \u2014 the construction steps had it backwards: the step still TO DO was solid green and the FINISHED one was white, so the list read as if the unfinished work were the completed work. Green now means done, as everyone expects, and a third state was added for the step that is available now: DONE is solid green with STEP n \u2713 DONE; DO THIS NEXT is amber (matching the IN PROGRESS pill) reading STEP n \u2013 DO THIS NEXT; LOCKED stays flat grey with a dashed border reading STEP n \u2013 LOCKED. Each state now differs in colour AND in wording, so it survives a bad screen or colour-blindness. Separately, the Inspect button was using a brighter green (#1f8a3b) than any other button for no reason; it now uses the app\u2019s single filled-action green (#2c6e49), so a green button means the same thing everywhere on the row."] },
   { ts: "2026-07-28", rev: "App Rev-601", type: "App", changes: ["NEW SHOP ORDER BUTTON MOVED AND HALVED (Rev-601 \u00b7 embedded validation REV-156 \u2192 REV-157) \u2014 on the Choose shop order window the \u2018+ Inspect on a NEW shop order\u2019 button was a full-width green banner sitting ABOVE the list of existing shop orders, which made the rare action look like the main one. It now sits in the bottom right of the window beside Cancel, at roughly half its former size, reading \u2018+ NEW shop order\u2019. Picking an existing shop order \u2014 the common action \u2014 is now the first thing on the screen."] },
@@ -1962,7 +1963,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:26 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:44 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2745,21 +2746,28 @@ function renderProjects(){
     if(_pk !== _lastPartHdr){
       _lastPartHdr = _pk;
       const htr = document.createElement('tr');
+      // Rev-604: the part's own buttons now sit UNDER THE ACTIONS COLUMN with the
+      // operation-row buttons, instead of floating over the Status / ODS columns where
+      // they lined up with nothing. The bar is two cells: the part name spans the first
+      // four columns, the buttons start exactly where Actions begins.
+      const hNameTd = document.createElement('td');
+      hNameTd.colSpan = 4;
+      hNameTd.style.cssText = 'background:#e4ded4; border-top:2px solid #7a1a1c; border-bottom:1px solid #cfc6b8; padding:8px 10px;';
       const htd = document.createElement('td');
-      htd.colSpan = 6;   // Rev-588: Construction Steps split out from Actions
-      htd.style.cssText = 'background:#e4ded4; border-top:2px solid #7a1a1c; border-bottom:1px solid #cfc6b8; padding:8px 10px;';
+      htd.colSpan = 2;
+      htd.style.cssText = 'background:#e4ded4; border-top:2px solid #7a1a1c; border-bottom:1px solid #cfc6b8; border-left:2px solid #cfc6b8; padding:8px 10px;';
       const hb = document.createElement('b');
       hb.textContent = item.data.partNum || '';
       // Rev-569: fixed-width name block so every part's buttons start on the same
       // vertical line instead of stepping in and out with the part-number length
-      hb.style.cssText = 'font-size:14px; font-weight:800; letter-spacing:.05em; color:#5c1416; display:inline-block; min-width:170px; margin-right:14px; vertical-align:middle;';
-      htd.appendChild(hb);
+      hb.style.cssText = 'font-size:14px; font-weight:800; letter-spacing:.05em; color:#5c1416; vertical-align:middle;';
+      hNameTd.appendChild(hb);
       const addOp = document.createElement('button');
       addOp.className = 'btn-ghost';
       addOp.className = 'cp-btn cp-btn-primary';
       addOp.textContent = 'Add Operation';
       addOp.title = 'Add another operation\u2019s Control Plan to this part (traveller already on file)';
-      addOp.style.cssText = 'width:124px; margin-right:8px; vertical-align:middle;';
+      addOp.style.cssText = 'width:124px; margin-right:8px; vertical-align:middle;';   // Rev-604: first button in the Actions column
       addOp.onclick = () => cpAddOpToPart(item.data.partNum);
       htd.appendChild(addOp);
       const trav = document.createElement('button');
@@ -2775,6 +2783,7 @@ function renderProjects(){
         + (_hasTrav ? '' : ' background:#7a5c2a; border-color:#63481f;');
       trav.onclick = () => _hasTrav ? cpViewTraveller(item.data.partNum) : cpTravellerPick(item.data.partNum);
       htd.appendChild(trav);
+      htr.appendChild(hNameTd);
       htr.appendChild(htd);
       tbody.appendChild(htr);
     }
