@@ -1533,7 +1533,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-630";
+const APP_REV = "Rev-631";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1666,6 +1666,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-631", type: "App", changes: ["CONSTRUCTION VISUALS CONFINED TO THE CONSTRUCTION COLUMN (Rev-631) \u2014 Rev-626 pulled the hazard banner and progress bar off the Actions side, but they still ran under OPERATION and STATUS, so the stripes crossed the op number and its status pill. Neither of those is construction either. The banner and bar now sit under the CONSTRUCTION STEPS column alone, between the two rules, lining up exactly with the five step buttons they describe."] },
   { ts: "2026-07-28", rev: "App Rev-630", type: "App", changes: ["ADD A MISSING LEVEL FROM THE BUILDER (Rev-630) \u2014 the Workcenter / Feature Type / 2nd Level / 3rd Level pickers only offer values that already exist in the Master List, which left no way forward when a feature needed something the master does not carry. Each picker now ends with \u2795 Add a new \u2026, which jumps to the MASTER LIST with Add Row open and the levels already chosen filled in. IT DELIBERATELY DOES NOT let a value be typed straight into the builder: these lists are read FROM the Master List, so a level invented on a plan would resolve to no master row, leave the methods band unfillable, and quietly produce a Control Plan line the master can never explain. The missing thing is a control type, not a word \u2014 so the fix belongs where control types live, with its H#, class, measurement method, frequencies and CMM technique filled in properly."] },
   { ts: "2026-07-28", rev: "App Rev-629", type: "App", changes: ["BACK GOES ONE STEP BACK (Rev-629) \u2014 leaving a construction step returned to the FULL PARTS LIST, because the handler called showProjects() and that clears the part filter by design (Rev-591 made the screen always open on the parts list). So finishing a step on 1000237620 dumped you at the top level and you had to find the part again \u2014 several times per operation. \u2190 BACK now returns to THAT PART\u2019S OPERATIONS, one level up, exactly where the step was launched from. \u2190 All Parts on that screen is still the way out to the top level."] },
   { ts: "2026-07-28", rev: "App Rev-628", type: "App", changes: ["SMALLER BANNER, ANIMATED BAR (Rev-628) \u2014 the hazard banner was 22px of shouting for a line of text; it is now 15px with finer stripes, and the progress bar dropped from 11px to 7px, so the pair reads as a status strip rather than roadworks. TWO PIECES OF MOTION, both meaning something: the hazard stripes CRAWL along the banner, and a highlight SWEEPS along the filled part of the bar \u2014 but only while the operation is unfinished. A finished operation has no banner and a still bar, so movement on the screen always means work outstanding. The banner wording also moved onto a solid dark chip: white-on-stripes was being read straight off the barber pole and losing, and no amount of text-shadow fixes a background that alternates black and amber every nine pixels. Both animations respect the system reduced-motion setting."] },
@@ -2169,7 +2170,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "2:24 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3600,13 +3601,18 @@ function renderProjects(){
     if(_cpBarFor){
       const btr = document.createElement('tr');
       btr.className = 'cp-op-row';
+      // Rev-631: the banner and bar sit under the CONSTRUCTION STEPS COLUMN and nothing
+      // else. Rev-626 pulled them off the Actions side but still let them run under
+      // Operation and Status, so hazard stripes crossed the op number and its status
+      // pill — neither of which is construction. The two columns before it are now an
+      // empty cell, so the visuals line up exactly with the column they describe.
+      const bpre = document.createElement('td');
+      bpre.colSpan = 2;
+      bpre.style.cssText = 'border-bottom:1px solid #e2ddd4;';
+      btr.appendChild(bpre);
       const btd = document.createElement('td');
-      // Rev-626: the banner and bar belong to the CONSTRUCTION half of the row only.
-      // Spanning the whole table put them straight through the Actions buttons and the
-      // CP REV figure, which are not construction and should not be under a hazard
-      // stripe. Three columns — Operation, Status, Construction Steps — and stop.
-      btd.colSpan = 3;
-      btd.style.cssText = 'padding:2px 10px 10px 10px; border-bottom:1px solid #e2ddd4;';
+      btd.colSpan = 1;
+      btd.style.cssText = 'padding:2px 10px 10px 10px; border-bottom:1px solid #e2ddd4; border-left:2px solid #e2ddd4;';
       // Rev-623: an operation that is not finished says so, in shop-floor hazard stripes
       const _pcRow = cpPlanPercent(p);
       if(_pcRow < 100){
