@@ -1462,7 +1462,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-591";
+const APP_REV = "Rev-592";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1476,6 +1476,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-592", type: "App", changes: ["912767-M OP-030 RESTORED (Rev-592) \u2014 the plan was deleted at 8:11 PM tonight; its last good copy (14 rows, all ballooned, 3 control types assigned, 1ST TURN, under construction) was recovered from the 6:52 PM commit of cp_data.json and pushed back, and its deletion marker was cleared from GitHub. THE CODE PART: deletions are tombstoned and the merge unions tombstones from BOTH sides with deletions always winning, so restoring the data alone would have been undone \u2014 any device still holding the tombstone would delete the plan again on its next pull. The key 912767-M::Rev-1::OP030 is now ignored as a tombstone, but ONLY for deletions dated before 2026-07-28T01:30Z: if the plan is deliberately deleted again later, that newer deletion carries a newer date and works normally. Stale copies of the marker are also purged from each device at start-up. Its gage (912767-M::OP030::B7 \u00b7 TEST GAGE) was never deleted and reconnects to the restored plan."] },
   { ts: "2026-07-27", rev: "App Rev-591", type: "App", changes: ["CONTROL PLANS OPENS ON PART NUMBERS, NOT EVERY OPERATION (Rev-591) \u2014 the screen used to show every operation of every part at once: a wall of rows, three step buttons and six action buttons deep, before you had said which part you cared about. It is now two levels. LEVEL ONE is a plain list of PART NUMBERS, one line each, showing how many operations the part has and which (OP-020 \u00b7 OP-030), a progress pill for the part as a whole (NOT STARTED / n OF n READY / ALL STEPS DONE counted across its operations), when it was last touched, its traveller button, and Open. The whole row is clickable. LEVEL TWO opens that one part: a \u2190 All Parts button and the part number at the top, then only that part\u2019s operations with the construction steps and actions exactly as before \u2014 and the first column now reads Operation rather than Part Number, since the part is already named above. + New Control Plan shows on the parts list where it belongs. Control Plans from the main menu always lands on level one."] },
   { ts: "2026-07-27", rev: "App Rev-590", type: "App", changes: ["BUILD TIME STAMP CORRECTED (Rev-590) \u2014 the header read REV-589 \u00b7 2026-07-27 10:56 PM when the actual time was 8:40 PM. Cause: BUILD_TIME is typed in by hand at build time, and for the last several revs it was written from estimate rather than read off the clock, drifting roughly two hours ahead. Now read from the machine clock converted to Eastern. Revs 578 through 589 carry stamps that are ahead by about two hours; the rev NUMBERS and their order are unaffected, and nothing in the app depends on the stamp \u2014 the update check compares APP_REV, never the time. Going forward the stamp is read, not guessed."] },
   { ts: "2026-07-27", rev: "App Rev-589", type: "App", changes: ["CONSTRUCTION STEP BUTTONS REBUILT (Rev-589) \u2014 the three steps were ordinary one-line buttons reading \u20181 \u00b7 Bubble Numbers\u2019, with the sequence competing with the wording for the same line. They are now proper two-line step buttons, 46px tall and all one width: STEP 1 in small spaced capitals on top, the job in bold underneath \u2014 ASSIGN BUBBLE NUMBERS / SELECT CONTROL TYPE / MEASUREMENT METHODS. The state is carried in the top line rather than by an emoji stuck on the front: a finished step reads STEP 1 \u2713 and turns white with a green outline; a locked one reads STEP 2 \u2013 LOCKED and goes flat grey with a dashed border, which looks unavailable at a glance instead of looking like a button that failed. The step still to do stays solid green. Tooltips are unchanged and still name the outstanding row count."] },
@@ -1940,7 +1941,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:02 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2383,6 +2384,29 @@ function updateHomeScreen(){
     if(scr && !scr.classList.contains('hidden') && typeof renderProjects === 'function') renderProjects();
   } catch(e){}
 }
+
+// ===== Rev-592: ONE RESTORED PLAN, AND WHY IT NEEDS CODE ========================
+// Deletions are tombstoned (a "this was deleted" marker) and the merge unions tombstones
+// from BOTH sides with deletions always winning. So putting a deleted plan back on GitHub
+// is not enough on its own: the device that still holds the tombstone would delete it
+// again on the very next pull. These keys are therefore ignored as tombstones — but only
+// if the deletion is older than the cutoff, so the plan can still be deleted deliberately
+// later and that newer deletion will stick.
+const CP_TOMB_IGNORE = { '912767-M::Rev-1::OP030': '2026-07-28T01:30:00.000Z' };
+function cpTombLives(t){
+  if(!t || !t.key) return false;
+  const cutoff = CP_TOMB_IGNORE[t.key];
+  if(cutoff && String(t.deletedAt || '') <= cutoff) return false;   // restored — ignore it
+  return true;
+}
+function cpPurgeRestoredTombstones(){
+  try{
+    const list = JSON.parse(localStorage.getItem('deletedProjectKeys') || '[]');
+    const kept = list.filter(cpTombLives);
+    if(kept.length !== list.length) localStorage.setItem('deletedProjectKeys', JSON.stringify(kept));
+  }catch(e){}
+}
+try{ cpPurgeRestoredTombstones(); }catch(e){}
 
 // ===== Rev-591: TWO LEVELS — PARTS FIRST, THEN THAT PART'S OPERATIONS ==========
 // Control Plans used to open straight onto every operation of every part, so the
@@ -10802,6 +10826,7 @@ function mergeRestore(backup){
   const tombByKey = {};
   [...localTomb, ...incomingTomb].forEach(t => {
     if(!t || !t.key) return;
+    if(!cpTombLives(t)) return;      // Rev-592: restored plans are not re-deleted
     if(!tombByKey[t.key] || (t.deletedAt||'') > (tombByKey[t.key].deletedAt||'')) tombByKey[t.key] = t;
   });
   const mergedTombstones = Object.values(tombByKey);
