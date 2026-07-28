@@ -523,9 +523,13 @@
       <label>Machine Type</label>
       <input type="text" id="cpMachine" placeholder="E.G., HARDINGE QUEST">
     </div>
-    <div class="field tight">
+    <!-- Rev-595: DATA ROWS removed from the screen. Nobody counts balloons before the
+         drawing is even loaded, and Step 1 is where rows are added anyway. The input is
+         KEPT here, hidden, because a dozen places read it — it now just carries the
+         starting row count (the AI balloon count when one is available, else 15). -->
+    <div class="field tight" id="cpRowsField" style="display:none;">
       <label>Data Rows (# of balloons)</label>
-      <input type="number" id="cpRows" placeholder="E.G., 15" min="5" max="50">
+      <input type="number" id="cpRows" placeholder="E.G., 15" min="5" max="50" value="15">
     </div>
   </div>
 
@@ -1464,7 +1468,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-594";
+const APP_REV = "Rev-595";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1478,6 +1482,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-595", type: "App", changes: ["DATA ROWS FIELD REMOVED FROM THE NEW-PLAN SCREEN (Rev-595) \u2014 the DATA ROWS (# OF BALLOONS) box asked for a balloon count before the drawing had even been loaded, and Step 1 \u00b7 ASSIGN BUBBLE NUMBERS is where rows actually get added or removed. It is gone from the screen. The input itself is kept in the page but hidden, because a dozen places read it: it now simply carries the starting row count \u2014 the AI balloon count when one is available, otherwise 15 \u2014 so nothing downstream changes and no code had to be rewired for a cosmetic removal."] },
   { ts: "2026-07-27", rev: "App Rev-594", type: "App", changes: ["THE UPLOAD ERROR FOUND AND FIXED (Rev-594) \u2014 the red banner read \u2018Uncaught ReferenceError: handleODSUpload is not defined\u2019, and that was the whole story: the ODS file handler was being CALLED about 7,000 lines before it was DEFINED. Normally harmless, since function declarations are hoisted, but in the installed-app window the picker was reaching it before the binding existed \u2014 so choosing a file did nothing at all, no conversion, no preview, just the file name sitting on the drop zone. That is also why the Rev-593 byte-sniffing fix appeared to do nothing: the code carrying it was never reached. The function now sits directly ABOVE the code that calls it and is exported explicitly, and both call sites use whichever binding exists, so ordering cannot cause this again. BUTTON WORDING: \u2018GENERATE NEW CONTROL PLAN\u2019 now reads \u2018SAVE NEW OPERATION CONTROL PLAN\u2019 \u2014 the screen builds one operation\u2019s plan, not a whole part\u2019s."] },
   { ts: "2026-07-27", rev: "App Rev-593", type: "App", changes: ["ODS PDF NOW CONVERTS \u2014 AND THE DRAWING SHOWS ON THE SCREEN (Rev-593) \u2014 uploading L3H_912767-M_ODS-040_REV-01.pdf left the file name sitting on the drop zone and no drawing anywhere. Cause: the ODS handler decided a file was a PDF only from the browser\u2019s type label, and a PDF saved by Chrome or served from OneDrive frequently carries a different label \u2014 so conversion was skipped and a raw PDF was handed to an <img>, which displays nothing. It now reads the FIRST BYTES: anything starting %PDF is converted whatever the label says, the same fix made for gage drawings at Rev-574. Second, a failed conversion used to blame the internet with one canned sentence; it now reports the real reason on the drop zone, in a toast and in a dialog. Third, the loaded drawing is captioned ODS DRAWING LOADED \u2014 CLICK TO ENLARGE above the preview."] },
   { ts: "2026-07-27", rev: "App Rev-592", type: "App", changes: ["912767-M OP-030 RESTORED (Rev-592) \u2014 the plan was deleted at 8:11 PM tonight; its last good copy (14 rows, all ballooned, 3 control types assigned, 1ST TURN, under construction) was recovered from the 6:52 PM commit of cp_data.json and pushed back, and its deletion marker was cleared from GitHub. THE CODE PART: deletions are tombstoned and the merge unions tombstones from BOTH sides with deletions always winning, so restoring the data alone would have been undone \u2014 any device still holding the tombstone would delete the plan again on its next pull. The key 912767-M::Rev-1::OP030 is now ignored as a tombstone, but ONLY for deletions dated before 2026-07-28T01:30Z: if the plan is deliberately deleted again later, that newer deletion carries a newer date and works normally. Stale copies of the marker are also purged from each device at start-up. Its gage (912767-M::OP030::B7 \u00b7 TEST GAGE) was never deleted and reconnects to the restored plan."] },
@@ -1945,7 +1950,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:34 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
