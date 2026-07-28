@@ -1533,7 +1533,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-634";
+const APP_REV = "Rev-635";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1666,6 +1666,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-635", type: "App", changes: ["THE PERCENTAGE SHOWS ITS WORKING (Rev-635) \u2014 partial credit within a stage was already there (10 of 30 rows earns a third of that stage\u2019s weight), but a bare figure gives no way to check it. Hovering the percentage now itemises it: each stage, its weight, its row fraction and the points it contributed, with the total underneath \u2014 e.g. \u2018Control types (worth 30): 10 of 30 = 33% \u2192 10 pts\u2019. The UNDER CONSTRUCTION banner also names the stage actually in progress and its count, so the line reads UNDER CONSTRUCTION \u2014 46% COMPLETE \u00b7 CONTROL TYPES 3/14 rather than a percentage on its own. Nothing about the calculation changed; it is now checkable rather than taken on trust."] },
   { ts: "2026-07-28", rev: "App Rev-634", type: "App", changes: ["PERCENTAGE NOW REFLECTS THE WORK (Rev-634) \u2014 an operation with Step 4 barely started and Step 5 untouched was reading 84% complete. Two faults, both flattering the figure. (1) EVERY STAGE WAS WORTH A FLAT 20%. Typing an op number and loading a drawing are two clicks; ballooning fourteen features, choosing fourteen control types and settling fourteen measurement methods is the actual job \u2014 yet those two clicks carried 40% of the plan. Weighting is now 5 / 5 / 30 / 30 / 30. (2) A LOCKED STAGE STILL SCORED: the methods band auto-fills from the Master List as soon as a control type lands, so Step 5 was banking credit for rows whose control types had not been chosen. Work that cannot be started yet is not work done \u2014 a locked stage now counts zero. The same operation now reads about 46%, which matches what is actually finished."] },
   { ts: "2026-07-28", rev: "App Rev-633", type: "App", changes: ["ACTION LOG NOW RECORDS THE EVENTS THAT EXPLAIN A FAULT (Rev-633) \u2014 clicks and screens alone say what was pressed, not what the app then did with it. Six app-level events are now logged by name: OPEN-PLAN and SAVE-PLAN (part, op, id and row count), STEP (which construction step was opened), PUSH (a data push starting), DELETE-PLAN (a plan deleted by hand), and TOMBSTONE \u2014 a deletion marker written by the rename path, which is precisely the line that would have identified the Rev-605 plan-eating bug in seconds instead of hours. Part number and operation ARE included on these entries, because without them the log cannot say WHICH plan vanished; tolerances, feature descriptions and gage notes are still never recorded, and nothing is transmitted \u2014 the log leaves the device only when the user copies it out."] },
   { ts: "2026-07-28", rev: "App Rev-632", type: "App", changes: ["OPERATION ROWS INDENTED FURTHER (Rev-632) \u2014 the op line was set in 34px from the left, which at the new 19px part-number size left OP-030 sitting almost level with the part it belongs to. Indent increased by 0.35in to 68px, so an operation reads plainly as a child of its part. Applies to numbered operations and to the \u21b3 (no op number) rows alike."] },
@@ -2173,7 +2174,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:56 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:08 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3181,6 +3182,26 @@ function cpOpStages(p){
 //      List the moment a control type lands — so Step 5 was banking credit for rows
 //      whose control types had not been chosen yet. Work that cannot be started yet is
 //      not work done: a locked stage now counts ZERO.
+// Rev-635: the percentage, itemised. A single figure invites the question 'where did
+// that come from', so the tooltip now shows each stage's weight, its row fraction and
+// the points it contributed — the sum is checkable at a glance.
+function cpPercentBreakdown(p){
+  const st = cpOpStages(p);
+  const names = { s1: 'Edit op #', s2: 'Upload ODS', s3: 'Assign bubbles', s4: 'Control types', s5: 'Measurement methods' };
+  const lines = [];
+  let total = 0;
+  ['s1','s2','s3','s4','s5'].forEach(k => {
+    const s = st[k], w = CP_STAGE_WEIGHTS[k];
+    let got = 0, note;
+    if(!s.open){ note = 'locked — not counted'; }
+    else if(s.done){ got = w; note = 'done'; }
+    else if(!s.total){ note = 'no rows'; }
+    else { const frac = (s.total - s.left) / s.total; got = w * frac; note = (s.total - s.left) + ' of ' + s.total + ' = ' + Math.round(frac * 100) + '%'; }
+    total += got;
+    lines.push(names[k] + ' (worth ' + w + '): ' + note + ' → ' + (Math.round(got * 10) / 10) + ' pts');
+  });
+  return lines.join('\n') + '\n' + '—'.repeat(18) + '\nTOTAL ' + Math.round(total) + '%';
+}
 const CP_STAGE_WEIGHTS = { s1: 5, s2: 5, s3: 30, s4: 30, s5: 30 };   // sums to 100
 function cpPlanPercent(p){
   const st = cpOpStages(p);
@@ -3608,8 +3629,11 @@ function renderProjects(){
     tdCpRev.style.cssText = 'text-align:right; white-space:nowrap;';
     const _pc = (typeof cpPlanPercent === 'function') ? cpPlanPercent(p) : 0;
     const _pcCol = _pc >= 100 ? '#1f5133' : (_pc > 0 ? '#8a6a12' : '#a49a8d');
+    // Rev-635: hovering the figure shows how it was arrived at, stage by stage
+    let _pcTip = 'How far this operation is through its five construction steps.';
+    try{ _pcTip = cpPercentBreakdown(p); }catch(e){}
     tdCpRev.innerHTML =
-        '<div class="cp-pct" style="color:' + _pcCol + ';" title="Share of the three construction steps finished on this operation">' + _pc + '%</div>'
+        '<div class="cp-pct" style="color:' + _pcCol + ';" title="' + String(_pcTip).replace(/"/g, '') + '">' + _pc + '%</div>'
       + '<div class="cp-rev" title="Control Plan revision \u2014 how many times this plan has been saved'
       + (p.rev ? ('&#10;Part / drawing rev: ' + String(p.rev).replace(/"/g,'')) : '') + '">Rev-'
       + (parseInt(p.cpRevNum, 10) || 1) + '</div>';
@@ -3639,7 +3663,18 @@ function renderProjects(){
       if(_pcRow < 100){
         const uc = document.createElement('div');
         uc.className = 'cp-uc';
-        uc.innerHTML = '<b>UNDER CONSTRUCTION \u2014 ' + _pcRow + '% COMPLETE</b>';
+        // Rev-635: say WHICH stage is in progress and how far through it is
+        let _ucNote = '';
+        try{
+          const _s = cpOpStages(p);
+          const _nm = { s3: 'BUBBLES', s4: 'CONTROL TYPES', s5: 'MEASUREMENT METHODS' };
+          ['s3','s4','s5'].some(k => {
+            const s = _s[k];
+            if(s && s.open && !s.done && s.total){ _ucNote = ' \u00b7 ' + _nm[k] + ' ' + (s.total - s.left) + '/' + s.total; return true; }
+            return false;
+          });
+        }catch(e){}
+        uc.innerHTML = '<b>UNDER CONSTRUCTION \u2014 ' + _pcRow + '% COMPLETE' + _ucNote + '</b>';
         uc.title = 'This operation is still being built. ' + (typeof cpOpStages === 'function' ? cpOpStages(p).labelSummary : '');
         btd.appendChild(uc);
       }
