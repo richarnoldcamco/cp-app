@@ -1468,7 +1468,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-595";
+const APP_REV = "Rev-596";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1482,6 +1482,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-596", type: "App", changes: ["ODS PDF CONVERTS AT LAST (Rev-596) \u2014 with handleODSUpload reachable after Rev-594, the failure moved one step along: \u2018convertPdfToImageFile is not defined\u2019. Both functions sat in the same stretch of the file, and declarations in that stretch are not reaching the global scope \u2014 which is why moving handleODSUpload out of it fixed that name and exposed the next one. Rather than chase each name in turn, the ODS upload now calls cpPdfPagesToImages, the converter the traveller and gage-drawing screens have been using successfully since Rev-570, and takes page 1; convertPdfToImageFile remains only as a fallback if it happens to be present. Both routes are checked with typeof before use, so a missing binding produces a clear message instead of a raw ReferenceError. The unreachable-declaration region itself is still to be tracked down \u2014 anything else living in it may fail the same way."] },
   { ts: "2026-07-27", rev: "App Rev-595", type: "App", changes: ["DATA ROWS FIELD REMOVED FROM THE NEW-PLAN SCREEN (Rev-595) \u2014 the DATA ROWS (# OF BALLOONS) box asked for a balloon count before the drawing had even been loaded, and Step 1 \u00b7 ASSIGN BUBBLE NUMBERS is where rows actually get added or removed. It is gone from the screen. The input itself is kept in the page but hidden, because a dozen places read it: it now simply carries the starting row count \u2014 the AI balloon count when one is available, otherwise 15 \u2014 so nothing downstream changes and no code had to be rewired for a cosmetic removal."] },
   { ts: "2026-07-27", rev: "App Rev-594", type: "App", changes: ["THE UPLOAD ERROR FOUND AND FIXED (Rev-594) \u2014 the red banner read \u2018Uncaught ReferenceError: handleODSUpload is not defined\u2019, and that was the whole story: the ODS file handler was being CALLED about 7,000 lines before it was DEFINED. Normally harmless, since function declarations are hoisted, but in the installed-app window the picker was reaching it before the binding existed \u2014 so choosing a file did nothing at all, no conversion, no preview, just the file name sitting on the drop zone. That is also why the Rev-593 byte-sniffing fix appeared to do nothing: the code carrying it was never reached. The function now sits directly ABOVE the code that calls it and is exported explicitly, and both call sites use whichever binding exists, so ordering cannot cause this again. BUTTON WORDING: \u2018GENERATE NEW CONTROL PLAN\u2019 now reads \u2018SAVE NEW OPERATION CONTROL PLAN\u2019 \u2014 the screen builds one operation\u2019s plan, not a whole part\u2019s."] },
   { ts: "2026-07-27", rev: "App Rev-593", type: "App", changes: ["ODS PDF NOW CONVERTS \u2014 AND THE DRAWING SHOWS ON THE SCREEN (Rev-593) \u2014 uploading L3H_912767-M_ODS-040_REV-01.pdf left the file name sitting on the drop zone and no drawing anywhere. Cause: the ODS handler decided a file was a PDF only from the browser\u2019s type label, and a PDF saved by Chrome or served from OneDrive frequently carries a different label \u2014 so conversion was skipped and a raw PDF was handed to an <img>, which displays nothing. It now reads the FIRST BYTES: anything starting %PDF is converted whatever the label says, the same fix made for gage drawings at Rev-574. Second, a failed conversion used to blame the internet with one canned sentence; it now reports the real reason on the drop zone, in a toast and in a dialog. Third, the loaded drawing is captioned ODS DRAWING LOADED \u2014 CLICK TO ENLARGE above the preview."] },
@@ -1950,7 +1951,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:44 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:56 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2289,7 +2290,22 @@ async function handleODSUpload(file){
   if(isPdf){
     flash('Converting PDF page 1 to an image…', false);
     if(pz) pz.innerHTML = '⏳ <strong>Converting PDF…</strong>';
-    try { file = await convertPdfToImageFile(file); }
+    try {
+      // Rev-596: use the converter that is PROVEN to run — cpPdfPagesToImages is the one
+      // the traveller and gage-drawing screens have been using successfully since Rev-570.
+      // convertPdfToImageFile lives in a stretch of the file whose declarations are not
+      // reaching the global scope, which is why it reported "not defined".
+      if(typeof cpPdfPagesToImages === 'function'){
+        const pages = await cpPdfPagesToImages(file);
+        if(!pages || !pages.length) throw new Error('the PDF produced no pages');
+        const blob = await (await fetch(pages[0].url)).blob();
+        file = new File([blob], String(file.name || 'drawing').replace(/\.pdf$/i, '') + '.png', { type: 'image/png' });
+      } else if(typeof convertPdfToImageFile === 'function'){
+        file = await convertPdfToImageFile(file);
+      } else {
+        throw new Error('no PDF converter is available in this build');
+      }
+    }
     catch(e){
       // Rev-593: report the REAL reason instead of one canned guess
       const msg = String((e && e.message) || e);
