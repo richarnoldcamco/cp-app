@@ -191,6 +191,18 @@
   .cp-btn-go{ background:#1f8a3b; color:#fff; border:1px solid #1a7433; }
   .cp-btn-quiet{ background:#fff; color:#3d3831; border:1px solid #c2b9ab; }
   .cp-btn-danger{ background:#fff; color:#9b2c2c; border:1px solid #d3a3a3; }
+  /* Rev-589: construction-step buttons carry the step number on their own line above
+     the job name, so the sequence reads before the wording does */
+  .cp-step{ height:46px; border-radius:6px; cursor:pointer; padding:0 14px; font-family:inherit;
+    display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+    white-space:nowrap; transition:filter .12s ease; }
+  .cp-step:hover:not(:disabled){ filter:brightness(1.08); }
+  .cp-step:disabled{ opacity:.45; cursor:not-allowed; }
+  .cp-step .cp-step-n{ font-size:9px; font-weight:800; letter-spacing:.14em; opacity:.75; line-height:1; }
+  .cp-step .cp-step-t{ font-size:12px; font-weight:800; letter-spacing:.03em; line-height:1.1; }
+  .cp-step-todo{ background:#2c6e49; color:#fff; border:1px solid #24593b; }
+  .cp-step-done{ background:#fff; color:#2c6e49; border:1px solid #a9cdb5; }
+  .cp-step-lock{ background:#f2efe9; color:#8a8279; border:1px dashed #c2b9ab; }
   .cp-pill{ display:inline-block; font-size:10px; font-weight:800; letter-spacing:.05em;
     padding:4px 10px; border-radius:11px; white-space:nowrap; }
   .cp-rev{ font-size:11px; font-weight:700; color:#8a8279; letter-spacing:.03em; white-space:nowrap; }
@@ -1449,7 +1461,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-588";
+const APP_REV = "Rev-589";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1463,6 +1475,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-27", rev: "App Rev-589", type: "App", changes: ["CONSTRUCTION STEP BUTTONS REBUILT (Rev-589) \u2014 the three steps were ordinary one-line buttons reading \u20181 \u00b7 Bubble Numbers\u2019, with the sequence competing with the wording for the same line. They are now proper two-line step buttons, 46px tall and all one width: STEP 1 in small spaced capitals on top, the job in bold underneath \u2014 ASSIGN BUBBLE NUMBERS / SELECT CONTROL TYPE / MEASUREMENT METHODS. The state is carried in the top line rather than by an emoji stuck on the front: a finished step reads STEP 1 \u2713 and turns white with a green outline; a locked one reads STEP 2 \u2013 LOCKED and goes flat grey with a dashed border, which looks unavailable at a glance instead of looking like a button that failed. The step still to do stays solid green. Tooltips are unchanged and still name the outstanding row count."] },
   { ts: "2026-07-27", rev: "App Rev-588", type: "App", changes: ["CONSTRUCTION STEPS COLUMN + THE STEPS NOW RUN IN ORDER (Rev-588) \u2014 the three step buttons moved into their own column headed CONSTRUCTION STEPS, separated by a rule from the supporting ACTIONS column (Inspect, Validation, Customer CP, Download, Rename, Delete). GATING: Step 2 stays locked until every row has a bubble number AND a feature description; Step 3 stays locked until every row has a control type. This matches how the work actually depends on itself \u2014 a control type cannot be chosen for a balloon that does not exist yet, and the methods band is filled BY the control type, so doing them out of order produces rows the master can never resolve. Nothing is hidden and nothing is guessed at: a locked button carries a \ud83d\udd12 and its tooltip says exactly how many rows are outstanding (e.g. \u20184 of 14 rows still need a control type\u2019), and a finished step turns quiet with a \u2713 so the state of every plan reads at a glance down the list."] },
   { ts: "2026-07-27", rev: "App Rev-587", type: "App", changes: ["THE THREE STEPS ARE NOW BUTTONS ON THE CONTROL PLANS LIST (Rev-587) \u2014 Rev-586 put the steps inside the builder, so the job still had to be chosen after opening the plan. Each operation row now carries the three steps directly: 1 \u00b7 BUBBLE NUMBERS, 2 \u00b7 CONTROL TYPE and 3 \u00b7 METHODS, each opening the builder already on that step. A hairline separates them from the supporting actions (Inspect, Validation, Customer CP, Download, Rename, Delete), which were trimmed slightly so the row still fits on one line. Each button\u2019s tooltip says what that step covers. The step bar inside the builder stays \u2014 it is still the way to switch step without going back to the list."] },
   { ts: "2026-07-27", rev: "App Rev-586", type: "App", changes: ["THE BUILDER IS NOW THREE STEPS (Rev-586) \u2014 all seventeen columns used to be on screen at once, so assigning balloons, choosing control types and setting measurement methods happened in the same crowded grid. A STEP bar now sits above the table: STEP 1 \u00b7 BUBBLE NUMBERS shows Doc#, Bubble#, pin, Feature/Process Description, Spec/Tol, Upper, Lower and Class \u2014 just enough to give every ODS balloon its row. STEP 2 \u00b7 CONTROL TYPE shows Doc#, Bubble#, pin, Control Type ID, Proposed, Feature, Spec and Class, and is the only step showing the \ud83c\udfaf Auto-fill Proposed and \ud83e\udd16 AI Propose Types buttons, which belong to this job and nothing else. STEP 3 \u00b7 MEASUREMENT METHODS shows the whole methods band, Special Gage / Fixture and Reaction Plan alongside the balloon and feature for reference. ALL COLUMNS restores the old single-screen view. This is a VIEW only \u2014 no data moves, nothing is locked, and steps can be switched at any time in any order without losing a thing; the chosen step is remembered per device. Assign Bubble Numbers on the Control Plans list now lands on Step 1."] },
@@ -1924,7 +1937,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-27";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:44 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:56 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2518,6 +2531,7 @@ function renderProjects(){
     tdSteps.style.borderLeft = '2px solid #e2ddd4';
     const stepWrap = document.createElement('div');
     stepWrap.className = 'cp-act';
+    stepWrap.style.gap = '8px';
     tdSteps.appendChild(stepWrap);
     const tdActions = document.createElement('td');
     tdActions.style.borderLeft = '2px solid #e2ddd4';
@@ -2546,30 +2560,41 @@ function renderProjects(){
     } else {
       const i = item.idx;
       const has = !!p.builderState;
-      // Rev-587/588: the three steps are their own buttons here, and they run in order
+      // Rev-587/588/589: the three construction steps, in order, each labelled with its
+      // step number above the job it does.
       const openAt = (s) => { try{ cpSetStep(s); }catch(e){} editProject(i); };
       const stepNote = has ? '' : ' \u2014 saved before editing was supported';
       const prog = cpStepProgress(p);
-      _target = stepWrap;
-      const b1 = mkBtn('1 \u00b7 Bubble Numbers', prog.s1Done ? 'quiet' : 'primary', 148,
+      const mkStep = (n, title, state, tip, fn) => {
+        const b = document.createElement('button');
+        b.className = 'cp-step cp-step-' + state;
+        b.style.width = '178px';
+        b.title = tip;
+        const l1 = document.createElement('span');
+        l1.className = 'cp-step-n';
+        l1.textContent = 'STEP ' + n + (state === 'done' ? '  \u2713' : (state === 'lock' ? '  \u2013 LOCKED' : ''));
+        const l2 = document.createElement('span');
+        l2.className = 'cp-step-t';
+        l2.textContent = title;
+        b.appendChild(l1); b.appendChild(l2);
+        if(state === 'lock' || !has) b.disabled = true; else b.onclick = fn;
+        stepWrap.appendChild(b);
+        return b;
+      };
+      mkStep(1, 'ASSIGN BUBBLE NUMBERS', prog.s1Done ? 'done' : 'todo',
         'STEP 1 \u2014 give every ODS balloon its row: bubble number, feature description and tolerance.\n'
         + prog.s1Note + '.' + stepNote,
-        () => openAt('1'), has);
-      const b2 = mkBtn('2 \u00b7 Control Type', prog.s2Done ? 'quiet' : 'primary', 132,
+        () => openAt('1'));
+      mkStep(2, 'SELECT CONTROL TYPE', prog.s1Done ? (prog.s2Done ? 'done' : 'todo') : 'lock',
         prog.s1Done
           ? ('STEP 2 \u2014 pick the Control Type for each balloon; the methods fill themselves from the Master List.\n' + prog.s2Note + '.' + stepNote)
           : ('LOCKED \u2014 finish Step 1 first. ' + prog.s1Note + '. A control type cannot be chosen for a balloon that does not exist yet.'),
-        () => openAt('2'), has && prog.s1Done);
-      const b3 = mkBtn('3 \u00b7 Methods', 'primary', 116,
+        () => openAt('2'));
+      mkStep(3, 'MEASUREMENT METHODS', prog.s2Done ? 'todo' : 'lock',
         prog.s2Done
           ? ('STEP 3 \u2014 review the measurement methods, set any special gage, confirm the reaction plan.' + stepNote)
           : ('LOCKED \u2014 finish Step 2 first. ' + prog.s2Note + '. The methods band is filled BY the control type.'),
-        () => openAt('3'), has && prog.s2Done);
-      // a done step gets a tick; a locked one gets a padlock, so the state reads at a glance
-      if(prog.s1Done) b1.textContent = '\u2713 1 \u00b7 Bubble Numbers';
-      if(!prog.s1Done && has) b2.textContent = '\ud83d\udd12 2 \u00b7 Control Type';
-      else if(prog.s2Done) b2.textContent = '\u2713 2 \u00b7 Control Type';
-      if(!prog.s2Done && has) b3.textContent = '\ud83d\udd12 3 \u00b7 Methods';
+        () => openAt('3'));
       _target = actWrap;
       mkBtn('Inspect', 'go', 84, 'Machinist: start a real inspection run for this plan (readings are saved)'
         + (has ? '' : ' \u2014 no plan data to inspect'), () => inspectMachinistValidation(i), has);
