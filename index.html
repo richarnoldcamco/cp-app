@@ -1544,7 +1544,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-648";
+const APP_REV = "Rev-649";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1677,6 +1677,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-649", type: "App", changes: ["ADD NEW CONTROL TYPE INHERITS THE LEVELS YOU ALREADY SET (Rev-649) \u2014 opening the form from the builder made you retype Workcenter and Feature Type even though they were already chosen on the Control Plan row. The levels WERE being handed over on window._cpMasterSeed since Rev-612, but nothing at the receiving end ever read them, so the seed was written and thrown away. openMasterEdit now applies it when adding a new row, and confirms how many levels were carried across. Re-entering the same facts is not just tedious \u2014 it is a chance for the master row and the plan row to disagree, which is exactly what the computed Control Type ID at Rev-646 was meant to end. The \u2795 Add a new \u2026 option on a level picker now carries EVERY level already set on the row rather than only those above it."] },
   { ts: "2026-07-28", rev: "App Rev-648", type: "App", changes: ["ADD NEW CONTROL TYPE \u2014 FIELDS OPEN ON THE FIRST CLICK (Rev-648) \u2014 moving from one field to the next needed two clicks: the first appeared to do nothing. Cause: leaving a field schedules its value list to close 150ms later, and that close was unconditional. Click the next field and it opened its own list immediately \u2014 then the previous field\u2019s timer fired and shut it, because both share one panel. The list really did open on the first click; it was closed again a moment later by the field you had just left. A panel now records which field owns it, and the delayed close only fires if that field\u2019s own panel is still the one showing. Rev-615 fixed the same symptom on the Master List grid; this is the Add New Control Type form, which has its own picker."] },
   { ts: "2026-07-28", rev: "App Rev-647", type: "App", changes: ["EVERY ROW RESOLVES, NOT JUST THE OPEN ONE (Rev-647) \u2014 Rev-646 computed the Control Type ID inside the focused row only, so a row whose levels were set while it was open went back to reading \u2014 not set \u2014 the moment it closed, and its dot stayed grey. Rows 4 and 5 carried LATHE / FACE GROOVE / TREPAN / OD and still counted as unfinished. Resolution belongs to the data, not to which row happens to be expanded: every row is now settled before the grid is drawn, so any row whose levels and tolerance band point at exactly ONE master row gets that control type applied, its methods band filled and its dot turned green. Rows that are ambiguous or match nothing are left alone \u2014 silence is better than a guess on a controlled document. The pass is guarded against re-entry, since applying a control type triggers its own redraw."] },
   { ts: "2026-07-28", rev: "App Rev-646", type: "App", changes: ["CONTROL TYPE ID IS NOW COMPUTED, NOT PICKED (Rev-646) \u2014 the Control Type ID is simply the Master List row the four levels point at, so choosing it from a list AND setting Workcenter / Feature Type / 2nd / 3rd Level was the same decision made twice \u2014 and the two could disagree, leaving a plan whose levels said one thing and whose control type said another. The dropdown is gone. The cell now RESOLVES: when exactly one master row matches the levels and the size / tolerance band, it is applied automatically and shown read-only with its H#. When several still match it says how many and NAMES THE LEVEL that would separate them (\u2018Set 3rd Level to narrow it to one\u2019) and lists the candidates. When none match it says so and offers \u2795 Add to Master List with the levels carried across. The size and tolerance pickers stay, because they narrow the master rows too. The Master List remains the single source of truth per CP-2C \u2014 this just stops the same fact being entered twice."] },
@@ -2198,7 +2199,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "6:08 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "6:24 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3070,7 +3071,8 @@ function cpLevelCell(idx, row, li, focused){
     if(sel.value === '__ADD__'){
       sel.value = cur;
       const seed = {};
-      CP_LEVELS.forEach((X, xi) => { if(xi < li) seed[X.field] = String(row[X.key] || ''); });
+      // Rev-649: carry EVERY level already set on the row, not only those above this one
+      CP_LEVELS.forEach((X, xi) => { if(xi !== li) seed[X.field] = String(row[X.key] || ''); });
       seed[L.field] = '';
       window._cpMasterSeed = seed;
       window._cpMasterSeedBack = { part: (cpBuildState && cpBuildState.partNum) || '', op: (cpBuildState && cpBuildState.opNum) || '' };
@@ -10465,11 +10467,22 @@ function openLevelManager(colKey){
 
 function openMasterEdit(idx){
   masterEditIdx = idx;
+  // Rev-649: when this form is opened from the builder's ➕ Add to Master List, the levels
+  // already chosen on the Control Plan row are carried in on window._cpMasterSeed. They
+  // were being set but never read here, so you had to type Workcenter and Feature Type a
+  // second time — the same facts, re-entered, with a fresh chance to disagree.
+  const _seed = (idx < 0 && window._cpMasterSeed) ? window._cpMasterSeed : null;
+  window._cpMasterSeed = null;
   // Rev-249: clear any prior-row reference strip from a previous chain step
   ['masterEditRefCap','masterEditRefRow'].forEach(id => { const e = document.getElementById(id); if(e) e.remove(); });
   const masterData = getMasterData();
   const row = idx >= 0 ? masterData[idx] : {};
+  if(_seed){ Object.keys(_seed).forEach(k => { if(_seed[k]) row[k] = _seed[k]; }); }   // Rev-649
   $('masterEditTitle').textContent = idx >= 0 ? ('Edit ' + (row.h||'Control Type')) : 'Add New Control Type';
+  if(_seed){
+    const _carried = ['workcenter','featureType','secondLevel','thirdLevel'].filter(k => _seed[k]).length;
+    if(_carried) setTimeout(() => { try{ flash('\u2713 ' + _carried + ' level(s) carried over from the Control Plan row \u2014 fill in the rest.'); }catch(e){} }, 120);
+  }
   const container = $('masterEditFields');
   container.innerHTML = '';
   // Rev-229: HORIZONTAL row layout — fields side by side like a table row, wrapping as needed
