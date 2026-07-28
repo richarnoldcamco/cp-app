@@ -1478,7 +1478,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-615";
+const APP_REV = "Rev-616";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1492,6 +1492,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-616", type: "App", changes: ["MASTER LIST EDIT ROW BROUGHT BACK DOWN TO SIZE (Rev-616) \u2014 the row being edited had been deliberately enlarged by 50% (12px cell padding, 9px input padding, 14px text, 90px minimum field width) and ended up towering over the grid it sits inside, pushing the tolerance-band columns wide and making the whole screen look coarse. Cell padding 12\u21923px, input padding 9\u21924px, text 14\u219212px, and the 90px minimum field width removed so narrow columns like the tolerance bands stay narrow. The \u2716 cancel button and its auto-saves note were scaled to match, and the \u25be caret moved in to suit the shorter box. The edit row is now the height of a normal row instead of three of them."] },
   { ts: "2026-07-28", rev: "App Rev-615", type: "App", changes: ["MASTER LIST VALUE LISTS OPEN ON THE FIRST CLICK (Rev-615) \u2014 on Workcenter, Feature Type, 2nd Level and 3rd Level (and every other value field on the Master List) the list of existing values opened ONLY from the small \u25be caret at the right-hand edge of the box. Clicking the field itself did nothing but place the cursor, so it took two clicks and the field looked broken. Focusing or clicking the field now opens the list immediately; the caret and the Down-arrow key still work. The click-away handler was taught to ignore clicks on the field itself, which would otherwise have closed the list at the very moment it opened."] },
   { ts: "2026-07-28", rev: "App Rev-614", type: "App", changes: ["PICK A CONTROL TYPE BY NARROWING IT DOWN (Rev-614) \u2014 choosing a control type meant scanning one long list of 65, which is the wrong shape for the job. The Master List is already organised WORKCENTER \u2192 FEATURE TYPE \u2192 2ND LEVEL \u2192 3RD LEVEL, so those four are now COLUMNS on the builder, sitting right after Control Type ID and shown in Step 2. On the open row they are live pickers; setting any of them cuts the Control Type list to what actually fits, on top of the existing Size / Tol bands. Each picker only offers values that still exist after the ones above it, so no combination can be chosen that matches nothing, and changing a level clears the levels below it rather than leaving a stale contradiction. On a closed row the four columns show the Master List values behind whatever control type that row is using \u2014 so the whole grid can be read at a glance to see what kind of control each balloon carries. The step column maps and the header band spans were re-numbered for the four new columns (data columns now run 0\u201320)."] },
   { ts: "2026-07-28", rev: "App Rev-613", type: "App", changes: ["HARDINGE LATHE RENAME MADE TO STICK (Rev-613) \u2014 the rename ran at Rev-609, set a run-once flag, and then a GitHub pull brought the old Master List straight back \u2014 incoming always wins on a pull \u2014 while the flag stopped the sweep ever running again. So the old name reappeared and stayed, and the Rev-610 plan sweep never ran either, because it was guarded by the same spent flag. THE FLAG IS GONE. The sweep is idempotent and now runs on EVERY start-up, after EVERY data pull, and again whenever the Master List screen is drawn. It costs nothing when there is nothing to change and pushes only when it actually changed something, so however stale the data arriving from GitHub is, it corrects itself instead of depending on one lucky moment. Matching also normalises whitespace, so HARDINGE\u2007\u2007LATHE with a double space is caught too. The old flag is deleted on start-up so no device is left half-applied."] },
@@ -1980,7 +1981,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:34 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:46 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -9297,30 +9298,31 @@ function buildEditingRow(row, idx){
 
   // Rev-293: no Save button — edits auto-save. Actions cell keeps only ✕ (cancel/discard) with a note.
   const tdAction = document.createElement('td');
-  tdAction.style.cssText = 'padding:10px 8px; border:2px solid var(--signal); white-space:nowrap; text-align:center; vertical-align:middle;';
+  tdAction.style.cssText = 'padding:3px 6px; border:2px solid var(--signal); white-space:nowrap; text-align:center; vertical-align:middle;';
   const cancelBtn = document.createElement('button');
   cancelBtn.textContent = '✖️';
   cancelBtn.title = 'Cancel / discard changes to this row';
-  cancelBtn.style.cssText = 'border:none; background:none; cursor:pointer; font-size:20px; display:block; margin:0 auto;';
+  cancelBtn.style.cssText = 'border:none; background:none; cursor:pointer; font-size:15px; display:block; margin:0 auto;';
   cancelBtn.onclick = cancelInlineEdit;
   const note = document.createElement('div');
   note.textContent = '✓ auto-saves';
-  note.style.cssText = 'font-size:9px; color:#1f7a4d; font-weight:700; margin-top:3px; white-space:nowrap;';
+  note.style.cssText = 'font-size:8px; color:#1f7a4d; font-weight:700; margin-top:1px; white-space:nowrap;';
   tdAction.appendChild(cancelBtn);
   tdAction.appendChild(note);
   tr.appendChild(tdAction);
 
   MASTER_COLS.forEach((col, colIdx) => {
     const td = document.createElement('td');
-    // 50% larger row: taller padding + bigger font on inputs
-    td.style.cssText = 'padding:12px 8px; border:2px solid var(--signal); vertical-align:middle;';
+    // Rev-616: the edit row was deliberately blown up 50% and ended up towering over the
+    // grid it sits inside. Back to the size of a normal row.
+    td.style.cssText = 'padding:3px 4px; border:2px solid var(--signal); vertical-align:middle;';
     if(['below500','above500','below0006','band0006','band0015','above003'].includes(col.key)) td.classList.add('mlBandCol');   // Rev-320
     const input = document.createElement('input');
     input.type = 'text';
     input.id = 'inline_' + col.key;
     input.dataset.colIdx = colIdx;
     input.value = row[col.key] || '';
-    input.style.cssText = 'width:100%; min-width:90px; padding:9px; font-size:14px; border:1px solid var(--line); border-radius:5px; text-transform:uppercase;';   // Rev-318: force ALL CAPS entry
+    input.style.cssText = 'width:100%; min-width:0; padding:4px 6px; font-size:12px; line-height:1.2; border:1px solid var(--line); border-radius:4px; text-transform:uppercase;';   // Rev-318: force ALL CAPS entry
     // Rev-286: Control Type ID auto-derives from Workcenter / Feature Type / 2nd Level and updates live
     // as those fields are edited (only when a Feature Type is set, so hand-set IDs like HARD-CUSTOM stay).
     if(col.key === 'workcenter' || col.key === 'featureType' || col.key === 'secondLevel' || col.key === 'thirdLevel'){
@@ -9419,7 +9421,7 @@ function buildEditingRow(row, idx){
       const ilCaret = document.createElement('span');
       ilCaret.textContent = '\u25BE';
       ilCaret.title = 'Show existing values';
-      ilCaret.style.cssText = 'position:absolute; right:9px; top:50%; transform:translateY(-50%); z-index:3; cursor:pointer; color:var(--ink-dim); font-size:12px; line-height:1;';
+      ilCaret.style.cssText = 'position:absolute; right:6px; top:50%; transform:translateY(-50%); z-index:3; cursor:pointer; color:var(--ink-dim); font-size:10px; line-height:1;';
       ilCaret.onpointerdown = ev => { ev.preventDefault(); ev.stopPropagation(); if(ilPanel){ ilClose(); } else { input.focus(); ilOpen(); } };
       td.appendChild(ilCaret);
       input.addEventListener('keydown', e => { if(e.key === 'ArrowDown' && !ilPanel){ e.preventDefault(); ilOpen(); } });
