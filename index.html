@@ -1472,7 +1472,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-611";
+const APP_REV = "Rev-612";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1486,6 +1486,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-612", type: "App", changes: ["EDIT A PART NUMBER FROM THE PARTS LIST (Rev-612) \u2014 renaming lived only on an operation row and touched only THAT plan, so a part with three operations had to be renamed three times and sat inconsistent in between. A \u270f\ufe0f now sits beside every part number on the parts list and renames the part in ONE action: every operation plan, the gages keyed to those operations (and their drawings), the stored ODS drawings, the traveller, and the part\u2019s own record all move to the new name. Proper window rather than browser prompts \u2014 part number and rev side by side in mandatory yellow, red Close in the title bar, Enter saves, Esc cancels, and a clash with an existing part is reported in the window instead of thrown away. Each renamed plan gets a fresh updated stamp so the Rev-606 rule protects it. FIX ALONGSIDE: the per-plan Rename built its new id WITHOUT the operation number, so a renamed plan silently lost its per-operation identity and could collide with another op of the same part; it now keeps the op in the key."] },
   { ts: "2026-07-28", rev: "App Rev-611", type: "App", changes: ["PART NUMBERS BLACK, BOLD AND BIGGER (Rev-611) \u2014 part numbers were dark red at 14\u201316px, which on a shop screen sat back rather than leading. They now read BLACK, weight 800, at 19px in all three places they appear: the parts list, the breadcrumb above an opened part, and the part header bar over its operations. The part number is the first thing anyone looks for on this screen, so it should be the loudest thing on it; the dark red is kept for headings, where it belongs."] },
   { ts: "2026-07-28", rev: "App Rev-610", type: "App", changes: ["RENAME EXTENDED TO EVERY SAVED CONTROL PLAN (Rev-610) \u2014 Rev-609 renamed HARDINGE LATHE to LATHE in the Master List only. The sweep now also rewrites the Workcenter on every SAVED PLAN: the plan-level workcenter and every feature row, across saved projects, drafts, the working copy and whatever is open in the builder. Plan rows are a snapshot taken when the row was written rather than a live link to the Master List, so they would otherwise have kept the old wording forever. Each plan it touches gets its updated stamp refreshed, which matters after Rev-606: a plan edited more recently than any deletion marker cannot be wiped by a stale one. Two supporting fixes: the SEEDED master list itself said Hardinge Lathe on all 65 rows, so a fresh device would have re-introduced the old name \u2014 the seed now says LATHE; and an empty master list no longer stops the sweep, since saved plans still need it. The open Control Plans list and builder redraw immediately, and the result pushes to GitHub."] },
   { ts: "2026-07-28", rev: "App Rev-609", type: "App", changes: ["WORKCENTER RENAMED: HARDINGE LATHE \u2192 LATHE (Rev-609) \u2014 every Master List row whose Workcenter read HARDINGE LATHE now reads LATHE. Done as a one-time sweep in the app rather than by editing the synced file directly: the Master List lives on each device and is pushed up from there, so a hand-edit on GitHub would have been overwritten by the next push \u2014 the same trap that cost 912767-M twice today. The sweep runs once per device, is flagged so it never repeats, reports how many rows it changed, and pushes the result straight to GitHub. It runs again after a data pull in case the rows arrive from GitHub after start-up, and it also rewrites any stored pick-list entry still naming the old value. Rows with any other Workcenter are untouched. NOTE: this only renames what is IN the Master List \u2014 Control Plans already built keep whatever workcenter was written onto their rows at the time."] },
@@ -1970,7 +1971,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:20 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:36 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2560,8 +2561,16 @@ function renderPartsIndex(tbody, combined){
         td.innerHTML = html; return td; };
 
       // Rev-611: part numbers read black, bold and larger everywhere they appear
-      tr.appendChild(cell('<b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">'
-        + (g.part || '') + '</b>'));
+      // Rev-612: with a pencil to rename the part across ALL of its operations
+      const tdName = cell('<b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">'
+        + (g.part || '') + '</b>');
+      const pen = document.createElement('button');
+      pen.textContent = '\u270f\ufe0f';
+      pen.title = 'Edit this part number / rev \u2014 applies to every operation of the part';
+      pen.style.cssText = 'margin-left:10px; border:none; background:none; cursor:pointer; font-size:13px; opacity:.55;';
+      pen.onclick = (e) => { e.stopPropagation(); cpRenamePart(g.part); };
+      tdName.appendChild(pen);
+      tr.appendChild(tdName);
 
       const opLabels = g.ops.map(o => o.data.opNum ? ('OP-' + o.data.opNum) : null).filter(Boolean);
       tr.appendChild(cell('<b>' + g.ops.length + '</b>'
@@ -2672,6 +2681,125 @@ function cpMigrateWorkcenterNames(){
   }catch(e){}
 }
 try{ cpMigrateWorkcenterNames(); }catch(e){}
+// ===== Rev-612: RENAME A PART, ACROSS ALL ITS OPERATIONS =========================
+// Rename lived only on an operation row and only touched THAT plan, so a part with
+// three operations had to be renamed three times and was inconsistent in between.
+// This renames the part everywhere in one action: every operation plan, the gages
+// keyed to those operations, the stored ODS drawings and traveller, and the part's
+// own record. Proper window, no browser prompts.
+function cpRenamePart(part){
+  const P = String(part || '').toUpperCase();
+  let projects = [];
+  try{ projects = JSON.parse(localStorage.getItem('cpProjects') || '[]'); }catch(e){}
+  const mine = projects.filter(p => String(p.partNum || '').toUpperCase() === P);
+  if(!mine.length){ alert('No saved plans found for ' + P + '.'); return; }
+  const curRev = mine[0].rev || '';
+
+  const old = document.getElementById('cpRenBg'); if(old) old.remove();
+  const bg = document.createElement('div');
+  bg.id = 'cpRenBg';
+  bg.style.cssText = 'position:fixed; inset:0; z-index:100008; background:rgba(20,15,12,.85); display:flex; align-items:center; justify-content:center; padding:18px;';
+  bg.innerHTML =
+   '<div style="background:#fff; border-radius:10px; width:100%; max-width:600px; overflow:hidden; box-shadow:0 10px 44px rgba(0,0,0,.5);">' +
+    '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.05em; padding:11px 16px; font-size:14px; display:flex; align-items:center; gap:12px;">' +
+      '<span style="flex:1 1 auto;">EDIT PART NUMBER \u2014 ' + P + '</span>' +
+      '<button id="cpRenX" style="background:#a02020; color:#fff; border:2px solid #7a1414; border-radius:7px; padding:5px 14px; font-weight:800; cursor:pointer;">\u2715 Close</button>' +
+    '</div>' +
+    '<div style="padding:16px;">' +
+      '<div style="font-size:12px; color:#555; line-height:1.5; margin-bottom:14px;">This renames the part on <b>all ' + mine.length + ' of its operation' + (mine.length === 1 ? '' : 's') + '</b>, and carries its gages, ODS drawings and traveller across with it.</div>' +
+      '<div style="display:flex; gap:14px; flex-wrap:wrap;">' +
+        '<div style="flex:1 1 260px; min-width:220px;">' +
+          '<label style="display:block; font-size:11px; font-weight:800; letter-spacing:.05em; margin-bottom:4px;">PART NUMBER</label>' +
+          '<input id="cpRenPart" style="width:100%; box-sizing:border-box; font-size:16px; font-weight:800; padding:10px; border:2px solid #c9c0b4; border-radius:6px; background:#fafa96;">' +
+        '</div>' +
+        '<div style="flex:0 0 150px;">' +
+          '<label style="display:block; font-size:11px; font-weight:800; letter-spacing:.05em; margin-bottom:4px;">PART REV</label>' +
+          '<input id="cpRenRev" style="width:100%; box-sizing:border-box; font-size:16px; font-weight:800; padding:10px; border:2px solid #c9c0b4; border-radius:6px; background:#fafa96;">' +
+        '</div>' +
+      '</div>' +
+      '<div id="cpRenWarn" style="display:none; font-size:12px; font-weight:700; color:#a11; margin-top:10px;"></div>' +
+    '</div>' +
+    '<div style="background:#f1ede6; padding:11px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid #ddd6cc;">' +
+      '<button id="cpRenCancel" style="padding:8px 18px; font-weight:700; cursor:pointer;">Cancel</button>' +
+      '<button id="cpRenSave" style="padding:8px 24px; font-weight:800; cursor:pointer; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px;">\u2713 Save</button>' +
+    '</div>' +
+   '</div>';
+  document.body.appendChild(bg);
+  const inP = document.getElementById('cpRenPart'), inR = document.getElementById('cpRenRev');
+  inP.value = mine[0].partNum || P; inR.value = curRev;
+  setTimeout(() => { inP.focus(); inP.select(); }, 60);
+  const close = () => bg.remove();
+  document.getElementById('cpRenCancel').onclick = close;
+  document.getElementById('cpRenX').onclick = close;
+  bg.onclick = (e) => { if(e.target === bg) close(); };
+  const warn = (m) => { const w = document.getElementById('cpRenWarn'); w.textContent = m || ''; w.style.display = m ? 'block' : 'none'; };
+
+  document.getElementById('cpRenSave').onclick = () => {
+    const newPart = inP.value.trim().toUpperCase();
+    const newRev = inR.value.trim();
+    if(!newPart){ warn('A part number is required.'); return; }
+    if(newPart === P && newRev === curRev){ close(); return; }
+    if(newPart !== P && projects.some(p => String(p.partNum || '').toUpperCase() === newPart)){
+      warn(newPart + ' already has Control Plans. Rename or delete those first.'); return;
+    }
+    const tombs = (() => { try{ return JSON.parse(localStorage.getItem('deletedProjectKeys') || '[]'); }catch(e){ return []; } })();
+    const stamp = new Date().toISOString();
+    let moved = 0;
+    projects.forEach(p => {
+      if(String(p.partNum || '').toUpperCase() !== P) return;
+      const op = String(p.opNum || '');
+      const oldId = p.id || (p.partNum + '::' + p.rev);
+      const newId = newPart + '::' + newRev + (op ? '::OP' + op : '');
+      // move the drawing and the gages onto the new keys BEFORE the part number changes
+      try{
+        const d = _idbGetOds(p.partNum, op);
+        if(d && d.odsImage){ _idbPutOds(newPart, op, d.odsImage, d.cleanOdsImage || null); }
+      }catch(e){}
+      try{
+        const map = cpGagesGet(); let ch = 0;
+        Object.keys(map).forEach(k => {
+          const g = map[k];
+          if(!g || String(g.part || '').toUpperCase() !== P || String(g.opNum || '') !== op) return;
+          const nk = cpGageKey(newPart, op, g.bubble);
+          if(nk === k) return;
+          try{ const gd = _idbGetDrawing('GAGE::' + k); if(gd && gd.odsImage){ _idbPutDrawing('GAGE::' + nk, gd.odsImage); _idbDelDrawing('GAGE::' + k); } }catch(e){}
+          g.part = newPart; g.key = nk; delete map[k]; map[nk] = g; ch++;
+        });
+        if(ch) cpGagesSet(map);
+      }catch(e){}
+      if(oldId !== newId) tombs.push({ key: oldId, deletedAt: stamp });
+      p.id = newId; p.partNum = newPart; p.rev = newRev; p.updated = stamp;
+      if(p.builderState){ p.builderState.partNum = newPart; p.builderState.rev = newRev; p.builderState.srcId = newId; }
+      moved++;
+    });
+    // the traveller belongs to the part, not an operation
+    try{
+      const t = _idbGetDrawing(P + '::TRAVELLER');
+      if(t && t.odsImage) _idbPutDrawing(newPart + '::TRAVELLER', t.odsImage);
+    }catch(e){}
+    try{
+      const info = cpPartInfoGet(P);
+      if(info) cpPartInfoSet(newPart, info);
+    }catch(e){}
+    try{ localStorage.setItem('deletedProjectKeys', JSON.stringify(tombs.filter(t => t.key !== (newPart + '::' + newRev)))); }catch(e){}
+    try{ localStorage.setItem('cpProjects', JSON.stringify(projects)); }catch(e){}
+    try{
+      if(cpBuildState && String(cpBuildState.partNum || '').toUpperCase() === P){
+        cpBuildState.partNum = newPart; cpBuildState.rev = newRev;
+      }
+    }catch(e){}
+    try{ logHistory('Control Plan', 'Rename part', P + ' \u2192 ' + newPart + ' ' + newRev, []); }catch(e){}
+    close();
+    cpPartFilter = null;
+    renderProjects();
+    flash('\u2713 Renamed to ' + newPart + ' ' + newRev + ' on ' + moved + ' operation' + (moved === 1 ? '' : 's') + '.');
+    try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
+  };
+  bg.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){ e.preventDefault(); close(); }
+    if(e.key === 'Enter'){ e.preventDefault(); document.getElementById('cpRenSave').click(); }
+  });
+}
 // Rev-599: an operation's ODS drawing. The plan carries its own copy; if the GitHub
 // sync stripped it, fall back to the per-part drawing store.
 function cpOpOdsImage(p){
@@ -3672,7 +3800,10 @@ function renameProject(idx){
   if(newRev == null) return;
   const revClean = newRev.trim();
   const oldId = p.id || ((p.partNum||'?') + '::' + (p.rev||'?'));
-  const newId = partClean + '::' + revClean;
+  // Rev-612: keep the operation in the id — without it a renamed plan silently loses
+  // its per-operation identity and can collide with another op of the same part
+  const _rop = String(p.opNum || '');
+  const newId = partClean + '::' + revClean + (_rop ? '::OP' + _rop : '');
   if(newId === oldId){ flash('No change.', false); return; }
   if(projects.some((q, qi) => qi !== idx && q.id === newId)){ flash('A plan named ' + partClean + ' ' + revClean + ' already exists — delete or rename it first.', true); return; }
   const tombs = JSON.parse(localStorage.getItem('deletedProjectKeys') || '[]');
