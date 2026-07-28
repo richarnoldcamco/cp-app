@@ -1544,7 +1544,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-645";
+const APP_REV = "Rev-646";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1677,6 +1677,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-646", type: "App", changes: ["CONTROL TYPE ID IS NOW COMPUTED, NOT PICKED (Rev-646) \u2014 the Control Type ID is simply the Master List row the four levels point at, so choosing it from a list AND setting Workcenter / Feature Type / 2nd / 3rd Level was the same decision made twice \u2014 and the two could disagree, leaving a plan whose levels said one thing and whose control type said another. The dropdown is gone. The cell now RESOLVES: when exactly one master row matches the levels and the size / tolerance band, it is applied automatically and shown read-only with its H#. When several still match it says how many and NAMES THE LEVEL that would separate them (\u2018Set 3rd Level to narrow it to one\u2019) and lists the candidates. When none match it says so and offers \u2795 Add to Master List with the levels carried across. The size and tolerance pickers stay, because they narrow the master rows too. The Master List remains the single source of truth per CP-2C \u2014 this just stops the same fact being entered twice."] },
   { ts: "2026-07-28", rev: "App Rev-645", type: "App", changes: ["LEVEL DROPDOWNS NO LONGER RUN UNDER THEIR OWN ARROW (Rev-645) \u2014 FACE GROOVE / TREPAN and 2ND LEVEL: any were printing straight through the browser\u2019s drop arrow, which looked broken. The boxes now reserve 20px on the right for the arrow, use border-box sizing so that padding comes out of the width rather than adding to it, and clip anything still too long with an ellipsis instead of letting it collide. The empty option also changed from \u20182ND LEVEL: any\u2019 to \u2018\u2014 any \u2014\u2019: the column heading already says which level the box belongs to, and repeating it inside was most of what pushed the text under the arrow in the first place."] },
   { ts: "2026-07-28", rev: "App Rev-644", type: "App", changes: ["THE RED FLAG MOVED TO THE CELL THAT IS ACTUALLY WRONG (Rev-644) \u2014 Rev-643 lit up Feature Type and 2nd Level, the cells that were correctly filled, while WORKCENTER \u2014 the one genuinely missing, and the one you have to go and fix \u2014 sat plain. That is the symptom highlighted instead of the cause, and it points the eye at the wrong place. A level cell now pulses red when it is BLANK and a level BELOW it holds a value, and the tooltip reads \u2018Workcenter is BLANK, but Feature Type and 2nd Level below it are filled \u2014 fill this in, or clear the level(s) below it.\u2019 One cell is flagged per gap, and it is the empty one."] },
   { ts: "2026-07-28", rev: "App Rev-643", type: "App", changes: ["A LEVEL FILLED OUT OF ORDER NOW FLAGS RED (Rev-643) \u2014 a row could carry a Feature Type and a 2nd Level with the Workcenter above them blank, and nothing said a word. That is not a cosmetic gap: the Master List is a hierarchy, so a 2nd Level with nothing above it can never resolve to a control type, and the methods band would stay unfillable while the row looked populated. Any level that holds a value while a level ABOVE it is empty now pulses red, and hovering names exactly which one is missing \u2014 \u2018Feature Type is set, but Workcenter above it is blank\u2019. The check reads the master row behind a chosen control type as well as what is typed on the row, so a row filled from the master is not flagged for gaps it does not actually have. The pulse respects the system reduced-motion setting."] },
@@ -2195,7 +2196,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "5:16 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "5:36 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6035,101 +6036,91 @@ function renderCPBuilder(){
       // FULL editable row
       // Control Type dropdown (yellow) — Rev-205: preceded by TOLERANCE ZONE pickers that
       // filter the list to master rows marked 'X' for the chosen size / tolerance band.
+      // ===== Rev-646: CONTROL TYPE ID IS COMPUTED, NOT PICKED =====================
+      // The Control Type ID is the Master List row that the four levels (plus the size /
+      // tolerance zone) point at. Choosing it from a long list AND setting the levels was
+      // the same decision made twice, and the two could disagree. This cell now RESOLVES:
+      //   exactly one master row matches  -> it is applied and shown, read-only
+      //   several match                   -> it says how many and what still differs
+      //   none match                      -> it says so, and offers the Master List
       const tdCT = document.createElement('td');
       tdCT.style.cssText = 'padding:6px; border:1px solid var(--line); background:#FFFDE0;';
+
+      // size / tolerance zone still narrow the master rows, so they stay
       const zoneWrap = document.createElement('div');
       zoneWrap.style.cssText = 'display:flex; gap:6px; margin-bottom:6px;';
       const mkZone = (field, opts, title) => {
         const zs = document.createElement('select');
         zs.title = title;
-        zs.style.cssText = 'flex:1; font-size:11px; padding:5px; background:#fff; border:1px solid var(--line); border-radius:4px; text-transform:none;';
-        opts.forEach(([v,l]) => { const o=document.createElement('option'); o.value=v; o.textContent=l; zs.appendChild(o); });
+        zs.style.cssText = 'flex:1; box-sizing:border-box; font-size:11px; padding:5px 20px 5px 6px; background:#fff; border:1px solid var(--line); border-radius:4px; text-transform:none; text-overflow:ellipsis;';
+        opts.forEach(([v, l]) => { const o = document.createElement('option'); o.value = v; o.textContent = l; zs.appendChild(o); });
         zs.value = row[field] || '';
-        zs.onchange = () => { row[field] = zs.value; renderCPBuilder(); };
+        zs.onchange = () => { row[field] = zs.value; renderCPBuilder(); try{ cpAutoSaveProject(); }catch(e){} };
+        zoneWrap.appendChild(zs);
         return zs;
       };
-      zoneWrap.appendChild(mkZone('sizeBand', [['','Size: any'],['below500','Below .500'],['above500','.500 or Greater']], 'Feature size band'));
-      zoneWrap.appendChild(mkZone('tolBand',  [['','Tol: any'],['below0006','Below .0006'],['band0006','.0006–.0014'],['band0015','.0015–.0029'],['above003','Over .003']], 'Total tolerance band'));
+      mkZone('sizeBand', [['','Size: any'],['below500','Below .500'],['above500','.500 or Greater']], 'Feature size band');
+      mkZone('tolBand', [['','Tol: any'],['below0006','Below .0006'],['band0006','.0006–.0014'],['band0015','.0015–.0029'],['above003','Over .003']], 'Total tolerance band');
       tdCT.appendChild(zoneWrap);
-      // Rev-270: custom control-type dropdown replaces the native <select>. It rebuilds its list
-      // FRESH from the Master List every time it opens, so a newly added control type (e.g. H59)
-      // always shows — no render-timing staleness. It also renders the H# small and blue, which a
-      // native <option> cannot do. Fixed-position panel escapes the builder's scroll clipping.
-      const ctBlue = '#1a5276';
-      const trigger = document.createElement('div');
-      trigger.tabIndex = 0;
-      trigger.style.cssText = 'width:100%; font-size:13px; padding:8px; cursor:pointer; display:flex; align-items:center; gap:8px; background:#FFFDE0; border:1px solid var(--line); border-radius:4px; text-transform:none;';
-      if(row.controlTypeId){
-        const selH = (options.find(o => o.id === row.controlTypeId) || {}).h || '';
-        if(selH){ const hs = document.createElement('span'); hs.textContent = selH; hs.style.cssText = 'font-size:10px; font-weight:700; color:' + ctBlue + ';'; trigger.appendChild(hs); }
-        const ids = document.createElement('span'); ids.textContent = row.controlTypeId; trigger.appendChild(ids);
-      } else {
-        const ph = document.createElement('span'); ph.textContent = '— select control type —'; ph.style.color = 'var(--ink-faint)'; trigger.appendChild(ph);
-      }
-      const caret = document.createElement('span'); caret.textContent = '\u25BE'; caret.style.cssText = 'margin-left:auto; color:var(--ink-dim);'; trigger.appendChild(caret);
 
-      let ctPanel = null;
-      const ctReposition = () => { if(!ctPanel) return; const r = trigger.getBoundingClientRect(); const vh = window.innerHeight; const below = vh - r.bottom - 10; const above = r.top - 10; ctPanel.style.left = r.left + 'px'; ctPanel.style.minWidth = Math.max(r.width, 260) + 'px'; if(below >= 200 || below >= above){ ctPanel.style.top = (r.bottom + 2) + 'px'; ctPanel.style.bottom = 'auto'; ctPanel.style.maxHeight = Math.max(140, below) + 'px'; } else { ctPanel.style.top = 'auto'; ctPanel.style.bottom = (vh - r.top + 2) + 'px'; ctPanel.style.maxHeight = Math.max(140, above) + 'px'; } };
-      const ctOutside = (e) => { if(e.target !== trigger && !trigger.contains(e.target) && (!ctPanel || !ctPanel.contains(e.target))) ctClose(); };
-      const ctClose = () => { if(ctPanel){ ctPanel.remove(); ctPanel = null; } document.removeEventListener('pointerdown', ctOutside, true); window.removeEventListener('scroll', ctReposition, true); window.removeEventListener('resize', ctReposition, true); };
-      const ctItem = (h, label, val, muted) => {
-        const it = document.createElement('div');
-        it.style.cssText = 'display:flex; align-items:center; gap:8px; padding:6px 10px; cursor:pointer; font-size:13px; white-space:nowrap; border-radius:5px; text-transform:none;';
-        it.onmouseenter = () => it.style.background = '#eef3f8';
-        it.onmouseleave = () => it.style.background = '';
-        const hs = document.createElement('span'); hs.textContent = h || ''; hs.style.cssText = 'font-size:10px; font-weight:700; color:' + ctBlue + '; min-width:38px; text-align:right;'; it.appendChild(hs);
-        const ls = document.createElement('span'); ls.textContent = label; if(muted) ls.style.color = 'var(--ink-faint)'; it.appendChild(ls);
-        it.onpointerdown = (e) => { e.preventDefault(); e.stopPropagation(); ctClose(); applyControlType(idx, val); };
-        return it;
-      };
-      const ctOpen = () => {
-        if(ctPanel){ ctClose(); return; }
-        let all = getControlTypeOptions();   // FRESH read — {id,h,row}; new control types appear immediately
-        // Rev-614: narrow by the four Master List levels first — that is how the master is
-        // organised, so it is how the list should be cut down
-        all = all.filter(o => cpLevelMatch(row, o.row));
-        const zoneMatch = o => {
+      // which master rows survive the levels AND the zone
+      let _cands = [];
+      try{
+        const _zoneOk = (o) => {
           if(row.sizeBand && String(o.row[row.sizeBand] || '').trim().toUpperCase() !== 'X') return false;
           if(row.tolBand  && String(o.row[row.tolBand]  || '').trim().toUpperCase() !== 'X') return false;
           return true;
         };
-        const hasZone = !!(row.sizeBand || row.tolBand);
-        const matching = all.filter(zoneMatch);
-        const others = hasZone ? all.filter(o => !zoneMatch(o)) : [];
-        // Rev-274: a Master List row with an H# but NO Control Type ID can't be selected — surface it
-        // greyed so a mis-saved row (e.g. an H59 whose ID never saved) is visible and can be fixed.
-        const noId = getMasterData().filter(r => String(r.h || '').trim() && !String(r.controlTypeId || '').trim());
-        ctPanel = document.createElement('div');
-        ctPanel.className = 'ctPick';
-        ctPanel.style.cssText = 'position:fixed; z-index:10090; background:#FFFDF2; border:1px solid var(--line); border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.28); max-height:60vh; overflow:auto; padding:3px;';
-        const ctDivider = (txt) => { const d = document.createElement('div'); d.textContent = txt; d.style.cssText = 'padding:5px 10px; font-size:10px; font-weight:700; color:var(--ink-faint); text-transform:none; border-top:1px solid var(--line); margin-top:3px;'; ctPanel.appendChild(d); };
-        ctPanel.appendChild(ctItem('', '— select control type —', '', true));
-        matching.forEach(o => ctPanel.appendChild(ctItem(o.h, o.id, o.id, false)));
-        if(others.length){ ctDivider('OTHER TOLERANCE ZONES'); others.forEach(o => ctPanel.appendChild(ctItem(o.h, o.id, o.id, false))); }
-        if(row.controlTypeId && !all.some(o => o.id === row.controlTypeId)){
-          const kh = (all.find(o => o.id === row.controlTypeId) || {}).h || '';
-          ctPanel.appendChild(ctItem(kh, row.controlTypeId + ' (outside zone)', row.controlTypeId, false));
+        _cands = getControlTypeOptions().filter(o => cpLevelMatch(row, o.row) && _zoneOk(o));
+      }catch(e){}
+
+      const box = document.createElement('div');
+      box.style.cssText = 'font-size:12px; line-height:1.4;';
+      if(_cands.length === 1){
+        const only = _cands[0];
+        if(String(row.controlTypeId || '') !== only.id){
+          try{ logAct('ct-resolved', 'balloon ' + (row.bubble || '') + ' \u2192 ' + only.id); }catch(e){}
+          setTimeout(() => { try{ applyControlType(idx, only.id); }catch(e){ row.controlTypeId = only.id; } }, 0);
         }
-        if(noId.length){
-          ctDivider('NEEDS A CONTROL TYPE ID \u2014 FIX IN MASTER LIST');
-          noId.forEach(r => {
-            const it = document.createElement('div');
-            it.style.cssText = 'display:flex; align-items:center; gap:8px; padding:6px 10px; font-size:12px; white-space:nowrap; color:var(--ink-faint); cursor:not-allowed;';
-            const hs = document.createElement('span'); hs.textContent = r.h || ''; hs.style.cssText = 'font-size:10px; font-weight:700; color:' + ctBlue + '; min-width:38px; text-align:right;'; it.appendChild(hs);
-            const ls = document.createElement('span'); ls.textContent = '(no Control Type ID — ' + [r.workcenter, r.featureType, r.secondLevel].filter(Boolean).join(' / ') + ')'; it.appendChild(ls);
-            ctPanel.appendChild(it);
-          });
+        box.innerHTML = '<div style="font-weight:800; color:#1e5b3a;">' + only.id + '</div>'
+          + '<div style="font-size:10px; color:#6b6257;">' + (only.h ? only.h + ' \u00b7 ' : '') + 'resolved from the levels \u2014 not typed</div>';
+      } else if(_cands.length === 0){
+        box.innerHTML = '<div style="font-weight:800; color:#a11;">\u2014 no master row matches \u2014</div>'
+          + '<div style="font-size:10px; color:#6b6257;">Adjust the levels, or add this control type to the Master List.</div>';
+        const add = document.createElement('button');
+        add.textContent = '\u2795 Add to Master List';
+        add.style.cssText = 'margin-top:5px; font-size:11px; font-weight:700; padding:4px 10px; border-radius:5px; border:1px solid #1a5276; background:#fff; color:#1a5276; cursor:pointer;';
+        add.onclick = (e) => {
+          e.stopPropagation();
+          const seed = {};
+          CP_LEVELS.forEach(X => { seed[X.field] = String(row[X.key] || ''); });
+          window._cpMasterSeed = seed;
+          flash('Add the control type on the Master List \u2014 the levels are filled in.');
+          try{ showMasterList(); setTimeout(() => { try{ openMasterEdit(-1); }catch(e){} }, 120); }catch(e){}
+        };
+        box.appendChild(add);
+        if(row.controlTypeId){ row.controlTypeId = ''; }
+      } else {
+        // several still match — name the level that would separate them
+        let splitOn = '';
+        for(let li2 = 0; li2 < CP_LEVELS.length; li2++){
+          const K = CP_LEVELS[li2];
+          if(String(row[K.key] || '').trim()) continue;
+          const vals = {};
+          _cands.forEach(o => { vals[cpLvNorm(o.row[K.field])] = 1; });
+          if(Object.keys(vals).length > 1){ splitOn = K.label; break; }
         }
-        document.body.appendChild(ctPanel);
-        ctReposition();
-        setTimeout(() => document.addEventListener('pointerdown', ctOutside, true), 0);
-        window.addEventListener('scroll', ctReposition, true);
-        window.addEventListener('resize', ctReposition, true);
-      };
-      trigger.onclick = (e) => { e.stopPropagation(); ctOpen(); };
-      trigger.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown'){ e.preventDefault(); ctOpen(); } else if(e.key === 'Escape'){ ctClose(); } };
-      tdCT.appendChild(trigger);
-      tr.appendChild(tdCT);
+        box.innerHTML = '<div style="font-weight:800; color:#8a6a12;">' + _cands.length + ' control types still match</div>'
+          + '<div style="font-size:10px; color:#6b6257;">'
+          + (splitOn ? 'Set <b>' + splitOn + '</b> to narrow it to one.' : 'Narrow the size / tolerance band to separate them.')
+          + '</div>'
+          + '<div style="font-size:10px; color:#8a8279; margin-top:3px;">' + _cands.slice(0, 4).map(o => o.id).join('<br>')
+          + (_cands.length > 4 ? '<br>\u2026' : '') + '</div>';
+        if(row.controlTypeId){ row.controlTypeId = ''; }
+      }
+      tdCT.appendChild(box);
+
+tr.appendChild(tdCT);
       // Rev-614: the four Master List levels, as live pickers on the open row
       for(let li = 0; li < CP_LEVELS.length; li++) tr.appendChild(cpLevelCell(idx, row, li, true));
 
