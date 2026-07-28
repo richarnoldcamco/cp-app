@@ -224,18 +224,21 @@
      room, and a finished one sits solid and still. */
   /* Rev-628: smaller hazard banner — the stripes CRAWL, and the wording sits on a solid
      chip instead of being read straight off the stripes, which it was losing against. */
-  .cp-uc{ position:relative; display:flex; align-items:center; justify-content:center; height:15px;
-    border-radius:3px; margin-bottom:4px; overflow:hidden;
-    background:repeating-linear-gradient(45deg,#e6a817 0 9px,#171310 9px 18px);
-    background-size:25.46px 25.46px; animation:cpStripe 1.1s linear infinite; }
-  .cp-uc b{ position:relative; background:#171310; color:#e6a817; font-size:8.5px; font-weight:800;
-    letter-spacing:.13em; padding:1px 9px; border-radius:2px; white-space:nowrap; }
-  @keyframes cpStripe{ from{ background-position:0 0; } to{ background-position:25.46px 0; } }
+  /* Rev-637: banner and bar both doubled in height — 15px -> 30px and 7px -> 14px — so
+     the pair carries across a shop screen. Stripe pitch and the wording scale with it,
+     otherwise a taller banner just means fatter stripes round the same small text. */
+  .cp-uc{ position:relative; display:flex; align-items:center; justify-content:center; height:30px;
+    border-radius:5px; margin-bottom:5px; overflow:hidden;
+    background:repeating-linear-gradient(45deg,#e6a817 0 14px,#171310 14px 28px);
+    background-size:39.6px 39.6px; animation:cpStripe 1.35s linear infinite; }
+  .cp-uc b{ position:relative; background:#171310; color:#e6a817; font-size:11px; font-weight:800;
+    letter-spacing:.13em; padding:3px 14px; border-radius:3px; white-space:nowrap; }
+  @keyframes cpStripe{ from{ background-position:0 0; } to{ background-position:39.6px 0; } }
   /* thinner bar, with a highlight that sweeps along the filled part while work is open */
-  .cp-prog{ position:relative; display:block; width:100%; height:7px; border-radius:4px; background:#ddd6cc; overflow:hidden; margin-top:0; }
-  .cp-prog-fill{ position:absolute; inset:0 auto 0 0; border-radius:4px; background:#2c6e49; overflow:hidden; transition:width .45s ease; }
+  .cp-prog{ position:relative; display:block; width:100%; height:14px; border-radius:7px; background:#ddd6cc; overflow:hidden; margin-top:0; }
+  .cp-prog-fill{ position:absolute; inset:0 auto 0 0; border-radius:7px; background:#2c6e49; overflow:hidden; transition:width .45s ease; }
   .cp-prog-fill.live{ background:linear-gradient(90deg,#2c6e49 0%,#3fa063 70%,#57c47d 100%); }
-  .cp-prog-fill.live::after{ content:''; position:absolute; inset:0; border-radius:4px;
+  .cp-prog-fill.live::after{ content:''; position:absolute; inset:0; border-radius:7px;
     background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.55) 50%,rgba(255,255,255,0) 100%);
     transform:translateX(-100%); animation:cpSweep 1.6s ease-in-out infinite; }
   @keyframes cpSweep{ 0%{ transform:translateX(-100%); } 60%,100%{ transform:translateX(100%); } }
@@ -1533,7 +1536,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-636";
+const APP_REV = "Rev-637";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1666,6 +1669,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-637", type: "App", changes: ["BANNER AND PROGRESS BAR DOUBLED IN HEIGHT (Rev-637) \u2014 the UNDER CONSTRUCTION banner goes 15px \u2192 30px and the progress bar 7px \u2192 14px. The stripe pitch and the wording were scaled with them (stripes 9px \u2192 14px, text 8.5px \u2192 11px, chip padding widened), because doubling only the height would have produced fatter stripes wrapped round the same small text \u2014 taller without being any more readable. The stripe animation was slowed to match the coarser pitch so it crawls at the same apparent speed, and the bar\u2019s corner radius follows its new height."] },
   { ts: "2026-07-28", rev: "App Rev-636", type: "App", changes: ["ADDING A SECOND OPERATION NO LONGER LOOKS LIKE OVERWRITING THE PART (Rev-636) \u2014 saving OP-040 onto a part that already had OP-030 raised \u2018A Control Plan already exists \u2014 this OVERWRITES the existing plan\u2019. Cause: the clash test compared PART NUMBER + REVISION only. That was right when a part had one Control Plan; since Rev-561 a part carries one plan PER ROUTING OPERATION, and the operation number is part of a plan\u2019s identity everywhere else in the app \u2014 it was simply missing from this one test. So the very thing \u2795 Add Operation exists to do was blocked behind an overwrite warning, and the safe-looking answer (Open the existing plan) would have sent you back into OP-030. Only the same part, the same rev AND the same operation is a clash now. The warning also names the operation, so when it does fire it is clear which plan is at risk rather than implying the whole part is."] },
   { ts: "2026-07-28", rev: "App Rev-635", type: "App", changes: ["THE PERCENTAGE SHOWS ITS WORKING (Rev-635) \u2014 partial credit within a stage was already there (10 of 30 rows earns a third of that stage\u2019s weight), but a bare figure gives no way to check it. Hovering the percentage now itemises it: each stage, its weight, its row fraction and the points it contributed, with the total underneath \u2014 e.g. \u2018Control types (worth 30): 10 of 30 = 33% \u2192 10 pts\u2019. The UNDER CONSTRUCTION banner also names the stage actually in progress and its count, so the line reads UNDER CONSTRUCTION \u2014 46% COMPLETE \u00b7 CONTROL TYPES 3/14 rather than a percentage on its own. Nothing about the calculation changed; it is now checkable rather than taken on trust."] },
   { ts: "2026-07-28", rev: "App Rev-634", type: "App", changes: ["PERCENTAGE NOW REFLECTS THE WORK (Rev-634) \u2014 an operation with Step 4 barely started and Step 5 untouched was reading 84% complete. Two faults, both flattering the figure. (1) EVERY STAGE WAS WORTH A FLAT 20%. Typing an op number and loading a drawing are two clicks; ballooning fourteen features, choosing fourteen control types and settling fourteen measurement methods is the actual job \u2014 yet those two clicks carried 40% of the plan. Weighting is now 5 / 5 / 30 / 30 / 30. (2) A LOCKED STAGE STILL SCORED: the methods band auto-fills from the Master List as soon as a control type lands, so Step 5 was banking credit for rows whose control types had not been chosen. Work that cannot be started yet is not work done \u2014 a locked stage now counts zero. The same operation now reads about 46%, which matches what is actually finished."] },
@@ -2175,7 +2179,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:20 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:28 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
