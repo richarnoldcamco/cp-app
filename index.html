@@ -1472,7 +1472,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-604";
+const APP_REV = "Rev-605";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1486,6 +1486,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-605", type: "App", changes: ["THE PLAN-EATING BUG FOUND (Rev-605) \u2014 912767-M kept disappearing and the pencil\u2019s op number would not stick. Cause found in the saved data: a DELETION had been recorded for 912767-M::Rev-1::OP030 at 12:14 today. It was not a mis-click. saveProject carries a rename rule from Rev-336: if the plan\u2019s id changed since it was opened, tombstone the old id so the old name cannot come back. That was written when an id was part::rev. Since per-operation plans the id ALSO carries the op number \u2014 so giving a plan its op number changed its id, the rename rule fired, and the app recorded a deletion OF THE PLAN ITSELF, which then propagated to every device. Three fixes: (1) only a changed PART NUMBER or REV counts as a rename now; an op-number change moves the same plan and never leaves a tombstone. (2) Opening a plan copies its op number and description into the builder, so the builder can no longer hold a blank op while the saved plan has one and compute a different id on the next save. (3) The pencil updates the builder\u2019s record of which saved plan it came from at the same time it changes the id. The lost plan and its false deletion marker were repaired in the synced data."] },
   { ts: "2026-07-28", rev: "App Rev-604", type: "App", changes: ["PART BUTTONS MOVED UNDER ACTIONS (Rev-604) \u2014 Add Operation and View / Upload Traveller sat immediately after the part number on the header bar, floating over the Status and ODS Drawing columns and lining up with nothing. The header bar is now two cells: the part number spans the first four columns, and its buttons begin exactly where the ACTIONS column begins, directly above the operation row\u2019s own buttons. Everything that acts on a row \u2014 part-level or operation-level \u2014 now lives in one vertical band, and the part name no longer needs its fixed-width spacer to keep things aligned."] },
   { ts: "2026-07-28", rev: "App Rev-603", type: "App", changes: ["A PART-FILLED STEP NOW SAYS IN PROGRESS (Rev-603) \u2014 Step 2 read DO THIS NEXT on a plan where 3 of its 14 rows already had a control type, which is simply untrue: the step had been started. An unfinished step that has already been part-filled now reads STEP n \u2013 IN PROGRESS with the count (e.g. STEP 2 \u2013 IN PROGRESS 3/14); DO THIS NEXT is reserved for a step where nothing has been done yet. Applies to all three steps, so a glance down the list distinguishes untouched work from work already underway."] },
   { ts: "2026-07-28", rev: "App Rev-602", type: "App", changes: ["STEP COLOURS TURNED THE RIGHT WAY ROUND (Rev-602) \u2014 the construction steps had it backwards: the step still TO DO was solid green and the FINISHED one was white, so the list read as if the unfinished work were the completed work. Green now means done, as everyone expects, and a third state was added for the step that is available now: DONE is solid green with STEP n \u2713 DONE; DO THIS NEXT is amber (matching the IN PROGRESS pill) reading STEP n \u2013 DO THIS NEXT; LOCKED stays flat grey with a dashed border reading STEP n \u2013 LOCKED. Each state now differs in colour AND in wording, so it survives a bad screen or colour-blindness. Separately, the Inspect button was using a brighter green (#1f8a3b) than any other button for no reason; it now uses the app\u2019s single filled-action green (#2c6e49), so a green button means the same thing everywhere on the row."] },
@@ -1963,7 +1964,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:44 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:58 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3867,9 +3868,19 @@ function saveProject(partNum, rev, base64Data, customerName, qualityLevel){
   if(existingIdx < 0 && cpBuildState && cpBuildState.srcId && cpBuildState.srcId !== entry.id){
     const j = projects.findIndex(p => p.id === cpBuildState.srcId);
     if(j >= 0){
-      const tombs = JSON.parse(localStorage.getItem('deletedProjectKeys') || '[]');
-      tombs.push({ key: cpBuildState.srcId, deletedAt: new Date().toISOString() });
-      localStorage.setItem('deletedProjectKeys', JSON.stringify(tombs));
+      // Rev-605 FIX: this branch tombstoned the OLD id on the assumption that a changed
+      // id means the plan was renamed. Since per-operation plans, the id also carries the
+      // op number — so simply giving a plan its op number (or the builder not yet knowing
+      // it) made the app record a DELETION of that plan and it vanished from every device.
+      // Only a changed PART NUMBER or REV is a rename; an op-number change just moves the
+      // same plan, and must never leave a tombstone behind.
+      const prev = projects[j];
+      const renamed = String(prev.partNum || '') !== String(partNum || '') || String(prev.rev || '') !== String(rev || '');
+      if(renamed){
+        const tombs = JSON.parse(localStorage.getItem('deletedProjectKeys') || '[]');
+        tombs.push({ key: cpBuildState.srcId, deletedAt: new Date().toISOString() });
+        localStorage.setItem('deletedProjectKeys', JSON.stringify(tombs));
+      }
       existingIdx = j;
     }
   }
@@ -3903,6 +3914,11 @@ function editProject(idx){
     return;
   }
   cpBuildState = JSON.parse(JSON.stringify(p.builderState));
+  // Rev-605: the saved plan is the authority on its own operation. Without this the
+  // builder could hold a blank op number while the stored plan had one, and the next
+  // save would compute a different id — which is what triggered the false rename above.
+  if(p.opNum && !cpBuildState.opNum) cpBuildState.opNum = p.opNum;
+  if(p.opDesc && !cpBuildState.opDesc) cpBuildState.opDesc = p.opDesc;
   _idbAttach(cpBuildState);   // Rev-338: re-attach drawing from IndexedDB
   cpBuildState.srcId = p.id || ((p.partNum||'') + '::' + (p.rev||''));   // Rev-336: remember which saved plan this is, so a part-number change RENAMES it instead of creating a duplicate
   if(typeof cpBuildState.focusIdx !== 'number') cpBuildState.focusIdx = 0;
@@ -4198,7 +4214,11 @@ function cpSetOpDesc(p){
 
     try{
       if(cpBuildState && String(cpBuildState.partNum||'') === String(p.partNum||'')
-         && String(cpBuildState.opNum||'') === oldOp){ cpBuildState.opNum = newOp; cpBuildState.opDesc = desc; }
+         && String(cpBuildState.opNum||'') === oldOp){
+        cpBuildState.opNum = newOp; cpBuildState.opDesc = desc;
+        // Rev-605: keep the builder's idea of which saved plan it came from in step
+        cpBuildState.srcId = (p.partNum || '') + '::' + (p.rev || '') + (newOp ? '::OP' + newOp : '');
+      }
     }catch(e){}
     p.opNum = newOp; p.opDesc = desc;
     close();
