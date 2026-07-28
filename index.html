@@ -1533,7 +1533,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-635";
+const APP_REV = "Rev-636";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1666,6 +1666,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-636", type: "App", changes: ["ADDING A SECOND OPERATION NO LONGER LOOKS LIKE OVERWRITING THE PART (Rev-636) \u2014 saving OP-040 onto a part that already had OP-030 raised \u2018A Control Plan already exists \u2014 this OVERWRITES the existing plan\u2019. Cause: the clash test compared PART NUMBER + REVISION only. That was right when a part had one Control Plan; since Rev-561 a part carries one plan PER ROUTING OPERATION, and the operation number is part of a plan\u2019s identity everywhere else in the app \u2014 it was simply missing from this one test. So the very thing \u2795 Add Operation exists to do was blocked behind an overwrite warning, and the safe-looking answer (Open the existing plan) would have sent you back into OP-030. Only the same part, the same rev AND the same operation is a clash now. The warning also names the operation, so when it does fire it is clear which plan is at risk rather than implying the whole part is."] },
   { ts: "2026-07-28", rev: "App Rev-635", type: "App", changes: ["THE PERCENTAGE SHOWS ITS WORKING (Rev-635) \u2014 partial credit within a stage was already there (10 of 30 rows earns a third of that stage\u2019s weight), but a bare figure gives no way to check it. Hovering the percentage now itemises it: each stage, its weight, its row fraction and the points it contributed, with the total underneath \u2014 e.g. \u2018Control types (worth 30): 10 of 30 = 33% \u2192 10 pts\u2019. The UNDER CONSTRUCTION banner also names the stage actually in progress and its count, so the line reads UNDER CONSTRUCTION \u2014 46% COMPLETE \u00b7 CONTROL TYPES 3/14 rather than a percentage on its own. Nothing about the calculation changed; it is now checkable rather than taken on trust."] },
   { ts: "2026-07-28", rev: "App Rev-634", type: "App", changes: ["PERCENTAGE NOW REFLECTS THE WORK (Rev-634) \u2014 an operation with Step 4 barely started and Step 5 untouched was reading 84% complete. Two faults, both flattering the figure. (1) EVERY STAGE WAS WORTH A FLAT 20%. Typing an op number and loading a drawing are two clicks; ballooning fourteen features, choosing fourteen control types and settling fourteen measurement methods is the actual job \u2014 yet those two clicks carried 40% of the plan. Weighting is now 5 / 5 / 30 / 30 / 30. (2) A LOCKED STAGE STILL SCORED: the methods band auto-fills from the Master List as soon as a control type lands, so Step 5 was banking credit for rows whose control types had not been chosen. Work that cannot be started yet is not work done \u2014 a locked stage now counts zero. The same operation now reads about 46%, which matches what is actually finished."] },
   { ts: "2026-07-28", rev: "App Rev-633", type: "App", changes: ["ACTION LOG NOW RECORDS THE EVENTS THAT EXPLAIN A FAULT (Rev-633) \u2014 clicks and screens alone say what was pressed, not what the app then did with it. Six app-level events are now logged by name: OPEN-PLAN and SAVE-PLAN (part, op, id and row count), STEP (which construction step was opened), PUSH (a data push starting), DELETE-PLAN (a plan deleted by hand), and TOMBSTONE \u2014 a deletion marker written by the rename path, which is precisely the line that would have identified the Rev-605 plan-eating bug in seconds instead of hours. Part number and operation ARE included on these entries, because without them the log cannot say WHICH plan vanished; tolerances, feature descriptions and gage notes are still never recorded, and nothing is transmitted \u2014 the log leaves the device only when the user copies it out."] },
@@ -2174,7 +2175,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:08 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:20 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4811,10 +4812,18 @@ async function generateCP(){
   const gPart = $('cpPartNum').value.trim();
   const gRev  = $('cpRev').value.trim();
   if(gPart){
+    // Rev-636 FIX: the clash test compared PART + REV only, which was correct when a part
+    // had one plan. A part now carries one plan PER ROUTING OPERATION, so adding OP-040 to
+    // a part that already has OP-030 was reported as overwriting the part — the very thing
+    // ➕ Add Operation exists to do was blocked behind an overwrite warning. The OPERATION
+    // NUMBER is part of a plan's identity, so it belongs in the test: only the same part,
+    // the same rev AND the same op is a genuine clash.
+    const gOp = ($('cpOpNum') ? $('cpOpNum').value.trim() : '');
     const projs = JSON.parse(localStorage.getItem('cpProjects') || '[]');
     let hitIdx = -1;
     projs.forEach((p, i) => {
-      if(cpNorm(p.partNum) === cpNorm(gPart) && cpNorm(p.rev) === cpNorm(gRev)){
+      if(cpNorm(p.partNum) === cpNorm(gPart) && cpNorm(p.rev) === cpNorm(gRev)
+         && cpNorm(p.opNum || '') === cpNorm(gOp)){
         if(hitIdx < 0) hitIdx = i;
         else if(p.builderState && !projs[hitIdx].builderState) hitIdx = i;   // prefer an editable record
       }
@@ -5528,6 +5537,11 @@ async function generateCPBuild(){
 // Rev-260: the GENERATE existence gate modal. Three explicit choices so a new blank skeleton can't
 // silently overwrite a saved Part #::Rev plan.
 function showGenerateGate(partNum, rev, projIdx){
+  // Rev-636: name the OPERATION as well, so it is clear what is actually at risk
+  try{
+    const _op = ($('cpOpNum') ? $('cpOpNum').value.trim() : '');
+    if(_op) rev = rev + '  \u00b7  OP-' + _op;
+  }catch(e){}
   const old = document.getElementById('cpGenGate'); if(old) old.remove();
   const nBalloons = parseInt($('cpRows').value || '15') || 0;
   const ov = document.createElement('div');
