@@ -1468,7 +1468,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-597";
+const APP_REV = "Rev-598";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1482,6 +1482,7 @@ function setDeviceMode(v){
 
 // Change log — most recent first. Each entry: date/time, rev, type, description
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-598", type: "App", changes: ["STEP 1 IS DONE WHEN EVERY ROW HAS THE GREEN DOT (Rev-598) \u2014 Step 1 was counting a row as finished once it had a bubble number and a description typed in. That proves nothing: the green dot in the pin column is what says the balloon has actually been LOCATED on the ODS drawing, which is what makes zoom-to-bubble and the drawing crops work. Step 1 now requires the dot on every row \u2014 read from the balloon positions saved with the plan, so it is judged the same way from the Control Plans list as it is inside the builder. GHOST ROWS ARE EXEMPT: a ghost is deliberately a balloon that is NOT on the drawing, so it can never be pinned and must not hold the step open. A feature description no longer gates the step \u2014 the dot is the test. The step-bar hint and the Step 1 tooltip now say so, and the outstanding count reads \u2018n of n rows are not pinned to the drawing yet (no green dot)\u2019."] },
   { ts: "2026-07-28", rev: "App Rev-597", type: "App", changes: ["COMPLETE NOW HAS TO BE EARNED (Rev-597) \u2014 Test1 was announcing itself COMPLETE with no operation number, no traveller and Step 3 untouched. The badge was reading nothing more than the manual under-construction switch: not marked under construction meant COMPLETE, regardless of the state of the work. A plan is now COMPLETE only when it has an operation number, a traveller on file for its part, and all three construction steps finished; anything short of that reads IN PROGRESS with a count, and hovering it lists exactly what is outstanding (\u2018no traveller uploaded for this part\u2019, \u2018Step 3: 6 of 6 rows still need a measurement method and reaction plan\u2019). The manual switch still works, but only to FORCE in-progress \u2014 it can no longer declare a plan finished. STEP 3 CAN ALSO SHOW AS DONE now: it is finished when every row carries a machinist method and a reaction plan, so the button turns white with a \u2713 like the other two instead of staying green forever. The part-level pill on the parts list uses the same rule, so ALL STEPS DONE became COMPLETE and means it."] },
   { ts: "2026-07-27", rev: "App Rev-596", type: "App", changes: ["ODS PDF CONVERTS AT LAST (Rev-596) \u2014 with handleODSUpload reachable after Rev-594, the failure moved one step along: \u2018convertPdfToImageFile is not defined\u2019. Both functions sat in the same stretch of the file, and declarations in that stretch are not reaching the global scope \u2014 which is why moving handleODSUpload out of it fixed that name and exposed the next one. Rather than chase each name in turn, the ODS upload now calls cpPdfPagesToImages, the converter the traveller and gage-drawing screens have been using successfully since Rev-570, and takes page 1; convertPdfToImageFile remains only as a fallback if it happens to be present. Both routes are checked with typeof before use, so a missing binding produces a clear message instead of a raw ReferenceError. The unreachable-declaration region itself is still to be tracked down \u2014 anything else living in it may fail the same way."] },
   { ts: "2026-07-27", rev: "App Rev-595", type: "App", changes: ["DATA ROWS FIELD REMOVED FROM THE NEW-PLAN SCREEN (Rev-595) \u2014 the DATA ROWS (# OF BALLOONS) box asked for a balloon count before the drawing had even been loaded, and Step 1 \u00b7 ASSIGN BUBBLE NUMBERS is where rows actually get added or removed. It is gone from the screen. The input itself is kept in the page but hidden, because a dozen places read it: it now simply carries the starting row count \u2014 the AI balloon count when one is available, otherwise 15 \u2014 so nothing downstream changes and no code had to be rewired for a cosmetic removal."] },
@@ -1952,7 +1953,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:14 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:22 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2609,7 +2610,18 @@ function cpPlanComplete(p){
 function cpStepProgress(p){
   const rows = (p && p.builderState && Array.isArray(p.builderState.rows)) ? p.builderState.rows : [];
   const total = rows.length;
-  const s1Left = rows.filter(r => !String(r.bubble || '').trim() || !String(r.featureDesc || '').trim()).length;
+  // Rev-598: Step 1 is finished when every row shows the GREEN DOT in the pin column —
+  // that dot means the balloon has actually been located on the ODS drawing, which is
+  // what makes zoom-to-bubble and the drawing crops work. A bubble number typed into a
+  // cell proves nothing on its own. Ghost rows are exempt: a ghost is deliberately a
+  // balloon that is NOT on the drawing, so it can never be pinned.
+  const feats = (p && p.builderState && Array.isArray(p.builderState.features)) ? p.builderState.features : [];
+  const isPinned = (b) => feats.some(f => String(f.n) === String(b));
+  const s1Left = rows.filter(r => {
+    if(r.ghost) return false;
+    if(!String(r.bubble || '').trim()) return true;
+    return !isPinned(r.bubble);
+  }).length;
   const s2Left = rows.filter(r => !String(r.controlTypeId || '').trim()).length;
   // Rev-597: step 3 is done when every row carries a machinist method and a reaction plan
   const s3Left = rows.filter(r => !String(r.measMethod || '').trim() || !String(r.reactionPlan || '').trim()).length;
@@ -2620,7 +2632,7 @@ function cpStepProgress(p){
     s3Done: total > 0 && s3Left === 0,
     s1Left, s2Left, s3Left,
     s3Note: total === 0 ? 'no rows yet' : (s3Left ? (s3Left + ' of ' + total + ' rows still need a measurement method and reaction plan') : 'all ' + total + ' rows done'),
-    s1Note: total === 0 ? 'no rows yet' : (s1Left ? (s1Left + ' of ' + total + ' rows still need a bubble number and description') : 'all ' + total + ' rows done'),
+    s1Note: total === 0 ? 'no rows yet' : (s1Left ? (s1Left + ' of ' + total + ' rows are not pinned to the drawing yet (no green dot)') : 'all ' + total + ' rows pinned'),
     s2Note: total === 0 ? 'no rows yet' : (s2Left ? (s2Left + ' of ' + total + ' rows still need a control type') : 'all ' + total + ' rows done')
   };
 }
@@ -2853,7 +2865,7 @@ function renderProjects(){
         return b;
       };
       mkStep(1, 'ASSIGN BUBBLE NUMBERS', prog.s1Done ? 'done' : 'todo',
-        'STEP 1 \u2014 give every ODS balloon its row: bubble number, feature description and tolerance.\n'
+        'STEP 1 \u2014 give every ODS balloon its row and pin it on the drawing. Done when every row shows the GREEN DOT in the pin column.\n'
         + prog.s1Note + '.' + stepNote,
         () => openAt('1'));
       mkStep(2, 'SELECT CONTROL TYPE', prog.s1Done ? (prog.s2Done ? 'done' : 'todo') : 'lock',
@@ -4844,7 +4856,7 @@ function reflectUnderConstruction(){
 //  13 FREQ(QE)  14 Meas(CMM)  15 Special Gage  16 Reaction Plan
 const CP_STEPS = {
   '1': { label: '1 \u00b7 Bubble Numbers',
-         hint: 'Give every ODS balloon its row: bubble number, what the feature is, and its tolerance.',
+         hint: 'Give every ODS balloon its row, then pin each one on the drawing \u2014 the step is done when every row shows a green dot.',
          cols: [0,1,2,5,6,7,8,9] },
   '2': { label: '2 \u00b7 Control Type',
          hint: 'Pick the Control Type for each balloon. The methods fill themselves from the Master List.',
