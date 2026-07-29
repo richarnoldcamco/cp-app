@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-711";
+const APP_REV = "Rev-712";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-712", type: "App", changes: ["POINT AT SOMETHING \u2014 WITHOUT A SCREENSHOT (Rev-712) \u2014 the ask was for a screenshot the user could highlight. A screenshot of the Build Control Plan screen carries part numbers, tolerances, feature descriptions and the ODS drawing, which is exactly the leak the help agent was built to make impossible \u2014 and the ITAR gate\u2019s own wording (\u2018only if NON-ITAR\u2019) means the honest answer on that screen is always no. SO THE USEFUL HALF WAS BUILT WITHOUT THE PIXELS. \u261d POINT AT SOMETHING dims the window, banners the screen, outlines whatever is under the cursor, and on click sends WHAT IT IS rather than WHAT IT SAYS: a column heading, a button label, a named region. NO IMAGE IS EVER CAPTURED. Data cells and entry fields are handled by DESIGN, not by filtering \u2014 point at one and the app sends \u2018a cell in the MACHINIST CHECK FREQ column (its contents were NOT sent)\u2019, because the column heading names the concept the question is about while the cell holds the customer\u2019s data. The window shows the exact phrase before you press Ask, so nothing goes out unseen. Esc cancels."] },
   { ts: "2026-07-29", rev: "App Rev-711", type: "App", changes: ["THE ITAR GATE NOW SITS ABOVE EVERYTHING (Rev-711) \u2014 the help window added at Rev-707 was given z-index 10120 while the ITAR permission modal sat at 10070, so the gate opened BEHIND the window that triggered it: visible enough to be noticed, impossible to reach. THAT IS THE WORST WAY FOR THIS PARTICULAR CONTROL TO FAIL. Every other overlay in the app can be dismissed by clicking the backdrop; a permission gate exists specifically to be REFUSED, and one that cannot be answered is one that cannot be refused. Raised to 11000, above every overlay in the app, and also set programmatically each time it is shown so a future overlay with a higher number cannot bury it again without someone noticing. z-index only \u2014 no change to what the gate asks, what it protects, or what happens on Cancel."] },
   { ts: "2026-07-29", rev: "App Rev-710", type: "App", changes: ["THE API KEY BOX NOW CHECKS WHAT WAS PASTED INTO IT (Rev-710) \u2014 the help agent reported \u2018invalid x-api-key\u2019, which reads like a broken feature but is the far end saying it does not recognise the key. The app was not corrupting it: saveApiKey stores .value.trim() verbatim and the field is type=password, so the global uppercase CSS cannot reach the value. The key itself was not accepted. SO THE SHAPE IS CHECKED BEFORE SAVING: a GitHub token (github_pat_ / ghp_) is REFUSED outright with the reason and where it actually belongs \u2014 behind password dots a GitHub token and an Anthropic key are indistinguishable, and both get pasted in the same session, so this was a matter of time. Anything not starting sk-ant- is saved but warned about. The key is never logged, shown or transmitted by this check; only its prefix is examined. THE HELP PANEL NOW NAMES THE CAUSE instead of repeating the raw error: it inspects the saved prefix and says either \u2018that is a GitHub token, put it in Admin \u2192 GitHub\u2019, or \u2018does not start sk-ant-\u2019, or \u2018looks right but was not accepted \u2014 most likely revoked or regenerated\u2019. A no-credit reply is called out separately, because that is an account problem and no amount of re-pasting will fix it."] },
   { ts: "2026-07-29", rev: "App Rev-709", type: "App", changes: ["SPECIAL FEATURES NO LONGER ASK FOR A SIZE OR TOLERANCE ZONE (Rev-709) \u2014 SHARP EDGE 3X showed both zone pickers plus a red line telling the QE to choose a band, for a feature that has no size and no tolerance. CHECKED AGAINST THE MASTER BEFORE CHANGING ANYTHING: all three LATHE / SPECIAL rows carry an X in EVERY band, so a zone there can neither narrow the candidates nor exclude any of them \u2014 the controls were incapable of affecting the outcome and could only invite a pointless decision, or worse, a wrong one recorded on the plan. On a SPECIAL row the pickers and their headings are now hidden and replaced with \u2018SPECIAL feature \u2014 no size or tolerance zone applies. Narrow it with the levels instead.\u2019 The red cannot-derive-a-band note is suppressed there too, since a MAX/MIN explanation is meaningless for a sharp-edge callout. The candidate advice also stops pointing at the zones on those rows and points at the 2nd / 3rd Level, which is what actually separates LATHE / SPECIAL from / VISUAL and / HELPFULNOTE."] },
@@ -2301,7 +2302,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "09:04 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "09:26 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7137,6 +7138,98 @@ const CP_HELP_GUIDE = [
   'answer generally and tell the user to read the value off the screen themselves.'
 ].join('\n');
 
+// Rev-712: POINT AT SOMETHING. A screenshot of this app carries part numbers, tolerances,
+// feature descriptions and the ODS drawing, so no image is ever captured or sent. Instead the
+// user points at a control and the app sends WHAT IT IS, not WHAT IT SAYS: a column heading, a
+// button label, a named screen region. Values are never read \u2014 see cpHelpDescribe below,
+// which refuses data cells and inputs by design rather than by filtering.
+let _cpHelpTarget = '';
+function cpHelpFriendlyId(id){
+  const map = {
+    cpBuilderScreen:'the Build Control Plan grid', projectsScreen:'the Control Plans list',
+    masterListScreen:'the Control Types Master List', adminScreen:'the Admin screen',
+    settingsScreen:'the Settings screen', menuScreen:'the main menu',
+    cpBuilderTbody:'a row in the Control Plan grid', cpStepBar:'the step bar'
+  };
+  return map[id] || '';
+}
+// What may be sent. UI furniture only: headings, button labels, region names. Never a value.
+function cpHelpDescribe(el){
+  try{
+    for(let n = el; n && n !== document.body; n = n.parentElement){
+      const tag = (n.tagName || '').toUpperCase();
+      // a column heading names a concept, not a value
+      if(tag === 'TH'){
+        const t = (n.textContent || '').replace(/\s+/g,' ').trim().slice(0,60);
+        if(t) return 'the "' + t + '" column heading';
+      }
+      // buttons and labels are fixed UI text written by us, not customer data
+      if(tag === 'BUTTON' || tag === 'LABEL'){
+        const t = (n.textContent || '').replace(/\s+/g,' ').trim().slice(0,60);
+        if(t) return 'the "' + t + '" button';
+      }
+      // a data cell or an entry field: say WHICH COLUMN, never the contents
+      if(tag === 'TD' || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'){
+        let td = n; while(td && (td.tagName || '').toUpperCase() !== 'TD') td = td.parentElement;
+        if(td && td.parentElement && td.parentElement.parentElement){
+          const tbl = td.closest('table');
+          const idx = Array.prototype.indexOf.call(td.parentElement.cells, td);
+          const hrows = tbl && tbl.tHead ? tbl.tHead.rows : null;
+          if(hrows && hrows.length){
+            for(let r = hrows.length - 1; r >= 0; r--){
+              const c = hrows[r].cells[idx];
+              const t = c ? (c.textContent || '').replace(/\s+/g,' ').trim().slice(0,60) : '';
+              if(t) return 'a cell in the "' + t + '" column (its contents were NOT sent)';
+            }
+          }
+        }
+        return 'an entry field on this screen (its contents were NOT sent)';
+      }
+      const f = n.id ? cpHelpFriendlyId(n.id) : '';
+      if(f) return f;
+    }
+  }catch(_){ }
+  return 'somewhere on the ' + cpHelpScreen() + ' screen';
+}
+function cpHelpStartPick(){
+  const ov = document.getElementById('cpHelpOv'); if(ov) ov.style.display = 'none';
+  const band = document.createElement('div');
+  band.id = 'cpHelpPickBand';
+  band.textContent = 'Click the thing you want to ask about \u00b7 Esc to cancel';
+  band.style.cssText = 'position:fixed; top:0; left:0; right:0; z-index:11500; background:#1a5276;'
+    + ' color:#fff; font-size:12px; font-weight:800; letter-spacing:.05em; text-align:center;'
+    + ' padding:7px; font-family:inherit;';
+  const ring = document.createElement('div');
+  ring.style.cssText = 'position:fixed; z-index:11400; border:2px solid #1a5276;'
+    + ' background:rgba(26,82,118,.12); pointer-events:none; display:none; border-radius:3px;';
+  document.body.appendChild(band); document.body.appendChild(ring);
+  const move = (e) => {
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    if(!el || el === band){ ring.style.display = 'none'; return; }
+    const r = el.getBoundingClientRect();
+    ring.style.display = 'block'; ring.style.left = r.left + 'px'; ring.style.top = r.top + 'px';
+    ring.style.width = r.width + 'px'; ring.style.height = r.height + 'px';
+  };
+  const done = () => {
+    document.removeEventListener('mousemove', move, true);
+    document.removeEventListener('click', click, true);
+    document.removeEventListener('keydown', key, true);
+    band.remove(); ring.remove();
+    if(ov) ov.style.display = 'flex';
+    const chip = document.getElementById('cpHelpTargetChip');
+    if(chip) chip.textContent = _cpHelpTarget ? ('Pointing at: ' + _cpHelpTarget) : '';
+  };
+  const click = (e) => {
+    e.preventDefault(); e.stopPropagation();
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    _cpHelpTarget = el ? cpHelpDescribe(el) : '';
+    done();
+  };
+  const key = (e) => { if(e.key === 'Escape'){ e.preventDefault(); _cpHelpTarget = ''; done(); } };
+  document.addEventListener('mousemove', move, true);
+  document.addEventListener('click', click, true);
+  document.addEventListener('keydown', key, true);
+}
 let _cpHelpOkThisSession = false;
 function cpHelpOpen(){
   const old = document.getElementById('cpHelpOv'); if(old) old.remove();
@@ -7152,13 +7245,17 @@ function cpHelpOpen(){
     + ' padding:10px 16px; font-size:13px;">\u2139 HELP \u2014 you are on: ' + cpHelpScreen() + '</div>'
     + '<div style="padding:10px 16px 0; font-size:11px; color:#6b6257; line-height:1.5;">'
     + 'Ask how to do something in this app. <b>Only your question, the screen name and the app '
-    + 'revision are sent</b> \u2014 no part numbers, tolerances, drawings or plan data. '
+    + 'revision are sent</b> \u2014 no part numbers, tolerances, drawings or plan data, and <b>no screenshot</b>. Point at a control and only WHAT IT IS is sent, never what it says. '
     + '<b style="color:#a5342a;">Do not type part or drawing details into the box.</b></div>';
   const ta = document.createElement('textarea');
   ta.placeholder = 'e.g. How do I mark a feature the machinist does not measure?';
   ta.style.cssText = 'margin:10px 16px; padding:9px; font-size:13px; min-height:64px;'
     + ' border:1px solid #c9c0b4; border-radius:6px; font-family:inherit; resize:vertical;';
   ta.className = 'no-upper';
+  const chip = document.createElement('div');
+  chip.id = 'cpHelpTargetChip';
+  chip.style.cssText = 'margin:0 16px 6px; font-size:11px; font-weight:800; color:#1a5276;';
+  chip.textContent = _cpHelpTarget ? ('Pointing at: ' + _cpHelpTarget) : '';
   const out = document.createElement('div');
   out.style.cssText = 'margin:0 16px; padding:0; font-size:13px; line-height:1.6; color:#3a352e;'
     + ' overflow:auto; flex:1 1 auto; min-height:0; white-space:pre-wrap;';
@@ -7196,7 +7293,9 @@ function cpHelpOpen(){
           model: 'claude-sonnet-4-6', max_tokens: 900,
           system: CP_HELP_GUIDE,
           messages: [{ role:'user', content:
-            'Screen: ' + cpHelpScreen() + '. App ' + APP_REV + '.\nQuestion: ' + q }]
+            'Screen: ' + cpHelpScreen() + '. App ' + APP_REV + '.'
+            + (_cpHelpTarget ? '\nThe user is pointing at ' + _cpHelpTarget + '.' : '')
+            + '\nQuestion: ' + q }]
         })
       });
       const d = await r.json();
@@ -7227,8 +7326,15 @@ function cpHelpOpen(){
     }catch(e){ out.textContent = 'Could not reach the AI service: ' + (e && e.message ? e.message : e); }
     ask.disabled = false;
   };
-  foot.appendChild(close); foot.appendChild(ask);
-  c.appendChild(ta); c.appendChild(out); c.appendChild(foot);
+  const pick = document.createElement('button');
+  pick.type = 'button'; pick.textContent = '\u261d Point at something';
+  pick.title = 'Click a control on the screen. Only WHAT it is gets sent \u2014 never a screenshot, '
+             + 'and never the contents of a cell.';
+  pick.style.cssText = 'font-size:12px; font-weight:700; padding:7px 14px; border:1px solid #c9c0b4;'
+    + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit; margin-right:auto;';
+  pick.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpHelpStartPick(); };
+  foot.appendChild(pick); foot.appendChild(close); foot.appendChild(ask);
+  c.appendChild(ta); c.appendChild(chip); c.appendChild(out); c.appendChild(foot);
   ov.appendChild(c);
   ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
   document.body.appendChild(ov);
