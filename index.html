@@ -1576,7 +1576,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-691";
+const APP_REV = "Rev-692";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1709,6 +1709,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-692", type: "App", changes: ["REASON (A) MUST NAME THE CONTROLLING BALLOON (Rev-692) \u2014 Rev-691 let a row say \u2018controlled by another feature on the same tool\u2019 without saying WHICH, which is not a control anyone can check: not an auditor, not the next QE, not you in six months. CP-8 requires every line to trace, and a control pointing at an unnamed sibling breaks the chain. The option is now \u2018Controlled by balloon [ ] on the same tool\u2019 with the number REQUIRED, and it is validated against the plan \u2014 a balloon not present on this operation is refused with the number named, and a row cannot cite itself. The line then reads NOT CHECKED BY MACHINIST \u2014 CONTROLLED BY BALLOON 6 ON THE SAME TOOL, on screen and in the .xlsx, which is checkable in seconds against the ODS. Undo clears the reference with the reason so a stale balloon number cannot survive a change of mind. Reason (b), CMM / QUALITY ENGINEER ONLY, needs no reference: the CMM column and FREQ (QE) on the same line already name who performs it."] },
   { ts: "2026-07-29", rev: "App Rev-691", type: "App", changes: ["A FEATURE THE MACHINIST DOES NOT MEASURE CAN NOW SAY SO (Rev-691) \u2014 the open row gains \u270b MACHINIST DOES NOT CHECK THIS, which asks WHICH of the two reasons applies: (1) controlled by another feature on the SAME TOOL, or (2) checked by CMM / Quality Engineer only. The Meas Method cell then reads NOT CHECKED BY MACHINIST \u2014 <reason> on an amber fill, with the master\u2019s own method kept in the hover text and a \u21ba to undo. Shown on closed rows too, from the same helper. IT CARRIES INTO THE .XLSX, deliberately: leaving the master method in the delivered document would state that the machinist performs a check the shop does not perform, which is Convention #2 exactly \u2014 the Control Method describes what the shop actually does, at the capability it actually has. # Recorded is cleared with it, since counting recorded measurements for a check nobody makes is the same false claim in a second column. STEP 3 now treats such a row as having answered the machinist question, so it can be approved \u2014 but it still demands a REACTION PLAN, because CP-7 makes a blank one a non-conformance whoever does the measuring. NOTE FOR THE INSTRUCTIONS: Rev-92 CP-2C describes the methods band as governed by the master row and does not yet describe this declared exception. The app now writes a state the controlling document does not define. Rev-92 is ITAR-controlled and is not edited without being asked, so this is flagged, not fixed."] },
   { ts: "2026-07-29", rev: "App Rev-690", type: "App", changes: ["A \u2018# RECORDED\u2019 OF 2 NOW SAYS WHY (Rev-690) \u2014 CHECKING TAPER appears under the figure, small and grey, wherever that cell holds 2, on the open row and the closed rows alike. Two recorded readings on a diameter means both ends are being measured, and the reason is taper \u2014 which the number alone never said, so it had to be carried in the head of whoever built the line or worked out again by whoever read it later. The mark is DERIVED, not stored: nothing is written to the row, so it appears and disappears with the value and cannot go stale or reach the .xlsx, which stays exactly as CP-2 specifies. Put in ONE helper called from both render paths on purpose \u2014 the open row and the closed row have drifted apart twice already this era (the Special Gage button at Rev-685, the approve tick at Rev-689), and duplicating this would have set up the same fault a third time. The hover text spells it out in full for anyone who does not already know the convention."] },
   { ts: "2026-07-29", rev: "App Rev-689", type: "App", changes: ["THE APPROVE BOXES WERE SHOWING THE PREVIOUS STEP\u2019S TICKS (Rev-689) \u2014 Step 2 read \u2713 COMPLETED while eleven of the fourteen boxes below it sat empty. Both were drawn from the same data and only one was current. cpSetStep re-rendered the rows ONLY when a row happened to be open (focusIdx !== -1); with no row open it called cpApplyStepView, which shows and hides COLUMNS but never rebuilds the cells. The approve box answers \u2018is this row approved FOR THE STEP I AM ON\u2019, so its contents change with the step \u2014 and arriving from another step left the old step\u2019s ticks sitting under a step bar reporting the new one. Real sequence: all fourteen approved on Step 2, over to Step 3, three approved there, back to Step 2 \u2014 caption correct at fourteen, boxes still painting Step 3\u2019s three. Now the rows are always redrawn on a step change. WORTH NAMING BECAUSE OF WHAT IT COST: a QE reading eleven empty boxes on a step that was in fact finished would have re-approved eleven rows that needed no second look, or worse, doubted the eleven that were right. A stale tick on an approval control is not a cosmetic fault."] },
@@ -2273,7 +2274,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "03:12 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "03:41 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6485,7 +6486,7 @@ tr.appendChild(tdCT);
             und.type = 'button'; und.textContent = '\u21ba Undo \u2014 machinist does check this';
             und.style.cssText = 'margin-top:5px; font-size:10px; font-weight:700; padding:2px 8px;'
               + ' border:1px solid #c9c0b4; border-radius:999px; background:#fff; cursor:pointer; font-family:inherit;';
-            und.onclick = (e) => { e.preventDefault(); e.stopPropagation(); delete row.noMachCheck;
+            und.onclick = (e) => { e.preventDefault(); e.stopPropagation(); delete row.noMachCheck; delete row.noMachRef;
               renderCPBuilder(); try{ cpAutoSaveProject(); }catch(_){ } };
             td.appendChild(und);
             td.title = nm + '\n\nThe master method for this control type is: ' + (row.measMethod || '(none)');
@@ -6525,7 +6526,37 @@ tr.appendChild(tdCT);
                    renderCPBuilder(); try{ cpAutoSaveProject(); }catch(_){ } };
                  pick.appendChild(b);
                };
-               opt('1 \u00b7 Controlled by another feature on the SAME TOOL', 'SAME_TOOL');
+               // reason (a): ask for the controlling balloon and check it exists here
+               (function(){
+                 const wrapA = document.createElement('div');
+                 wrapA.style.cssText = 'display:flex; gap:4px; align-items:center; flex-wrap:wrap;';
+                 const lab = document.createElement('span');
+                 lab.style.cssText = 'font-size:10px; font-weight:700; color:#3a352e;';
+                 lab.textContent = '1 \u00b7 Controlled by balloon';
+                 const inp = document.createElement('input');
+                 inp.type = 'text'; inp.placeholder = 'no.';
+                 inp.style.cssText = 'width:52px; font-size:10px; padding:3px 6px; border:1px solid #c9c0b4;'
+                   + ' border-radius:6px; font-family:inherit; text-align:center;';
+                 const go = document.createElement('button');
+                 go.type = 'button'; go.textContent = 'on the same tool \u2713';
+                 go.style.cssText = 'font-size:10px; font-weight:700; padding:3px 8px; border:1px solid #c9c0b4;'
+                   + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit;';
+                 const warn = document.createElement('div');
+                 warn.style.cssText = 'font-size:10px; color:#a5342a; font-weight:700; width:100%;';
+                 go.onclick = (e) => {
+                   e.preventDefault(); e.stopPropagation();
+                   const v = String(inp.value || '').trim().toUpperCase();
+                   if(!v){ warn.textContent = 'Give the balloon number that controls this feature.'; return; }
+                   const rows = (cpBuildState && cpBuildState.rows) || [];
+                   const hit = rows.some((rr, ri) => ri !== idx && String(rr.bubble || '').trim().toUpperCase() === v);
+                   if(!hit){ warn.textContent = 'Balloon ' + v + ' is not on this plan \u2014 check the number.'; return; }
+                   row.noMachCheck = 'SAME_TOOL'; row.noMachRef = v;
+                   try{ logAct('row-edit', 'no machinist check \u00b7 SAME_TOOL'); }catch(_){ }
+                   renderCPBuilder(); try{ cpAutoSaveProject(); }catch(_){ }
+                 };
+                 wrapA.appendChild(lab); wrapA.appendChild(inp); wrapA.appendChild(go);
+                 pick.appendChild(wrapA); pick.appendChild(warn);
+               })();
                opt('2 \u00b7 Checked by CMM / Quality Engineer only', 'CMM_QE');
                bar.appendChild(pick);
              });
@@ -6627,12 +6658,16 @@ tr.appendChild(tdCT);
 // Control Plan has to say which — Convention #2: the Control Method describes what the
 // shop actually does. Stored on the row as a declared override, never silently blank.
 const CP_NOMACH = {
-  SAME_TOOL:  'NOT CHECKED BY MACHINIST \u2014 CONTROLLED BY ANOTHER FEATURE ON THE SAME TOOL',
+  SAME_TOOL:  'NOT CHECKED BY MACHINIST \u2014 CONTROLLED BY BALLOON {n} ON THE SAME TOOL',
   CMM_QE:     'NOT CHECKED BY MACHINIST \u2014 CMM / QUALITY ENGINEER ONLY'
 };
+// Rev-692: reason (a) must NAME the controlling balloon. 'Another feature on the same
+// tool' cannot be checked by an auditor or by the next QE, and CP-8 requires every line
+// to stay traceable — a control pointing at an unnamed sibling breaks that chain.
 function cpNoMachText(row){
   const k = row && row.noMachCheck;
-  return k && CP_NOMACH[k] ? CP_NOMACH[k] : '';
+  if(!k || !CP_NOMACH[k]) return '';
+  return CP_NOMACH[k].replace('{n}', String(row.noMachRef || '?'));
 }
 function cpTaperMark(td, val){
   try{
