@@ -1572,7 +1572,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-683";
+const APP_REV = "Rev-684";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1705,6 +1705,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-684", type: "App", changes: ["CONTROL TYPE ID HIDDEN ON STEP 3 (Rev-684) \u2014 dropped from the visible columns on 3 \u00b7 Measurement Methods; it remains on Step 2, where it is chosen, and on All columns. This finishes what Rev-673 started and got half right: that rev argued for keeping the column because the methods band is auto-filled BY the control type and reviewing methods without seeing their source removes the context. The argument was sound and still is \u2014 but the source is visible one click away on Step 2 and on All columns, and a column carried on every row for context you can fetch when you want it is a column spending width for nothing. Asked for twice; kept once too often. THE INERT CODE FROM REV-673/674 IS LEFT IN PLACE ON PURPOSE: the compact read-only cell and the 130px header on Step 3 no longer run, because a hidden column renders nothing. They are two lines, they are commented, and they are what makes the column reappear cleanly if this is ever reversed \u2014 deleting them would only mean rediscovering the fixed-layout header rule a third time."] },
   { ts: "2026-07-29", rev: "App Rev-683", type: "App", changes: ["NOTHING IS LOCKED ANY MORE (Rev-683) \u2014 OP-030 showed Step 4 COMPLETED and Step 5 LOCKED at the same time. Both were correct under the old rules and together they were nonsense: DONE follows APPROVAL (Rev-681) and all fourteen rows had been approved, while UNLOCK followed the DATA and three rows \u2014 bubbles 4, 12 and 10 \u2014 still carried no control type. So the app reported a step finished and then refused entry to the next one, and gave no way to find out why. A lock cannot be argued with; the only move left was to guess. Every step is now ALWAYS openable. The old test survives as `ready`, but it WARNS instead of refusing: a step whose groundwork is incomplete reads NEEDS EARLIER STEP and is styled as work to do rather than greyed out, and it opens on click like any other. THE UNDERLYING LESSON IS WORTH MORE THAN THE FIX: approving a row that was never filled in is what produced the contradiction. Approval is a claim about a row, so the app should not have made it possible to approve an empty one \u2014 that is the next thing to correct, not the gate that caught it."] },
   { ts: "2026-07-28", rev: "App Rev-682", type: "App", changes: ["HANDOFF PROMPT TAKES THE CROSS-APP RULES FROM THE PFMEA DEPLOY DOC \u2014 AND ONLY THOSE (Rev-682) \u2014 three things carried over because they describe the OPERATOR and CAMCO practice rather than one app\u2019s plumbing: (1) walking through anything on the machine ONE STEP AT A TIME, waiting for a screenshot and reading what it actually shows before moving on, never dumping the whole list, and stating faults plainly with the root cause; (2) the photo rule \u2014 500,000 bytes and 2400px maximum, always re-encoded from ORIGINALS because a JPEG round trip does not reverse, with text-bearing images kept as PNG; (3) a short warning that the PFMEA Builder ships as two files with a versioned crate and its own deploy order while CP is a single file pushed to two repos. WHAT WAS DELIBERATELY NOT COPIED: the crate procedure, app/assets-vN.js, latest.html, the boot-guard WANT constant, the PF recovery build. None of it exists in CP, and a prompt that describes machinery the app does not have is worse than one that stays silent \u2014 the next chat would follow it confidently and be wrong. The photo rule is recorded here as the OPERATOR rule; it supersedes SC-25 wording in the PFMEA instructions, which is a PF document and is not edited from this app."] },
   { ts: "2026-07-28", rev: "App Rev-681", type: "App", changes: ["DONE NOW MEANS APPROVED (Rev-681) \u2014 Rev-680 made the row dot mean approval but left the arithmetic counting DATA, so the app could stamp an operation COMPLETED at 98% with not one row reviewed. That gap is closed: a step is done when every row on it is APPROVED, and the percentage, the n/total on each step and the COMPLETED stamp all follow the approvals. Expect finished-looking operations to fall back down the list \u2014 that is the point; the earlier figure was reporting typing, not judgement. TWO COUNTS ARE KEPT because they answer different questions: dNLeft = rows whose data is not there yet, sNLeft = rows not approved. Hover any step and it now reads both, e.g. \u20180 of 14 approved \u00b7 data complete\u2019, so a step that is filled in but unreviewed is distinguishable at a glance from one that is genuinely empty. GATING DELIBERATELY LEFT ON THE DATA: a step UNLOCKS when the previous step\u2019s data is present, not when it is approved, so needing to sign off Step 3 never blocks you from starting Step 4 \u2014 approval is a record of review, and turning it into a gate would only invite clicking through it to get moving. Ghost rows stay exempt on Step 1, as before."] },
@@ -2261,7 +2262,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "01:18 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "01:22 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5965,7 +5966,7 @@ const CP_STEPS = {
          cols: [0,1,2,3,4,5,6,7,8,9,12] },
   '3': { label: '3 \u00b7 Measurement Methods',
          hint: 'Review what the master filled in, set any special gage, and confirm the reaction plan.',
-         cols: [0,1,2,3,8,9,12,13,14,15,16,17,18,19] },
+         cols: [0,1,2,8,9,12,13,14,15,16,17,18,19] },
   'A': { label: 'All columns',
          hint: 'Every column at once \u2014 the old single-screen view.',
          cols: null }
