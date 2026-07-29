@@ -732,7 +732,7 @@
           <tr style="background:#9DC3E6;">
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:45px;">Doc #</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:50px;">Bubble #</th>
-            <th rowspan="2" style="padding:2px; border:1px solid #5a8bb5; width:22px;" title="Row done for the STEP you are on — ● filled from the data, ✓ marked by hand. Click a dot to mark or un-mark a row.">✔</th>
+            <th rowspan="2" style="padding:2px; border:1px solid #5a8bb5; width:46px;" title="APPROVE this row for the STEP you are on — ● filled from the data, ✓ marked by hand. Click a dot to mark or un-mark a row.">✔</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:221px;">Control Type ID</th>
             <!-- Rev-614: the four Master List levels, so a control type can be narrowed down
                  the same way the Master List is organised instead of hunted in one long list -->
@@ -1572,7 +1572,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-686";
+const APP_REV = "Rev-687";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1705,6 +1705,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-687", type: "App", changes: ["THE APPROVE MARK IS NOW A RECTANGLE YOU CAN ACTUALLY HIT (Rev-687) \u2014 it was a ring glyph about 9px across sitting in a 22px column: a hard target with a mouse and a worse one with a finger, on the one control that has to be pressed once per row for every row in the plan. It is now a 34\u00d722 rounded rectangle in a 46px column, roughly nine times the area. The three states carry over unchanged and read more plainly at the larger size: GREY OUTLINE, empty = the data for this step is not there yet; GREEN OUTLINE, empty = data complete, waiting for you; GREEN FILLED WITH A WHITE TICK = you approved it. The tick appears only on a row YOU approved, which is the point of Rev-680 \u2014 a filled box is a signature, not a status light. Same click behaviour, same tooltips, same pop animation."] },
   { ts: "2026-07-29", rev: "App Rev-686", type: "App", changes: ["\u2018FREQ (EVERY)\u2019 IS NOW \u2018MACHINIST CHECK FREQ\u2019 ON SCREEN (Rev-686) \u2014 FREQ (Every) never finished its own sentence: every WHAT. Beside FREQ (QE), which names its owner, the column that says how often the MACHINIST checks the feature was the one that did not say who it belonged to. Renamed in all six places it is shown: the builder grid, the Master List grid, the label map, the Master List column set, the master edit form and the row edit form. TWO PLACES DELIBERATELY LEFT AS \u2018FREQ (EVERY)\u2019, AND THIS IS NOT AN OVERSIGHT. (1) The .xlsx export header \u2014 Instructions Rev-92 CP-2 names that column in the delivered header band, and the Instructions are the controlling ITAR document, not edited without being asked. Renaming the deliverable to disagree with its own spec is how an audit finding is written. (2) The import header map, which reads \u2018FREQ (EVERY)\u2019 out of existing workbooks \u2014 rename it and every Control Plan and Master List already on disk silently loses that column on import, with no error. The screen wording and the document wording are allowed to differ; the document and the spec are not."] },
   { ts: "2026-07-29", rev: "App Rev-685", type: "App", changes: ["ONE-TAP GAGE TYPES IN THE SPECIAL GAGE WINDOW (Rev-685) \u2014 seven chips under the description box: PLUG GAGE, RING GAGE, THREAD PLUG GAGE, THREAD RING GAGE, SNAP GAGE, GO/NO-GO PINS, HOLDING FIXTURE. The list is the lathe work that actually recurs rather than a catalogue; a long list would take as long to read as the words take to type. THEY INSERT, THEY DO NOT REPLACE. A tap drops the text at the CARET and hands focus straight back to the box with the caret after it, so PLUG GAGE can be followed immediately by the size and tolerance \u2014 which is the part the toolmaker actually needs and the part only you can supply. Where text is already present and does not end in a space, dash or comma, an em-dash separator is added; where it is not needed it is not added, so tapping twice does not produce stray punctuation. Nothing is overwritten and Cancel still abandons the lot."] },
   { ts: "2026-07-29", rev: "App Rev-684", type: "App", changes: ["CONTROL TYPE ID HIDDEN ON STEP 3 (Rev-684) \u2014 dropped from the visible columns on 3 \u00b7 Measurement Methods; it remains on Step 2, where it is chosen, and on All columns. This finishes what Rev-673 started and got half right: that rev argued for keeping the column because the methods band is auto-filled BY the control type and reviewing methods without seeing their source removes the context. The argument was sound and still is \u2014 but the source is visible one click away on Step 2 and on All columns, and a column carried on every row for context you can fetch when you want it is a column spending width for nothing. Asked for twice; kept once too often. THE INERT CODE FROM REV-673/674 IS LEFT IN PLACE ON PURPOSE: the compact read-only cell and the 130px header on Step 3 no longer run, because a hidden column renders nothing. They are two lines, they are commented, and they are what makes the column reappear cleanly if this is ever reversed \u2014 deleting them would only mean rediscovering the fixed-layout header rule a third time."] },
@@ -2264,7 +2265,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "01:36 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "01:43 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6202,7 +6203,7 @@ function renderCPBuilder(){
 
     // Rev-342: thin pin-status column — green dot when this balloon's position is pinned
     const tdPin = document.createElement('td');
-    tdPin.style.cssText = 'padding:0; border:1px solid var(--line); text-align:center; width:22px;';
+    tdPin.style.cssText = 'padding:0; border:1px solid var(--line); text-align:center; width:46px;';
     // Rev-641: the dot answers "is THIS ROW done for the step I am on", not one fixed
     // question. On Step 1 that is the balloon being pinned; on Step 2 it is the control
     // type being chosen; on Step 3 the measurement method and reaction plan. Every row
@@ -6241,8 +6242,17 @@ function renderCPBuilder(){
       tdPin.innerHTML = '<span style="font-size:' + (focused?'14px':'11px') + '; line-height:1;" title="Ghost — balloon not on the drawing">👻</span>';
     } else {
       const _pop = (window._cpPopRow === idx && window._cpPopStep === _step) ? ' cp-pop' : '';
-      tdPin.innerHTML = '<span class="cp-dot' + _pop + '" style="color:' + ((_on || _ready) ? '#1e8449' : '#c9c9c9')
-        + '; font-size:' + _size + '; line-height:1;">' + (_on ? '●' : '○') + '</span>';
+      // Rev-687: a 34x22 rounded rectangle, not a text bullet. The old mark was a small
+      // ring glyph roughly 9px across in a 22px column — a hard target with a mouse and a
+      // worse one with a finger, on the control that must be pressed once per row.
+      const _bg   = _on ? '#1e8449' : '#fff';
+      const _bord = (_on || _ready) ? '#1e8449' : '#c4c0b8';
+      const _fg   = _on ? '#fff' : (_ready ? '#1e8449' : '#c4c0b8');
+      tdPin.innerHTML = '<span class="cp-dot' + _pop + '" style="display:inline-flex;'
+        + ' align-items:center; justify-content:center; width:34px; height:22px; border-radius:5px;'
+        + ' border:2px solid ' + _bord + '; background:' + _bg + '; color:' + _fg + ';'
+        + ' font-size:14px; font-weight:900; line-height:1; box-sizing:border-box;">'
+        + (_on ? '\u2713' : '') + '</span>';
       if(_pop){ window._cpPopRow = null; window._cpPopStep = null; }
     }
     if(!row.ghost){
