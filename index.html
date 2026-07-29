@@ -212,9 +212,18 @@
   .cp-step:disabled{ opacity:.45; cursor:not-allowed; }
   .cp-step .cp-step-n{ font-size:9px; font-weight:800; letter-spacing:.14em; opacity:.75; line-height:1; }
   .cp-step .cp-step-t{ font-size:12px; font-weight:800; letter-spacing:.03em; line-height:1.1; }
+  /* Rev-679: STEP n moved OUT of the button, above it, so the button holds only the job
+     name and its state. The state line sits under the name in thin black rather than
+     being stamped across the label, which is what made Rev-677 unreadable. */
+  .cp-stepcap{ font-size:9px; font-weight:700; letter-spacing:.16em; color:#8a8279;
+    line-height:1; margin-bottom:3px; text-align:center; }
+  .cp-step .cp-step-s{ font-size:8.5px; font-weight:300; letter-spacing:.18em; line-height:1;
+    color:#111; opacity:.72; margin-top:3px; }
   /* Rev-602: three states, read the way people expect them.
-     GREEN FILLED = done. AMBER = this is the one to do now. GREY DASHED = locked. */
-  .cp-step-done{ background:#2c6e49; color:#fff; border:1px solid #24593b; }
+     GREEN = done. AMBER = this is the one to do now. GREY DASHED = locked.
+     Rev-679: the done fill is lightened so thin BLACK state text reads on it; the green
+     is carried by a heavier border and the tick instead of a solid block of colour. */
+  .cp-step-done{ background:#e9f3ec; color:#1d5136; border:1.5px solid #2c6e49; }
   .cp-step-todo{ background:#fdf4e0; color:#6b5314; border:2px solid #e6a817; }
   .cp-step-lock{ background:#f2efe9; color:#8a8279; border:1px dashed #c2b9ab; }
   .cp-pill{ display:inline-block; font-size:10px; font-weight:800; letter-spacing:.05em;
@@ -235,14 +244,9 @@
     letter-spacing:.13em; padding:3px 14px; border-radius:3px; white-space:nowrap; }
   /* Rev-676: COMPLETED stamp over a finished step button. Drawn in CSS so it scales and
      costs nothing to load. pointer-events:none so the button underneath still works. */
-  .cp-stepwrap{ position:relative; display:inline-block; }
-  .cp-stamp{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-13deg);
-    pointer-events:none; border:2.5px solid #1e7a3c; color:#1e7a3c; border-radius:3px;
-    padding:1px 7px; font-size:11px; font-weight:900; letter-spacing:.14em; line-height:1.15;
-    font-family:Arial,Helvetica,sans-serif; background:rgba(255,255,255,.60); opacity:.88;
-    white-space:nowrap; box-shadow:0 0 0 1.5px rgba(30,122,60,.20); }
-  .cp-stamp.on{ color:#eaf7ee; border-color:#eaf7ee; background:rgba(0,0,0,.18);
-    box-shadow:0 0 0 1.5px rgba(255,255,255,.25); }
+  .cp-stepwrap{ display:inline-flex; flex-direction:column; align-items:center; vertical-align:top; }
+  .cp-donecap{ font-size:8.5px; font-weight:300; letter-spacing:.18em; color:#111; opacity:.7;
+    margin-top:3px; text-align:center; line-height:1; }
   @keyframes cpStripe{ from{ background-position:0 0; } to{ background-position:39.6px 0; } }
   /* thinner bar, with a highlight that sweeps along the filled part while work is open */
   .cp-prog{ position:relative; display:block; width:100%; height:14px; border-radius:7px; background:#ddd6cc; overflow:hidden; margin-top:0; }
@@ -1568,7 +1572,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-678";
+const APP_REV = "Rev-679";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1701,6 +1705,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-679", type: "App", changes: ["STEP BUTTONS REBUILT \u2014 THE STAMP WAS PRINTING OVER THE LABEL (Rev-679) \u2014 Rev-677 laid COMPLETED across the middle of each finished button, directly over the wording it was meant to be commenting on, so both became unreadable: STEP 1 \u2713 DONE and COMPLETED fighting for the same 130 pixels. Rebuilt rather than nudged. STEP n now sits ABOVE the button as a small grey caption, which leaves the button holding just two things: the job name, and its state on a line underneath in thin black \u2014 \u2713 COMPLETED, IN PROGRESS 13/14, DO THIS NEXT, LOCKED. Nothing overlaps anything. THE DONE FILL WAS LIGHTENED from solid #2c6e49 to a pale green with a heavier green border, because thin black text cannot be read on a dark green block \u2014 the state colour is now carried by the border and the tick rather than a slab of colour, which also stops five finished steps in a row reading as a solid green bar. Amber for the step to do now and grey dashed for locked are unchanged. The same treatment was applied to the step bar inside Build Control Plan, where the identical overlay had the identical problem."] },
   { ts: "2026-07-28", rev: "App Rev-678", type: "App", changes: ["THE GREEN DOTS ARE BACK ON STEP 3 (Rev-678) \u2014 the per-row done dot was missing from 3 \u00b7 Measurement Methods, so there was no way to mark a row as correctly assigned on the one step where the judgement is hardest. It was not a missing feature: the dot column simply was not in that step\u2019s visible-column list \u2014 present on Steps 1 and 2, dropped from Step 3. The dot already understood the step, and had done since Rev-642: on Step 3 it reads \u2018Measurement method and reaction plan set\u2019 and fills itself from the data, and clicking it marks the row settled by hand. That hand-mark is what cpStepProgress counts, which means it also drives the Step 5 fraction on the Control Plans list, the percentage, and the COMPLETED stamp \u2014 so the dots were the missing half of a loop that was otherwise complete. Put back at its existing position after Bubble #, not beside the Methods band, so the dot sits in the same place on every step rather than moving as you change step."] },
   { ts: "2026-07-28", rev: "App Rev-677", type: "App", changes: ["STAMP MOVED TO THE RIGHT BUTTONS, AND A STEP NOW SHOWS HOW FAR IN IT IS (Rev-677) \u2014 TWO CORRECTIONS. (1) Rev-676 put the COMPLETED stamp on the step bar inside Build Control Plan; the buttons meant were the five CONSTRUCTION STEPS on the Control Plans list \u2014 different buttons, different screen. The stamp now sits on those, in the light variant so it reads over the dark green DONE fill. (2) THE 98% WAS NOT WRONG \u2014 THE LABEL WAS. Stage weights are 5/5/30/30/30, so 5+5+30+30+(30\u00d713/14) = 97.86, rounded to 98: one row of fourteen outstanding is worth about 2% of the plan, and the figure was right. What made it look wrong was Step 5 reading DO THIS NEXT beside it \u2014 that label was identical whether none of the fourteen rows were done or thirteen were, so a nearly-finished step was indistinguishable from an untouched one. A started step now reads IN PROGRESS 13/14. The percentage arithmetic is untouched; only the wording changed. Kept DO THIS NEXT for a step with nothing done yet, since that is the one case where it is accurate."] },
   { ts: "2026-07-28", rev: "App Rev-676", type: "App", changes: ["A COMPLETED STAMP LANDS ON EACH FINISHED STEP (Rev-676) \u2014 the step buttons said which step you were ON but never which ones were DONE; that had to be worked out by visiting each one and reading the hint. A finished step now carries a COMPLETED stamp across its button \u2014 angled, outlined, in green, going white when the step is the one selected so it stays legible on the dark red. It appears the moment the last outstanding row on that step is settled and disappears again if a row is later emptied, so it always reports the current state rather than a step someone once finished. USES THE EXISTING TEST, NOT A NEW ONE: cpStepProgress already decided this \u2014 Step 1 every non-ghost balloon pinned on the drawing (Rev-598), Step 2 every row carrying a control type, Step 3 every row with a machinist method AND a reaction plan (Rev-597, and CP-7 makes a blank reaction plan a non-conformance). A row marked done by hand still counts, per Rev-642. The stamp is DRAWN in CSS rather than loaded as a picture, so it scales, adds nothing to the file, and needs no image rights; it is also click-through, so the button under it still works. The hover text now names what is outstanding, or confirms the count when complete."] },
@@ -2252,7 +2257,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:48 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "08:56 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3726,39 +3731,35 @@ function renderProjects(){
         b.style.minWidth = '132px';
         b.style.padding = '0 12px';
         b.title = tip;
-        const l1 = document.createElement('span');
-        l1.className = 'cp-step-n';
         let tag;
         // Rev-677: a started-but-unfinished step said DO THIS NEXT whether 0 or 13 of 14
         // rows were done, which read as 'not begun' beside a 98% bar. It now shows how far in.
         const _S = { 1: st.s1, 2: st.s2, 3: st.s3, 4: st.s4, 5: st.s5 }[n];
-        if(state === 'done') tag = '  \u2713 DONE';
+        if(state === 'done') tag = '\u2713 COMPLETED';
         else if(state === 'lock') tag = '  \u2013 LOCKED';
         else if(_S && _S.total > 1 && _S.left < _S.total)
           tag = '  \u2013 IN PROGRESS  ' + (_S.total - _S.left) + '/' + _S.total;
         else tag = '  \u2013 DO THIS NEXT';
-        l1.textContent = 'STEP ' + n + tag;
         const l2 = document.createElement('span');
         l2.className = 'cp-step-t';
         l2.style.fontSize = '11px';
         l2.style.whiteSpace = 'nowrap';
         l2.textContent = title;
-        b.appendChild(l1); b.appendChild(l2);
+        const l3 = document.createElement('span');
+        l3.className = 'cp-step-s';
+        l3.textContent = tag.replace(/^\s*[\u2013\u2014]\s*/, '').replace(/^\s*\u2713\s*/, '').trim();
+        b.appendChild(l2); b.appendChild(l3);
         if(state === 'lock' || !has) b.disabled = true; else b.onclick = fn;
         // Rev-677: the COMPLETED stamp belongs HERE. Rev-676 put it on the step bar inside
         // Build Control Plan — a different set of buttons on a different screen.
-        if(state === 'done'){
-          const wrap = document.createElement('span');
-          wrap.className = 'cp-stepwrap';
-          wrap.appendChild(b);
-          const stamp = document.createElement('span');
-          stamp.className = 'cp-stamp on';
-          stamp.textContent = 'COMPLETED';
-          wrap.appendChild(stamp);
-          stepWrap.appendChild(wrap);
-        } else {
-          stepWrap.appendChild(b);
-        }
+        const wrap = document.createElement('span');
+        wrap.className = 'cp-stepwrap';
+        const cap = document.createElement('span');
+        cap.className = 'cp-stepcap';
+        cap.textContent = 'STEP ' + n;
+        wrap.appendChild(cap);
+        wrap.appendChild(b);
+        stepWrap.appendChild(wrap);
         return b;
       };
       // Rev-620: a step only reads DONE if everything before it is done too. Step 5 was
@@ -5985,15 +5986,16 @@ function cpApplyStepView(){
         b.parentNode.insertBefore(wrap, b);
         wrap.appendChild(b);
       }
-      const oldS = wrap.querySelector('.cp-stamp'); if(oldS) oldS.remove();
+      const oldS = wrap.querySelector('.cp-donecap'); if(oldS) oldS.remove();
       const pr = (typeof cpStepProgress === 'function' && typeof cpBuildState !== 'undefined' && cpBuildState)
                  ? cpStepProgress({ builderState: cpBuildState }) : null;
       const doneMap = pr ? { '1': pr.s1Done, '2': pr.s2Done, '3': pr.s3Done } : {};
       const noteMap = pr ? { '1': pr.s1Note, '2': pr.s2Note, '3': pr.s3Note } : {};
       if(pr && doneMap[k]){
         const st = document.createElement('span');
-        st.className = 'cp-stamp' + (on ? ' on' : '');
-        st.textContent = 'COMPLETED';
+        st.className = 'cp-donecap';
+        st.textContent = '\u2713 COMPLETED';
+        if(on) st.style.opacity = '.95';
         wrap.appendChild(st);
         b.title = 'COMPLETED \u2014 ' + (noteMap[k] || '');
       } else if(pr && noteMap[k]){
