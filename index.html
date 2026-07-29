@@ -719,16 +719,16 @@
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:45px;">Doc #</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:50px;">Bubble #</th>
             <th rowspan="2" style="padding:2px; border:1px solid #5a8bb5; width:22px;" title="Row done for the STEP you are on — ● filled from the data, ✓ marked by hand. Click a dot to mark or un-mark a row.">✔</th>
-            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:260px;">Control Type ID</th>
+            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:221px;">Control Type ID</th>
             <!-- Rev-614: the four Master List levels, so a control type can be narrowed down
                  the same way the Master List is organised instead of hunted in one long list -->
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:110px;">Workcenter</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:110px;">Feature Type</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:100px;">2nd Level</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:100px;">3rd Level</th>
-            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:180px;">Feature / Process Description</th>
+            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:153px;">Feature / Process Description</th>
             <!-- Rev-207: Process Step / Operation ID# / Machine / Process columns hidden on-screen; values still fill the xlsx per CP-2 -->
-            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:120px;">Product / Process Spec / Tol</th>
+            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:102px;">Product / Process Spec / Tol</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:80px;">Upper Limit</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:80px;">Lower Limit</th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:55px;">Class</th>
@@ -738,7 +738,7 @@
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:90px;">Reaction Plan</th>
           </tr>
           <tr style="background:#bdd7ee;">
-            <th style="padding:5px; border:1px solid #5a8bb5; width:190px;">Meas Method (Machinist)</th>
+            <th style="padding:5px; border:1px solid #5a8bb5; width:162px;">Meas Method (Machinist)</th>
             <th style="padding:5px; border:1px solid #5a8bb5; width:80px;"># Recorded</th>
             <th style="padding:5px; border:1px solid #5a8bb5; width:115px;">FREQ (Every)</th>
             <th style="padding:5px; border:1px solid #5a8bb5; width:90px;">FREQ (QE)</th>
@@ -1558,7 +1558,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-673";
+const APP_REV = "Rev-674";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1691,6 +1691,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-674", type: "App", changes: ["FOUR COLUMNS CUT 15%, AND REV-673 CORRECTED (Rev-674) \u2014 Control Type ID 260\u2192221px, Feature / Process Description 180\u2192153px, Product / Process Spec / Tol 120\u2192102px, Meas Method (Machinist) 190\u2192162px: 84px reclaimed across the grid so more of the methods band fits without scrolling. CORRECTION TO REV-673: that rev claimed to shrink the Control Type cell on Step 3 and did not. The builder table is table-layout:FIXED, which means a column takes its width from the HEADER cell \u2014 so setting 130px on the data cell clipped the text but left the column at its full 260px and returned no space at all. It looked tidier and bought nothing. Step 3 now sets the HEADER width to 130px and restores 221px on the other steps, so the column genuinely collapses where the resolver is not in use. Recorded rather than quietly folded into this rev because \u2018fixed layout takes its width from the header\u2019 is the kind of thing worth only learning once."] },
   { ts: "2026-07-28", rev: "App Rev-673", type: "App", changes: ["CONTROL TYPE COLUMN SHRUNK ON STEP 3 (Rev-673) \u2014 opening a row on 3 \u00b7 Measurement Methods still drew the full Control Type RESOLVER in that cell: the size and tolerance zone pickers, the candidate count, the link to the Master List. That is Step 2 machinery, and on Step 3 it was spending a large part of the screen restating a decision already made \u2014 while the columns the step exists for (Meas Method, # Recorded, FREQ Every, FREQ QE, CMM, Special Gage, Reaction Plan) were pushed off to the right and had to be scrolled to. On Step 3 the cell is now a narrow read-only label, 130px, clipped with the full Control Type ID on hover. KEPT RATHER THAN HIDDEN, deliberately: the methods on that row were auto-filled BY that control type, so reviewing them without being able to see which one they came from would remove the one piece of context that makes the review meaningful \u2014 and CP-2C makes the Master List row authoritative over every value in the band. It stays visible, just quiet. Steps 2 and All columns are unchanged and still show the full resolver."] },
   { ts: "2026-07-28", rev: "App Rev-672", type: "App", changes: ["TOLERANCE BANDS NOW READ LOOSEST TO TIGHTEST (Rev-672) \u2014 the four tolerance-band columns ran Below .0006 \u2192 .0006-.0014 \u2192 .0015-.0029 \u2192 Over .003, i.e. tightest on the left. Reversed to Over .003 \u2192 .0015-.0029 \u2192 .0006-.0014 \u2192 Below .0006, so the loosest band sits far left and the tightest far right. This is the direction that matters on the shop floor: the right-hand end of the strip is now the KC end \u2014 tighter as the eye travels right, and the sub-.0011 band that drives Classification under CP-6 lands where attention is highest. CHANGED IN THREE PLACES, NOT ONE: the display column list AND both field-order arrays (the edit form and the read-only reference strip above it). Rev-650 is the reason \u2014 that rev fixed a strip which had drifted one column out of step with the form beneath it because a key was missing from one list and not the other. These lists must move together or the strip lies about which value belongs to which band. NO DATA WAS TOUCHED: every band value is stored against its own key, so re-ordering the list moves the columns and carries each X with its own band. The SIZE pair (Below .500 / .500 or Greater) was deliberately LEFT ALONE \u2014 those are feature sizes, not tolerances, and were not part of the instruction."] },
   { ts: "2026-07-28", rev: "App Rev-671", type: "App", changes: ["THE APP WAS RELOADING ITSELF IN A LOOP (Rev-671) \u2014 the ACTION LOG settled what guesswork could not: \u2018app-start Rev-663\u2019 seventeen times in a row, roughly two seconds apart, before Rev-664 finally stuck; earlier, Rev-654 and Rev-655 alternating back and forth. That loop is the three-minute \u2018still loading\u2019, and it is also why the Control Plan table drew twice \u2014 a reload landing mid-render repaints the rows underneath the ones already there, which is why the second block restarted at Doc #1 instead of continuing at 15. No data was ever duplicated; a refresh cleared it. TWO FAULTS COMPOUNDING. (1) The auto-update cooldown, \u2018at most once a minute\u2019, lived in a plain variable \u2014 wiped by the very reload it triggers, so it could never limit anything across reloads. (2) Reloading does not guarantee coming back on the new rev: the site can still serve a CACHED older copy while the GitHub API already reports the newer one, so the tab returns on the old rev, sees \u2018newer version available\u2019 again, and goes round again until the cache expires. Verified from this end \u2014 a read-back immediately after a push returned the previous rev from the raw CDN while the API returned the new one. FIXED BOTH WAYS: the cooldown is now persisted in localStorage so it survives the reload, and a LOOP BREAKER counts reloads per target rev and, after three, stops reloading and shows the one-tap update banner instead. The counter clears once the running rev catches up. Worst case is now a banner you tap, never a tab that will not settle. Chose a cap over a longer delay deliberately: a delay only slows a loop down, it does not end it."] },
@@ -2237,7 +2238,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:12 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "08:19 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5963,6 +5964,10 @@ function cpApplyStepView(){
       r0[13].style.display = methodCols ? '' : 'none';
       if(methodCols) r0[13].colSpan = methodCols;
     }
+    // Rev-674: table-layout is FIXED, so a column's width comes from its HEADER cell — the
+    // narrow data cell added at Rev-673 clipped the text but left the column 260px wide and
+    // gave no space back. Set the header itself on Step 3.
+    if(r0[3]) r0[3].style.width = (step === '3') ? '130px' : '221px';
     if(r0[14]) r0[14].style.display = show(18) ? '' : 'none';   // Special Gage
     if(r0[15]) r0[15].style.display = show(19) ? '' : 'none';   // Reaction Plan
   }
