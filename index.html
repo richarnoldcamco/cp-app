@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-705";
+const APP_REV = "Rev-706";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-706", type: "App", changes: ["A ROW THAT CANNOT SUPPORT AN APPROVAL CAN NO LONGER BE APPROVED (Rev-706) \u2014 balloon 10, FLATNESS .001 MAX, was ticked green with NO CONTROL TYPE set. The tick was a free switch: it never consulted the step\u2019s own readiness test, so any row could be signed off, and since Rev-681 that approval then counted toward the percentage, the step fraction and the COMPLETED stamp. A plan could reach 100% and COMPLETED on rows with nothing behind them. NOW REFUSED, WITH THE REASON AND THE REMEDY: Step 2 says choose a control type first; Step 3 says it needs a measurement method and a reaction plan (CP-7) and points at \u270b MACHINIST DOES NOT CHECK THIS as the DECLARED way to answer the machinist question when nobody measures it \u2014 the exception stays available, it just has to be stated rather than waved through. Step 1 says pin the balloon. Refusals are written to the action log. EXISTING BAD APPROVALS ARE NOT HIDDEN: a row already approved that the data does not support is now drawn RED with a \u2018!\u2019 instead of a green tick, reads APPROVED BUT THE ROW IS NOT COMPLETE on hover, and shows INCOMPLETE on the open row. They were legal before this rev and they are still on the plan \u2014 leaving them green is how they reach a customer. On 1000237620 OP-030 this will light up balloons 4, 12, 13 and 10, all of which are approved with no control type."] },
   { ts: "2026-07-29", rev: "App Rev-705", type: "App", changes: ["SIZE BAND RENAMED TO SIZE OF FEATURE BEING MEASURED (Rev-705) \u2014 \u2018SIZE BAND\u2019 and \u2018TOLERANCE BAND\u2019 read as two flavours of the same thing, which is precisely the confusion that put Below .500 on a \u2260.604 ID one rev ago. The heading now names what the number IS rather than what kind of thing it is, so the two controls stop looking like a matched pair. TOLERANCE BAND keeps its name \u2014 it genuinely is a band, and the contrast is the point. On screen only: the underlying field is still sizeBand, the master list columns are untouched, and nothing in the .xlsx or the import map changed."] },
   { ts: "2026-07-29", rev: "App Rev-704", type: "App", changes: ["SIZE BAND AND TOLERANCE BAND ARE NOW LABELLED (Rev-704) \u2014 the two pickers carried their label inside the option text (\u2018Size: any\u2019, \u2018Tol: any\u2019), so the label existed only while the value did not. Choose a band and the boxes read \u2018Below .500\u2019 and \u2018.0015\u2013.0029\u2019 side by side with nothing saying which is which \u2014 and every other column on the row takes its heading from the table header, so these two were the only controls on the screen with no title above them. SIZE BAND and TOLERANCE BAND now sit over them. THE HOVER TEXT ANSWERS THE CONFUSION THAT ACTUALLY MATTERS: size band is \u2018size of the feature itself \u2014 not its tolerance\u2019, because the two are easy to conflate when both boxes hold decimals of the same shape, and picking the size band off the tolerance is exactly the slip that puts a row on the wrong master line."] },
   { ts: "2026-07-29", rev: "App Rev-703", type: "App", changes: ["THE TOLERANCE ZONE NOW SAYS WHERE IT CAME FROM, OR WHY IT IS BLANK (Rev-703) \u2014 cpAutoBands has derived the size and tolerance zones from the parsed limits since Rev-219 and it worked; it just did it SILENTLY, so a derived zone was indistinguishable from one the QE had chosen, and a blank zone gave no reason. Both are now stated under the pickers. DERIVED: green, \u2018\u2713 Zone set from \u0394 .0020 \u2014 confirm it, or change it above\u2019, and the derived flag is dropped the moment the zone is changed by hand so it stops claiming to be computed. NOT DERIVABLE: red, naming the real reason \u2014 MAX / MIN callouts say CP-6 does not treat them as a \u00b1 band so the zone is not set automatically; angular and radius callouts say the same; a single-value callout says there is no high/low pair to measure from. THAT DISTINCTION IS THE POINT. On ID TO OD RUNOUT .002 MAX the two candidates were H120 (unclassified, FREQ 10, QE NO CHECK) and H121 (KC, FREQ 1, QE 1 IN 20) \u2014 one gage, two control regimes, different CP-6 classifications. Guessing a band from a MAX callout would have silently picked one and produced a plausible plan with the wrong classification on a runout to a datum. The app now does the arithmetic where the Instructions allow it and says plainly where the judgement is the QE\u2019s."] },
@@ -2295,7 +2296,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "07:29 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "07:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6281,14 +6282,18 @@ function renderCPBuilder(){
       // Rev-687: a 34x22 rounded rectangle, not a text bullet. The old mark was a small
       // ring glyph roughly 9px across in a 22px column — a hard target with a mouse and a
       // worse one with a finger, on the control that must be pressed once per row.
-      const _bg   = _on ? '#1e8449' : '#fff';
-      const _bord = (_on || _ready) ? '#1e8449' : '#c4c0b8';
+      // Rev-706: an approval standing on a row the data does not support is drawn RED with
+      // a warning mark, not green. These were approvable before this rev and are still on
+      // the plan; hiding them behind a green tick is how they reach a customer.
+      const _bad  = _on && !_ok;
+      const _bg   = _bad ? '#a5342a' : (_on ? '#1e8449' : '#fff');
+      const _bord = _bad ? '#7d2419' : ((_on || _ready) ? '#1e8449' : '#c4c0b8');
       const _fg   = _on ? '#fff' : (_ready ? '#1e8449' : '#c4c0b8');
       tdPin.innerHTML = '<span class="cp-dot' + _pop + '" style="display:inline-flex;'
         + ' align-items:center; justify-content:center; width:34px; height:22px; border-radius:5px;'
         + ' border:2px solid ' + _bord + '; background:' + _bg + '; color:' + _fg + ';'
         + ' font-size:14px; font-weight:900; line-height:1; box-sizing:border-box;">'
-        + (_on ? '\u2713' : '') + '</span>';
+        + (_bad ? '!' : (_on ? '\u2713' : '')) + '</span>';
       if(_pop){ window._cpPopRow = null; window._cpPopStep = null; }
     }
     if(!row.ghost){
@@ -6306,13 +6311,33 @@ function renderCPBuilder(){
           _apr = 'APPROVED \u2014 who and when were not recorded (before Rev-701)';
         }
       }catch(_){ }
-      tdPin.title = (_on ? _apr + '\nClick to un-approve.\n(' + _why + ')'
+      tdPin.title = (_bad ? 'APPROVED BUT THE ROW IS NOT COMPLETE \u2014 ' + _why
+                            + '.\nThis approval was made before Rev-706, when the app allowed it.'
+                            + '\nFix the row, or click to un-approve.\n' + _apr
+                    : _on ? _apr + '\nClick to un-approve.\n(' + _why + ')'
                          : (_ready ? 'Ready \u2014 ' + _why + '.\nNOT APPROVED YET \u00b7 click to approve this row.'
                                    : _why + '.\nNot ready to approve yet.'))
                   + (_step !== '1' && !_pinned ? '\n(this balloon is not pinned on the drawing)' : '');
       tdPin.onclick = (e) => {
         e.stopPropagation();
         if(!row.stepDone) row.stepDone = {};
+        // Rev-706: an approval is a claim ABOUT A ROW. A row that cannot support the claim
+        // cannot be approved — the tick was a free switch, so a row with no control type
+        // and nothing behind its methods could be signed off and would then count toward
+        // the percentage, the step fraction and the COMPLETED stamp.
+        if(!row.stepDone[_step] && !_ok){
+          try{
+            const fix = (_step === '2') ? 'Choose a control type on this row first.'
+                      : (_step === '3') ? 'It needs a measurement method and a reaction plan (CP-7). '
+                                        + 'If the machinist genuinely does not measure it, use '
+                                        + '\u270b MACHINIST DOES NOT CHECK THIS \u2014 that is a declared '
+                                        + 'state and counts as answered.'
+                      : 'Pin the balloon on the drawing first.';
+            flash('CANNOT APPROVE \u2014 ' + _why + '. ' + fix);
+          }catch(_){ }
+          try{ logAct('row-mark', 'approval REFUSED \u00b7 step ' + _step + ' \u00b7 balloon ' + (row.bubble||'')); }catch(_){ }
+          return;
+        }
         row.stepDone[_step] = !row.stepDone[_step];
         // Rev-701: an approval that cannot say WHO or WHEN is not much of an approval.
         try{
@@ -6344,6 +6369,7 @@ function renderCPBuilder(){
           cap.style.color = '#8a8279';
           cap.textContent = 'not stamped';
         }
+        if(_bad){ cap.style.color = '#a5342a'; cap.textContent = 'INCOMPLETE'; }
         tdPin.appendChild(cap);
       }catch(_){ }
     }
