@@ -1572,7 +1572,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-684";
+const APP_REV = "Rev-685";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1705,6 +1705,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-685", type: "App", changes: ["ONE-TAP GAGE TYPES IN THE SPECIAL GAGE WINDOW (Rev-685) \u2014 seven chips under the description box: PLUG GAGE, RING GAGE, THREAD PLUG GAGE, THREAD RING GAGE, SNAP GAGE, GO/NO-GO PINS, HOLDING FIXTURE. The list is the lathe work that actually recurs rather than a catalogue; a long list would take as long to read as the words take to type. THEY INSERT, THEY DO NOT REPLACE. A tap drops the text at the CARET and hands focus straight back to the box with the caret after it, so PLUG GAGE can be followed immediately by the size and tolerance \u2014 which is the part the toolmaker actually needs and the part only you can supply. Where text is already present and does not end in a space, dash or comma, an em-dash separator is added; where it is not needed it is not added, so tapping twice does not produce stray punctuation. Nothing is overwritten and Cancel still abandons the lot."] },
   { ts: "2026-07-29", rev: "App Rev-684", type: "App", changes: ["CONTROL TYPE ID HIDDEN ON STEP 3 (Rev-684) \u2014 dropped from the visible columns on 3 \u00b7 Measurement Methods; it remains on Step 2, where it is chosen, and on All columns. This finishes what Rev-673 started and got half right: that rev argued for keeping the column because the methods band is auto-filled BY the control type and reviewing methods without seeing their source removes the context. The argument was sound and still is \u2014 but the source is visible one click away on Step 2 and on All columns, and a column carried on every row for context you can fetch when you want it is a column spending width for nothing. Asked for twice; kept once too often. THE INERT CODE FROM REV-673/674 IS LEFT IN PLACE ON PURPOSE: the compact read-only cell and the 130px header on Step 3 no longer run, because a hidden column renders nothing. They are two lines, they are commented, and they are what makes the column reappear cleanly if this is ever reversed \u2014 deleting them would only mean rediscovering the fixed-layout header rule a third time."] },
   { ts: "2026-07-29", rev: "App Rev-683", type: "App", changes: ["NOTHING IS LOCKED ANY MORE (Rev-683) \u2014 OP-030 showed Step 4 COMPLETED and Step 5 LOCKED at the same time. Both were correct under the old rules and together they were nonsense: DONE follows APPROVAL (Rev-681) and all fourteen rows had been approved, while UNLOCK followed the DATA and three rows \u2014 bubbles 4, 12 and 10 \u2014 still carried no control type. So the app reported a step finished and then refused entry to the next one, and gave no way to find out why. A lock cannot be argued with; the only move left was to guess. Every step is now ALWAYS openable. The old test survives as `ready`, but it WARNS instead of refusing: a step whose groundwork is incomplete reads NEEDS EARLIER STEP and is styled as work to do rather than greyed out, and it opens on click like any other. THE UNDERLYING LESSON IS WORTH MORE THAN THE FIX: approving a row that was never filled in is what produced the contradiction. Approval is a claim about a row, so the app should not have made it possible to approve an empty one \u2014 that is the next thing to correct, not the gate that caught it."] },
   { ts: "2026-07-28", rev: "App Rev-682", type: "App", changes: ["HANDOFF PROMPT TAKES THE CROSS-APP RULES FROM THE PFMEA DEPLOY DOC \u2014 AND ONLY THOSE (Rev-682) \u2014 three things carried over because they describe the OPERATOR and CAMCO practice rather than one app\u2019s plumbing: (1) walking through anything on the machine ONE STEP AT A TIME, waiting for a screenshot and reading what it actually shows before moving on, never dumping the whole list, and stating faults plainly with the root cause; (2) the photo rule \u2014 500,000 bytes and 2400px maximum, always re-encoded from ORIGINALS because a JPEG round trip does not reverse, with text-bearing images kept as PNG; (3) a short warning that the PFMEA Builder ships as two files with a versioned crate and its own deploy order while CP is a single file pushed to two repos. WHAT WAS DELIBERATELY NOT COPIED: the crate procedure, app/assets-vN.js, latest.html, the boot-guard WANT constant, the PF recovery build. None of it exists in CP, and a prompt that describes machinery the app does not have is worse than one that stays silent \u2014 the next chat would follow it confidently and be wrong. The photo rule is recorded here as the OPERATOR rule; it supersedes SC-25 wording in the PFMEA instructions, which is a PF document and is not edited from this app."] },
@@ -2262,7 +2263,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "01:22 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "01:29 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6580,6 +6581,16 @@ function cpGagePopup(idx){
       '</div>' +
       '<textarea id="cpGageText" rows="3" placeholder="E.G. PLUG GAGE, GO/NO-GO, .6040/.6035 \u2014 CARBIDE PINS, HANDLE STAMPED WITH PART NUMBER AND BALLOON 3. OR: HOLDING FIXTURE TO SUPPORT THE RING ON THE ROLL CHECKER WITHOUT DISTORTING THE .029/.027 WALL." ' +
         'style="width:100%; box-sizing:border-box; font-size:13px; padding:8px 10px; border:2px solid #c9c0b4; border-radius:6px; font-family:inherit; line-height:1.45; resize:vertical; flex:0 0 auto;"></textarea>' +
+      // Rev-685: one-tap starters for the gage types that come up over and over. They
+      // INSERT at the cursor rather than replacing, so a tap can be followed by the size,
+      // the tolerance and whatever else the toolmaker needs.
+      '<div id="cpGageChips" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; flex:0 0 auto;">' +
+        ['PLUG GAGE','RING GAGE','THREAD PLUG GAGE','THREAD RING GAGE','SNAP GAGE','GO/NO-GO PINS','HOLDING FIXTURE']
+          .map(t => '<button type="button" class="cpGageChip" data-t="' + t + '" '
+            + 'style="font-size:11px; font-weight:700; padding:4px 10px; border:1px solid #c9c0b4; '
+            + 'border-radius:999px; background:#fff; color:#3a352e; cursor:pointer; font-family:inherit;">'
+            + t + '</button>').join('') +
+      '</div>' +
       // Rev-575: attach the gage drawing right here, without going to the list first
       '<div style="font-size:11px; font-weight:800; letter-spacing:.05em; margin:10px 0 6px; border-top:1px solid #e4ded4; padding-top:9px; flex:0 0 auto;">GAGE DRAWING</div>' +
       '<div id="cpGageDwgRow" style="flex:1 1 auto; min-height:0; display:flex; flex-direction:column;"></div>' +
@@ -6596,6 +6607,25 @@ function cpGagePopup(idx){
   // the app force-uppercases most fields; this is free prose, so leave what is typed alone
   ta.classList.add('no-upper');
   setTimeout(() => { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }, 60);
+  // Rev-685: chips insert at the caret and hand focus straight back to the box
+  try{
+    document.querySelectorAll('.cpGageChip').forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const t = btn.getAttribute('data-t') || '';
+        const v = ta.value;
+        let a = (typeof ta.selectionStart === 'number') ? ta.selectionStart : v.length;
+        let b = (typeof ta.selectionEnd === 'number') ? ta.selectionEnd : v.length;
+        const before = v.slice(0, a), after = v.slice(b);
+        // only add a separator where one is actually needed
+        const sep = (before && !/[\s\u2014,-]$/.test(before)) ? ' \u2014 ' : '';
+        const ins = sep + t;
+        ta.value = before + ins + after;
+        const caret = (before + ins).length;
+        ta.focus(); ta.setSelectionRange(caret, caret);
+      };
+    });
+  }catch(e){}
   // Rev-576: the uploader lives IN this window now — no second screen. Same capture
   // engine, mounted straight into the GAGE DRAWING section: browse, drag, or Ctrl+V;
   // any PDF including a Chrome PDF Document; sew + nudge appear only for 2+ pages.
