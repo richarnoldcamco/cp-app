@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-709";
+const APP_REV = "Rev-710";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-710", type: "App", changes: ["THE API KEY BOX NOW CHECKS WHAT WAS PASTED INTO IT (Rev-710) \u2014 the help agent reported \u2018invalid x-api-key\u2019, which reads like a broken feature but is the far end saying it does not recognise the key. The app was not corrupting it: saveApiKey stores .value.trim() verbatim and the field is type=password, so the global uppercase CSS cannot reach the value. The key itself was not accepted. SO THE SHAPE IS CHECKED BEFORE SAVING: a GitHub token (github_pat_ / ghp_) is REFUSED outright with the reason and where it actually belongs \u2014 behind password dots a GitHub token and an Anthropic key are indistinguishable, and both get pasted in the same session, so this was a matter of time. Anything not starting sk-ant- is saved but warned about. The key is never logged, shown or transmitted by this check; only its prefix is examined. THE HELP PANEL NOW NAMES THE CAUSE instead of repeating the raw error: it inspects the saved prefix and says either \u2018that is a GitHub token, put it in Admin \u2192 GitHub\u2019, or \u2018does not start sk-ant-\u2019, or \u2018looks right but was not accepted \u2014 most likely revoked or regenerated\u2019. A no-credit reply is called out separately, because that is an account problem and no amount of re-pasting will fix it."] },
   { ts: "2026-07-29", rev: "App Rev-709", type: "App", changes: ["SPECIAL FEATURES NO LONGER ASK FOR A SIZE OR TOLERANCE ZONE (Rev-709) \u2014 SHARP EDGE 3X showed both zone pickers plus a red line telling the QE to choose a band, for a feature that has no size and no tolerance. CHECKED AGAINST THE MASTER BEFORE CHANGING ANYTHING: all three LATHE / SPECIAL rows carry an X in EVERY band, so a zone there can neither narrow the candidates nor exclude any of them \u2014 the controls were incapable of affecting the outcome and could only invite a pointless decision, or worse, a wrong one recorded on the plan. On a SPECIAL row the pickers and their headings are now hidden and replaced with \u2018SPECIAL feature \u2014 no size or tolerance zone applies. Narrow it with the levels instead.\u2019 The red cannot-derive-a-band note is suppressed there too, since a MAX/MIN explanation is meaningless for a sharp-edge callout. The candidate advice also stops pointing at the zones on those rows and points at the 2nd / 3rd Level, which is what actually separates LATHE / SPECIAL from / VISUAL and / HELPFULNOTE."] },
   { ts: "2026-07-29", rev: "App Rev-708", type: "App", changes: ["FIX \u2014 REV-706 EMPTIED THE GRID (Rev-708) \u2014 \u2018Uncaught ReferenceError: _bad is not defined\u2019 and not a single row drew. Rev-706 declared const _bad inside the ELSE branch where the approve mark is painted, but two later uses \u2014 the tooltip and the open-row caption \u2014 sit OUTSIDE that block, so every row threw on render and the table came up with headers and nothing under them. Declared now beside _on and _ready, where all three uses can see it. WHY node --check DID NOT CATCH IT: a block-scoped const referenced from an outer scope is valid SYNTAX; it fails at RUN time. The pre-push check proves the file parses, not that it runs \u2014 that gap has now cost one broken rev and is worth remembering rather than trusting the PASS. Rolled FORWARD to a higher rev as usual; Rev-706\u2019s behaviour is unchanged and intact."] },
   { ts: "2026-07-29", rev: "App Rev-707", type: "App", changes: ["AI HELP AGENT ON EVERY SCREEN (Rev-707) \u2014 a fixed \u2139 HELP button top-right, present on every screen because it is mounted to the body rather than into each screen\u2019s markup. It opens a window that names the screen you are on, takes a question and answers in plain language. WHAT IT SENDS, AND THE REASON THIS IS THE WHOLE DESIGN: the screen name, the app revision and your typed question. NOTHING ELSE. cpBuildState is never read by this code \u2014 no part numbers, no tolerances, no feature descriptions, no drawings leave the device. The window says so above the box, and warns in red not to type part or drawing details in. The existing ITAR confirm gate runs before the first question of each session. A help agent is the easiest possible place to leak an ITAR-controlled drawing, so it was built to have nothing to leak rather than built to be careful. GROUNDED IN THE APP\u2019S OWN RULES: the system prompt carries the five construction steps, how the master list resolves, and CP-2C / CP-6 / CP-7 / Conventions 2 and 5, so answers match the Instructions rather than generic quality-engineering advice. It is told plainly that it has not been given the plan and must not ask for it \u2014 an agent that invites a paste of the drawing defeats the point. Uses the existing anthropicApiKey; asks for it if unset."] },
@@ -2299,7 +2300,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:32 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "08:51 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7199,7 +7200,28 @@ function cpHelpOpen(){
       });
       const d = await r.json();
       const txt = (d.content || []).filter(x => x.type === 'text').map(x => x.text).join('\n').trim();
-      out.textContent = txt || ('No answer came back. ' + (d.error ? (d.error.message || '') : ''));
+      if(txt){ out.textContent = txt; }
+      else {
+        const em = (d.error && d.error.message) ? String(d.error.message) : '';
+        // Rev-710: translate the failures that are about SETUP, not about the question
+        if(/invalid x-api-key|authentication/i.test(em)){
+          const kk = localStorage.getItem('anthropicApiKey') || '';
+          out.textContent = 'Anthropic rejected the API key.\n\n'
+            + (/^(github_pat_|ghp_)/i.test(kk)
+                ? 'The key saved in Settings is a GITHUB token, not an Anthropic key. Put the '
+                  + 'GitHub token in Admin \u2192 GitHub, and paste an Anthropic key (it starts '
+                  + 'sk-ant-) into API Settings.'
+                : (kk.indexOf('sk-ant-') !== 0
+                    ? 'The saved key does not start sk-ant-, so it is probably not an Anthropic '
+                      + 'key. Re-copy it from console.anthropic.com/api-keys.'
+                    : 'The key looks like an Anthropic key but was not accepted \u2014 most likely '
+                      + 'revoked or regenerated. Create a new one at console.anthropic.com/api-keys.'));
+        } else if(/credit|billing|quota/i.test(em)){
+          out.textContent = 'The Anthropic account has no available credit. ' + em;
+        } else {
+          out.textContent = 'No answer came back. ' + em;
+        }
+      }
       try{ logAct('ai', 'help asked \u00b7 ' + cpHelpScreen()); }catch(_){ }
     }catch(e){ out.textContent = 'Could not reach the AI service: ' + (e && e.message ? e.message : e); }
     ask.disabled = false;
@@ -12216,6 +12238,20 @@ function saveApiKey(){
   if(!key){
     flash('API key required', true);
     return;
+  }
+  // Rev-710: check the SHAPE before saving. An Anthropic key starts sk-ant-. A GitHub token
+  // starts github_pat_ or ghp_ and looks identical behind password dots, so it can be pasted
+  // here and stored happily — the app then reports 'invalid x-api-key' from the far end,
+  // which reads like a broken feature rather than the wrong secret in the wrong box.
+  // The key is never logged or shown; only its prefix is examined.
+  if(/^(github_pat_|ghp_|gho_|ghu_|ghs_)/i.test(key)){
+    flash('That is a GITHUB token, not an Anthropic API key. It belongs in Admin \u2192 GitHub. '
+        + 'An Anthropic key starts sk-ant- and comes from console.anthropic.com/api-keys.', true);
+    return;
+  }
+  if(key.indexOf('sk-ant-') !== 0){
+    flash('That does not look like an Anthropic API key \u2014 they start sk-ant-. Saved anyway, '
+        + 'but if the AI features report an invalid key, re-copy it from console.anthropic.com/api-keys.', true);
   }
   localStorage.setItem('anthropicApiKey', key);
   flash('✓ API key saved');
