@@ -1576,7 +1576,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-690";
+const APP_REV = "Rev-691";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1709,6 +1709,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-691", type: "App", changes: ["A FEATURE THE MACHINIST DOES NOT MEASURE CAN NOW SAY SO (Rev-691) \u2014 the open row gains \u270b MACHINIST DOES NOT CHECK THIS, which asks WHICH of the two reasons applies: (1) controlled by another feature on the SAME TOOL, or (2) checked by CMM / Quality Engineer only. The Meas Method cell then reads NOT CHECKED BY MACHINIST \u2014 <reason> on an amber fill, with the master\u2019s own method kept in the hover text and a \u21ba to undo. Shown on closed rows too, from the same helper. IT CARRIES INTO THE .XLSX, deliberately: leaving the master method in the delivered document would state that the machinist performs a check the shop does not perform, which is Convention #2 exactly \u2014 the Control Method describes what the shop actually does, at the capability it actually has. # Recorded is cleared with it, since counting recorded measurements for a check nobody makes is the same false claim in a second column. STEP 3 now treats such a row as having answered the machinist question, so it can be approved \u2014 but it still demands a REACTION PLAN, because CP-7 makes a blank one a non-conformance whoever does the measuring. NOTE FOR THE INSTRUCTIONS: Rev-92 CP-2C describes the methods band as governed by the master row and does not yet describe this declared exception. The app now writes a state the controlling document does not define. Rev-92 is ITAR-controlled and is not edited without being asked, so this is flagged, not fixed."] },
   { ts: "2026-07-29", rev: "App Rev-690", type: "App", changes: ["A \u2018# RECORDED\u2019 OF 2 NOW SAYS WHY (Rev-690) \u2014 CHECKING TAPER appears under the figure, small and grey, wherever that cell holds 2, on the open row and the closed rows alike. Two recorded readings on a diameter means both ends are being measured, and the reason is taper \u2014 which the number alone never said, so it had to be carried in the head of whoever built the line or worked out again by whoever read it later. The mark is DERIVED, not stored: nothing is written to the row, so it appears and disappears with the value and cannot go stale or reach the .xlsx, which stays exactly as CP-2 specifies. Put in ONE helper called from both render paths on purpose \u2014 the open row and the closed row have drifted apart twice already this era (the Special Gage button at Rev-685, the approve tick at Rev-689), and duplicating this would have set up the same fault a third time. The hover text spells it out in full for anyone who does not already know the convention."] },
   { ts: "2026-07-29", rev: "App Rev-689", type: "App", changes: ["THE APPROVE BOXES WERE SHOWING THE PREVIOUS STEP\u2019S TICKS (Rev-689) \u2014 Step 2 read \u2713 COMPLETED while eleven of the fourteen boxes below it sat empty. Both were drawn from the same data and only one was current. cpSetStep re-rendered the rows ONLY when a row happened to be open (focusIdx !== -1); with no row open it called cpApplyStepView, which shows and hides COLUMNS but never rebuilds the cells. The approve box answers \u2018is this row approved FOR THE STEP I AM ON\u2019, so its contents change with the step \u2014 and arriving from another step left the old step\u2019s ticks sitting under a step bar reporting the new one. Real sequence: all fourteen approved on Step 2, over to Step 3, three approved there, back to Step 2 \u2014 caption correct at fourteen, boxes still painting Step 3\u2019s three. Now the rows are always redrawn on a step change. WORTH NAMING BECAUSE OF WHAT IT COST: a QE reading eleven empty boxes on a step that was in fact finished would have re-approved eleven rows that needed no second look, or worse, doubted the eleven that were right. A stale tick on an approval control is not a cosmetic fault."] },
   { ts: "2026-07-29", rev: "App Rev-688", type: "App", changes: ["TWO WAYS OUT OF A WRONG MEASUREMENT METHOD, FROM STEP 3 (Rev-688) \u2014 the open row now carries a small strip under the Meas Method (Machinist) cell: the CONTROL TYPE that produced the value, then \u21ba CHANGE CONTROL TYPE and \u270e EDIT MASTER ROW. The first drops you on Step 2 with the same row open, and picking a different control type re-fills the entire band. The second opens the Master List already searched to that control type. THE CELL ITSELF IS STILL NOT TYPABLE, AND THAT IS THE POINT: CP-2C makes the resolved master row authoritative over Meas Method, # recorded, FREQ EVERY, FREQ QE and Meas Method CMM, and says in terms not to hand-edit them on the Control Plan to disagree with the master. A free-text box here would have been the quickest thing to build and would have quietly put the plan out of conformance one cell at a time, with the .xlsx still claiming the master as its source. The two FREQ cells stay editable because they already have a declared override path from Rev-499 \u2014 orange fill, an OVR chip carrying the master value, and a \u21ba to snap back. Restored access became necessary when Rev-684 hid the Control Type column on Step 3: the column went, and with it the only route to the thing that fills the band."] },
@@ -2272,7 +2273,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "02:58 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "03:12 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6227,7 +6228,9 @@ function renderCPBuilder(){
       _ok = !!String(row.controlTypeId || '').trim();
       _why = _ok ? 'Control type chosen for this row' : 'No control type on this row yet';
     } else if(_step === '3'){
-      _ok = !!String(row.measMethod || '').trim() && !!String(row.reactionPlan || '').trim();
+      // Rev-691: a row declared NOT CHECKED BY MACHINIST has answered the machinist
+      // question; it still needs its reaction plan (CP-7).
+      _ok = (!!String(row.measMethod || '').trim() || !!cpNoMachText(row)) && !!String(row.reactionPlan || '').trim();
       _why = _ok ? 'Measurement method and reaction plan set' : 'Still needs a measurement method / reaction plan';
     } else {
       _ok = _pinned;
@@ -6470,6 +6473,25 @@ tr.appendChild(tdCT);
         // here. Two legitimate routes are offered instead, on the open row only.
         if(key === 'measMethod'){
           const ct = String(row.controlTypeId || '').trim();
+          const nm = cpNoMachText(row);
+          if(nm){
+            td.textContent = '';
+            td.style.background = '#fff4e6';
+            const lab = document.createElement('div');
+            lab.style.cssText = 'font-size:11px; font-weight:800; color:#8a4b12; line-height:1.25;';
+            lab.textContent = nm;
+            td.appendChild(lab);
+            const und = document.createElement('button');
+            und.type = 'button'; und.textContent = '\u21ba Undo \u2014 machinist does check this';
+            und.style.cssText = 'margin-top:5px; font-size:10px; font-weight:700; padding:2px 8px;'
+              + ' border:1px solid #c9c0b4; border-radius:999px; background:#fff; cursor:pointer; font-family:inherit;';
+            und.onclick = (e) => { e.preventDefault(); e.stopPropagation(); delete row.noMachCheck;
+              renderCPBuilder(); try{ cpAutoSaveProject(); }catch(_){ } };
+            td.appendChild(und);
+            td.title = nm + '\n\nThe master method for this control type is: ' + (row.measMethod || '(none)');
+            tr.appendChild(td);
+            return;
+          }
           const bar = document.createElement('div');
           bar.style.cssText = 'margin-top:7px; display:flex; flex-wrap:wrap; gap:5px; align-items:center;';
           const src = document.createElement('span');
@@ -6488,6 +6510,25 @@ tr.appendChild(tdCT);
           mk('\u21ba Change control type',
              'Go to Step 2 with this row open and pick a different control type. The whole methods band re-fills from the new master row.',
              () => { try{ cpBuildState.focusIdx = idx; cpSetStep('2'); }catch(e){} });
+          mk('\u270b Machinist does NOT check this',
+             'Mark this feature as one the machinist does not measure, and say why. CP-7 still requires a reaction plan.',
+             () => {
+               const pick = document.createElement('div');
+               pick.style.cssText = 'margin-top:6px; display:flex; flex-direction:column; gap:4px; width:100%;';
+               const opt = (label, key) => {
+                 const b = document.createElement('button');
+                 b.type = 'button'; b.textContent = label;
+                 b.style.cssText = 'text-align:left; font-size:10px; font-weight:700; padding:4px 8px;'
+                   + ' border:1px solid #c9c0b4; border-radius:6px; background:#fff; cursor:pointer; font-family:inherit;';
+                 b.onclick = (e) => { e.preventDefault(); e.stopPropagation(); row.noMachCheck = key;
+                   try{ logAct('row-edit', 'no machinist check \u00b7 ' + key); }catch(_){ }
+                   renderCPBuilder(); try{ cpAutoSaveProject(); }catch(_){ } };
+                 pick.appendChild(b);
+               };
+               opt('1 \u00b7 Controlled by another feature on the SAME TOOL', 'SAME_TOOL');
+               opt('2 \u00b7 Checked by CMM / Quality Engineer only', 'CMM_QE');
+               bar.appendChild(pick);
+             });
           if(ct) mk('\u270e Edit master row',
              'Open the Master List at this control type. Editing it there changes every Control Plan line that uses it \u2014 which is the point, and the risk.',
              () => {
@@ -6526,7 +6567,10 @@ tr.appendChild(tdCT);
       tr.appendChild(compactCell(row.upperLimit, 'center'));
       tr.appendChild(compactCell(row.lowerLimit, 'center'));
       tr.appendChild(compactCell(row.classification, 'center'));
-      tr.appendChild(compactCell(row.measMethod, 'left'));
+      (function(){ const _nm = cpNoMachText(row);
+        const _c = compactCell(_nm || row.measMethod, 'left');
+        if(_nm){ _c.style.background = '#fff4e6'; _c.style.fontWeight = '700'; _c.style.color = '#8a4b12'; }
+        tr.appendChild(_c); })();
       (function(){ const _t = compactCell(row.numRecorded, 'center'); cpTaperMark(_t, row.numRecorded); tr.appendChild(_t); })();
       (function(){ const td = compactCell(row.freqEvery, 'center');
         if(row._freqOvr && row._freqOvr.freqEvery !== undefined){ td.style.background = '#ffe8cc'; td.style.fontWeight = '800'; td.title = 'OVERRIDE — master: ' + (row._freqOvr.freqEvery || '(blank)'); }
@@ -6579,6 +6623,17 @@ tr.appendChild(tdCT);
 // requirement travels with the Control Plan instead of living in someone's head.
 // Rev-690: label a '# Recorded' of 2 as a taper check. Kept in one place so the open row
 // and the closed rows cannot drift apart.
+// Rev-691: a feature the MACHINIST does not measure. Two legitimate reasons, and the
+// Control Plan has to say which — Convention #2: the Control Method describes what the
+// shop actually does. Stored on the row as a declared override, never silently blank.
+const CP_NOMACH = {
+  SAME_TOOL:  'NOT CHECKED BY MACHINIST \u2014 CONTROLLED BY ANOTHER FEATURE ON THE SAME TOOL',
+  CMM_QE:     'NOT CHECKED BY MACHINIST \u2014 CMM / QUALITY ENGINEER ONLY'
+};
+function cpNoMachText(row){
+  const k = row && row.noMachCheck;
+  return k && CP_NOMACH[k] ? CP_NOMACH[k] : '';
+}
 function cpTaperMark(td, val){
   try{
     if(String(val == null ? '' : val).trim() !== '2') return;
@@ -8972,8 +9027,8 @@ function buildCPxlsx(saveOnly){
         r.upperLimit || '',
         r.lowerLimit || '',
         r.classification,
-        r.measMethod,
-        r.numRecorded,
+        cpNoMachText(r) || r.measMethod,
+        cpNoMachText(r) ? '' : r.numRecorded,
         r.freqEvery,
         r.freqQE,
         r.measMethodCMM,
