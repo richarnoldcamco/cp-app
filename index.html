@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-698";
+const APP_REV = "Rev-699";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-699", type: "App", changes: ["OVERRIDES NOW RECORD WHO AND WHEN (Rev-699) \u2014 header changed from orange to CAMCO maroon, and THIS PLAN SAYS replaced by the sentence asked for: \u2018RARNOLD over-rode this from 10 to 5 on July 29, 2026\u2019. THE SENTENCE COULD NOT SIMPLY BE PRINTED: as of Rev-698 the app stored the master value and nothing else, so a line naming a person and a date would have been an audit entry the app INVENTED \u2014 on a document whose whole purpose is being true. So the stamp is now captured at the moment an override is typed (_freqOvrBy: who + ISO timestamp) and cleared with the override. FOR OVERRIDES THAT ALREADY EXIST there is nothing to recover, and the window says so in those words: \u2018who and when were NOT recorded (set before Rev-699)\u2019 \u2014 an admission is worth more than a plausible guess. WHAT THE NAME IS AND IS NOT: it comes from the device\u2019s own setting (cpUserInitials, falling back to the GitHub username), so it records who the DEVICE is set up as, not who was sitting at it. The app is a single public page; nothing in it can authenticate anyone. It is attribution, never a signature, and it is worded that way. Real authentication needs Supabase, which is a separate decision."] },
   { ts: "2026-07-29", rev: "App Rev-698", type: "App", changes: ["THE OVERRIDE CHIP NOW EXPLAINS ITSELF (Rev-698) \u2014 it announced OVERRIDE \u2014 MASTER: 10 and left the reader to work out what an override is, how the cell became one, and whether to act. A \u2018?\u2019 beside it opens a window showing the MASTER LIST value and THIS PLAN value side by side, then: what an override is (CP-2C makes the Control Type\u2019s master row authoritative over the methods band; an override is this plan deliberately disagreeing on one line), how it happened (someone typed a different value; the app kept the master value so it could be restored and turned the cell orange so the difference cannot pass unnoticed), and the two choices \u2014 KEEP if the difference is intended, RESTORE if it was a slip, and if the MASTER is the thing that is wrong, fix it on the Master List so every plan using that control type is corrected rather than this one line. IT ALSO STATES A LIMIT PLAINLY: the app does not record WHO changed the value or WHEN, so if it was not you, the plan cannot say who. That is a real gap on a document that gets audited, and it is better said out loud on the screen than discovered by someone trying to answer the question. Buttons on the window do the thing being described rather than only naming it."] },
   { ts: "2026-07-29", rev: "App Rev-697", type: "App", changes: ["THE ODS NOW SITS BESIDE THE BALLOON BOX (Rev-697) \u2014 the window asked for a balloon number while the drawing that carries the balloons was behind it. That is a recall test, and recalling the wrong number produces a control plan that names an uncontrolled feature as the control and still passes validation, because the balloon exists. The window is now 96vw \u00d7 94vh with the choices on the left and the FULL ODS on the right, fitted to the pane; clicking it opens the existing full-size zoom viewer. The feature name and tolerance run at 21px, up from 12 \u2014 that line is what tells you WHICH row you are declaring, and at 12px it was the smallest thing in a window about a decision that changes the delivered document. The list of the operation\u2019s other balloons stays under reason 1, so the number can be read off the drawing and confirmed against the description without leaving the window. If no drawing is loaded, the pane says so rather than sitting empty."] },
   { ts: "2026-07-29", rev: "App Rev-696", type: "App", changes: ["EDIT MASTER ROW DID NOTHING \u2014 THE MASTER LIST WAS OPENING BEHIND THE BUILDER (Rev-696) \u2014 showMasterList hides ten screens by name and cpBuilderScreen was not among them, so the Master List was revealed UNDERNEATH the still-visible Build Control Plan screen. The click worked, the navigation worked, nothing was on top. Fixed in showMasterList itself rather than in the caller, because every future route into the Master List from the builder would have hit the same wall \u2014 the omission was in the shared function, not in Rev-688\u2019s button. SECOND FAULT IN THE SAME BUTTON: the search term was being written to the box BEFORE showMasterList ran, while the builder was still the visible screen, so it was set and then wiped by the render. The filter is now applied AFTER the screen is up, the Clear Search button is revealed with it, and the list is repainted so the control type is actually filtered to. Worth noting how this hid: the handler was wrapped in try/catch, so had it thrown, it would have failed just as silently \u2014 a swallowed error and a screen behind another screen look identical from the outside."] },
@@ -2288,7 +2289,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "05:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "06:14 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6460,10 +6461,18 @@ tr.appendChild(tdCT);
             const masterVal = row._freqOvr[key] !== undefined ? row._freqOvr[key] : (row[key] || '');
             if(v === String(masterVal).toUpperCase()){
               delete row._freqOvr[key];        // typed the master value back — not an override
+              try{ if(row._freqOvrBy) delete row._freqOvrBy[key]; }catch(_){ }
               row[key] = masterVal;
             } else {
               if(row._freqOvr[key] === undefined) row._freqOvr[key] = row[key] || '';   // remember master
               row[key] = v;
+              // Rev-699: stamp WHO and WHEN. Without this the window could only say that
+              // the value differs, not who changed it — and a sentence naming a person the
+              // app never recorded would be an invented audit entry.
+              try{
+                row._freqOvrBy = row._freqOvrBy || {};
+                row._freqOvrBy[key] = { who: cpWhoAmI(), when: new Date().toISOString() };
+              }catch(_){ }
             }
             renderCPBuilder(); cpAutoSaveProject();
           };
@@ -6473,7 +6482,7 @@ tr.appendChild(tdCT);
             chip.style.cssText = 'font-size:9px; font-weight:800; color:#a35400; letter-spacing:.05em; margin-top:2px; cursor:pointer;';
             chip.textContent = 'OVERRIDE — master: ' + (row._freqOvr[key] || '(blank)') + ' ↺';
             chip.title = 'Master List value is ' + (row._freqOvr[key] || '(blank)') + '. Click to restore it.';
-            chip.onclick = () => { row[key] = row._freqOvr[key] || ''; delete row._freqOvr[key]; renderCPBuilder(); cpAutoSaveProject(); };
+            chip.onclick = () => { row[key] = row._freqOvr[key] || ''; delete row._freqOvr[key]; try{ if(row._freqOvrBy) delete row._freqOvrBy[key]; }catch(_){ } renderCPBuilder(); cpAutoSaveProject(); };
             td.appendChild(chip);
             // Rev-698: the chip states a fact; the ? explains it
             const q = document.createElement('button');
@@ -6837,6 +6846,18 @@ function cpNoMachModal(idx){
 }
 // Rev-698: an OVERRIDE chip states a fact without explaining it. This says what an
 // override IS, how this one came about, and what the two choices are.
+// Rev-699: the best identity the app actually holds. NOT authentication — the app is a
+// public single-file page, so this records who the DEVICE is set up as, not who is sitting
+// at it. Labelled "recorded by" everywhere it is shown, never "signed by".
+function cpWhoAmI(){
+  try{
+    const v = (localStorage.getItem('cpUserInitials') || '').trim();
+    if(v) return v.toUpperCase();
+    const g = (localStorage.getItem('ghUser') || '').trim();
+    if(g) return g.toUpperCase();
+  }catch(_){ }
+  return '';
+}
 function cpOvrInfoModal(idx, key){
   const row = (cpBuildState && cpBuildState.rows) ? cpBuildState.rows[idx] : null;
   if(!row) return;
@@ -6845,6 +6866,18 @@ function cpOvrInfoModal(idx, key){
   const masterVal = (row._freqOvr && row._freqOvr[key] !== undefined && row._freqOvr[key] !== '')
                     ? row._freqOvr[key] : '(blank)';
   const nowVal = row[key] || '(blank)';
+  // Rev-699: say who and when if it was recorded; say plainly that it was not, if it was not.
+  const _st = (row._freqOvrBy && row._freqOvrBy[key]) ? row._freqOvrBy[key] : null;
+  let _stampLine;
+  if(_st && _st.who){
+    let d = _st.when;
+    try{ d = new Date(_st.when).toLocaleDateString(undefined,
+           { year:'numeric', month:'long', day:'numeric' }); }catch(_){ }
+    _stampLine = _st.who + ' over-rode this from ' + masterVal + ' to ' + nowVal + ' on ' + d;
+  } else {
+    _stampLine = 'Over-ridden from ' + masterVal + ' to ' + nowVal
+      + '  \u2014  who and when were NOT recorded (set before Rev-699)';
+  }
   const ov = document.createElement('div');
   ov.id = 'cpOvrInfoOv';
   ov.style.cssText = 'position:fixed; inset:0; z-index:10090; background:rgba(0,0,0,0.55);'
@@ -6852,15 +6885,14 @@ function cpOvrInfoModal(idx, key){
   const c = document.createElement('div');
   c.style.cssText = 'background:#fff; border-radius:10px; max-width:620px; width:100%;'
     + ' box-shadow:0 12px 46px rgba(0,0,0,.45); font-family:inherit; overflow:hidden;';
-  c.innerHTML = '<div style="background:#a35400; color:#fff; font-weight:800; letter-spacing:.04em;'
+  c.innerHTML = '<div style="background:#7a1a1c; color:#fff; font-weight:800; letter-spacing:.04em;'
     + ' padding:10px 16px; font-size:13px;">OVERRIDE \u2014 ' + label + ' \u00b7 BALLOON '
     + (row.bubble || '') + '</div>'
     + '<div style="padding:14px 16px; font-size:12px; line-height:1.6; color:#3a352e;">'
-    + '<div style="display:flex; gap:26px; margin-bottom:12px; font-size:13px;">'
-    +   '<div><div style="font-size:10px; color:#8a8279; font-weight:700; letter-spacing:.08em;">MASTER LIST SAYS</div>'
-    +   '<div style="font-weight:800;">' + masterVal + '</div></div>'
-    +   '<div><div style="font-size:10px; color:#8a8279; font-weight:700; letter-spacing:.08em;">THIS PLAN SAYS</div>'
-    +   '<div style="font-weight:800; color:#a35400;">' + nowVal + '</div></div>'
+    + '<div style="margin-bottom:12px; font-size:13px;">'
+    +   '<div style="font-size:10px; color:#8a8279; font-weight:700; letter-spacing:.08em;">MASTER LIST SAYS</div>'
+    +   '<div style="font-weight:800; margin-bottom:9px;">' + masterVal + '</div>'
+    +   '<div style="font-weight:800; color:#7a1a1c; line-height:1.4;">' + _stampLine + '</div>'
     + '</div>'
     + '<b>What an override is.</b> This cell normally fills itself from the Control Type\u2019s row '
     + 'on the Master List \u2014 CP-2C makes that row authoritative over the whole methods band. '
