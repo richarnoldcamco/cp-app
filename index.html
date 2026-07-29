@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-706";
+const APP_REV = "Rev-707";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-707", type: "App", changes: ["AI HELP AGENT ON EVERY SCREEN (Rev-707) \u2014 a fixed \u2139 HELP button top-right, present on every screen because it is mounted to the body rather than into each screen\u2019s markup. It opens a window that names the screen you are on, takes a question and answers in plain language. WHAT IT SENDS, AND THE REASON THIS IS THE WHOLE DESIGN: the screen name, the app revision and your typed question. NOTHING ELSE. cpBuildState is never read by this code \u2014 no part numbers, no tolerances, no feature descriptions, no drawings leave the device. The window says so above the box, and warns in red not to type part or drawing details in. The existing ITAR confirm gate runs before the first question of each session. A help agent is the easiest possible place to leak an ITAR-controlled drawing, so it was built to have nothing to leak rather than built to be careful. GROUNDED IN THE APP\u2019S OWN RULES: the system prompt carries the five construction steps, how the master list resolves, and CP-2C / CP-6 / CP-7 / Conventions 2 and 5, so answers match the Instructions rather than generic quality-engineering advice. It is told plainly that it has not been given the plan and must not ask for it \u2014 an agent that invites a paste of the drawing defeats the point. Uses the existing anthropicApiKey; asks for it if unset."] },
   { ts: "2026-07-29", rev: "App Rev-706", type: "App", changes: ["A ROW THAT CANNOT SUPPORT AN APPROVAL CAN NO LONGER BE APPROVED (Rev-706) \u2014 balloon 10, FLATNESS .001 MAX, was ticked green with NO CONTROL TYPE set. The tick was a free switch: it never consulted the step\u2019s own readiness test, so any row could be signed off, and since Rev-681 that approval then counted toward the percentage, the step fraction and the COMPLETED stamp. A plan could reach 100% and COMPLETED on rows with nothing behind them. NOW REFUSED, WITH THE REASON AND THE REMEDY: Step 2 says choose a control type first; Step 3 says it needs a measurement method and a reaction plan (CP-7) and points at \u270b MACHINIST DOES NOT CHECK THIS as the DECLARED way to answer the machinist question when nobody measures it \u2014 the exception stays available, it just has to be stated rather than waved through. Step 1 says pin the balloon. Refusals are written to the action log. EXISTING BAD APPROVALS ARE NOT HIDDEN: a row already approved that the data does not support is now drawn RED with a \u2018!\u2019 instead of a green tick, reads APPROVED BUT THE ROW IS NOT COMPLETE on hover, and shows INCOMPLETE on the open row. They were legal before this rev and they are still on the plan \u2014 leaving them green is how they reach a customer. On 1000237620 OP-030 this will light up balloons 4, 12, 13 and 10, all of which are approved with no control type."] },
   { ts: "2026-07-29", rev: "App Rev-705", type: "App", changes: ["SIZE BAND RENAMED TO SIZE OF FEATURE BEING MEASURED (Rev-705) \u2014 \u2018SIZE BAND\u2019 and \u2018TOLERANCE BAND\u2019 read as two flavours of the same thing, which is precisely the confusion that put Below .500 on a \u2260.604 ID one rev ago. The heading now names what the number IS rather than what kind of thing it is, so the two controls stop looking like a matched pair. TOLERANCE BAND keeps its name \u2014 it genuinely is a band, and the contrast is the point. On screen only: the underlying field is still sizeBand, the master list columns are untouched, and nothing in the .xlsx or the import map changed."] },
   { ts: "2026-07-29", rev: "App Rev-704", type: "App", changes: ["SIZE BAND AND TOLERANCE BAND ARE NOW LABELLED (Rev-704) \u2014 the two pickers carried their label inside the option text (\u2018Size: any\u2019, \u2018Tol: any\u2019), so the label existed only while the value did not. Choose a band and the boxes read \u2018Below .500\u2019 and \u2018.0015\u2013.0029\u2019 side by side with nothing saying which is which \u2014 and every other column on the row takes its heading from the table header, so these two were the only controls on the screen with no title above them. SIZE BAND and TOLERANCE BAND now sit over them. THE HOVER TEXT ANSWERS THE CONFUSION THAT ACTUALLY MATTERS: size band is \u2018size of the feature itself \u2014 not its tolerance\u2019, because the two are easy to conflate when both boxes hold decimals of the same shape, and picking the size band off the tolerance is exactly the slip that puts a row on the wrong master line."] },
@@ -2296,7 +2297,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "07:44 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "08:06 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7064,6 +7065,153 @@ function cpOvrInfoModal(idx, key){
   ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
   document.body.appendChild(ov);
 }
+// ===== Rev-707: AI HELP AGENT ============================================
+// A floating HELP button on every screen. The hard rule: it sends the SCREEN you are on,
+// the app rev and your typed question — and NOTHING from the plan. No part numbers, no
+// tolerances, no feature descriptions, no drawings. cpBuildState is never read here.
+const CP_HELP_SCREENS = [
+  ['menuScreen','Main menu'], ['projectsScreen','Control Plans list'],
+  ['newCPScreen','New Control Plan'], ['cpBuilderScreen','Build Control Plan'],
+  ['masterListScreen','Control Types Master List'], ['gagesScreen','Special gages'],
+  ['customersScreen','Customers'], ['instructionsScreen','Instructions'],
+  ['settingsScreen','Settings'], ['adminScreen','Admin'],
+  ['appInstructionsScreen','App instructions'], ['recentChangesScreen','Recent changes'],
+  ['reportsScreen','Reports'], ['historyScreen','History']
+];
+function cpHelpScreen(){
+  for(const [id, name] of CP_HELP_SCREENS){
+    const el = document.getElementById(id);
+    if(el && !el.classList.contains('hidden')) return name;
+  }
+  return 'Unknown screen';
+}
+// What the app knows about itself. Conventions and navigation only — no part data.
+const CP_HELP_GUIDE = [
+  'You are the built-in help agent for the CAMCO Control Plan Generator, a single-file web app',
+  'used by a quality engineer to build ITAR-controlled Control Plans for machined aerospace parts.',
+  'Answer in plain language with click-by-click steps. The user is NOT a programmer; define any',
+  'unavoidable term in one short sentence. Be brief. If you do not know, say so and suggest where',
+  'in the app to look rather than inventing a button that may not exist.',
+  '',
+  'HOW THE APP IS ORGANISED:',
+  '- CONTROL PLANS list: one card per part, with a row per routing operation (OP-030 etc).',
+  '  Each operation shows five construction steps: 1 Edit op #, 2 Upload ODS, 3 Assign bubbles,',
+  '  4 Assign control types, 5 Assign measurement types. A step reads COMPLETED only when every',
+  '  row on it has been APPROVED by the QE.',
+  '- BUILD CONTROL PLAN: the grid. Three step views plus All columns. One row per ODS balloon.',
+  '- MASTER LIST: the Control Types Master List. Selecting levels (Workcenter / Feature Type /',
+  '  2nd / 3rd) plus the size and tolerance zones resolves ONE master row, which then fills the',
+  '  methods band. The master list is the single source of truth for those columns (rule CP-2C).',
+  '',
+  'RULES THE USER CARES ABOUT:',
+  '- CP-2C: the resolved master row governs Meas Method, # recorded, both FREQ columns and CMM.',
+  '  Only the two FREQ cells can be overridden, and an override is recorded with who and when.',
+  '- CP-6: any feature whose total tolerance band is under .0011 inch is a KC. MAX-only, radius',
+  '  and angular callouts are NOT plus/minus bands and are not auto-classified.',
+  '- CP-7: every line needs a Reaction Plan. CW843-1 for in-house, CW854-1 for vendor work.',
+  '- Convention 5: one Control Plan row per ODS balloon, never two balloons on one line.',
+  '- Convention 2: a Control Method must describe what the shop actually does.',
+  '- A row cannot be approved until the step it is on is satisfied. If the machinist genuinely',
+  '  does not measure a feature, use the button MACHINIST DOES NOT CHECK THIS and give the reason.',
+  '',
+  'IMPORTANT: you have NOT been sent the user\'s plan, part numbers, tolerances or drawings, and',
+  'you must not ask for them or invite the user to paste them. If a question needs that detail,',
+  'answer generally and tell the user to read the value off the screen themselves.'
+].join('\n');
+
+let _cpHelpOkThisSession = false;
+function cpHelpOpen(){
+  const old = document.getElementById('cpHelpOv'); if(old) old.remove();
+  const ov = document.createElement('div');
+  ov.id = 'cpHelpOv';
+  ov.style.cssText = 'position:fixed; inset:0; z-index:10120; background:rgba(0,0,0,0.5);'
+    + ' display:flex; align-items:center; justify-content:center; padding:18px;';
+  const c = document.createElement('div');
+  c.style.cssText = 'background:#fff; border-radius:10px; width:100%; max-width:700px;'
+    + ' max-height:88vh; display:flex; flex-direction:column; overflow:hidden;'
+    + ' box-shadow:0 12px 46px rgba(0,0,0,.45); font-family:inherit;';
+  c.innerHTML = '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.04em;'
+    + ' padding:10px 16px; font-size:13px;">\u2139 HELP \u2014 you are on: ' + cpHelpScreen() + '</div>'
+    + '<div style="padding:10px 16px 0; font-size:11px; color:#6b6257; line-height:1.5;">'
+    + 'Ask how to do something in this app. <b>Only your question, the screen name and the app '
+    + 'revision are sent</b> \u2014 no part numbers, tolerances, drawings or plan data. '
+    + '<b style="color:#a5342a;">Do not type part or drawing details into the box.</b></div>';
+  const ta = document.createElement('textarea');
+  ta.placeholder = 'e.g. How do I mark a feature the machinist does not measure?';
+  ta.style.cssText = 'margin:10px 16px; padding:9px; font-size:13px; min-height:64px;'
+    + ' border:1px solid #c9c0b4; border-radius:6px; font-family:inherit; resize:vertical;';
+  ta.className = 'no-upper';
+  const out = document.createElement('div');
+  out.style.cssText = 'margin:0 16px; padding:0; font-size:13px; line-height:1.6; color:#3a352e;'
+    + ' overflow:auto; flex:1 1 auto; min-height:0; white-space:pre-wrap;';
+  const foot = document.createElement('div');
+  foot.style.cssText = 'display:flex; justify-content:flex-end; gap:8px; padding:12px 16px;'
+    + ' border-top:1px solid #e4ded4; flex:0 0 auto;';
+  const close = document.createElement('button');
+  close.type = 'button'; close.textContent = 'Close';
+  close.style.cssText = 'font-size:12px; font-weight:700; padding:7px 16px; border:1px solid #c9c0b4;'
+    + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit;';
+  close.onclick = () => ov.remove();
+  const ask = document.createElement('button');
+  ask.type = 'button'; ask.textContent = 'Ask';
+  ask.style.cssText = 'font-size:12px; font-weight:800; padding:7px 18px; border:1px solid #154360;'
+    + ' border-radius:6px; background:#1a5276; color:#fff; cursor:pointer; font-family:inherit;';
+  ask.onclick = async () => {
+    const q = String(ta.value || '').trim();
+    if(!q){ out.textContent = 'Type a question first.'; return; }
+    const key = localStorage.getItem('anthropicApiKey');
+    if(!key){ out.textContent = 'No Anthropic API key set. Admin \u2192 Settings \u2192 API key.'; return; }
+    if(!_cpHelpOkThisSession){
+      let ok = true;
+      try{ if(typeof showItarConfirm === 'function') ok = await showItarConfirm(); }catch(_){ }
+      if(!ok){ out.textContent = 'Cancelled \u2014 nothing was sent.'; return; }
+      _cpHelpOkThisSession = true;
+    }
+    ask.disabled = true; out.textContent = 'Thinking\u2026';
+    try{
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'x-api-key': key,
+                   'anthropic-version':'2023-06-01',
+                   'anthropic-dangerous-direct-browser-access':'true' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6', max_tokens: 900,
+          system: CP_HELP_GUIDE,
+          messages: [{ role:'user', content:
+            'Screen: ' + cpHelpScreen() + '. App ' + APP_REV + '.\nQuestion: ' + q }]
+        })
+      });
+      const d = await r.json();
+      const txt = (d.content || []).filter(x => x.type === 'text').map(x => x.text).join('\n').trim();
+      out.textContent = txt || ('No answer came back. ' + (d.error ? (d.error.message || '') : ''));
+      try{ logAct('ai', 'help asked \u00b7 ' + cpHelpScreen()); }catch(_){ }
+    }catch(e){ out.textContent = 'Could not reach the AI service: ' + (e && e.message ? e.message : e); }
+    ask.disabled = false;
+  };
+  foot.appendChild(close); foot.appendChild(ask);
+  c.appendChild(ta); c.appendChild(out); c.appendChild(foot);
+  ov.appendChild(c);
+  ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
+  document.body.appendChild(ov);
+  setTimeout(() => { try{ ta.focus(); }catch(_){ } }, 60);
+}
+function cpHelpMountButton(){
+  if(document.getElementById('cpHelpFab')) return;
+  const b = document.createElement('button');
+  b.id = 'cpHelpFab'; b.type = 'button'; b.textContent = '\u2139 HELP';
+  b.title = 'Ask how to do something in this app';
+  b.style.cssText = 'position:fixed; top:8px; right:12px; z-index:9000; font-size:11px;'
+    + ' font-weight:800; letter-spacing:.05em; padding:6px 12px; border-radius:6px;'
+    + ' border:1px solid #154360; background:#1a5276; color:#fff; cursor:pointer;'
+    + ' font-family:inherit; box-shadow:0 2px 6px rgba(0,0,0,.25);';
+  b.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpHelpOpen(); };
+  document.body.appendChild(b);
+}
+try{
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', cpHelpMountButton);
+  else cpHelpMountButton();
+}catch(_){ }
+// ===== end Rev-707 help agent ===========================================
 function cpTaperMark(td, val){
   try{
     if(String(val == null ? '' : val).trim() !== '2') return;
