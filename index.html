@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-697";
+const APP_REV = "Rev-698";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-698", type: "App", changes: ["THE OVERRIDE CHIP NOW EXPLAINS ITSELF (Rev-698) \u2014 it announced OVERRIDE \u2014 MASTER: 10 and left the reader to work out what an override is, how the cell became one, and whether to act. A \u2018?\u2019 beside it opens a window showing the MASTER LIST value and THIS PLAN value side by side, then: what an override is (CP-2C makes the Control Type\u2019s master row authoritative over the methods band; an override is this plan deliberately disagreeing on one line), how it happened (someone typed a different value; the app kept the master value so it could be restored and turned the cell orange so the difference cannot pass unnoticed), and the two choices \u2014 KEEP if the difference is intended, RESTORE if it was a slip, and if the MASTER is the thing that is wrong, fix it on the Master List so every plan using that control type is corrected rather than this one line. IT ALSO STATES A LIMIT PLAINLY: the app does not record WHO changed the value or WHEN, so if it was not you, the plan cannot say who. That is a real gap on a document that gets audited, and it is better said out loud on the screen than discovered by someone trying to answer the question. Buttons on the window do the thing being described rather than only naming it."] },
   { ts: "2026-07-29", rev: "App Rev-697", type: "App", changes: ["THE ODS NOW SITS BESIDE THE BALLOON BOX (Rev-697) \u2014 the window asked for a balloon number while the drawing that carries the balloons was behind it. That is a recall test, and recalling the wrong number produces a control plan that names an uncontrolled feature as the control and still passes validation, because the balloon exists. The window is now 96vw \u00d7 94vh with the choices on the left and the FULL ODS on the right, fitted to the pane; clicking it opens the existing full-size zoom viewer. The feature name and tolerance run at 21px, up from 12 \u2014 that line is what tells you WHICH row you are declaring, and at 12px it was the smallest thing in a window about a decision that changes the delivered document. The list of the operation\u2019s other balloons stays under reason 1, so the number can be read off the drawing and confirmed against the description without leaving the window. If no drawing is loaded, the pane says so rather than sitting empty."] },
   { ts: "2026-07-29", rev: "App Rev-696", type: "App", changes: ["EDIT MASTER ROW DID NOTHING \u2014 THE MASTER LIST WAS OPENING BEHIND THE BUILDER (Rev-696) \u2014 showMasterList hides ten screens by name and cpBuilderScreen was not among them, so the Master List was revealed UNDERNEATH the still-visible Build Control Plan screen. The click worked, the navigation worked, nothing was on top. Fixed in showMasterList itself rather than in the caller, because every future route into the Master List from the builder would have hit the same wall \u2014 the omission was in the shared function, not in Rev-688\u2019s button. SECOND FAULT IN THE SAME BUTTON: the search term was being written to the box BEFORE showMasterList ran, while the builder was still the visible screen, so it was set and then wiped by the render. The filter is now applied AFTER the screen is up, the Clear Search button is revealed with it, and the list is repainted so the control type is actually filtered to. Worth noting how this hid: the handler was wrapped in try/catch, so had it thrown, it would have failed just as silently \u2014 a swallowed error and a screen behind another screen look identical from the outside."] },
   { ts: "2026-07-29", rev: "App Rev-695", type: "App", changes: ["THE REASONING MOVED BEHIND \u24d8 MORE INFO (Rev-695) \u2014 the window opened with a paragraph on Convention #2 and a warning about CP-6 and CP-7 before it showed the two choices. Correct content, wrong place: someone who has pressed \u2018Machinist does NOT check this\u2019 already knows why they are there and needs the decision, and a paragraph that appears every time is a paragraph that stops being read \u2014 which costs the warning its force on the one occasion it matters. The header is now the feature and its tolerance plus a MORE INFO button; the reasoning and the CP-6 / CP-7 caveat live in a second window a click away. NOTHING WAS DELETED, only moved: it stays reachable for a new QE, for anyone unsure which reason applies, and for whoever has to defend the line in an audit. The two option cards keep their own explanations inline, since those describe the choice being made rather than the policy behind it."] },
@@ -2287,7 +2288,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "05:31 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "05:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6474,6 +6475,15 @@ tr.appendChild(tdCT);
             chip.title = 'Master List value is ' + (row._freqOvr[key] || '(blank)') + '. Click to restore it.';
             chip.onclick = () => { row[key] = row._freqOvr[key] || ''; delete row._freqOvr[key]; renderCPBuilder(); cpAutoSaveProject(); };
             td.appendChild(chip);
+            // Rev-698: the chip states a fact; the ? explains it
+            const q = document.createElement('button');
+            q.type = 'button'; q.textContent = '?';
+            q.title = 'What does OVERRIDE mean, and how did this cell become one?';
+            q.style.cssText = 'margin-top:3px; width:17px; height:17px; padding:0; line-height:1;'
+              + ' border:1px solid #a35400; border-radius:50%; background:#fff; color:#a35400;'
+              + ' font-size:11px; font-weight:800; cursor:pointer; font-family:inherit;';
+            q.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpOvrInfoModal(idx, key); };
+            td.appendChild(q);
           }
           tr.appendChild(td);
           return;
@@ -6824,6 +6834,70 @@ function cpNoMachModal(idx){
     };
   }catch(e){}
   setTimeout(() => { try{ inp.focus(); }catch(_){ } }, 60);
+}
+// Rev-698: an OVERRIDE chip states a fact without explaining it. This says what an
+// override IS, how this one came about, and what the two choices are.
+function cpOvrInfoModal(idx, key){
+  const row = (cpBuildState && cpBuildState.rows) ? cpBuildState.rows[idx] : null;
+  if(!row) return;
+  const old = document.getElementById('cpOvrInfoOv'); if(old) old.remove();
+  const label = (key === 'freqEvery') ? 'MACHINIST CHECK FREQ' : 'FREQ (QUALITY ENGINEER)';
+  const masterVal = (row._freqOvr && row._freqOvr[key] !== undefined && row._freqOvr[key] !== '')
+                    ? row._freqOvr[key] : '(blank)';
+  const nowVal = row[key] || '(blank)';
+  const ov = document.createElement('div');
+  ov.id = 'cpOvrInfoOv';
+  ov.style.cssText = 'position:fixed; inset:0; z-index:10090; background:rgba(0,0,0,0.55);'
+    + ' display:flex; align-items:center; justify-content:center; padding:20px;';
+  const c = document.createElement('div');
+  c.style.cssText = 'background:#fff; border-radius:10px; max-width:620px; width:100%;'
+    + ' box-shadow:0 12px 46px rgba(0,0,0,.45); font-family:inherit; overflow:hidden;';
+  c.innerHTML = '<div style="background:#a35400; color:#fff; font-weight:800; letter-spacing:.04em;'
+    + ' padding:10px 16px; font-size:13px;">OVERRIDE \u2014 ' + label + ' \u00b7 BALLOON '
+    + (row.bubble || '') + '</div>'
+    + '<div style="padding:14px 16px; font-size:12px; line-height:1.6; color:#3a352e;">'
+    + '<div style="display:flex; gap:26px; margin-bottom:12px; font-size:13px;">'
+    +   '<div><div style="font-size:10px; color:#8a8279; font-weight:700; letter-spacing:.08em;">MASTER LIST SAYS</div>'
+    +   '<div style="font-weight:800;">' + masterVal + '</div></div>'
+    +   '<div><div style="font-size:10px; color:#8a8279; font-weight:700; letter-spacing:.08em;">THIS PLAN SAYS</div>'
+    +   '<div style="font-weight:800; color:#a35400;">' + nowVal + '</div></div>'
+    + '</div>'
+    + '<b>What an override is.</b> This cell normally fills itself from the Control Type\u2019s row '
+    + 'on the Master List \u2014 CP-2C makes that row authoritative over the whole methods band. '
+    + 'An override is this plan deliberately disagreeing with it on this one line.<br><br>'
+    + '<b>How this one happened.</b> Someone typed a different value into the cell. The app kept '
+    + 'the master\u2019s value so it could be put back, and marked the cell orange so the difference '
+    + 'cannot pass unnoticed. <span style="color:#a35400; font-weight:700;">It does not record who '
+    + 'changed it or when</span> \u2014 so if this was not you, the plan cannot tell you who.<br><br>'
+    + '<b>Your two choices.</b> KEEP it if the difference is intended \u2014 the master row is written '
+    + 'for a family of features and this one genuinely needs checking at a different rate. RESTORE it '
+    + 'if the value was typed by mistake, or if the master itself is wrong. If the master is wrong, '
+    + 'fix it on the Master List instead, so every plan using that control type is corrected rather '
+    + 'than this one line.<br><br>'
+    + 'Only the two FREQ cells can be overridden. The rest of the methods band is not editable here, '
+    + 'per CP-2C.'
+    + '</div>';
+  const foot = document.createElement('div');
+  foot.style.cssText = 'display:flex; justify-content:flex-end; gap:8px; padding:0 16px 14px;';
+  const rest = document.createElement('button');
+  rest.type = 'button'; rest.textContent = '\u21ba Restore the master value';
+  rest.style.cssText = 'font-size:12px; font-weight:700; padding:7px 14px; border:1px solid #c9c0b4;'
+    + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit;';
+  rest.onclick = () => {
+    row[key] = (row._freqOvr && row._freqOvr[key]) || '';
+    if(row._freqOvr) delete row._freqOvr[key];
+    ov.remove(); renderCPBuilder(); try{ cpAutoSaveProject(); }catch(_){ }
+  };
+  const keep = document.createElement('button');
+  keep.type = 'button'; keep.textContent = 'Keep the override';
+  keep.style.cssText = 'font-size:12px; font-weight:700; padding:7px 14px; border:1px solid #24593b;'
+    + ' border-radius:6px; background:#2c6e49; color:#fff; cursor:pointer; font-family:inherit;';
+  keep.onclick = () => ov.remove();
+  foot.appendChild(rest); foot.appendChild(keep);
+  c.appendChild(foot);
+  ov.appendChild(c);
+  ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
+  document.body.appendChild(ov);
 }
 function cpTaperMark(td, val){
   try{
