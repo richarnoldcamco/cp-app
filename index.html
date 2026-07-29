@@ -274,6 +274,14 @@
      three rows down the grid is impossible to miss */
   /* Rev-690: two recorded measurements on a diameter means both ends are being read —
      the check is for TAPER. The cell said '2' and left that unsaid. */
+  /* Rev-693: the balloon box needs saying out loud — which number goes in it is the one
+     thing a QE can get backwards here. Pulses until something is typed. */
+  @keyframes cpHintPulse{ 0%,100%{ opacity:.55; transform:translateX(0); }
+                          50%{ opacity:1; transform:translateX(-3px); } }
+  .cp-hint{ display:inline-flex; align-items:flex-start; gap:5px; margin-left:6px;
+    font-size:10px; font-weight:700; color:#a5342a; line-height:1.3; max-width:290px; }
+  .cp-hint .cp-hint-arrow{ font-size:13px; line-height:1; animation:cpHintPulse 1.15s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce){ .cp-hint .cp-hint-arrow{ animation:none; opacity:.9; } }
   .cp-taper{ display:block; margin-top:1px; font-size:7.5px; font-weight:700; letter-spacing:.06em;
     color:#8a8279; opacity:.85; line-height:1.05; text-transform:uppercase; white-space:nowrap; }
   .cp-dot{ display:inline-block; transition:color .15s ease; }
@@ -1576,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-692";
+const APP_REV = "Rev-693";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1709,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-693", type: "App", changes: ["THE BALLOON BOX NOW SAYS WHICH NUMBER GOES IN IT (Rev-693) \u2014 a pulsing arrow and one line beside the input: \u2018Enter the balloon that IS measured \u2014 the feature cut by the same tool. If that one is to print, this one is too.\u2019 WHICH WAY ROUND THAT NUMBER GOES IS THE ONE THING EASY TO GET BACKWARDS HERE, and getting it backwards is silent: the plan would name the uncontrolled feature as the control, read perfectly well, and be wrong in a way no validation catches \u2014 the balloon exists, so the check passes. The line is worded as the reasoning, not as an instruction, so it teaches the rule rather than just directing a keystroke. It disappears as soon as anything is typed, so it never sits in the way of a QE who already knows. The pulse is opacity and a 3px drift, and it stops entirely under prefers-reduced-motion."] },
   { ts: "2026-07-29", rev: "App Rev-692", type: "App", changes: ["REASON (A) MUST NAME THE CONTROLLING BALLOON (Rev-692) \u2014 Rev-691 let a row say \u2018controlled by another feature on the same tool\u2019 without saying WHICH, which is not a control anyone can check: not an auditor, not the next QE, not you in six months. CP-8 requires every line to trace, and a control pointing at an unnamed sibling breaks the chain. The option is now \u2018Controlled by balloon [ ] on the same tool\u2019 with the number REQUIRED, and it is validated against the plan \u2014 a balloon not present on this operation is refused with the number named, and a row cannot cite itself. The line then reads NOT CHECKED BY MACHINIST \u2014 CONTROLLED BY BALLOON 6 ON THE SAME TOOL, on screen and in the .xlsx, which is checkable in seconds against the ODS. Undo clears the reference with the reason so a stale balloon number cannot survive a change of mind. Reason (b), CMM / QUALITY ENGINEER ONLY, needs no reference: the CMM column and FREQ (QE) on the same line already name who performs it."] },
   { ts: "2026-07-29", rev: "App Rev-691", type: "App", changes: ["A FEATURE THE MACHINIST DOES NOT MEASURE CAN NOW SAY SO (Rev-691) \u2014 the open row gains \u270b MACHINIST DOES NOT CHECK THIS, which asks WHICH of the two reasons applies: (1) controlled by another feature on the SAME TOOL, or (2) checked by CMM / Quality Engineer only. The Meas Method cell then reads NOT CHECKED BY MACHINIST \u2014 <reason> on an amber fill, with the master\u2019s own method kept in the hover text and a \u21ba to undo. Shown on closed rows too, from the same helper. IT CARRIES INTO THE .XLSX, deliberately: leaving the master method in the delivered document would state that the machinist performs a check the shop does not perform, which is Convention #2 exactly \u2014 the Control Method describes what the shop actually does, at the capability it actually has. # Recorded is cleared with it, since counting recorded measurements for a check nobody makes is the same false claim in a second column. STEP 3 now treats such a row as having answered the machinist question, so it can be approved \u2014 but it still demands a REACTION PLAN, because CP-7 makes a blank one a non-conformance whoever does the measuring. NOTE FOR THE INSTRUCTIONS: Rev-92 CP-2C describes the methods band as governed by the master row and does not yet describe this declared exception. The app now writes a state the controlling document does not define. Rev-92 is ITAR-controlled and is not edited without being asked, so this is flagged, not fixed."] },
   { ts: "2026-07-29", rev: "App Rev-690", type: "App", changes: ["A \u2018# RECORDED\u2019 OF 2 NOW SAYS WHY (Rev-690) \u2014 CHECKING TAPER appears under the figure, small and grey, wherever that cell holds 2, on the open row and the closed rows alike. Two recorded readings on a diameter means both ends are being measured, and the reason is taper \u2014 which the number alone never said, so it had to be carried in the head of whoever built the line or worked out again by whoever read it later. The mark is DERIVED, not stored: nothing is written to the row, so it appears and disappears with the value and cannot go stale or reach the .xlsx, which stays exactly as CP-2 specifies. Put in ONE helper called from both render paths on purpose \u2014 the open row and the closed row have drifted apart twice already this era (the Special Gage button at Rev-685, the approve tick at Rev-689), and duplicating this would have set up the same fault a third time. The hover text spells it out in full for anyone who does not already know the convention."] },
@@ -2274,7 +2283,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "03:41 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "03:47 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6554,7 +6563,20 @@ tr.appendChild(tdCT);
                    try{ logAct('row-edit', 'no machinist check \u00b7 SAME_TOOL'); }catch(_){ }
                    renderCPBuilder(); try{ cpAutoSaveProject(); }catch(_){ }
                  };
+                 // Rev-693: say which balloon goes in the box, with an arrow at it
+                 const hint = document.createElement('span');
+                 hint.className = 'cp-hint';
+                 const arw = document.createElement('span');
+                 arw.className = 'cp-hint-arrow'; arw.textContent = '\u2190';
+                 const htx = document.createElement('span');
+                 htx.textContent = 'Enter the balloon that IS measured \u2014 the feature cut by the '
+                   + 'same tool. If that one is to print, this one is too.';
+                 hint.appendChild(arw); hint.appendChild(htx);
+                 inp.addEventListener('input', () => {
+                   hint.style.display = String(inp.value || '').trim() ? 'none' : '';
+                 });
                  wrapA.appendChild(lab); wrapA.appendChild(inp); wrapA.appendChild(go);
+                 wrapA.appendChild(hint);
                  pick.appendChild(wrapA); pick.appendChild(warn);
                })();
                opt('2 \u00b7 Checked by CMM / Quality Engineer only', 'CMM_QE');
