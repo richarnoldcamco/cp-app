@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-707";
+const APP_REV = "Rev-708";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-708", type: "App", changes: ["FIX \u2014 REV-706 EMPTIED THE GRID (Rev-708) \u2014 \u2018Uncaught ReferenceError: _bad is not defined\u2019 and not a single row drew. Rev-706 declared const _bad inside the ELSE branch where the approve mark is painted, but two later uses \u2014 the tooltip and the open-row caption \u2014 sit OUTSIDE that block, so every row threw on render and the table came up with headers and nothing under them. Declared now beside _on and _ready, where all three uses can see it. WHY node --check DID NOT CATCH IT: a block-scoped const referenced from an outer scope is valid SYNTAX; it fails at RUN time. The pre-push check proves the file parses, not that it runs \u2014 that gap has now cost one broken rev and is worth remembering rather than trusting the PASS. Rolled FORWARD to a higher rev as usual; Rev-706\u2019s behaviour is unchanged and intact."] },
   { ts: "2026-07-29", rev: "App Rev-707", type: "App", changes: ["AI HELP AGENT ON EVERY SCREEN (Rev-707) \u2014 a fixed \u2139 HELP button top-right, present on every screen because it is mounted to the body rather than into each screen\u2019s markup. It opens a window that names the screen you are on, takes a question and answers in plain language. WHAT IT SENDS, AND THE REASON THIS IS THE WHOLE DESIGN: the screen name, the app revision and your typed question. NOTHING ELSE. cpBuildState is never read by this code \u2014 no part numbers, no tolerances, no feature descriptions, no drawings leave the device. The window says so above the box, and warns in red not to type part or drawing details in. The existing ITAR confirm gate runs before the first question of each session. A help agent is the easiest possible place to leak an ITAR-controlled drawing, so it was built to have nothing to leak rather than built to be careful. GROUNDED IN THE APP\u2019S OWN RULES: the system prompt carries the five construction steps, how the master list resolves, and CP-2C / CP-6 / CP-7 / Conventions 2 and 5, so answers match the Instructions rather than generic quality-engineering advice. It is told plainly that it has not been given the plan and must not ask for it \u2014 an agent that invites a paste of the drawing defeats the point. Uses the existing anthropicApiKey; asks for it if unset."] },
   { ts: "2026-07-29", rev: "App Rev-706", type: "App", changes: ["A ROW THAT CANNOT SUPPORT AN APPROVAL CAN NO LONGER BE APPROVED (Rev-706) \u2014 balloon 10, FLATNESS .001 MAX, was ticked green with NO CONTROL TYPE set. The tick was a free switch: it never consulted the step\u2019s own readiness test, so any row could be signed off, and since Rev-681 that approval then counted toward the percentage, the step fraction and the COMPLETED stamp. A plan could reach 100% and COMPLETED on rows with nothing behind them. NOW REFUSED, WITH THE REASON AND THE REMEDY: Step 2 says choose a control type first; Step 3 says it needs a measurement method and a reaction plan (CP-7) and points at \u270b MACHINIST DOES NOT CHECK THIS as the DECLARED way to answer the machinist question when nobody measures it \u2014 the exception stays available, it just has to be stated rather than waved through. Step 1 says pin the balloon. Refusals are written to the action log. EXISTING BAD APPROVALS ARE NOT HIDDEN: a row already approved that the data does not support is now drawn RED with a \u2018!\u2019 instead of a green tick, reads APPROVED BUT THE ROW IS NOT COMPLETE on hover, and shows INCOMPLETE on the open row. They were legal before this rev and they are still on the plan \u2014 leaving them green is how they reach a customer. On 1000237620 OP-030 this will light up balloons 4, 12, 13 and 10, all of which are approved with no control type."] },
   { ts: "2026-07-29", rev: "App Rev-705", type: "App", changes: ["SIZE BAND RENAMED TO SIZE OF FEATURE BEING MEASURED (Rev-705) \u2014 \u2018SIZE BAND\u2019 and \u2018TOLERANCE BAND\u2019 read as two flavours of the same thing, which is precisely the confusion that put Below .500 on a \u2260.604 ID one rev ago. The heading now names what the number IS rather than what kind of thing it is, so the two controls stop looking like a matched pair. TOLERANCE BAND keeps its name \u2014 it genuinely is a band, and the contrast is the point. On screen only: the underlying field is still sizeBand, the master list columns are untouched, and nothing in the .xlsx or the import map changed."] },
@@ -2297,7 +2298,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:06 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "08:19 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6275,6 +6276,10 @@ function renderCPBuilder(){
     const _manual = !!(row.stepDone && row.stepDone[_step]);
     const _on = _manual;
     const _ready = _ok && !_manual;
+    // Rev-708: declared HERE, not inside the non-ghost branch. Rev-706 put it in the else
+    // block where the mark is drawn, but the tooltip and the open-row caption below are
+    // OUTSIDE that block — so every row threw ReferenceError and the grid rendered empty.
+    const _bad = _on && !_ok;
     const _size = focused ? '15px' : '12px';
     if(row.ghost){
       tdPin.innerHTML = '<span style="font-size:' + (focused?'14px':'11px') + '; line-height:1;" title="Ghost — balloon not on the drawing">👻</span>';
@@ -6286,7 +6291,6 @@ function renderCPBuilder(){
       // Rev-706: an approval standing on a row the data does not support is drawn RED with
       // a warning mark, not green. These were approvable before this rev and are still on
       // the plan; hiding them behind a green tick is how they reach a customer.
-      const _bad  = _on && !_ok;
       const _bg   = _bad ? '#a5342a' : (_on ? '#1e8449' : '#fff');
       const _bord = _bad ? '#7d2419' : ((_on || _ready) ? '#1e8449' : '#c4c0b8');
       const _fg   = _on ? '#fff' : (_ready ? '#1e8449' : '#c4c0b8');
