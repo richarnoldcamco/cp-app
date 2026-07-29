@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-712";
+const APP_REV = "Rev-713";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-713", type: "App", changes: ["LIMITS NOW STACK, UPPER OVER LOWER (Rev-713) \u2014 .134/.124 written inline reads as a fraction or a range and leaves which number is which to be inferred; on a CNC print the upper limit sits ON TOP of the lower, and Instructions \u00a70.14 already says so \u2014 the app was breaking its own documented convention on screen while the .xlsx honoured it. One helper, cpSpecStackHtml, now renders the high limit on the top line and the low directly beneath, and it is used in both places a spec is DISPLAYED: the MACHINIST DOES NOT CHECK window header and the closed-row Product / Process Spec / Tol cell. IT DECIDES WHICH IS WHICH BY VALUE, not by position, so a limit typed low-first still displays upper-over-lower rather than repeating the entry error back as though it were correct. The original digits are preserved rather than reformatted, so .6040 does not become .604. Callouts that are not a clean pair \u2014 MAX, angular, single values, notes such as BURR IS OKAY \u2014 SEE ODS \u2014 pass through unchanged, and any trailing word is kept beside the stack at a smaller size. THE OPEN ROW\u2019S SPEC BOX IS DELIBERATELY UNCHANGED: it is a text input and has to stay typable; stacking would mean it could not be edited."] },
   { ts: "2026-07-29", rev: "App Rev-712", type: "App", changes: ["POINT AT SOMETHING \u2014 WITHOUT A SCREENSHOT (Rev-712) \u2014 the ask was for a screenshot the user could highlight. A screenshot of the Build Control Plan screen carries part numbers, tolerances, feature descriptions and the ODS drawing, which is exactly the leak the help agent was built to make impossible \u2014 and the ITAR gate\u2019s own wording (\u2018only if NON-ITAR\u2019) means the honest answer on that screen is always no. SO THE USEFUL HALF WAS BUILT WITHOUT THE PIXELS. \u261d POINT AT SOMETHING dims the window, banners the screen, outlines whatever is under the cursor, and on click sends WHAT IT IS rather than WHAT IT SAYS: a column heading, a button label, a named region. NO IMAGE IS EVER CAPTURED. Data cells and entry fields are handled by DESIGN, not by filtering \u2014 point at one and the app sends \u2018a cell in the MACHINIST CHECK FREQ column (its contents were NOT sent)\u2019, because the column heading names the concept the question is about while the cell holds the customer\u2019s data. The window shows the exact phrase before you press Ask, so nothing goes out unseen. Esc cancels."] },
   { ts: "2026-07-29", rev: "App Rev-711", type: "App", changes: ["THE ITAR GATE NOW SITS ABOVE EVERYTHING (Rev-711) \u2014 the help window added at Rev-707 was given z-index 10120 while the ITAR permission modal sat at 10070, so the gate opened BEHIND the window that triggered it: visible enough to be noticed, impossible to reach. THAT IS THE WORST WAY FOR THIS PARTICULAR CONTROL TO FAIL. Every other overlay in the app can be dismissed by clicking the backdrop; a permission gate exists specifically to be REFUSED, and one that cannot be answered is one that cannot be refused. Raised to 11000, above every overlay in the app, and also set programmatically each time it is shown so a future overlay with a higher number cannot bury it again without someone noticing. z-index only \u2014 no change to what the gate asks, what it protects, or what happens on Cancel."] },
   { ts: "2026-07-29", rev: "App Rev-710", type: "App", changes: ["THE API KEY BOX NOW CHECKS WHAT WAS PASTED INTO IT (Rev-710) \u2014 the help agent reported \u2018invalid x-api-key\u2019, which reads like a broken feature but is the far end saying it does not recognise the key. The app was not corrupting it: saveApiKey stores .value.trim() verbatim and the field is type=password, so the global uppercase CSS cannot reach the value. The key itself was not accepted. SO THE SHAPE IS CHECKED BEFORE SAVING: a GitHub token (github_pat_ / ghp_) is REFUSED outright with the reason and where it actually belongs \u2014 behind password dots a GitHub token and an Anthropic key are indistinguishable, and both get pasted in the same session, so this was a matter of time. Anything not starting sk-ant- is saved but warned about. The key is never logged, shown or transmitted by this check; only its prefix is examined. THE HELP PANEL NOW NAMES THE CAUSE instead of repeating the raw error: it inspects the saved prefix and says either \u2018that is a GitHub token, put it in Admin \u2192 GitHub\u2019, or \u2018does not start sk-ant-\u2019, or \u2018looks right but was not accepted \u2014 most likely revoked or regenerated\u2019. A no-credit reply is called out separately, because that is an account problem and no amount of re-pasting will fix it."] },
@@ -2302,7 +2303,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "09:26 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "09:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6713,7 +6714,11 @@ tr.appendChild(tdCT);
       for(let li = 0; li < CP_LEVELS.length; li++) tr.appendChild(cpLevelCell(idx, row, li, false));
       tr.appendChild(compactCell(row.featureDesc, 'left'));
       // Rev-207: four columns hidden on-screen
-      tr.appendChild(compactCell(row.spec, 'center'));
+      (function(){ const _sc = compactCell('', 'center');
+        _sc.innerHTML = cpSpecStackHtml(row.spec);
+        _sc.title = String(row.spec || '');
+        _sc.style.whiteSpace = 'normal';
+        tr.appendChild(_sc); })();
       tr.appendChild(compactCell(row.upperLimit, 'center'));
       tr.appendChild(compactCell(row.lowerLimit, 'center'));
       tr.appendChild(compactCell(row.classification, 'center'));
@@ -6836,7 +6841,7 @@ function cpNoMachModal(idx){
     + '<div style="padding:14px 18px 6px; font-size:21px; line-height:1.35; color:#3a352e;'
     + ' display:flex; align-items:center; gap:12px; flex-wrap:wrap; flex:0 0 auto;">'
     + '<span><b>' + (row.desc || row.featureDesc || 'This feature') + '</b> \u2014 '
-    + (row.spec || '') + '</span>'
+    + cpSpecStackHtml(row.spec) + '</span>'
     + '<button type="button" id="cpNoMachInfo" style="font-size:10.5px; font-weight:700;'
     + ' padding:4px 10px; border:1px solid #c9c0b4; border-radius:999px; background:#fff;'
     + ' color:#3a352e; cursor:pointer; font-family:inherit;">\u24d8 MORE INFO</button>'
@@ -9434,6 +9439,26 @@ function cpAutoBands(row){
 // candidates nor exclude them — the controls could only ever add noise and doubt.
 function cpNoZones(row){
   try{ return cpLvNorm(row.lvFt) === 'SPECIAL'; }catch(_){ return false; }
+}
+// Rev-713: Instructions §0.14 — clean high/low limits are shown STACKED, the upper limit on
+// the top line and the lower directly beneath it, matching the ballooned drawing. Written
+// inline as .134/.124 it reads like a fraction or a range and inverts the machinist’s
+// expectation of which number is which. Returns HTML; falls back to the text unchanged when
+// the callout is not a clean pair (MAX, angular, single value, notes).
+function cpSpecStackHtml(spec){
+  const raw = String(spec == null ? '' : spec);
+  const esc = raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const nums = raw.match(/\d*\.\d+|\d+\.\d*/g);
+  if(!nums || nums.length < 2) return esc;
+  const a = parseFloat(nums[0]), b = parseFloat(nums[1]);
+  if(isNaN(a) || isNaN(b) || a === b) return esc;
+  const hi = (a > b) ? nums[0] : nums[1];
+  const lo = (a > b) ? nums[1] : nums[0];
+  const tail = raw.replace(nums[0],'').replace(nums[1],'').replace(/[\/\s\-]+/g,' ').trim();
+  return '<span style="display:inline-block; text-align:center; line-height:1.15;">'
+       + '<span style="display:block;">' + hi + '</span>'
+       + '<span style="display:block;">' + lo + '</span></span>'
+       + (tail ? ' <span style="font-size:.85em;">' + tail.replace(/</g,'&lt;') + '</span>' : '');
 }
 function cpBandWhyNot(row){
   const spec = String(row.spec || '').trim();
