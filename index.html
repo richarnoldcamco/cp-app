@@ -1572,7 +1572,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-679";
+const APP_REV = "Rev-680";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1705,6 +1705,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-680", type: "App", changes: ["A GREEN DOT NOW MEANS YOU APPROVED THE ROW, NOT THAT THE CELLS ARE FULL (Rev-680) \u2014 the dot filled itself from the DATA (_on = data OR hand-mark), so all fourteen rows arrived solid green on a plan where nothing had been reviewed. On a quality record that is the wrong claim to make on the QE\u2019s behalf: \u2018the cells contain text\u2019 and \u2018I have checked this row\u2019 are different statements and only the second is an approval. THREE STATES: grey ring = the data for this step is not there yet; GREEN RING = data complete, waiting for your approval; GREEN SOLID = you clicked it. Only your click fills it. This REVERSES Rev-652, which removed the mark distinguishing a hand-approved row from a data-filled one on the reasoning that it was the same statement either way \u2014 recorded plainly, because that reasoning is now overturned rather than quietly dropped. NOT CHANGED, AND IT MATTERS: cpStepProgress still counts a row as done on DATA or approval, so the percentage, the Step 5 fraction and the COMPLETED stamp still report COMPLETENESS, not approval. Left deliberately \u2014 switching it would drop finished-looking operations back down the list and pull their stamps off, which is a decision to take on purpose, not a side effect of a dot changing colour."] },
   { ts: "2026-07-28", rev: "App Rev-679", type: "App", changes: ["STEP BUTTONS REBUILT \u2014 THE STAMP WAS PRINTING OVER THE LABEL (Rev-679) \u2014 Rev-677 laid COMPLETED across the middle of each finished button, directly over the wording it was meant to be commenting on, so both became unreadable: STEP 1 \u2713 DONE and COMPLETED fighting for the same 130 pixels. Rebuilt rather than nudged. STEP n now sits ABOVE the button as a small grey caption, which leaves the button holding just two things: the job name, and its state on a line underneath in thin black \u2014 \u2713 COMPLETED, IN PROGRESS 13/14, DO THIS NEXT, LOCKED. Nothing overlaps anything. THE DONE FILL WAS LIGHTENED from solid #2c6e49 to a pale green with a heavier green border, because thin black text cannot be read on a dark green block \u2014 the state colour is now carried by the border and the tick rather than a slab of colour, which also stops five finished steps in a row reading as a solid green bar. Amber for the step to do now and grey dashed for locked are unchanged. The same treatment was applied to the step bar inside Build Control Plan, where the identical overlay had the identical problem."] },
   { ts: "2026-07-28", rev: "App Rev-678", type: "App", changes: ["THE GREEN DOTS ARE BACK ON STEP 3 (Rev-678) \u2014 the per-row done dot was missing from 3 \u00b7 Measurement Methods, so there was no way to mark a row as correctly assigned on the one step where the judgement is hardest. It was not a missing feature: the dot column simply was not in that step\u2019s visible-column list \u2014 present on Steps 1 and 2, dropped from Step 3. The dot already understood the step, and had done since Rev-642: on Step 3 it reads \u2018Measurement method and reaction plan set\u2019 and fills itself from the data, and clicking it marks the row settled by hand. That hand-mark is what cpStepProgress counts, which means it also drives the Step 5 fraction on the Control Plans list, the percentage, and the COMPLETED stamp \u2014 so the dots were the missing half of a loop that was otherwise complete. Put back at its existing position after Bubble #, not beside the Methods band, so the dot sits in the same place on every step rather than moving as you change step."] },
   { ts: "2026-07-28", rev: "App Rev-677", type: "App", changes: ["STAMP MOVED TO THE RIGHT BUTTONS, AND A STEP NOW SHOWS HOW FAR IN IT IS (Rev-677) \u2014 TWO CORRECTIONS. (1) Rev-676 put the COMPLETED stamp on the step bar inside Build Control Plan; the buttons meant were the five CONSTRUCTION STEPS on the Control Plans list \u2014 different buttons, different screen. The stamp now sits on those, in the light variant so it reads over the dark green DONE fill. (2) THE 98% WAS NOT WRONG \u2014 THE LABEL WAS. Stage weights are 5/5/30/30/30, so 5+5+30+30+(30\u00d713/14) = 97.86, rounded to 98: one row of fourteen outstanding is worth about 2% of the plan, and the figure was right. What made it look wrong was Step 5 reading DO THIS NEXT beside it \u2014 that label was identical whether none of the fourteen rows were done or thirteen were, so a nearly-finished step was indistinguishable from an untouched one. A started step now reads IN PROGRESS 13/14. The percentage arithmetic is untouched; only the wording changed. Kept DO THIS NEXT for a step with nothing done yet, since that is the one case where it is accurate."] },
@@ -2257,7 +2258,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:56 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "09:04 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6204,21 +6205,28 @@ function renderCPBuilder(){
     // Rev-652: ONE mark, two states — a grey ring or a green dot. The ✓ that distinguished
     // a hand-marked row from a data-filled one is gone at your request: it is the same
     // statement either way, and two green symbols meaning 'done' read as two states.
+    // Rev-680: SOLID GREEN NOW MEANS YOU APPROVED IT, NOTHING ELSE. It used to fill from
+    // the DATA, so every row arrived green without anyone having reviewed it.
+    //   grey ring   = the data for this step is not there yet
+    //   green ring  = data complete, WAITING FOR YOUR APPROVAL
+    //   green solid = you clicked it
     const _manual = !!(row.stepDone && row.stepDone[_step]);
-    const _on = _ok || _manual;
+    const _on = _manual;
+    const _ready = _ok && !_manual;
     const _size = focused ? '15px' : '12px';
     if(row.ghost){
       tdPin.innerHTML = '<span style="font-size:' + (focused?'14px':'11px') + '; line-height:1;" title="Ghost — balloon not on the drawing">👻</span>';
     } else {
       const _pop = (window._cpPopRow === idx && window._cpPopStep === _step) ? ' cp-pop' : '';
-      tdPin.innerHTML = '<span class="cp-dot' + _pop + '" style="color:' + (_on ? '#1e8449' : '#c9c9c9')
+      tdPin.innerHTML = '<span class="cp-dot' + _pop + '" style="color:' + ((_on || _ready) ? '#1e8449' : '#c9c9c9')
         + '; font-size:' + _size + '; line-height:1;">' + (_on ? '●' : '○') + '</span>';
       if(_pop){ window._cpPopRow = null; window._cpPopStep = null; }
     }
     if(!row.ghost){
       tdPin.style.cursor = 'pointer';
-      tdPin.title = (_on ? 'Done for this step \u2014 click to clear.\n(' + _why + ')'
-                         : _why + '  \u00b7  click to mark this row done')
+      tdPin.title = (_on ? 'APPROVED by you for this step \u2014 click to un-approve.\n(' + _why + ')'
+                         : (_ready ? 'Ready \u2014 ' + _why + '.\nNOT APPROVED YET \u00b7 click to approve this row.'
+                                   : _why + '.\nNot ready to approve yet.'))
                   + (_step !== '1' && !_pinned ? '\n(this balloon is not pinned on the drawing)' : '');
       tdPin.onclick = (e) => {
         e.stopPropagation();
