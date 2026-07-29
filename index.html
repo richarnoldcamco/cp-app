@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-693";
+const APP_REV = "Rev-694";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-694", type: "App", changes: ["THE TWO REASONS NOW GET A WINDOW THAT EXPLAINS THEM (Rev-694) \u2014 the inline strip asked a QE to declare that a characteristic is NOT measured by the person running the machine, using two short button labels and a hint that vanished on the first keystroke. The reasoning sat in tooltips nobody has to open. It is now a proper dialog: what the declaration means and why it exists (Convention #2 \u2014 the Control Plan states what the shop ACTUALLY does), then each reason on its own card with the thinking spelled out, then the controls. Reason 1 says plainly ENTER THE BALLOON THAT IS MEASURED, NOT THIS ONE, and lists the other ballooned features on the operation so the number can be picked rather than recalled \u2014 and it now refuses the row\u2019s OWN balloon by name, which the inline version allowed. Reason 2 carries the warning that mattered and was missing: check Meas Method (CMM) and FREQ (QE) are filled first, or the line ends up saying nobody checks the feature at all. The header states what the declaration does NOT do \u2014 it does not remove the line, lower its Classification under CP-6, or excuse it from a Reaction Plan under CP-7."] },
   { ts: "2026-07-29", rev: "App Rev-693", type: "App", changes: ["THE BALLOON BOX NOW SAYS WHICH NUMBER GOES IN IT (Rev-693) \u2014 a pulsing arrow and one line beside the input: \u2018Enter the balloon that IS measured \u2014 the feature cut by the same tool. If that one is to print, this one is too.\u2019 WHICH WAY ROUND THAT NUMBER GOES IS THE ONE THING EASY TO GET BACKWARDS HERE, and getting it backwards is silent: the plan would name the uncontrolled feature as the control, read perfectly well, and be wrong in a way no validation catches \u2014 the balloon exists, so the check passes. The line is worded as the reasoning, not as an instruction, so it teaches the rule rather than just directing a keystroke. It disappears as soon as anything is typed, so it never sits in the way of a QE who already knows. The pulse is opacity and a 3px drift, and it stops entirely under prefers-reduced-motion."] },
   { ts: "2026-07-29", rev: "App Rev-692", type: "App", changes: ["REASON (A) MUST NAME THE CONTROLLING BALLOON (Rev-692) \u2014 Rev-691 let a row say \u2018controlled by another feature on the same tool\u2019 without saying WHICH, which is not a control anyone can check: not an auditor, not the next QE, not you in six months. CP-8 requires every line to trace, and a control pointing at an unnamed sibling breaks the chain. The option is now \u2018Controlled by balloon [ ] on the same tool\u2019 with the number REQUIRED, and it is validated against the plan \u2014 a balloon not present on this operation is refused with the number named, and a row cannot cite itself. The line then reads NOT CHECKED BY MACHINIST \u2014 CONTROLLED BY BALLOON 6 ON THE SAME TOOL, on screen and in the .xlsx, which is checkable in seconds against the ODS. Undo clears the reference with the reason so a stale balloon number cannot survive a change of mind. Reason (b), CMM / QUALITY ENGINEER ONLY, needs no reference: the CMM column and FREQ (QE) on the same line already name who performs it."] },
   { ts: "2026-07-29", rev: "App Rev-691", type: "App", changes: ["A FEATURE THE MACHINIST DOES NOT MEASURE CAN NOW SAY SO (Rev-691) \u2014 the open row gains \u270b MACHINIST DOES NOT CHECK THIS, which asks WHICH of the two reasons applies: (1) controlled by another feature on the SAME TOOL, or (2) checked by CMM / Quality Engineer only. The Meas Method cell then reads NOT CHECKED BY MACHINIST \u2014 <reason> on an amber fill, with the master\u2019s own method kept in the hover text and a \u21ba to undo. Shown on closed rows too, from the same helper. IT CARRIES INTO THE .XLSX, deliberately: leaving the master method in the delivered document would state that the machinist performs a check the shop does not perform, which is Convention #2 exactly \u2014 the Control Method describes what the shop actually does, at the capability it actually has. # Recorded is cleared with it, since counting recorded measurements for a check nobody makes is the same false claim in a second column. STEP 3 now treats such a row as having answered the machinist question, so it can be approved \u2014 but it still demands a REACTION PLAN, because CP-7 makes a blank one a non-conformance whoever does the measuring. NOTE FOR THE INSTRUCTIONS: Rev-92 CP-2C describes the methods band as governed by the master row and does not yet describe this declared exception. The app now writes a state the controlling document does not define. Rev-92 is ITAR-controlled and is not edited without being asked, so this is flagged, not fixed."] },
@@ -2283,7 +2284,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "03:47 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "03:56 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6521,67 +6522,8 @@ tr.appendChild(tdCT);
              'Go to Step 2 with this row open and pick a different control type. The whole methods band re-fills from the new master row.',
              () => { try{ cpBuildState.focusIdx = idx; cpSetStep('2'); }catch(e){} });
           mk('\u270b Machinist does NOT check this',
-             'Mark this feature as one the machinist does not measure, and say why. CP-7 still requires a reaction plan.',
-             () => {
-               const pick = document.createElement('div');
-               pick.style.cssText = 'margin-top:6px; display:flex; flex-direction:column; gap:4px; width:100%;';
-               const opt = (label, key) => {
-                 const b = document.createElement('button');
-                 b.type = 'button'; b.textContent = label;
-                 b.style.cssText = 'text-align:left; font-size:10px; font-weight:700; padding:4px 8px;'
-                   + ' border:1px solid #c9c0b4; border-radius:6px; background:#fff; cursor:pointer; font-family:inherit;';
-                 b.onclick = (e) => { e.preventDefault(); e.stopPropagation(); row.noMachCheck = key;
-                   try{ logAct('row-edit', 'no machinist check \u00b7 ' + key); }catch(_){ }
-                   renderCPBuilder(); try{ cpAutoSaveProject(); }catch(_){ } };
-                 pick.appendChild(b);
-               };
-               // reason (a): ask for the controlling balloon and check it exists here
-               (function(){
-                 const wrapA = document.createElement('div');
-                 wrapA.style.cssText = 'display:flex; gap:4px; align-items:center; flex-wrap:wrap;';
-                 const lab = document.createElement('span');
-                 lab.style.cssText = 'font-size:10px; font-weight:700; color:#3a352e;';
-                 lab.textContent = '1 \u00b7 Controlled by balloon';
-                 const inp = document.createElement('input');
-                 inp.type = 'text'; inp.placeholder = 'no.';
-                 inp.style.cssText = 'width:52px; font-size:10px; padding:3px 6px; border:1px solid #c9c0b4;'
-                   + ' border-radius:6px; font-family:inherit; text-align:center;';
-                 const go = document.createElement('button');
-                 go.type = 'button'; go.textContent = 'on the same tool \u2713';
-                 go.style.cssText = 'font-size:10px; font-weight:700; padding:3px 8px; border:1px solid #c9c0b4;'
-                   + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit;';
-                 const warn = document.createElement('div');
-                 warn.style.cssText = 'font-size:10px; color:#a5342a; font-weight:700; width:100%;';
-                 go.onclick = (e) => {
-                   e.preventDefault(); e.stopPropagation();
-                   const v = String(inp.value || '').trim().toUpperCase();
-                   if(!v){ warn.textContent = 'Give the balloon number that controls this feature.'; return; }
-                   const rows = (cpBuildState && cpBuildState.rows) || [];
-                   const hit = rows.some((rr, ri) => ri !== idx && String(rr.bubble || '').trim().toUpperCase() === v);
-                   if(!hit){ warn.textContent = 'Balloon ' + v + ' is not on this plan \u2014 check the number.'; return; }
-                   row.noMachCheck = 'SAME_TOOL'; row.noMachRef = v;
-                   try{ logAct('row-edit', 'no machinist check \u00b7 SAME_TOOL'); }catch(_){ }
-                   renderCPBuilder(); try{ cpAutoSaveProject(); }catch(_){ }
-                 };
-                 // Rev-693: say which balloon goes in the box, with an arrow at it
-                 const hint = document.createElement('span');
-                 hint.className = 'cp-hint';
-                 const arw = document.createElement('span');
-                 arw.className = 'cp-hint-arrow'; arw.textContent = '\u2190';
-                 const htx = document.createElement('span');
-                 htx.textContent = 'Enter the balloon that IS measured \u2014 the feature cut by the '
-                   + 'same tool. If that one is to print, this one is too.';
-                 hint.appendChild(arw); hint.appendChild(htx);
-                 inp.addEventListener('input', () => {
-                   hint.style.display = String(inp.value || '').trim() ? 'none' : '';
-                 });
-                 wrapA.appendChild(lab); wrapA.appendChild(inp); wrapA.appendChild(go);
-                 wrapA.appendChild(hint);
-                 pick.appendChild(wrapA); pick.appendChild(warn);
-               })();
-               opt('2 \u00b7 Checked by CMM / Quality Engineer only', 'CMM_QE');
-               bar.appendChild(pick);
-             });
+             'Explain why this feature is not measured by the machinist.',
+             () => cpNoMachModal(idx));
           if(ct) mk('\u270e Edit master row',
              'Open the Master List at this control type. Editing it there changes every Control Plan line that uses it \u2014 which is the point, and the risk.',
              () => {
@@ -6690,6 +6632,116 @@ function cpNoMachText(row){
   const k = row && row.noMachCheck;
   if(!k || !CP_NOMACH[k]) return '';
   return CP_NOMACH[k].replace('{n}', String(row.noMachRef || '?'));
+}
+// Rev-694: the two reasons deserve a window, not a cramped strip of buttons. A QE is
+// being asked to state that a characteristic is NOT measured by the person running the
+// machine; that needs the reasoning in front of them, not a tooltip they may not open.
+function cpNoMachModal(idx){
+  const row = (cpBuildState && cpBuildState.rows) ? cpBuildState.rows[idx] : null;
+  if(!row) return;
+  const old = document.getElementById('cpNoMachModal'); if(old) old.remove();
+  const rows = (cpBuildState && cpBuildState.rows) || [];
+  const others = rows.filter((rr, ri) => ri !== idx && String(rr.bubble || '').trim())
+                     .map(rr => String(rr.bubble).trim() + ' \u2014 ' + (rr.desc || rr.featureDesc || ''));
+
+  const ov = document.createElement('div');
+  ov.id = 'cpNoMachModal';
+  ov.style.cssText = 'position:fixed; inset:0; z-index:10080; background:rgba(0,0,0,0.62);'
+    + ' display:flex; align-items:center; justify-content:center; padding:18px;';
+  const card = document.createElement('div');
+  card.style.cssText = 'background:#fff; border-radius:10px; width:100%; max-width:720px;'
+    + ' max-height:92vh; overflow:auto; box-shadow:0 12px 46px rgba(0,0,0,.45); font-family:inherit;';
+  const H = (t) => '<div style="background:#8a4b12; color:#fff; font-weight:800; letter-spacing:.04em;'
+    + ' padding:10px 16px; font-size:13px;">' + t + '</div>';
+  const bubble = String(row.bubble || '');
+  card.innerHTML = H('MACHINIST DOES NOT CHECK \u2014 BALLOON ' + bubble)
+    + '<div style="padding:14px 16px 4px; font-size:12px; line-height:1.55; color:#3a352e;">'
+    + '<b>' + (row.desc || row.featureDesc || 'This feature') + '</b> \u2014 '
+    + (row.spec || '') + '<br><br>'
+    + 'A Control Plan states what the shop <b>actually does</b> (Convention #2). If the machinist '
+    + 'does not measure this feature, leaving the master\u2019s method in place claims a check that '
+    + 'nobody performs. Recording the reason keeps the document honest and tells the next person '
+    + 'why the cell is not blank by mistake.<br><br>'
+    + '<span style="color:#8a4b12; font-weight:700;">This does not remove the line, lower its '
+    + 'Classification, or excuse it from a Reaction Plan (CP-7).</span>'
+    + '</div>';
+
+  // --- option 1 ---
+  const o1 = document.createElement('div');
+  o1.style.cssText = 'margin:12px 16px; border:1.5px solid #c9c0b4; border-radius:8px; padding:12px;';
+  o1.innerHTML = '<div style="font-weight:800; font-size:12px; margin-bottom:5px;">1 \u00b7 CONTROLLED BY ANOTHER FEATURE ON THE SAME TOOL</div>'
+    + '<div style="font-size:11.5px; line-height:1.5; color:#3a352e;">'
+    + 'One tool cuts this feature and another in the same setup, so the two move together. '
+    + 'Measuring the other one proves this one \u2014 if that feature is to print, so is this.<br>'
+    + '<b>Enter the balloon that IS measured</b>, not this one. That number is what an auditor '
+    + 'follows to find the control, so it must name a balloon on this operation.'
+    + '</div>';
+  const r1 = document.createElement('div');
+  r1.style.cssText = 'margin-top:9px; display:flex; gap:6px; align-items:center; flex-wrap:wrap;';
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.value = (row.noMachCheck === 'SAME_TOOL' ? (row.noMachRef || '') : '');
+  inp.placeholder = 'balloon no.';
+  inp.style.cssText = 'width:96px; font-size:12px; padding:5px 8px; border:1px solid #c9c0b4;'
+    + ' border-radius:6px; font-family:inherit; text-align:center;';
+  const b1 = document.createElement('button');
+  b1.type = 'button'; b1.textContent = 'Use this reason';
+  b1.style.cssText = 'font-size:11px; font-weight:700; padding:6px 14px; border:1px solid #24593b;'
+    + ' border-radius:6px; background:#2c6e49; color:#fff; cursor:pointer; font-family:inherit;';
+  const w1 = document.createElement('div');
+  w1.style.cssText = 'font-size:11px; font-weight:700; color:#a5342a; width:100%;';
+  const avail = document.createElement('div');
+  avail.style.cssText = 'font-size:10.5px; color:#6b6257; width:100%; margin-top:4px;';
+  avail.textContent = others.length ? ('On this operation: ' + others.slice(0, 8).join('   \u00b7   ')
+                       + (others.length > 8 ? '   \u00b7   \u2026' : '')) : '';
+  b1.onclick = () => {
+    const v = String(inp.value || '').trim().toUpperCase();
+    if(!v){ w1.textContent = 'Give the balloon number that controls this feature.'; return; }
+    if(v === String(row.bubble || '').trim().toUpperCase()){
+      w1.textContent = 'That is this row\u2019s own balloon \u2014 name the OTHER feature.'; return; }
+    if(!rows.some((rr, ri) => ri !== idx && String(rr.bubble || '').trim().toUpperCase() === v)){
+      w1.textContent = 'Balloon ' + v + ' is not on this operation \u2014 check the number.'; return; }
+    row.noMachCheck = 'SAME_TOOL'; row.noMachRef = v;
+    try{ logAct('row-edit', 'no machinist check \u00b7 SAME_TOOL'); }catch(_){ }
+    ov.remove(); renderCPBuilder(); try{ cpAutoSaveProject(); }catch(_){ }
+  };
+  r1.appendChild(inp); r1.appendChild(b1); r1.appendChild(w1); r1.appendChild(avail);
+  o1.appendChild(r1);
+
+  // --- option 2 ---
+  const o2 = document.createElement('div');
+  o2.style.cssText = 'margin:0 16px 12px; border:1.5px solid #c9c0b4; border-radius:8px; padding:12px;';
+  o2.innerHTML = '<div style="font-weight:800; font-size:12px; margin-bottom:5px;">2 \u00b7 CHECKED BY CMM / QUALITY ENGINEER ONLY</div>'
+    + '<div style="font-size:11.5px; line-height:1.5; color:#3a352e;">'
+    + 'Nothing at the machine measures this \u2014 it is verified away from the spindle, by CMM or by '
+    + 'the Quality Engineer. No balloon reference is needed: the Meas Method (CMM) and FREQ (QE) '
+    + 'cells on this same line already name who performs it.<br>'
+    + '<b>Check those two cells are filled before choosing this</b>, or the line will say nobody checks it at all.'
+    + '</div>';
+  const b2 = document.createElement('button');
+  b2.type = 'button'; b2.textContent = 'Use this reason';
+  b2.style.cssText = 'margin-top:9px; font-size:11px; font-weight:700; padding:6px 14px;'
+    + ' border:1px solid #24593b; border-radius:6px; background:#2c6e49; color:#fff; cursor:pointer; font-family:inherit;';
+  b2.onclick = () => {
+    row.noMachCheck = 'CMM_QE'; delete row.noMachRef;
+    try{ logAct('row-edit', 'no machinist check \u00b7 CMM_QE'); }catch(_){ }
+    ov.remove(); renderCPBuilder(); try{ cpAutoSaveProject(); }catch(_){ }
+  };
+  o2.appendChild(b2);
+
+  const foot = document.createElement('div');
+  foot.style.cssText = 'display:flex; justify-content:flex-end; gap:8px; padding:10px 16px 14px; border-top:1px solid #e4ded4;';
+  const cancel = document.createElement('button');
+  cancel.type = 'button'; cancel.textContent = 'Cancel';
+  cancel.style.cssText = 'font-size:12px; font-weight:700; padding:7px 16px; border:1px solid #c9c0b4;'
+    + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit;';
+  cancel.onclick = () => ov.remove();
+  foot.appendChild(cancel);
+
+  card.appendChild(o1); card.appendChild(o2); card.appendChild(foot);
+  ov.appendChild(card);
+  ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
+  document.body.appendChild(ov);
+  setTimeout(() => { try{ inp.focus(); }catch(_){ } }, 60);
 }
 function cpTaperMark(td, val){
   try{
