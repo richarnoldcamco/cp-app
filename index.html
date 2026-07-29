@@ -754,7 +754,7 @@
           <tr style="background:#bdd7ee;">
             <th style="padding:5px; border:1px solid #5a8bb5; width:162px;">Meas Method (Machinist)</th>
             <th style="padding:5px; border:1px solid #5a8bb5; width:80px;"># Recorded</th>
-            <th style="padding:5px; border:1px solid #5a8bb5; width:115px;">FREQ (Every)</th>
+            <th style="padding:5px; border:1px solid #5a8bb5; width:115px;">MACHINIST CHECK FREQ</th>
             <th style="padding:5px; border:1px solid #5a8bb5; width:90px;">FREQ (QE)</th>
             <th style="padding:5px; border:1px solid #5a8bb5; width:116px;">Meas Method (CMM)</th>
           </tr>
@@ -941,7 +941,7 @@
           <th class="mlBandCol" style="padding: 4px 2px; border: 1px solid #5a8bb5; text-align:center; background:#bdd7ee; white-space:normal; font-size:10px;">Over .003</th>
           <th style="padding: 6px; border: 1px solid #5a8bb5; text-align:left; background:#bdd7ee; white-space:normal;">Measurement Method</th>
           <th style="padding: 6px; border: 1px solid #5a8bb5; text-align:center; background:#bdd7ee; white-space:normal;"># recorded measurements</th>
-          <th style="padding: 6px; border: 1px solid #5a8bb5; text-align:center; background:#bdd7ee; white-space:normal;">FREQ (EVERY)</th>
+          <th style="padding: 6px; border: 1px solid #5a8bb5; text-align:center; background:#bdd7ee; white-space:normal;">MACHINIST CHECK FREQ</th>
         </tr>
         <tr id="masterFilterRow"></tr>
       </thead>
@@ -1572,7 +1572,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-685";
+const APP_REV = "Rev-686";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1705,6 +1705,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-686", type: "App", changes: ["\u2018FREQ (EVERY)\u2019 IS NOW \u2018MACHINIST CHECK FREQ\u2019 ON SCREEN (Rev-686) \u2014 FREQ (Every) never finished its own sentence: every WHAT. Beside FREQ (QE), which names its owner, the column that says how often the MACHINIST checks the feature was the one that did not say who it belonged to. Renamed in all six places it is shown: the builder grid, the Master List grid, the label map, the Master List column set, the master edit form and the row edit form. TWO PLACES DELIBERATELY LEFT AS \u2018FREQ (EVERY)\u2019, AND THIS IS NOT AN OVERSIGHT. (1) The .xlsx export header \u2014 Instructions Rev-92 CP-2 names that column in the delivered header band, and the Instructions are the controlling ITAR document, not edited without being asked. Renaming the deliverable to disagree with its own spec is how an audit finding is written. (2) The import header map, which reads \u2018FREQ (EVERY)\u2019 out of existing workbooks \u2014 rename it and every Control Plan and Master List already on disk silently loses that column on import, with no error. The screen wording and the document wording are allowed to differ; the document and the spec are not."] },
   { ts: "2026-07-29", rev: "App Rev-685", type: "App", changes: ["ONE-TAP GAGE TYPES IN THE SPECIAL GAGE WINDOW (Rev-685) \u2014 seven chips under the description box: PLUG GAGE, RING GAGE, THREAD PLUG GAGE, THREAD RING GAGE, SNAP GAGE, GO/NO-GO PINS, HOLDING FIXTURE. The list is the lathe work that actually recurs rather than a catalogue; a long list would take as long to read as the words take to type. THEY INSERT, THEY DO NOT REPLACE. A tap drops the text at the CARET and hands focus straight back to the box with the caret after it, so PLUG GAGE can be followed immediately by the size and tolerance \u2014 which is the part the toolmaker actually needs and the part only you can supply. Where text is already present and does not end in a space, dash or comma, an em-dash separator is added; where it is not needed it is not added, so tapping twice does not produce stray punctuation. Nothing is overwritten and Cancel still abandons the lot."] },
   { ts: "2026-07-29", rev: "App Rev-684", type: "App", changes: ["CONTROL TYPE ID HIDDEN ON STEP 3 (Rev-684) \u2014 dropped from the visible columns on 3 \u00b7 Measurement Methods; it remains on Step 2, where it is chosen, and on All columns. This finishes what Rev-673 started and got half right: that rev argued for keeping the column because the methods band is auto-filled BY the control type and reviewing methods without seeing their source removes the context. The argument was sound and still is \u2014 but the source is visible one click away on Step 2 and on All columns, and a column carried on every row for context you can fetch when you want it is a column spending width for nothing. Asked for twice; kept once too often. THE INERT CODE FROM REV-673/674 IS LEFT IN PLACE ON PURPOSE: the compact read-only cell and the 130px header on Step 3 no longer run, because a hidden column renders nothing. They are two lines, they are commented, and they are what makes the column reappear cleanly if this is ever reversed \u2014 deleting them would only mean rediscovering the fixed-layout header rule a third time."] },
   { ts: "2026-07-29", rev: "App Rev-683", type: "App", changes: ["NOTHING IS LOCKED ANY MORE (Rev-683) \u2014 OP-030 showed Step 4 COMPLETED and Step 5 LOCKED at the same time. Both were correct under the old rules and together they were nonsense: DONE follows APPROVAL (Rev-681) and all fourteen rows had been approved, while UNLOCK followed the DATA and three rows \u2014 bubbles 4, 12 and 10 \u2014 still carried no control type. So the app reported a step finished and then refused entry to the next one, and gave no way to find out why. A lock cannot be argued with; the only move left was to guess. Every step is now ALWAYS openable. The old test survives as `ready`, but it WARNS instead of refusing: a step whose groundwork is incomplete reads NEEDS EARLIER STEP and is styled as work to do rather than greyed out, and it opens on click like any other. THE UNDERLYING LESSON IS WORTH MORE THAN THE FIX: approving a row that was never filled in is what produced the contradiction. Approval is a claim about a row, so the app should not have made it possible to approve an empty one \u2014 that is the next thing to correct, not the gate that caught it."] },
@@ -2263,7 +2264,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "01:29 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "01:36 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -9322,7 +9323,7 @@ const MASTER_FIELD_LABELS = {
   h: 'H#', group: 'Group', controlTypeId: 'Control Type ID', featureType: 'Feature Type',
   secondLevel: '2nd Level', featureDesc: 'Feature Description', workcenter: 'Workcenter',
   classification: 'Classification', measMethod: 'Measurement Method', numRecorded: '# Recorded',
-  freqEvery: 'FREQ (EVERY)', freqQE: 'FREQ (QE)', measMethodCMM: 'Meas Method (CMM)',
+  freqEvery: 'MACHINIST CHECK FREQ', freqQE: 'FREQ (QE)', measMethodCMM: 'Meas Method (CMM)',
   futureImprovement: 'Future Improvement'
 };
 
@@ -9518,7 +9519,7 @@ const MASTER_COLS = [
   {key:'below0006', label:'Below .0006', w:41},
   {key:'measMethod', label:'Meas Method (Machinist)', w:198},
   {key:'numRecorded', label:'# Recorded', w:90},
-  {key:'freqEvery', label:'FREQ (Every)', w:68},
+  {key:'freqEvery', label:'MACHINIST CHECK FREQ', w:68},
   {key:'freqQE', label:'FREQ (QE)', w:100},
   {key:'measMethodCMM', label:'Meas Method (CMM)', w:200},
   {key:'futureImprovement', label:'Future Improvement', w:160}
@@ -10610,7 +10611,7 @@ function convertAllMasterDataToCaps(){
 }
 
 function openLevelManager(colKey){
-  const FLAT = [['measMethod','Meas Method (Machinist)'],['numRecorded','# Recorded'],['freqEvery','FREQ (Every)'],
+  const FLAT = [['measMethod','Meas Method (Machinist)'],['numRecorded','# Recorded'],['freqEvery','MACHINIST CHECK FREQ'],
     ['freqQE','FREQ (QE)'],['measMethodCMM','Meas Method (CMM)'],['classification','Class']];
   let ov = document.getElementById('levelMgrOverlay');
   if(ov) ov.remove();
@@ -11186,7 +11187,7 @@ function editMasterRow(rowIdx){
       <div><label style="font-size: 12px; color: var(--text-2); display: block; margin-bottom: 4px;">Classification</label><input type="text" value="${row.classification}" style="width: 100%; padding: 6px; border: 1px solid var(--line); border-radius: 4px; font-size: 12px;"></div>
       <div><label style="font-size: 12px; color: var(--text-2); display: block; margin-bottom: 4px;">Measurement Method</label><input type="text" value="${row.measMethod}" style="width: 100%; padding: 6px; border: 1px solid var(--line); border-radius: 4px; font-size: 12px;"></div>
       <div><label style="font-size: 12px; color: var(--text-2); display: block; margin-bottom: 4px;"># Recorded</label><input type="text" value="${row.numRecorded}" style="width: 100%; padding: 6px; border: 1px solid var(--line); border-radius: 4px; font-size: 12px;"></div>
-      <div><label style="font-size: 12px; color: var(--text-2); display: block; margin-bottom: 4px;">FREQ (EVERY)</label><input type="text" value="${row.freqEvery}" style="width: 100%; padding: 6px; border: 1px solid var(--line); border-radius: 4px; font-size: 12px;"></div>
+      <div><label style="font-size: 12px; color: var(--text-2); display: block; margin-bottom: 4px;">MACHINIST CHECK FREQ</label><input type="text" value="${row.freqEvery}" style="width: 100%; padding: 6px; border: 1px solid var(--line); border-radius: 4px; font-size: 12px;"></div>
       <div><label style="font-size: 12px; color: var(--text-2); display: block; margin-bottom: 4px;">FREQ (QE)</label><input type="text" value="${row.freqQE}" style="width: 100%; padding: 6px; border: 1px solid var(--line); border-radius: 4px; font-size: 12px;"></div>
       <div><label style="font-size: 12px; color: var(--text-2); display: block; margin-bottom: 4px;">Meas Method (CMM)</label><input type="text" value="${row.measMethodCMM}" style="width: 100%; padding: 6px; border: 1px solid var(--line); border-radius: 4px; font-size: 12px;"></div>
       <div><label style="font-size: 12px; color: var(--text-2); display: block; margin-bottom: 4px;">Future Improvement</label><input type="text" value="${row.futureImprovement}" style="width: 100%; padding: 6px; border: 1px solid var(--line); border-radius: 4px; font-size: 12px;"></div>
