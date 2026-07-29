@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-699";
+const APP_REV = "Rev-700";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-700", type: "App", changes: ["RICHARD ARNOLD IS THE STANDING ATTRIBUTION UNTIL THERE IS A LOGIN (Rev-700) \u2014 new stamps read RICHARD ARNOLD rather than a GitHub handle, on the operator\u2019s statement that every change on this installation is his. A value in cpUserInitials still overrides it, so nothing here has to be undone when a real login arrives. THE WHO AND THE WHEN ARE TREATED DIFFERENTLY ON OLDER OVERRIDES, AND THAT IS THE POINT: the name can be asserted, because he can vouch for it; the DATE cannot, because nobody knows it. So a pre-Rev-699 override now reads \u2018RICHARD ARNOLD over-rode this from 10 to 5 on a date that was NOT recorded\u2019, with a line beneath explaining that the name is a standing assumption and the date is genuinely unknown and is not guessed. Filling that date with the file\u2019s timestamp, or today, would have looked complete and been false \u2014 and a fabricated date on a quality record is exactly the thing an audit exists to catch. WHAT THIS STILL IS NOT: attribution, not authentication. The app is a single public page and cannot verify anyone. When a second person touches this installation before a login exists, every stamp will name Richard Arnold whoever typed it \u2014 the assumption holds only while the assumption holds."] },
   { ts: "2026-07-29", rev: "App Rev-699", type: "App", changes: ["OVERRIDES NOW RECORD WHO AND WHEN (Rev-699) \u2014 header changed from orange to CAMCO maroon, and THIS PLAN SAYS replaced by the sentence asked for: \u2018RARNOLD over-rode this from 10 to 5 on July 29, 2026\u2019. THE SENTENCE COULD NOT SIMPLY BE PRINTED: as of Rev-698 the app stored the master value and nothing else, so a line naming a person and a date would have been an audit entry the app INVENTED \u2014 on a document whose whole purpose is being true. So the stamp is now captured at the moment an override is typed (_freqOvrBy: who + ISO timestamp) and cleared with the override. FOR OVERRIDES THAT ALREADY EXIST there is nothing to recover, and the window says so in those words: \u2018who and when were NOT recorded (set before Rev-699)\u2019 \u2014 an admission is worth more than a plausible guess. WHAT THE NAME IS AND IS NOT: it comes from the device\u2019s own setting (cpUserInitials, falling back to the GitHub username), so it records who the DEVICE is set up as, not who was sitting at it. The app is a single public page; nothing in it can authenticate anyone. It is attribution, never a signature, and it is worded that way. Real authentication needs Supabase, which is a separate decision."] },
   { ts: "2026-07-29", rev: "App Rev-698", type: "App", changes: ["THE OVERRIDE CHIP NOW EXPLAINS ITSELF (Rev-698) \u2014 it announced OVERRIDE \u2014 MASTER: 10 and left the reader to work out what an override is, how the cell became one, and whether to act. A \u2018?\u2019 beside it opens a window showing the MASTER LIST value and THIS PLAN value side by side, then: what an override is (CP-2C makes the Control Type\u2019s master row authoritative over the methods band; an override is this plan deliberately disagreeing on one line), how it happened (someone typed a different value; the app kept the master value so it could be restored and turned the cell orange so the difference cannot pass unnoticed), and the two choices \u2014 KEEP if the difference is intended, RESTORE if it was a slip, and if the MASTER is the thing that is wrong, fix it on the Master List so every plan using that control type is corrected rather than this one line. IT ALSO STATES A LIMIT PLAINLY: the app does not record WHO changed the value or WHEN, so if it was not you, the plan cannot say who. That is a real gap on a document that gets audited, and it is better said out loud on the screen than discovered by someone trying to answer the question. Buttons on the window do the thing being described rather than only naming it."] },
   { ts: "2026-07-29", rev: "App Rev-697", type: "App", changes: ["THE ODS NOW SITS BESIDE THE BALLOON BOX (Rev-697) \u2014 the window asked for a balloon number while the drawing that carries the balloons was behind it. That is a recall test, and recalling the wrong number produces a control plan that names an uncontrolled feature as the control and still passes validation, because the balloon exists. The window is now 96vw \u00d7 94vh with the choices on the left and the FULL ODS on the right, fitted to the pane; clicking it opens the existing full-size zoom viewer. The feature name and tolerance run at 21px, up from 12 \u2014 that line is what tells you WHICH row you are declaring, and at 12px it was the smallest thing in a window about a decision that changes the delivered document. The list of the operation\u2019s other balloons stays under reason 1, so the number can be read off the drawing and confirmed against the description without leaving the window. If no drawing is loaded, the pane says so rather than sitting empty."] },
@@ -2289,7 +2290,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "06:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "06:23 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6849,14 +6850,16 @@ function cpNoMachModal(idx){
 // Rev-699: the best identity the app actually holds. NOT authentication — the app is a
 // public single-file page, so this records who the DEVICE is set up as, not who is sitting
 // at it. Labelled "recorded by" everywhere it is shown, never "signed by".
+// Rev-700: until there is a login, the operator has stated that every change on this
+// installation is his. So the default is his NAME rather than a GitHub handle. A value set
+// in cpUserInitials still wins, so this needs no undoing when a real login arrives.
+const CP_DEFAULT_USER = 'RICHARD ARNOLD';
 function cpWhoAmI(){
   try{
     const v = (localStorage.getItem('cpUserInitials') || '').trim();
     if(v) return v.toUpperCase();
-    const g = (localStorage.getItem('ghUser') || '').trim();
-    if(g) return g.toUpperCase();
   }catch(_){ }
-  return '';
+  return CP_DEFAULT_USER;
 }
 function cpOvrInfoModal(idx, key){
   const row = (cpBuildState && cpBuildState.rows) ? cpBuildState.rows[idx] : null;
@@ -6875,8 +6878,12 @@ function cpOvrInfoModal(idx, key){
            { year:'numeric', month:'long', day:'numeric' }); }catch(_){ }
     _stampLine = _st.who + ' over-rode this from ' + masterVal + ' to ' + nowVal + ' on ' + d;
   } else {
-    _stampLine = 'Over-ridden from ' + masterVal + ' to ' + nowVal
-      + '  \u2014  who and when were NOT recorded (set before Rev-699)';
+    _stampLine = CP_DEFAULT_USER + ' over-rode this from ' + masterVal + ' to ' + nowVal
+      + ' on a date that was NOT recorded'
+      + '<div style="font-weight:400; font-size:11px; color:#6b6257; margin-top:3px;">'
+      + 'Set before Rev-699, when the app began stamping overrides. The name is the standing '
+      + 'assumption that every change on this installation is yours; the date is genuinely '
+      + 'unknown and is not guessed.</div>';
   }
   const ov = document.createElement('div');
   ov.id = 'cpOvrInfoOv';
