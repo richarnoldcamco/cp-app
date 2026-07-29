@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-701";
+const APP_REV = "Rev-702";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-702", type: "App", changes: ["THE ? NOW TRAVELS WITH THE OVERRIDE ONTO CLOSED ROWS (Rev-702) \u2014 the orange fill marked overridden cells on every row, but the explanation behind the ? existed only on the OPEN row, so from the grid you could see that three cells disagreed with the Master List and had no way to ask why without opening each one. A mark that raises a question everywhere should answer it everywhere. FREQ (QE) GAINED THE SAME TREATMENT, which it never had on closed rows at all: it was drawn as a plain cell, so an override there showed NO orange and NO ?, and was invisible until the row was opened. Both FREQ columns now run through one helper, so they cannot drift apart the way the open row and the closed row have three times this era. The ? is 14px and sits inline beside the value, and the cell is set to overflow:visible so it is not clipped by the compact row\u2019s ellipsis rule."] },
   { ts: "2026-07-29", rev: "App Rev-701", type: "App", changes: ["APPROVALS NOW RECORD WHO AND WHEN (Rev-701) \u2014 the tick recorded THAT a row was approved and nothing else, so having just approved a row there was no way to see that you had, or when. Every approval now stamps the name and an ISO timestamp (stepDoneBy), and un-approving clears it, so a cleared-then-reapproved row carries the NEW date rather than the old one. SHOWN TWO WAYS: on the open row the name and date sit under the tick in green, visible without hovering \u2014 an approval hidden behind a tooltip is an approval nobody checks; on closed rows the hover reads APPROVED BY RICHARD ARNOLD ON JULY 29, 2026. Approvals made before this rev say \u2018who and when were not recorded (before Rev-701)\u2019 and are marked \u2018not stamped\u2019 on the open row \u2014 the same choice as Rev-700: an admission rather than a plausible date. THIS MATTERS MORE THAN THE OVERRIDE STAMP DOES. Since Rev-681 approvals drive the percentage, the step fractions and the COMPLETED stamps \u2014 they are the claim the document rests on. An unattributed approval is the weakest link in that chain, and it is now the same strength as the rest."] },
   { ts: "2026-07-29", rev: "App Rev-700", type: "App", changes: ["RICHARD ARNOLD IS THE STANDING ATTRIBUTION UNTIL THERE IS A LOGIN (Rev-700) \u2014 new stamps read RICHARD ARNOLD rather than a GitHub handle, on the operator\u2019s statement that every change on this installation is his. A value in cpUserInitials still overrides it, so nothing here has to be undone when a real login arrives. THE WHO AND THE WHEN ARE TREATED DIFFERENTLY ON OLDER OVERRIDES, AND THAT IS THE POINT: the name can be asserted, because he can vouch for it; the DATE cannot, because nobody knows it. So a pre-Rev-699 override now reads \u2018RICHARD ARNOLD over-rode this from 10 to 5 on a date that was NOT recorded\u2019, with a line beneath explaining that the name is a standing assumption and the date is genuinely unknown and is not guessed. Filling that date with the file\u2019s timestamp, or today, would have looked complete and been false \u2014 and a fabricated date on a quality record is exactly the thing an audit exists to catch. WHAT THIS STILL IS NOT: attribution, not authentication. The app is a single public page and cannot verify anyone. When a second person touches this installation before a login exists, every stamp will name Richard Arnold whoever typed it \u2014 the assumption holds only while the assumption holds."] },
   { ts: "2026-07-29", rev: "App Rev-699", type: "App", changes: ["OVERRIDES NOW RECORD WHO AND WHEN (Rev-699) \u2014 header changed from orange to CAMCO maroon, and THIS PLAN SAYS replaced by the sentence asked for: \u2018RARNOLD over-rode this from 10 to 5 on July 29, 2026\u2019. THE SENTENCE COULD NOT SIMPLY BE PRINTED: as of Rev-698 the app stored the master value and nothing else, so a line naming a person and a date would have been an audit entry the app INVENTED \u2014 on a document whose whole purpose is being true. So the stamp is now captured at the moment an override is typed (_freqOvrBy: who + ISO timestamp) and cleared with the override. FOR OVERRIDES THAT ALREADY EXIST there is nothing to recover, and the window says so in those words: \u2018who and when were NOT recorded (set before Rev-699)\u2019 \u2014 an admission is worth more than a plausible guess. WHAT THE NAME IS AND IS NOT: it comes from the device\u2019s own setting (cpUserInitials, falling back to the GitHub username), so it records who the DEVICE is set up as, not who was sitting at it. The app is a single public page; nothing in it can authenticate anyone. It is attribution, never a signature, and it is worded that way. Real authentication needs Supabase, which is a separate decision."] },
@@ -2291,7 +2292,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "06:31 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "06:40 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6633,10 +6634,28 @@ tr.appendChild(tdCT);
         if(_nm){ _c.style.background = '#fff4e6'; _c.style.fontWeight = '700'; _c.style.color = '#8a4b12'; }
         tr.appendChild(_c); })();
       (function(){ const _t = compactCell(row.numRecorded, 'center'); cpTaperMark(_t, row.numRecorded); tr.appendChild(_t); })();
-      (function(){ const td = compactCell(row.freqEvery, 'center');
-        if(row._freqOvr && row._freqOvr.freqEvery !== undefined){ td.style.background = '#ffe8cc'; td.style.fontWeight = '800'; td.title = 'OVERRIDE — master: ' + (row._freqOvr.freqEvery || '(blank)'); }
-        tr.appendChild(td); })();
-      tr.appendChild(compactCell(row.freqQE, 'center'));
+      // Rev-702: the ? travels with the override onto CLOSED rows. The orange fill was
+      // visible everywhere; the explanation was only reachable by opening the row.
+      const _ovrCompact = (key) => {
+        const td = compactCell(row[key], 'center');
+        if(row._freqOvr && row._freqOvr[key] !== undefined){
+          td.style.background = '#ffe8cc'; td.style.fontWeight = '800';
+          td.style.overflow = 'visible'; td.style.whiteSpace = 'nowrap';
+          td.title = 'OVERRIDE \u2014 master: ' + (row._freqOvr[key] || '(blank)');
+          const q = document.createElement('button');
+          q.type = 'button'; q.textContent = '?';
+          q.title = 'What does OVERRIDE mean, and how did this cell become one?';
+          q.style.cssText = 'margin-left:5px; width:14px; height:14px; padding:0; line-height:1;'
+            + ' border:1px solid #a35400; border-radius:50%; background:#fff; color:#a35400;'
+            + ' font-size:9px; font-weight:800; cursor:pointer; font-family:inherit;'
+            + ' vertical-align:middle;';
+          q.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpOvrInfoModal(idx, key); };
+          td.appendChild(q);
+        }
+        return td;
+      };
+      tr.appendChild(_ovrCompact('freqEvery'));
+      tr.appendChild(_ovrCompact('freqQE'));
       tr.appendChild(compactCell(row.measMethodCMM, 'left'));
       // Rev-571: special gage shows as a chip in the compact row (read-only at this size)
       tr.appendChild(cpGageCell(idx, row, true));   // Rev-675: button on closed rows too
