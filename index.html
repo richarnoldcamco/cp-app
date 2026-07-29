@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-694";
+const APP_REV = "Rev-695";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-695", type: "App", changes: ["THE REASONING MOVED BEHIND \u24d8 MORE INFO (Rev-695) \u2014 the window opened with a paragraph on Convention #2 and a warning about CP-6 and CP-7 before it showed the two choices. Correct content, wrong place: someone who has pressed \u2018Machinist does NOT check this\u2019 already knows why they are there and needs the decision, and a paragraph that appears every time is a paragraph that stops being read \u2014 which costs the warning its force on the one occasion it matters. The header is now the feature and its tolerance plus a MORE INFO button; the reasoning and the CP-6 / CP-7 caveat live in a second window a click away. NOTHING WAS DELETED, only moved: it stays reachable for a new QE, for anyone unsure which reason applies, and for whoever has to defend the line in an audit. The two option cards keep their own explanations inline, since those describe the choice being made rather than the policy behind it."] },
   { ts: "2026-07-29", rev: "App Rev-694", type: "App", changes: ["THE TWO REASONS NOW GET A WINDOW THAT EXPLAINS THEM (Rev-694) \u2014 the inline strip asked a QE to declare that a characteristic is NOT measured by the person running the machine, using two short button labels and a hint that vanished on the first keystroke. The reasoning sat in tooltips nobody has to open. It is now a proper dialog: what the declaration means and why it exists (Convention #2 \u2014 the Control Plan states what the shop ACTUALLY does), then each reason on its own card with the thinking spelled out, then the controls. Reason 1 says plainly ENTER THE BALLOON THAT IS MEASURED, NOT THIS ONE, and lists the other ballooned features on the operation so the number can be picked rather than recalled \u2014 and it now refuses the row\u2019s OWN balloon by name, which the inline version allowed. Reason 2 carries the warning that mattered and was missing: check Meas Method (CMM) and FREQ (QE) are filled first, or the line ends up saying nobody checks the feature at all. The header states what the declaration does NOT do \u2014 it does not remove the line, lower its Classification under CP-6, or excuse it from a Reaction Plan under CP-7."] },
   { ts: "2026-07-29", rev: "App Rev-693", type: "App", changes: ["THE BALLOON BOX NOW SAYS WHICH NUMBER GOES IN IT (Rev-693) \u2014 a pulsing arrow and one line beside the input: \u2018Enter the balloon that IS measured \u2014 the feature cut by the same tool. If that one is to print, this one is too.\u2019 WHICH WAY ROUND THAT NUMBER GOES IS THE ONE THING EASY TO GET BACKWARDS HERE, and getting it backwards is silent: the plan would name the uncontrolled feature as the control, read perfectly well, and be wrong in a way no validation catches \u2014 the balloon exists, so the check passes. The line is worded as the reasoning, not as an instruction, so it teaches the rule rather than just directing a keystroke. It disappears as soon as anything is typed, so it never sits in the way of a QE who already knows. The pulse is opacity and a 3px drift, and it stops entirely under prefers-reduced-motion."] },
   { ts: "2026-07-29", rev: "App Rev-692", type: "App", changes: ["REASON (A) MUST NAME THE CONTROLLING BALLOON (Rev-692) \u2014 Rev-691 let a row say \u2018controlled by another feature on the same tool\u2019 without saying WHICH, which is not a control anyone can check: not an auditor, not the next QE, not you in six months. CP-8 requires every line to trace, and a control pointing at an unnamed sibling breaks the chain. The option is now \u2018Controlled by balloon [ ] on the same tool\u2019 with the number REQUIRED, and it is validated against the plan \u2014 a balloon not present on this operation is refused with the number named, and a row cannot cite itself. The line then reads NOT CHECKED BY MACHINIST \u2014 CONTROLLED BY BALLOON 6 ON THE SAME TOOL, on screen and in the .xlsx, which is checkable in seconds against the ODS. Undo clears the reference with the reason so a stale balloon number cannot survive a change of mind. Reason (b), CMM / QUALITY ENGINEER ONLY, needs no reference: the CMM column and FREQ (QE) on the same line already name who performs it."] },
@@ -2284,7 +2285,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "03:56 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "05:12 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6654,16 +6655,16 @@ function cpNoMachModal(idx){
   const H = (t) => '<div style="background:#8a4b12; color:#fff; font-weight:800; letter-spacing:.04em;'
     + ' padding:10px 16px; font-size:13px;">' + t + '</div>';
   const bubble = String(row.bubble || '');
+  // Rev-695: the reasoning moved behind MORE INFO. Someone reaching this window usually
+  // knows why they are here and needs the two choices, not a paragraph in front of them.
   card.innerHTML = H('MACHINIST DOES NOT CHECK \u2014 BALLOON ' + bubble)
-    + '<div style="padding:14px 16px 4px; font-size:12px; line-height:1.55; color:#3a352e;">'
-    + '<b>' + (row.desc || row.featureDesc || 'This feature') + '</b> \u2014 '
-    + (row.spec || '') + '<br><br>'
-    + 'A Control Plan states what the shop <b>actually does</b> (Convention #2). If the machinist '
-    + 'does not measure this feature, leaving the master\u2019s method in place claims a check that '
-    + 'nobody performs. Recording the reason keeps the document honest and tells the next person '
-    + 'why the cell is not blank by mistake.<br><br>'
-    + '<span style="color:#8a4b12; font-weight:700;">This does not remove the line, lower its '
-    + 'Classification, or excuse it from a Reaction Plan (CP-7).</span>'
+    + '<div style="padding:13px 16px 2px; font-size:12px; line-height:1.5; color:#3a352e;'
+    + ' display:flex; align-items:center; gap:10px; flex-wrap:wrap;">'
+    + '<span><b>' + (row.desc || row.featureDesc || 'This feature') + '</b> \u2014 '
+    + (row.spec || '') + '</span>'
+    + '<button type="button" id="cpNoMachInfo" style="font-size:10.5px; font-weight:700;'
+    + ' padding:4px 10px; border:1px solid #c9c0b4; border-radius:999px; background:#fff;'
+    + ' color:#3a352e; cursor:pointer; font-family:inherit;">\u24d8 MORE INFO</button>'
     + '</div>';
 
   // --- option 1 ---
@@ -6741,6 +6742,42 @@ function cpNoMachModal(idx){
   ov.appendChild(card);
   ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
   document.body.appendChild(ov);
+  // MORE INFO — the reasoning, on demand
+  try{
+    const ib = document.getElementById('cpNoMachInfo');
+    if(ib) ib.onclick = (e) => {
+      e.preventDefault(); e.stopPropagation();
+      const old2 = document.getElementById('cpNoMachInfoOv'); if(old2) old2.remove();
+      const iov = document.createElement('div');
+      iov.id = 'cpNoMachInfoOv';
+      iov.style.cssText = 'position:fixed; inset:0; z-index:10090; background:rgba(0,0,0,0.55);'
+        + ' display:flex; align-items:center; justify-content:center; padding:20px;';
+      const ic = document.createElement('div');
+      ic.style.cssText = 'background:#fff; border-radius:10px; max-width:560px; width:100%;'
+        + ' box-shadow:0 12px 46px rgba(0,0,0,.45); font-family:inherit; overflow:hidden;';
+      ic.innerHTML = '<div style="background:#5c5349; color:#fff; font-weight:800; letter-spacing:.04em;'
+        + ' padding:9px 15px; font-size:12px;">WHY THIS DECLARATION EXISTS</div>'
+        + '<div style="padding:14px 16px; font-size:12px; line-height:1.6; color:#3a352e;">'
+        + 'A Control Plan states what the shop <b>actually does</b> (Convention #2). If the machinist '
+        + 'does not measure this feature, leaving the master\u2019s method in place claims a check that '
+        + 'nobody performs. Recording the reason keeps the document honest and tells the next person '
+        + 'why the cell is not blank by mistake.<br><br>'
+        + '<span style="color:#8a4b12; font-weight:700;">This does not remove the line, lower its '
+        + 'Classification (CP-6), or excuse it from a Reaction Plan (CP-7).</span>'
+        + '</div>';
+      const ifoot = document.createElement('div');
+      ifoot.style.cssText = 'display:flex; justify-content:flex-end; padding:0 16px 14px;';
+      const ib2 = document.createElement('button');
+      ib2.type = 'button'; ib2.textContent = 'Close';
+      ib2.style.cssText = 'font-size:12px; font-weight:700; padding:7px 16px; border:1px solid #c9c0b4;'
+        + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit;';
+      ib2.onclick = () => iov.remove();
+      ifoot.appendChild(ib2); ic.appendChild(ifoot);
+      iov.appendChild(ic);
+      iov.onclick = (ev) => { if(ev.target === iov) iov.remove(); };
+      document.body.appendChild(iov);
+    };
+  }catch(e){}
   setTimeout(() => { try{ inp.focus(); }catch(_){ } }, 60);
 }
 function cpTaperMark(td, val){
