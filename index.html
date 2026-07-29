@@ -1568,7 +1568,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-676";
+const APP_REV = "Rev-677";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1701,6 +1701,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-677", type: "App", changes: ["STAMP MOVED TO THE RIGHT BUTTONS, AND A STEP NOW SHOWS HOW FAR IN IT IS (Rev-677) \u2014 TWO CORRECTIONS. (1) Rev-676 put the COMPLETED stamp on the step bar inside Build Control Plan; the buttons meant were the five CONSTRUCTION STEPS on the Control Plans list \u2014 different buttons, different screen. The stamp now sits on those, in the light variant so it reads over the dark green DONE fill. (2) THE 98% WAS NOT WRONG \u2014 THE LABEL WAS. Stage weights are 5/5/30/30/30, so 5+5+30+30+(30\u00d713/14) = 97.86, rounded to 98: one row of fourteen outstanding is worth about 2% of the plan, and the figure was right. What made it look wrong was Step 5 reading DO THIS NEXT beside it \u2014 that label was identical whether none of the fourteen rows were done or thirteen were, so a nearly-finished step was indistinguishable from an untouched one. A started step now reads IN PROGRESS 13/14. The percentage arithmetic is untouched; only the wording changed. Kept DO THIS NEXT for a step with nothing done yet, since that is the one case where it is accurate."] },
   { ts: "2026-07-28", rev: "App Rev-676", type: "App", changes: ["A COMPLETED STAMP LANDS ON EACH FINISHED STEP (Rev-676) \u2014 the step buttons said which step you were ON but never which ones were DONE; that had to be worked out by visiting each one and reading the hint. A finished step now carries a COMPLETED stamp across its button \u2014 angled, outlined, in green, going white when the step is the one selected so it stays legible on the dark red. It appears the moment the last outstanding row on that step is settled and disappears again if a row is later emptied, so it always reports the current state rather than a step someone once finished. USES THE EXISTING TEST, NOT A NEW ONE: cpStepProgress already decided this \u2014 Step 1 every non-ghost balloon pinned on the drawing (Rev-598), Step 2 every row carrying a control type, Step 3 every row with a machinist method AND a reaction plan (Rev-597, and CP-7 makes a blank reaction plan a non-conformance). A row marked done by hand still counts, per Rev-642. The stamp is DRAWN in CSS rather than loaded as a picture, so it scales, adds nothing to the file, and needs no image rights; it is also click-through, so the button under it still works. The hover text now names what is outstanding, or confirms the count when complete."] },
   { ts: "2026-07-28", rev: "App Rev-675", type: "App", changes: ["MEAS METHOD (CMM) CUT 25%, AND THE GAGE BUTTON NOW SITS ON EVERY ROW (Rev-675) \u2014 (1) Meas Method (CMM) 155\u2192116px. (2) The Special Gage / Fixture pop-up was NOT missing \u2014 Rev-571 built it, with a writing box, an Edit button once filled and a clear. It was only ever drawn on the OPEN row; every closed row rendered the same column as a plain read-only chip. So the column read as blank and un-actionable down the whole grid, and the feature could only be found by opening a row and noticing it. cpGageCell now takes a COMPACT mode and closed rows use it: \u2018+ GAGE\u2019 on empty rows, the description with Edit / \u2715 once set, at reduced padding and font so row height barely moves and the filled text stays on one line instead of wrapping to three. Same pop-up either way \u2014 nothing new was built, an existing control was simply made reachable from where you actually are. The button stops the click from reaching the row, so pressing it no longer opens the row underneath."] },
   { ts: "2026-07-28", rev: "App Rev-674", type: "App", changes: ["FOUR COLUMNS CUT 15%, AND REV-673 CORRECTED (Rev-674) \u2014 Control Type ID 260\u2192221px, Feature / Process Description 180\u2192153px, Product / Process Spec / Tol 120\u2192102px, Meas Method (Machinist) 190\u2192162px: 84px reclaimed across the grid so more of the methods band fits without scrolling. CORRECTION TO REV-673: that rev claimed to shrink the Control Type cell on Step 3 and did not. The builder table is table-layout:FIXED, which means a column takes its width from the HEADER cell \u2014 so setting 130px on the data cell clipped the text but left the column at its full 260px and returned no space at all. It looked tidier and bought nothing. Step 3 now sets the HEADER width to 130px and restores 221px on the other steps, so the column genuinely collapses where the resolver is not in use. Recorded rather than quietly folded into this rev because \u2018fixed layout takes its width from the header\u2019 is the kind of thing worth only learning once."] },
@@ -2250,7 +2251,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:34 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "08:41 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3727,8 +3728,13 @@ function renderProjects(){
         const l1 = document.createElement('span');
         l1.className = 'cp-step-n';
         let tag;
+        // Rev-677: a started-but-unfinished step said DO THIS NEXT whether 0 or 13 of 14
+        // rows were done, which read as 'not begun' beside a 98% bar. It now shows how far in.
+        const _S = { 1: st.s1, 2: st.s2, 3: st.s3, 4: st.s4, 5: st.s5 }[n];
         if(state === 'done') tag = '  \u2713 DONE';
         else if(state === 'lock') tag = '  \u2013 LOCKED';
+        else if(_S && _S.total > 1 && _S.left < _S.total)
+          tag = '  \u2013 IN PROGRESS  ' + (_S.total - _S.left) + '/' + _S.total;
         else tag = '  \u2013 DO THIS NEXT';
         l1.textContent = 'STEP ' + n + tag;
         const l2 = document.createElement('span');
@@ -3738,7 +3744,20 @@ function renderProjects(){
         l2.textContent = title;
         b.appendChild(l1); b.appendChild(l2);
         if(state === 'lock' || !has) b.disabled = true; else b.onclick = fn;
-        stepWrap.appendChild(b);
+        // Rev-677: the COMPLETED stamp belongs HERE. Rev-676 put it on the step bar inside
+        // Build Control Plan — a different set of buttons on a different screen.
+        if(state === 'done'){
+          const wrap = document.createElement('span');
+          wrap.className = 'cp-stepwrap';
+          wrap.appendChild(b);
+          const stamp = document.createElement('span');
+          stamp.className = 'cp-stamp on';
+          stamp.textContent = 'COMPLETED';
+          wrap.appendChild(stamp);
+          stepWrap.appendChild(wrap);
+        } else {
+          stepWrap.appendChild(b);
+        }
         return b;
       };
       // Rev-620: a step only reads DONE if everything before it is done too. Step 5 was
