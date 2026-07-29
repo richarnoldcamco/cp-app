@@ -1572,7 +1572,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-687";
+const APP_REV = "Rev-688";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1705,6 +1705,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-688", type: "App", changes: ["TWO WAYS OUT OF A WRONG MEASUREMENT METHOD, FROM STEP 3 (Rev-688) \u2014 the open row now carries a small strip under the Meas Method (Machinist) cell: the CONTROL TYPE that produced the value, then \u21ba CHANGE CONTROL TYPE and \u270e EDIT MASTER ROW. The first drops you on Step 2 with the same row open, and picking a different control type re-fills the entire band. The second opens the Master List already searched to that control type. THE CELL ITSELF IS STILL NOT TYPABLE, AND THAT IS THE POINT: CP-2C makes the resolved master row authoritative over Meas Method, # recorded, FREQ EVERY, FREQ QE and Meas Method CMM, and says in terms not to hand-edit them on the Control Plan to disagree with the master. A free-text box here would have been the quickest thing to build and would have quietly put the plan out of conformance one cell at a time, with the .xlsx still claiming the master as its source. The two FREQ cells stay editable because they already have a declared override path from Rev-499 \u2014 orange fill, an OVR chip carrying the master value, and a \u21ba to snap back. Restored access became necessary when Rev-684 hid the Control Type column on Step 3: the column went, and with it the only route to the thing that fills the band."] },
   { ts: "2026-07-29", rev: "App Rev-687", type: "App", changes: ["THE APPROVE MARK IS NOW A RECTANGLE YOU CAN ACTUALLY HIT (Rev-687) \u2014 it was a ring glyph about 9px across sitting in a 22px column: a hard target with a mouse and a worse one with a finger, on the one control that has to be pressed once per row for every row in the plan. It is now a 34\u00d722 rounded rectangle in a 46px column, roughly nine times the area. The three states carry over unchanged and read more plainly at the larger size: GREY OUTLINE, empty = the data for this step is not there yet; GREEN OUTLINE, empty = data complete, waiting for you; GREEN FILLED WITH A WHITE TICK = you approved it. The tick appears only on a row YOU approved, which is the point of Rev-680 \u2014 a filled box is a signature, not a status light. Same click behaviour, same tooltips, same pop animation."] },
   { ts: "2026-07-29", rev: "App Rev-686", type: "App", changes: ["\u2018FREQ (EVERY)\u2019 IS NOW \u2018MACHINIST CHECK FREQ\u2019 ON SCREEN (Rev-686) \u2014 FREQ (Every) never finished its own sentence: every WHAT. Beside FREQ (QE), which names its owner, the column that says how often the MACHINIST checks the feature was the one that did not say who it belonged to. Renamed in all six places it is shown: the builder grid, the Master List grid, the label map, the Master List column set, the master edit form and the row edit form. TWO PLACES DELIBERATELY LEFT AS \u2018FREQ (EVERY)\u2019, AND THIS IS NOT AN OVERSIGHT. (1) The .xlsx export header \u2014 Instructions Rev-92 CP-2 names that column in the delivered header band, and the Instructions are the controlling ITAR document, not edited without being asked. Renaming the deliverable to disagree with its own spec is how an audit finding is written. (2) The import header map, which reads \u2018FREQ (EVERY)\u2019 out of existing workbooks \u2014 rename it and every Control Plan and Master List already on disk silently loses that column on import, with no error. The screen wording and the document wording are allowed to differ; the document and the spec are not."] },
   { ts: "2026-07-29", rev: "App Rev-685", type: "App", changes: ["ONE-TAP GAGE TYPES IN THE SPECIAL GAGE WINDOW (Rev-685) \u2014 seven chips under the description box: PLUG GAGE, RING GAGE, THREAD PLUG GAGE, THREAD RING GAGE, SNAP GAGE, GO/NO-GO PINS, HOLDING FIXTURE. The list is the lathe work that actually recurs rather than a catalogue; a long list would take as long to read as the words take to type. THEY INSERT, THEY DO NOT REPLACE. A tap drops the text at the CARET and hands focus straight back to the box with the caret after it, so PLUG GAGE can be followed immediately by the size and tolerance \u2014 which is the part the toolmaker actually needs and the part only you can supply. Where text is already present and does not end in a space, dash or comma, an em-dash separator is added; where it is not needed it is not added, so tapping twice does not produce stray punctuation. Nothing is overwritten and Cancel still abandons the lot."] },
@@ -2265,7 +2266,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "01:43 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "01:58 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6453,6 +6454,40 @@ tr.appendChild(tdCT);
         td.style.cssText = 'padding:10px; border:1px solid var(--line); font-size:13px; text-align:' + align + ';' + (empty ? 'background:#fdecea;' : '');
         td.textContent = row[key] || '';
         td.title = row[key] || '';
+        // Rev-688: the machinist method is auto-filled BY the control type and CP-2C makes
+        // the resolved master row authoritative over this whole band — so it is not typed
+        // here. Two legitimate routes are offered instead, on the open row only.
+        if(key === 'measMethod'){
+          const ct = String(row.controlTypeId || '').trim();
+          const bar = document.createElement('div');
+          bar.style.cssText = 'margin-top:7px; display:flex; flex-wrap:wrap; gap:5px; align-items:center;';
+          const src = document.createElement('span');
+          src.style.cssText = 'font-size:10px; color:#8a2b22; font-weight:700; letter-spacing:.02em;';
+          src.textContent = ct || '\u2014 no control type \u2014';
+          src.title = ct ? 'Filled from this Master List row \u2014 CP-2C: the master governs this band' : '';
+          bar.appendChild(src);
+          const mk = (label, tip, fn) => {
+            const b = document.createElement('button');
+            b.type = 'button'; b.textContent = label; b.title = tip;
+            b.style.cssText = 'font-size:10px; font-weight:700; padding:2px 8px; border:1px solid #c9c0b4;'
+              + ' border-radius:999px; background:#fff; color:#3a352e; cursor:pointer; font-family:inherit;';
+            b.onclick = (e) => { e.preventDefault(); e.stopPropagation(); fn(); };
+            bar.appendChild(b);
+          };
+          mk('\u21ba Change control type',
+             'Go to Step 2 with this row open and pick a different control type. The whole methods band re-fills from the new master row.',
+             () => { try{ cpBuildState.focusIdx = idx; cpSetStep('2'); }catch(e){} });
+          if(ct) mk('\u270e Edit master row',
+             'Open the Master List at this control type. Editing it there changes every Control Plan line that uses it \u2014 which is the point, and the risk.',
+             () => {
+               try{
+                 masterSearch = ct;
+                 const sb = document.getElementById('masterSearchBox'); if(sb) sb.value = ct;
+                 showMasterList();
+               }catch(e){}
+             });
+          td.appendChild(bar);
+        }
         tr.appendChild(td);
       });
 
