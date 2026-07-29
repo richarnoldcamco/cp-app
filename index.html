@@ -1512,7 +1512,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- ITAR EXPORT-CONTROL CONFIRMATION MODAL -->
-<div id="itarModal" style="display:none; position:fixed; inset:0; z-index:10070; background:rgba(0,0,0,0.55); align-items:center; justify-content:center; padding:20px;">
+<div id="itarModal" style="display:none; position:fixed; inset:0; z-index:11000; background:rgba(0,0,0,0.55); align-items:center; justify-content:center; padding:20px;">
   <div style="background:#fff; border-radius:14px; max-width:440px; width:100%; box-shadow:0 24px 60px rgba(0,0,0,0.4); overflow:hidden;">
     <div style="background:#6e1414; color:#fff; padding:16px 22px; display:flex; align-items:center; gap:10px;">
       <span style="font-size:22px;">⚠️</span>
@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-710";
+const APP_REV = "Rev-711";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-711", type: "App", changes: ["THE ITAR GATE NOW SITS ABOVE EVERYTHING (Rev-711) \u2014 the help window added at Rev-707 was given z-index 10120 while the ITAR permission modal sat at 10070, so the gate opened BEHIND the window that triggered it: visible enough to be noticed, impossible to reach. THAT IS THE WORST WAY FOR THIS PARTICULAR CONTROL TO FAIL. Every other overlay in the app can be dismissed by clicking the backdrop; a permission gate exists specifically to be REFUSED, and one that cannot be answered is one that cannot be refused. Raised to 11000, above every overlay in the app, and also set programmatically each time it is shown so a future overlay with a higher number cannot bury it again without someone noticing. z-index only \u2014 no change to what the gate asks, what it protects, or what happens on Cancel."] },
   { ts: "2026-07-29", rev: "App Rev-710", type: "App", changes: ["THE API KEY BOX NOW CHECKS WHAT WAS PASTED INTO IT (Rev-710) \u2014 the help agent reported \u2018invalid x-api-key\u2019, which reads like a broken feature but is the far end saying it does not recognise the key. The app was not corrupting it: saveApiKey stores .value.trim() verbatim and the field is type=password, so the global uppercase CSS cannot reach the value. The key itself was not accepted. SO THE SHAPE IS CHECKED BEFORE SAVING: a GitHub token (github_pat_ / ghp_) is REFUSED outright with the reason and where it actually belongs \u2014 behind password dots a GitHub token and an Anthropic key are indistinguishable, and both get pasted in the same session, so this was a matter of time. Anything not starting sk-ant- is saved but warned about. The key is never logged, shown or transmitted by this check; only its prefix is examined. THE HELP PANEL NOW NAMES THE CAUSE instead of repeating the raw error: it inspects the saved prefix and says either \u2018that is a GitHub token, put it in Admin \u2192 GitHub\u2019, or \u2018does not start sk-ant-\u2019, or \u2018looks right but was not accepted \u2014 most likely revoked or regenerated\u2019. A no-credit reply is called out separately, because that is an account problem and no amount of re-pasting will fix it."] },
   { ts: "2026-07-29", rev: "App Rev-709", type: "App", changes: ["SPECIAL FEATURES NO LONGER ASK FOR A SIZE OR TOLERANCE ZONE (Rev-709) \u2014 SHARP EDGE 3X showed both zone pickers plus a red line telling the QE to choose a band, for a feature that has no size and no tolerance. CHECKED AGAINST THE MASTER BEFORE CHANGING ANYTHING: all three LATHE / SPECIAL rows carry an X in EVERY band, so a zone there can neither narrow the candidates nor exclude any of them \u2014 the controls were incapable of affecting the outcome and could only invite a pointless decision, or worse, a wrong one recorded on the plan. On a SPECIAL row the pickers and their headings are now hidden and replaced with \u2018SPECIAL feature \u2014 no size or tolerance zone applies. Narrow it with the levels instead.\u2019 The red cannot-derive-a-band note is suppressed there too, since a MAX/MIN explanation is meaningless for a sharp-edge callout. The candidate advice also stops pointing at the zones on those rows and points at the 2nd / 3rd Level, which is what actually separates LATHE / SPECIAL from / VISUAL and / HELPFULNOTE."] },
   { ts: "2026-07-29", rev: "App Rev-708", type: "App", changes: ["FIX \u2014 REV-706 EMPTIED THE GRID (Rev-708) \u2014 \u2018Uncaught ReferenceError: _bad is not defined\u2019 and not a single row drew. Rev-706 declared const _bad inside the ELSE branch where the approve mark is painted, but two later uses \u2014 the tooltip and the open-row caption \u2014 sit OUTSIDE that block, so every row threw on render and the table came up with headers and nothing under them. Declared now beside _on and _ready, where all three uses can see it. WHY node --check DID NOT CATCH IT: a block-scoped const referenced from an outer scope is valid SYNTAX; it fails at RUN time. The pre-push check proves the file parses, not that it runs \u2014 that gap has now cost one broken rev and is worth remembering rather than trusting the PASS. Rolled FORWARD to a higher rev as usual; Rev-706\u2019s behaviour is unchanged and intact."] },
@@ -2300,7 +2301,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:51 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "09:04 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16582,6 +16583,10 @@ function showItarConfirm(){
     proceed.onclick = () => { cleanup(); resolve(true); };
     cancel.onclick = () => { cleanup(); resolve(false); };
     modal.onclick = (e) => { if(e.target === modal){ cleanup(); resolve(false); } };
+    // Rev-711: a permission gate must be the topmost thing on the screen. The help window
+    // (Rev-707, z-index 10120) was drawn OVER it, so the ITAR question was unreachable and
+    // unanswerable — the worst possible failure for a control that exists to be refused.
+    modal.style.zIndex = '11000';
     modal.style.display = 'flex';
   });
 }
