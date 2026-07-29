@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-703";
+const APP_REV = "Rev-704";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-704", type: "App", changes: ["SIZE BAND AND TOLERANCE BAND ARE NOW LABELLED (Rev-704) \u2014 the two pickers carried their label inside the option text (\u2018Size: any\u2019, \u2018Tol: any\u2019), so the label existed only while the value did not. Choose a band and the boxes read \u2018Below .500\u2019 and \u2018.0015\u2013.0029\u2019 side by side with nothing saying which is which \u2014 and every other column on the row takes its heading from the table header, so these two were the only controls on the screen with no title above them. SIZE BAND and TOLERANCE BAND now sit over them. THE HOVER TEXT ANSWERS THE CONFUSION THAT ACTUALLY MATTERS: size band is \u2018size of the feature itself \u2014 not its tolerance\u2019, because the two are easy to conflate when both boxes hold decimals of the same shape, and picking the size band off the tolerance is exactly the slip that puts a row on the wrong master line."] },
   { ts: "2026-07-29", rev: "App Rev-703", type: "App", changes: ["THE TOLERANCE ZONE NOW SAYS WHERE IT CAME FROM, OR WHY IT IS BLANK (Rev-703) \u2014 cpAutoBands has derived the size and tolerance zones from the parsed limits since Rev-219 and it worked; it just did it SILENTLY, so a derived zone was indistinguishable from one the QE had chosen, and a blank zone gave no reason. Both are now stated under the pickers. DERIVED: green, \u2018\u2713 Zone set from \u0394 .0020 \u2014 confirm it, or change it above\u2019, and the derived flag is dropped the moment the zone is changed by hand so it stops claiming to be computed. NOT DERIVABLE: red, naming the real reason \u2014 MAX / MIN callouts say CP-6 does not treat them as a \u00b1 band so the zone is not set automatically; angular and radius callouts say the same; a single-value callout says there is no high/low pair to measure from. THAT DISTINCTION IS THE POINT. On ID TO OD RUNOUT .002 MAX the two candidates were H120 (unclassified, FREQ 10, QE NO CHECK) and H121 (KC, FREQ 1, QE 1 IN 20) \u2014 one gage, two control regimes, different CP-6 classifications. Guessing a band from a MAX callout would have silently picked one and produced a plausible plan with the wrong classification on a runout to a datum. The app now does the arithmetic where the Instructions allow it and says plainly where the judgement is the QE\u2019s."] },
   { ts: "2026-07-29", rev: "App Rev-702", type: "App", changes: ["THE ? NOW TRAVELS WITH THE OVERRIDE ONTO CLOSED ROWS (Rev-702) \u2014 the orange fill marked overridden cells on every row, but the explanation behind the ? existed only on the OPEN row, so from the grid you could see that three cells disagreed with the Master List and had no way to ask why without opening each one. A mark that raises a question everywhere should answer it everywhere. FREQ (QE) GAINED THE SAME TREATMENT, which it never had on closed rows at all: it was drawn as a plain cell, so an override there showed NO orange and NO ?, and was invisible until the row was opened. Both FREQ columns now run through one helper, so they cannot drift apart the way the open row and the closed row have three times this era. The ? is 14px and sits inline beside the value, and the cell is set to overflow:visible so it is not clipped by the compact row\u2019s ellipsis rule."] },
   { ts: "2026-07-29", rev: "App Rev-701", type: "App", changes: ["APPROVALS NOW RECORD WHO AND WHEN (Rev-701) \u2014 the tick recorded THAT a row was approved and nothing else, so having just approved a row there was no way to see that you had, or when. Every approval now stamps the name and an ISO timestamp (stepDoneBy), and un-approving clears it, so a cleared-then-reapproved row carries the NEW date rather than the old one. SHOWN TWO WAYS: on the open row the name and date sit under the tick in green, visible without hovering \u2014 an approval hidden behind a tooltip is an approval nobody checks; on closed rows the hover reads APPROVED BY RICHARD ARNOLD ON JULY 29, 2026. Approvals made before this rev say \u2018who and when were not recorded (before Rev-701)\u2019 and are marked \u2018not stamped\u2019 on the open row \u2014 the same choice as Rev-700: an admission rather than a plausible date. THIS MATTERS MORE THAN THE OVERRIDE STAMP DOES. Since Rev-681 approvals drive the percentage, the step fractions and the COMPLETED stamps \u2014 they are the claim the document rests on. An unattributed approval is the weakest link in that chain, and it is now the same strength as the rest."] },
@@ -2293,7 +2294,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "07:04 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "07:22 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6374,6 +6375,20 @@ function renderCPBuilder(){
       } else {
 
       // size / tolerance zone still narrow the master rows, so they stay
+      // Rev-704: headings over the two zone pickers. The option text carries the label only
+      // while the value is unset ('Size: any'), so a chosen band left the box unlabelled.
+      const zoneHead = document.createElement('div');
+      zoneHead.style.cssText = 'display:flex; gap:6px; margin-bottom:2px;';
+      [['SIZE BAND','Size of the feature itself \u2014 not its tolerance'],
+       ['TOLERANCE BAND','Total tolerance of the feature (high limit minus low limit)']]
+        .forEach(([txt, tip]) => {
+          const h = document.createElement('div');
+          h.textContent = txt; h.title = tip;
+          h.style.cssText = 'flex:1; font-size:9px; font-weight:800; letter-spacing:.07em;'
+            + ' color:#6b6257; white-space:nowrap;';
+          zoneHead.appendChild(h);
+        });
+      tdCT.appendChild(zoneHead);
       const zoneWrap = document.createElement('div');
       zoneWrap.style.cssText = 'display:flex; gap:6px; margin-bottom:6px;';
       const mkZone = (field, opts, title) => {
