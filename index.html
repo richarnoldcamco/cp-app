@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-696";
+const APP_REV = "Rev-697";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-697", type: "App", changes: ["THE ODS NOW SITS BESIDE THE BALLOON BOX (Rev-697) \u2014 the window asked for a balloon number while the drawing that carries the balloons was behind it. That is a recall test, and recalling the wrong number produces a control plan that names an uncontrolled feature as the control and still passes validation, because the balloon exists. The window is now 96vw \u00d7 94vh with the choices on the left and the FULL ODS on the right, fitted to the pane; clicking it opens the existing full-size zoom viewer. The feature name and tolerance run at 21px, up from 12 \u2014 that line is what tells you WHICH row you are declaring, and at 12px it was the smallest thing in a window about a decision that changes the delivered document. The list of the operation\u2019s other balloons stays under reason 1, so the number can be read off the drawing and confirmed against the description without leaving the window. If no drawing is loaded, the pane says so rather than sitting empty."] },
   { ts: "2026-07-29", rev: "App Rev-696", type: "App", changes: ["EDIT MASTER ROW DID NOTHING \u2014 THE MASTER LIST WAS OPENING BEHIND THE BUILDER (Rev-696) \u2014 showMasterList hides ten screens by name and cpBuilderScreen was not among them, so the Master List was revealed UNDERNEATH the still-visible Build Control Plan screen. The click worked, the navigation worked, nothing was on top. Fixed in showMasterList itself rather than in the caller, because every future route into the Master List from the builder would have hit the same wall \u2014 the omission was in the shared function, not in Rev-688\u2019s button. SECOND FAULT IN THE SAME BUTTON: the search term was being written to the box BEFORE showMasterList ran, while the builder was still the visible screen, so it was set and then wiped by the render. The filter is now applied AFTER the screen is up, the Clear Search button is revealed with it, and the list is repainted so the control type is actually filtered to. Worth noting how this hid: the handler was wrapped in try/catch, so had it thrown, it would have failed just as silently \u2014 a swallowed error and a screen behind another screen look identical from the outside."] },
   { ts: "2026-07-29", rev: "App Rev-695", type: "App", changes: ["THE REASONING MOVED BEHIND \u24d8 MORE INFO (Rev-695) \u2014 the window opened with a paragraph on Convention #2 and a warning about CP-6 and CP-7 before it showed the two choices. Correct content, wrong place: someone who has pressed \u2018Machinist does NOT check this\u2019 already knows why they are there and needs the decision, and a paragraph that appears every time is a paragraph that stops being read \u2014 which costs the warning its force on the one occasion it matters. The header is now the feature and its tolerance plus a MORE INFO button; the reasoning and the CP-6 / CP-7 caveat live in a second window a click away. NOTHING WAS DELETED, only moved: it stays reachable for a new QE, for anyone unsure which reason applies, and for whoever has to defend the line in an audit. The two option cards keep their own explanations inline, since those describe the choice being made rather than the policy behind it."] },
   { ts: "2026-07-29", rev: "App Rev-694", type: "App", changes: ["THE TWO REASONS NOW GET A WINDOW THAT EXPLAINS THEM (Rev-694) \u2014 the inline strip asked a QE to declare that a characteristic is NOT measured by the person running the machine, using two short button labels and a hint that vanished on the first keystroke. The reasoning sat in tooltips nobody has to open. It is now a proper dialog: what the declaration means and why it exists (Convention #2 \u2014 the Control Plan states what the shop ACTUALLY does), then each reason on its own card with the thinking spelled out, then the controls. Reason 1 says plainly ENTER THE BALLOON THAT IS MEASURED, NOT THIS ONE, and lists the other ballooned features on the operation so the number can be picked rather than recalled \u2014 and it now refuses the row\u2019s OWN balloon by name, which the inline version allowed. Reason 2 carries the warning that mattered and was missing: check Meas Method (CMM) and FREQ (QE) are filled first, or the line ends up saying nobody checks the feature at all. The header states what the declaration does NOT do \u2014 it does not remove the line, lower its Classification under CP-6, or excuse it from a Reaction Plan under CP-7."] },
@@ -2286,7 +2287,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "05:22 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "05:31 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6655,16 +6656,19 @@ function cpNoMachModal(idx){
   ov.style.cssText = 'position:fixed; inset:0; z-index:10080; background:rgba(0,0,0,0.62);'
     + ' display:flex; align-items:center; justify-content:center; padding:18px;';
   const card = document.createElement('div');
-  card.style.cssText = 'background:#fff; border-radius:10px; width:100%; max-width:720px;'
-    + ' max-height:92vh; overflow:auto; box-shadow:0 12px 46px rgba(0,0,0,.45); font-family:inherit;';
+  // Rev-697: much larger, and the ODS sits beside the choice — the balloon number cannot
+  // be picked from memory, so the drawing has to be in the same window as the box.
+  card.style.cssText = 'background:#fff; border-radius:10px; width:96vw; max-width:1600px;'
+    + ' height:94vh; display:flex; flex-direction:column; overflow:hidden;'
+    + ' box-shadow:0 12px 46px rgba(0,0,0,.45); font-family:inherit;';
   const H = (t) => '<div style="background:#8a4b12; color:#fff; font-weight:800; letter-spacing:.04em;'
     + ' padding:10px 16px; font-size:13px;">' + t + '</div>';
   const bubble = String(row.bubble || '');
   // Rev-695: the reasoning moved behind MORE INFO. Someone reaching this window usually
   // knows why they are here and needs the two choices, not a paragraph in front of them.
   card.innerHTML = H('MACHINIST DOES NOT CHECK \u2014 BALLOON ' + bubble)
-    + '<div style="padding:13px 16px 2px; font-size:12px; line-height:1.5; color:#3a352e;'
-    + ' display:flex; align-items:center; gap:10px; flex-wrap:wrap;">'
+    + '<div style="padding:14px 18px 6px; font-size:21px; line-height:1.35; color:#3a352e;'
+    + ' display:flex; align-items:center; gap:12px; flex-wrap:wrap; flex:0 0 auto;">'
     + '<span><b>' + (row.desc || row.featureDesc || 'This feature') + '</b> \u2014 '
     + (row.spec || '') + '</span>'
     + '<button type="button" id="cpNoMachInfo" style="font-size:10.5px; font-weight:700;'
@@ -6735,7 +6739,7 @@ function cpNoMachModal(idx){
   o2.appendChild(b2);
 
   const foot = document.createElement('div');
-  foot.style.cssText = 'display:flex; justify-content:flex-end; gap:8px; padding:10px 16px 14px; border-top:1px solid #e4ded4;';
+  foot.style.cssText = 'display:flex; justify-content:flex-end; gap:8px; padding:10px 16px 14px; border-top:1px solid #e4ded4; flex:0 0 auto;';
   const cancel = document.createElement('button');
   cancel.type = 'button'; cancel.textContent = 'Cancel';
   cancel.style.cssText = 'font-size:12px; font-weight:700; padding:7px 16px; border:1px solid #c9c0b4;'
@@ -6743,7 +6747,43 @@ function cpNoMachModal(idx){
   cancel.onclick = () => ov.remove();
   foot.appendChild(cancel);
 
-  card.appendChild(o1); card.appendChild(o2); card.appendChild(foot);
+  // ---- body: choices on the left, the ODS drawing on the right --------------
+  const body = document.createElement('div');
+  body.style.cssText = 'flex:1 1 auto; display:flex; gap:0; min-height:0; overflow:hidden;';
+  const left = document.createElement('div');
+  left.style.cssText = 'flex:0 0 46%; max-width:46%; overflow:auto; padding-bottom:6px;';
+  const right = document.createElement('div');
+  right.style.cssText = 'flex:1 1 auto; min-width:0; border-left:1px solid #e4ded4;'
+    + ' background:#f6f4f0; display:flex; flex-direction:column;';
+  const rHead = document.createElement('div');
+  rHead.style.cssText = 'font-size:11px; font-weight:800; letter-spacing:.05em; color:#5c5349;'
+    + ' padding:8px 14px; border-bottom:1px solid #e4ded4; flex:0 0 auto;';
+  rHead.textContent = 'ODS DRAWING \u2014 READ THE BALLOON OFF HERE';
+  right.appendChild(rHead);
+  const holder = document.createElement('div');
+  holder.style.cssText = 'flex:1 1 auto; min-height:0; overflow:auto; display:flex;'
+    + ' align-items:center; justify-content:center; padding:8px;';
+  let odsSrc = '';
+  try{ odsSrc = (cpBuildState && cpBuildState.odsImage) ? cpBuildState.odsImage : ''; }catch(_){ }
+  if(odsSrc){
+    const im = document.createElement('img');
+    im.src = odsSrc; im.alt = 'ODS drawing';
+    im.style.cssText = 'max-width:100%; max-height:100%; object-fit:contain; cursor:zoom-in;';
+    im.title = 'Click to open the full-size viewer';
+    im.onclick = () => { try{ const b = document.getElementById('odsViewerImage');
+      if(b){ b.src = odsSrc; const m = document.getElementById('odsViewerModal');
+             if(m) m.classList.remove('hidden'); } }catch(_){ } };
+    holder.appendChild(im);
+  } else {
+    const none = document.createElement('div');
+    none.style.cssText = 'font-size:12px; color:#8a8279; padding:20px; text-align:center;';
+    none.textContent = 'No ODS drawing loaded for this operation.';
+    holder.appendChild(none);
+  }
+  right.appendChild(holder);
+  left.appendChild(o1); left.appendChild(o2);
+  body.appendChild(left); body.appendChild(right);
+  card.appendChild(body); card.appendChild(foot);
   ov.appendChild(card);
   ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
   document.body.appendChild(ov);
