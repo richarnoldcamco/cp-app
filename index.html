@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-695";
+const APP_REV = "Rev-696";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-696", type: "App", changes: ["EDIT MASTER ROW DID NOTHING \u2014 THE MASTER LIST WAS OPENING BEHIND THE BUILDER (Rev-696) \u2014 showMasterList hides ten screens by name and cpBuilderScreen was not among them, so the Master List was revealed UNDERNEATH the still-visible Build Control Plan screen. The click worked, the navigation worked, nothing was on top. Fixed in showMasterList itself rather than in the caller, because every future route into the Master List from the builder would have hit the same wall \u2014 the omission was in the shared function, not in Rev-688\u2019s button. SECOND FAULT IN THE SAME BUTTON: the search term was being written to the box BEFORE showMasterList ran, while the builder was still the visible screen, so it was set and then wiped by the render. The filter is now applied AFTER the screen is up, the Clear Search button is revealed with it, and the list is repainted so the control type is actually filtered to. Worth noting how this hid: the handler was wrapped in try/catch, so had it thrown, it would have failed just as silently \u2014 a swallowed error and a screen behind another screen look identical from the outside."] },
   { ts: "2026-07-29", rev: "App Rev-695", type: "App", changes: ["THE REASONING MOVED BEHIND \u24d8 MORE INFO (Rev-695) \u2014 the window opened with a paragraph on Convention #2 and a warning about CP-6 and CP-7 before it showed the two choices. Correct content, wrong place: someone who has pressed \u2018Machinist does NOT check this\u2019 already knows why they are there and needs the decision, and a paragraph that appears every time is a paragraph that stops being read \u2014 which costs the warning its force on the one occasion it matters. The header is now the feature and its tolerance plus a MORE INFO button; the reasoning and the CP-6 / CP-7 caveat live in a second window a click away. NOTHING WAS DELETED, only moved: it stays reachable for a new QE, for anyone unsure which reason applies, and for whoever has to defend the line in an audit. The two option cards keep their own explanations inline, since those describe the choice being made rather than the policy behind it."] },
   { ts: "2026-07-29", rev: "App Rev-694", type: "App", changes: ["THE TWO REASONS NOW GET A WINDOW THAT EXPLAINS THEM (Rev-694) \u2014 the inline strip asked a QE to declare that a characteristic is NOT measured by the person running the machine, using two short button labels and a hint that vanished on the first keystroke. The reasoning sat in tooltips nobody has to open. It is now a proper dialog: what the declaration means and why it exists (Convention #2 \u2014 the Control Plan states what the shop ACTUALLY does), then each reason on its own card with the thinking spelled out, then the controls. Reason 1 says plainly ENTER THE BALLOON THAT IS MEASURED, NOT THIS ONE, and lists the other ballooned features on the operation so the number can be picked rather than recalled \u2014 and it now refuses the row\u2019s OWN balloon by name, which the inline version allowed. Reason 2 carries the warning that mattered and was missing: check Meas Method (CMM) and FREQ (QE) are filled first, or the line ends up saying nobody checks the feature at all. The header states what the declaration does NOT do \u2014 it does not remove the line, lower its Classification under CP-6, or excuse it from a Reaction Plan under CP-7."] },
   { ts: "2026-07-29", rev: "App Rev-693", type: "App", changes: ["THE BALLOON BOX NOW SAYS WHICH NUMBER GOES IN IT (Rev-693) \u2014 a pulsing arrow and one line beside the input: \u2018Enter the balloon that IS measured \u2014 the feature cut by the same tool. If that one is to print, this one is too.\u2019 WHICH WAY ROUND THAT NUMBER GOES IS THE ONE THING EASY TO GET BACKWARDS HERE, and getting it backwards is silent: the plan would name the uncontrolled feature as the control, read perfectly well, and be wrong in a way no validation catches \u2014 the balloon exists, so the check passes. The line is worded as the reasoning, not as an instruction, so it teaches the rule rather than just directing a keystroke. It disappears as soon as anything is typed, so it never sits in the way of a QE who already knows. The pulse is opacity and a 3px drift, and it stops entirely under prefers-reduced-motion."] },
@@ -2285,7 +2286,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "05:12 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "05:22 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6529,9 +6530,13 @@ tr.appendChild(tdCT);
              'Open the Master List at this control type. Editing it there changes every Control Plan line that uses it \u2014 which is the point, and the risk.',
              () => {
                try{
+                 showMasterList();
+                 // set the filter AFTER the screen is up, then repaint — the box does not
+                 // exist to be filled while the builder is still the visible screen
                  masterSearch = ct;
                  const sb = document.getElementById('masterSearchBox'); if(sb) sb.value = ct;
-                 showMasterList();
+                 const cb = document.getElementById('masterSearchClearBtn'); if(cb) cb.style.display = '';
+                 if(typeof renderMasterList === 'function') renderMasterList();
                }catch(e){}
              });
           td.appendChild(bar);
@@ -9510,6 +9515,9 @@ function showMasterList(){
   $('recentChangesScreen').classList.add('hidden');
   if($('reportsScreen'))$('reportsScreen').classList.add('hidden');
   $('historyScreen').classList.add('hidden');
+  // Rev-696: the CP Builder was NOT in this hide list, so opening the Master List from
+  // inside the builder left the builder on top and looked like nothing had happened.
+  if($('cpBuilderScreen')) $('cpBuilderScreen').classList.add('hidden');
   $('masterListScreen').classList.remove('hidden');
   setHeaderBackVisible(true);
   if(typeof ghAutoPull === 'function') ghAutoPull();   // Rev-281: show the latest from other machines
