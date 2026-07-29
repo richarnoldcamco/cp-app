@@ -233,6 +233,16 @@
     background-size:39.6px 39.6px; animation:cpStripe 1.35s linear infinite; }
   .cp-uc b{ position:relative; background:#171310; color:#ffffff; font-size:11px; font-weight:800;
     letter-spacing:.13em; padding:3px 14px; border-radius:3px; white-space:nowrap; }
+  /* Rev-676: COMPLETED stamp over a finished step button. Drawn in CSS so it scales and
+     costs nothing to load. pointer-events:none so the button underneath still works. */
+  .cp-stepwrap{ position:relative; display:inline-block; }
+  .cp-stamp{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-13deg);
+    pointer-events:none; border:2.5px solid #1e7a3c; color:#1e7a3c; border-radius:3px;
+    padding:1px 7px; font-size:11px; font-weight:900; letter-spacing:.14em; line-height:1.15;
+    font-family:Arial,Helvetica,sans-serif; background:rgba(255,255,255,.60); opacity:.88;
+    white-space:nowrap; box-shadow:0 0 0 1.5px rgba(30,122,60,.20); }
+  .cp-stamp.on{ color:#eaf7ee; border-color:#eaf7ee; background:rgba(0,0,0,.18);
+    box-shadow:0 0 0 1.5px rgba(255,255,255,.25); }
   @keyframes cpStripe{ from{ background-position:0 0; } to{ background-position:39.6px 0; } }
   /* thinner bar, with a highlight that sweeps along the filled part while work is open */
   .cp-prog{ position:relative; display:block; width:100%; height:14px; border-radius:7px; background:#ddd6cc; overflow:hidden; margin-top:0; }
@@ -1558,7 +1568,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-675";
+const APP_REV = "Rev-676";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1691,6 +1701,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-28", rev: "App Rev-676", type: "App", changes: ["A COMPLETED STAMP LANDS ON EACH FINISHED STEP (Rev-676) \u2014 the step buttons said which step you were ON but never which ones were DONE; that had to be worked out by visiting each one and reading the hint. A finished step now carries a COMPLETED stamp across its button \u2014 angled, outlined, in green, going white when the step is the one selected so it stays legible on the dark red. It appears the moment the last outstanding row on that step is settled and disappears again if a row is later emptied, so it always reports the current state rather than a step someone once finished. USES THE EXISTING TEST, NOT A NEW ONE: cpStepProgress already decided this \u2014 Step 1 every non-ghost balloon pinned on the drawing (Rev-598), Step 2 every row carrying a control type, Step 3 every row with a machinist method AND a reaction plan (Rev-597, and CP-7 makes a blank reaction plan a non-conformance). A row marked done by hand still counts, per Rev-642. The stamp is DRAWN in CSS rather than loaded as a picture, so it scales, adds nothing to the file, and needs no image rights; it is also click-through, so the button under it still works. The hover text now names what is outstanding, or confirms the count when complete."] },
   { ts: "2026-07-28", rev: "App Rev-675", type: "App", changes: ["MEAS METHOD (CMM) CUT 25%, AND THE GAGE BUTTON NOW SITS ON EVERY ROW (Rev-675) \u2014 (1) Meas Method (CMM) 155\u2192116px. (2) The Special Gage / Fixture pop-up was NOT missing \u2014 Rev-571 built it, with a writing box, an Edit button once filled and a clear. It was only ever drawn on the OPEN row; every closed row rendered the same column as a plain read-only chip. So the column read as blank and un-actionable down the whole grid, and the feature could only be found by opening a row and noticing it. cpGageCell now takes a COMPACT mode and closed rows use it: \u2018+ GAGE\u2019 on empty rows, the description with Edit / \u2715 once set, at reduced padding and font so row height barely moves and the filled text stays on one line instead of wrapping to three. Same pop-up either way \u2014 nothing new was built, an existing control was simply made reachable from where you actually are. The button stops the click from reaching the row, so pressing it no longer opens the row underneath."] },
   { ts: "2026-07-28", rev: "App Rev-674", type: "App", changes: ["FOUR COLUMNS CUT 15%, AND REV-673 CORRECTED (Rev-674) \u2014 Control Type ID 260\u2192221px, Feature / Process Description 180\u2192153px, Product / Process Spec / Tol 120\u2192102px, Meas Method (Machinist) 190\u2192162px: 84px reclaimed across the grid so more of the methods band fits without scrolling. CORRECTION TO REV-673: that rev claimed to shrink the Control Type cell on Step 3 and did not. The builder table is table-layout:FIXED, which means a column takes its width from the HEADER cell \u2014 so setting 130px on the data cell clipped the text but left the column at its full 260px and returned no space at all. It looked tidier and bought nothing. Step 3 now sets the HEADER width to 130px and restores 221px on the other steps, so the column genuinely collapses where the resolver is not in use. Recorded rather than quietly folded into this rev because \u2018fixed layout takes its width from the header\u2019 is the kind of thing worth only learning once."] },
   { ts: "2026-07-28", rev: "App Rev-673", type: "App", changes: ["CONTROL TYPE COLUMN SHRUNK ON STEP 3 (Rev-673) \u2014 opening a row on 3 \u00b7 Measurement Methods still drew the full Control Type RESOLVER in that cell: the size and tolerance zone pickers, the candidate count, the link to the Master List. That is Step 2 machinery, and on Step 3 it was spending a large part of the screen restating a decision already made \u2014 while the columns the step exists for (Meas Method, # Recorded, FREQ Every, FREQ QE, CMM, Special Gage, Reaction Plan) were pushed off to the right and had to be scrolled to. On Step 3 the cell is now a narrow read-only label, 130px, clipped with the full Control Type ID on hover. KEPT RATHER THAN HIDDEN, deliberately: the methods on that row were auto-filled BY that control type, so reviewing them without being able to see which one they came from would remove the one piece of context that makes the review meaningful \u2014 and CP-2C makes the Master List row authoritative over every value in the band. It stays visible, just quiet. Steps 2 and All columns are unchanged and still show the full resolver."] },
@@ -2239,7 +2250,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-28";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:26 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "08:34 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5945,6 +5956,30 @@ function cpApplyStepView(){
     b.style.color = on ? '#fff' : '#5c5349';
     b.style.borderColor = on ? '#5c1416' : '#c2b9ab';
     b.style.fontWeight = on ? '800' : '600';
+    // Rev-676: COMPLETED stamp once that step has nothing outstanding.
+    try{
+      let wrap = b.parentElement;
+      if(!wrap || !wrap.classList.contains('cp-stepwrap')){
+        wrap = document.createElement('span');
+        wrap.className = 'cp-stepwrap';
+        b.parentNode.insertBefore(wrap, b);
+        wrap.appendChild(b);
+      }
+      const oldS = wrap.querySelector('.cp-stamp'); if(oldS) oldS.remove();
+      const pr = (typeof cpStepProgress === 'function' && typeof cpBuildState !== 'undefined' && cpBuildState)
+                 ? cpStepProgress({ builderState: cpBuildState }) : null;
+      const doneMap = pr ? { '1': pr.s1Done, '2': pr.s2Done, '3': pr.s3Done } : {};
+      const noteMap = pr ? { '1': pr.s1Note, '2': pr.s2Note, '3': pr.s3Note } : {};
+      if(pr && doneMap[k]){
+        const st = document.createElement('span');
+        st.className = 'cp-stamp' + (on ? ' on' : '');
+        st.textContent = 'COMPLETED';
+        wrap.appendChild(st);
+        b.title = 'COMPLETED \u2014 ' + (noteMap[k] || '');
+      } else if(pr && noteMap[k]){
+        b.title = noteMap[k];
+      }
+    }catch(e){}
   });
   const hint = document.getElementById('cpStepHint');
   if(hint) hint.textContent = def.hint;
@@ -6007,6 +6042,7 @@ function renderCPBuilder(){
     try{ cpResolveAllRows(); }finally{ window._cpResolving = 0; }
   }
 
+  try{ setTimeout(cpApplyStepView, 0); }catch(e){}   // Rev-676: refresh the COMPLETED stamps after a redraw
   cpBuildState.rows.forEach((row, idx) => {
     const focused = idx === cpBuildState.focusIdx;
     // Rev-221 self-heal: pull a stored dimension into an empty Spec cell, and (re)compute
