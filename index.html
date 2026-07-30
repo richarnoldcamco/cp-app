@@ -1585,7 +1585,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-729";
+const APP_REV = "Rev-730";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1718,6 +1718,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-730", type: "App", changes: ["THE VIDEO GETS A NAME AND ITS OWN BUTTON (Rev-730) \u2014 a clip was only reachable by opening \u2139 HELP and reading \u2018Watch how-to\u2019, which tells a new user nothing about what it covers. A green button now sits immediately LEFT of \u2139 HELP on any screen that has a video, showing the title \u2014 \u25b6 HOW TO ASSIGN BUBBLE NUMBERS \u2014 and playing it on click. It appears and disappears with the screen you are on, so each screen advertises only its own. NAMING: after a recording finishes the app asks what the clip is called, in a themed box rather than the browser\u2019s grey prompt, and the player gained \u270e RENAME. Titles are stored beside the clip AND written into videos/ with it, so another device gets the name as well as the recording; deleting a video clears its name and removes the button. An untitled clip falls back to \u25b6 HOW-TO VIDEO rather than showing nothing. WHAT YOU MUST TEST (rule 8): on Build Control Plan, confirm the green button reads your title, plays the clip, and is NOT there on the Control Plans list."] },
   { ts: "2026-07-30", rev: "App Rev-729", type: "App", changes: ["TOKENS RULE ADDED AS RULE 9 (Rev-729) \u2014 the standard now states, as a firm rule carried into every future chat, that the GitHub token and the Anthropic API key live in the chat and in the app by DELIBERATE decision of the account owner, that Claude pushes revisions directly with the token, and that the risk is noted ONCE on a newly pasted credential and then not raised again. THE WORDING MATTERS MORE THAN THE INSTRUCTION: deleting the subject at Rev-728 left nothing to inherit, so each new chat met a token with no context and re-argued it from scratch \u2014 which is what the PFMEA chat has been doing. Recording it as a CONSIDERED DECISION BY THE OWNER, rather than as silence, is what stops it being re-litigated. It keeps one note on a newly pasted credential, because a credential appearing somewhere unexpected is worth one sentence \u2014 what it forbids is repetition after the decision is known. END-OF-SESSION moves back to rule 10; the list runs 1\u201310. WHAT YOU MUST TEST (rule 8): press \ud83d\udcac New Chat Prompt and confirm rule 9 reads TOKENS AND KEYS LIVE IN THE CHAT AND IN THE APP and rule 10 is END-OF-SESSION."] },
   { ts: "2026-07-30", rev: "App Rev-728", type: "App", changes: ["RULE 9 REMOVED FROM THE INSTRUCTION STANDARD (Rev-728) \u2014 the operator has decided the GitHub token and the Anthropic API key live in the chat and in the app, so the rule forbidding Claude from handling credentials is deleted from CP_RICH_STANDARD and the old rule 10 (END-OF-SESSION) is renumbered to 9, leaving the list running 1\u20139 with no gap. Claude resumes pushing revisions straight to cp-app/index.html and cp-generator-data/cp_app.html, which is how every rev before 727 shipped. All other rules are untouched. WHAT YOU MUST TEST (rule 8): press \ud83d\udcac New Chat Prompt and confirm the copied text opens with \u2018INSTRUCTION STANDARD \u2014 RICH ARNOLD\u2019 and that the numbered list ends at 9 (END-OF-SESSION) with nothing about credentials."] },
   { ts: "2026-07-30", rev: "App Rev-727", type: "App", changes: ["THE INSTRUCTION STANDARD IS NOW PART OF THE HANDOFF PROMPT (Rev-727) \u2014 Rich Arnold\u2019s INSTRUCTION STANDARD is baked in VERBATIM as CP_RICH_STANDARD and prepended to the text the \ud83d\udcac New Chat Prompt button copies, so every future chat inherits it without it being pasted again. WHAT YOU MUST TEST (rule 8): press \ud83d\udcac New Chat Prompt and confirm the copied text now OPENS with \u2018INSTRUCTION STANDARD \u2014 RICH ARNOLD\u2019 before the usual app description. RULE 9 TAKES EFFECT IMMEDIATELY AND CHANGES HOW THIS APP IS SHIPPED: Claude no longer handles the GitHub token, so this revision was NOT pushed by Claude \u2014 it is delivered as a file for the operator to load through Admin \u2192 Import App Code, and every revision from here follows that route. The claude-push token pasted into the session before this rule existed should be regenerated. NOTE ON WHERE THIS LIVES: the app tries to fetch the shared prompt block from a repo that does not exist (found at Rev-682), so the copy baked into the file IS the one in use \u2014 which is why baking it in works at all."] },
@@ -2320,7 +2321,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "03:11 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "03:34 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7525,7 +7526,7 @@ async function ghPushHowto(screenName){
     let sha = null;
     try{ const g = await fetch(url, { headers: hdrs, cache: 'no-store' });
       if(g.ok){ const j = await g.json(); sha = j.sha || null; } }catch(e){}
-    const payload = JSON.stringify({ screen: screenName, video: src, ut: new Date().toISOString() });
+    const payload = JSON.stringify({ screen: screenName, video: src, title: cpHowtoTitle(screenName), ut: new Date().toISOString() });
     const body = { message: 'How-to video ' + screenName + ' ' + new Date().toISOString(),
                    content: btoa(unescape(encodeURIComponent(payload))) };
     if(sha) body.sha = sha;
@@ -7568,6 +7569,8 @@ async function ghPullHowto(screenName){
     const j = JSON.parse(await r.text());
     if(!j || !j.video) return false;
     cpHowtoSave(screenName, j.video);
+    if(j.title) cpHowtoSetTitle(screenName, j.title);
+    try{ cpHowtoFab(); }catch(_){ }
     return true;
   }catch(e){ return false; }
 }
@@ -7584,6 +7587,79 @@ async function ghDeleteHowto(screenName){
     return r.ok;
   }catch(e){ return false; }
 }
+// Rev-730: a video needs a NAME. Stored beside the clip, shown on the button, and carried
+// into videos/ so other devices get the title as well as the recording.
+function cpHowtoTitles(){
+  try{ return JSON.parse(localStorage.getItem('cpHowtoTitles') || '{}') || {}; }catch(_){ return {}; }
+}
+function cpHowtoTitle(screenName){
+  const t = cpHowtoTitles()[screenName];
+  return (t && String(t).trim()) ? String(t).trim() : '';
+}
+function cpHowtoSetTitle(screenName, title){
+  try{
+    const m = cpHowtoTitles();
+    if(title) m[screenName] = String(title).trim().toUpperCase(); else delete m[screenName];
+    localStorage.setItem('cpHowtoTitles', JSON.stringify(m));
+  }catch(_){ }
+}
+// a themed one-line prompt; the browser's own prompt box cannot be styled
+function cpPromptBox(heading, label, value){
+  return new Promise(resolve => {
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed; inset:0; z-index:11900; background:rgba(0,0,0,.6);'
+      + ' display:flex; align-items:center; justify-content:center; padding:20px;';
+    const c = document.createElement('div');
+    c.style.cssText = 'background:#fff; border-radius:10px; max-width:520px; width:100%;'
+      + ' box-shadow:0 12px 46px rgba(0,0,0,.45); font-family:inherit; overflow:hidden;';
+    c.innerHTML = '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.04em;'
+      + ' padding:10px 16px; font-size:13px;">' + heading + '</div>'
+      + '<div style="padding:14px 16px 6px; font-size:12px; color:#3a352e;">' + label + '</div>';
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.value = value || '';
+    inp.style.cssText = 'margin:0 16px; width:calc(100% - 32px); box-sizing:border-box; font-size:14px;'
+      + ' font-weight:700; padding:9px 10px; border:1px solid #c9c0b4; border-radius:6px; font-family:inherit;';
+    const foot = document.createElement('div');
+    foot.style.cssText = 'display:flex; justify-content:flex-end; gap:8px; padding:12px 16px 14px;';
+    const no = document.createElement('button'); no.type='button'; no.textContent='Cancel';
+    no.style.cssText = 'font-size:12px; font-weight:700; padding:7px 16px; border:1px solid #c9c0b4;'
+      + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit;';
+    const ok = document.createElement('button'); ok.type='button'; ok.textContent='Save name';
+    ok.style.cssText = 'font-size:12px; font-weight:800; padding:7px 18px; border:1px solid #154360;'
+      + ' border-radius:6px; background:#1a5276; color:#fff; cursor:pointer; font-family:inherit;';
+    const done = v => { ov.remove(); resolve(v); };
+    no.onclick = () => done(null);
+    ok.onclick = () => done(String(inp.value || '').trim());
+    inp.onkeydown = e => { if(e.key === 'Enter') ok.click(); if(e.key === 'Escape') no.click(); };
+    foot.appendChild(no); foot.appendChild(ok);
+    c.appendChild(inp); c.appendChild(foot); ov.appendChild(c);
+    document.body.appendChild(ov);
+    setTimeout(() => { try{ inp.focus(); inp.select(); }catch(_){ } }, 50);
+  });
+}
+// Rev-730: the titled button that sits LEFT of ℹ HELP on whichever screen has a video
+function cpHowtoFab(){
+  try{
+    const scr = cpHelpScreen();
+    let b = document.getElementById('cpHowtoFab');
+    const has = !!cpHowtoGet(scr);
+    if(!has){ if(b) b.remove(); return; }
+    const label = '\u25b6 ' + (cpHowtoTitle(scr) || 'HOW-TO VIDEO');
+    if(!b){
+      b = document.createElement('button');
+      b.id = 'cpHowtoFab'; b.type = 'button';
+      b.style.cssText = 'position:fixed; top:8px; right:96px; z-index:9000; font-size:11px;'
+        + ' font-weight:800; letter-spacing:.05em; padding:6px 12px; border-radius:6px;'
+        + ' border:1px solid #215236; background:#2c6e49; color:#fff; cursor:pointer;'
+        + ' font-family:inherit; box-shadow:0 2px 6px rgba(0,0,0,.25); max-width:42vw;'
+        + ' overflow:hidden; text-overflow:ellipsis; white-space:nowrap;';
+      b.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpHowtoPlay(cpHelpScreen()); };
+      document.body.appendChild(b);
+    }
+    if(b.textContent !== label){ b.textContent = label; b.title = label + ' \u2014 click to play'; }
+  }catch(_){ }
+}
+try{ setInterval(cpHowtoFab, 1200); }catch(_){ }
 function cpHowtoPlay(screenName){
   const src = cpHowtoGet(screenName);
   if(!src){ flash('No how-to video saved for this screen yet.', true); return; }
@@ -7602,12 +7678,18 @@ function cpHowtoPlay(screenName){
     b.onclick = fn; bar.appendChild(b);
   };
   mk('Close', 'background:#fff; color:#3a352e; border:1px solid #c9c0b4;', () => ov.remove());
+  mk('\u270e Rename', 'background:#fff; color:#1a5276; border:1px solid #9dbdd4;', async () => {
+    const nm = await cpPromptBox('RENAME VIDEO', 'What should the button say?',
+      cpHowtoTitle(screenName) || 'HOW TO ');
+    if(nm !== null){ cpHowtoSetTitle(screenName, nm); cpHowtoFab();
+      ghPushHowto(screenName); flash('\u2713 Renamed to ' + (nm || 'HOW-TO VIDEO') + '.'); }
+  });
   mk('\u2715 Delete this video', 'background:#a5342a; color:#fff; border:1px solid #7d2419;', async () => {
     const ok = await cpConfirmBox('DELETE HOW-TO VIDEO',
       'Delete the how-to video for <b>' + screenName + '</b>?<br><br>'
       + 'Nothing else is affected. You can record and add another at any time.', '\ud83d\uddd1 Delete video');
     if(!ok) return;
-    cpHowtoDelete(screenName); ov.remove();
+    cpHowtoDelete(screenName); cpHowtoSetTitle(screenName, ''); cpHowtoFab(); ov.remove();
     ghDeleteHowto(screenName).then(ok => {
       flash(ok ? '\u2713 How-to video deleted here and from videos/ in the repo.'
                : 'Deleted on this device. The copy in videos/ is still there \u2014 it will come back '
@@ -7653,8 +7735,13 @@ function cpHowtoRecord(screenName){
         return;
       }
       const r = new FileReader();
-      r.onload = () => {
+      r.onload = async () => {
         cpHowtoSave(screenName, r.result);
+        const nm = await cpPromptBox('NAME THIS VIDEO',
+          'What is this clip called? It shows on the green button beside \u2139 HELP.',
+          cpHowtoTitle(screenName) || 'HOW TO ');
+        if(nm) cpHowtoSetTitle(screenName, nm);
+        cpHowtoFab();
         try{ logAct('howto', 'video recorded \u00b7 ' + screenName); }catch(_){ }
         flash('\u2713 Recorded ' + MB.toFixed(1) + ' MB for ' + screenName + ' \u2014 uploading\u2026');
         ghPushHowto(screenName).then(ok => {
