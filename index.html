@@ -1585,7 +1585,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-725";
+const APP_REV = "Rev-726";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1718,6 +1718,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-726", type: "App", changes: ["RECORD THE VIDEO IN THE APP \u2014 NO FILE, NO FOLDER (Rev-726) \u2014 Rev-723 built an UPLOAD, which asks the user to have already made a clip somewhere else and keep it as a local file: precisely the thing the operator said he did not want. \u23fa RECORD HOW-TO now captures the screen from inside the app and saves straight to videos/. Press it, do the steps, press \u23f9 STOP & SAVE. A red pill sits at the top of the screen while it runs with a live timer, and ending the share from Chrome\u2019s own bar stops the recording cleanly too. The HELP window closes itself first so it is not filmed. Narration is recorded if the microphone is allowed and skipped silently if it is not. Encoded at 12fps and ~0.9 Mbps \u2014 a screen recording of a static grid needs no more, and it keeps a two-minute clip near 10 MB, inside the 25 MB limit; anything over is refused with the size named rather than bloating every device. Upload-a-file remains as a secondary button for a clip made elsewhere. UNAVOIDABLE: the browser still asks WHICH window to share \u2014 that is Chrome\u2019s own permission prompt and no page can skip it."] },
   { ts: "2026-07-30", rev: "App Rev-725", type: "App", changes: ["THE VIDEO UPLOAD IS NOW READ BACK, AND A DEVICE-ONLY CLIP SAYS SO (Rev-725) \u2014 the operator has decided not to keep local source files: the app is the store of record. That is sound BECAUSE the copy in videos/ is version-controlled and therefore a real archive \u2014 but it puts all the weight on the upload actually landing. So the push now READS THE FILE BACK and compares its length before reporting success, the same check used on every app rev; a PUT that returns ok but does not land no longer counts. IF IT FAILS, THE WARNING PERSISTS: the screen is recorded in cpHowtoUnsynced, the HELP button reads \u2018\u25b6 Watch how-to \u26a0 this device only\u2019, and opening HELP quietly retries the upload and clears the mark when it succeeds. A one-off flash was not good enough for a message that means \u2018this is the only copy in existence\u2019 \u2014 it disappears in seconds and the browser storage holding that copy can be cleared without warning."] },
   { ts: "2026-07-30", rev: "App Rev-724", type: "App", changes: ["HOW-TO VIDEOS NOW LIVE IN videos/ IN THE PRIVATE REPO (Rev-724) \u2014 Rev-723 stored a clip in IndexedDB on ONE device, which is no use for training: the new user is on a different machine from whoever recorded it, and a browser cache is not a place to keep something the shop depends on. Saving now uploads to videos/HOWTO__SCREEN.json in the private data repo, modelled on the Rev-506 drawing sync (fetch the sha, PUT, report honestly if it fails rather than claiming success). Opening HELP on a screen with no local clip pulls it once per session and flips the button to \u25b6 WATCH HOW-TO when it lands. Deleting removes both copies and says plainly if the repo copy survived \u2014 otherwise the next pull would resurrect it. ITS OWN FOLDER, NOT drawings/: the two are different things with different lifetimes \u2014 drawings are ITAR part data tied to a part\u2019s retention, videos are training material \u2014 and a future clear-out of one must not take the other with it. Still the PRIVATE repo, never a public video host: a recording of this app shows part numbers, tolerances and the drawing."] },
   { ts: "2026-07-30", rev: "App Rev-723", type: "App", changes: ["HOW-TO VIDEO PER SCREEN (Rev-723) \u2014 the \u2139 HELP window now carries \uff0b ADD HOW-TO VIDEO, which becomes \u25b6 WATCH HOW-TO once a clip is saved for the screen you are on. Help already knew which screen that was, so the video attaches itself to the right one with nothing to choose. Player has Close and a confirmed Delete. IT NEVER GOES TO A PUBLIC VIDEO HOST, AND THAT IS THE WHOLE POINT: a recording of the builder shows part numbers, tolerances, the ODS drawing and the customer name \u2014 ITAR-controlled export data. YouTube or any similar service would be a disclosure. The clip is stored on the DEVICE in IndexedDB and rides the same private-repo sync the ODS drawings already use, which is the one route in this app already trusted with drawing images. CAPPED AT 25 MB with a plain reason: every device downloads the whole file, and the repo is 16.7 MB today. A two-minute screen capture at moderate quality lands around 5\u201315 MB; anything larger asks for a shorter clip or a lower resolution rather than silently bloating every install."] },
@@ -2316,7 +2317,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "01:44 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "02:06 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7614,6 +7615,85 @@ function cpHowtoPlay(screenName){
   ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
   document.body.appendChild(ov);
 }
+// Rev-726: RECORD IN THE APP. Rev-723 only offered a file picker, which asks the user to have
+// already made a video somewhere else \u2014 exactly the local file the operator said he did not
+// want. This records the screen from inside the app and saves straight to videos/.
+let _cpRecState = null;
+function cpHowtoRecord(screenName){
+  if(_cpRecState){ flash('Already recording \u2014 press \u23f9 STOP.', true); return; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia){
+    flash('This browser cannot record the screen. Use Chrome or Edge on the desktop.', true); return;
+  }
+  const ovH = document.getElementById('cpHelpOv'); if(ovH) ovH.remove();   // do not film the help window
+  navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 12 }, audio: true }).then(async stream => {
+    // narration if the mic is allowed; carry on silently if it is not
+    let mic = null;
+    try{ mic = await navigator.mediaDevices.getUserMedia({ audio: true }); }catch(_){ }
+    if(mic) mic.getAudioTracks().forEach(t => stream.addTrack(t));
+    let mime = '';
+    ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4']
+      .some(m => { if(window.MediaRecorder && MediaRecorder.isTypeSupported(m)){ mime = m; return true; } });
+    const rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 900000 } : undefined);
+    const chunks = [];
+    rec.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop = () => {
+      try{ stream.getTracks().forEach(t => t.stop()); }catch(_){ }
+      try{ if(mic) mic.getTracks().forEach(t => t.stop()); }catch(_){ }
+      const bar = document.getElementById('cpRecBar'); if(bar) bar.remove();
+      _cpRecState = null;
+      const blob = new Blob(chunks, { type: mime || 'video/webm' });
+      const MB = blob.size / 1048576;
+      if(!blob.size){ flash('Nothing was recorded.', true); return; }
+      if(MB > 25){
+        flash('That recording is ' + MB.toFixed(0) + ' MB \u2014 over the 25 MB limit. Record a shorter '
+            + 'clip; every device downloads it in full.', true);
+        return;
+      }
+      const r = new FileReader();
+      r.onload = () => {
+        cpHowtoSave(screenName, r.result);
+        try{ logAct('howto', 'video recorded \u00b7 ' + screenName); }catch(_){ }
+        flash('\u2713 Recorded ' + MB.toFixed(1) + ' MB for ' + screenName + ' \u2014 uploading\u2026');
+        ghPushHowto(screenName).then(ok => {
+          cpHowtoMarkUnsynced(screenName, !ok);
+          flash(ok ? '\u2713 Stored in videos/ and read back. It plays on your other devices too.'
+                   : '\u26a0 THIS DEVICE ONLY \u2014 the upload did not land. Check the GitHub token in Admin.', !ok);
+        });
+      };
+      r.readAsDataURL(blob);
+    };
+    // stop when the user ends sharing from Chrome's own bar
+    try{ stream.getVideoTracks()[0].addEventListener('ended', () => { try{ rec.stop(); }catch(_){ } }); }catch(_){ }
+    const bar = document.createElement('div');
+    bar.id = 'cpRecBar';
+    bar.style.cssText = 'position:fixed; top:8px; left:50%; transform:translateX(-50%); z-index:11800;'
+      + ' background:#a5342a; color:#fff; font-size:12px; font-weight:800; letter-spacing:.05em;'
+      + ' padding:7px 14px; border-radius:999px; box-shadow:0 2px 10px rgba(0,0,0,.4);'
+      + ' display:flex; align-items:center; gap:10px; font-family:inherit;';
+    const t0 = Date.now();
+    const lab = document.createElement('span');
+    lab.textContent = '\u25cf RECORDING \u2014 ' + screenName + '  0:00';
+    const stop = document.createElement('button');
+    stop.type = 'button'; stop.textContent = '\u23f9 STOP & SAVE';
+    stop.style.cssText = 'font-size:11px; font-weight:800; padding:4px 12px; border-radius:999px;'
+      + ' border:none; background:#fff; color:#a5342a; cursor:pointer; font-family:inherit;';
+    stop.onclick = () => { try{ rec.stop(); }catch(_){ } };
+    bar.appendChild(lab); bar.appendChild(stop);
+    document.body.appendChild(bar);
+    const tick = setInterval(() => {
+      if(!document.getElementById('cpRecBar')){ clearInterval(tick); return; }
+      const sec = Math.floor((Date.now() - t0) / 1000);
+      lab.textContent = '\u25cf RECORDING \u2014 ' + screenName + '  '
+        + Math.floor(sec/60) + ':' + String(sec % 60).padStart(2,'0');
+    }, 1000);
+    _cpRecState = rec;
+    rec.start(1000);
+    flash('Recording. Do the steps, then press \u23f9 STOP & SAVE.');
+  }).catch(err => {
+    flash('Screen recording was not started' + (err && err.name === 'NotAllowedError'
+      ? ' \u2014 sharing was cancelled.' : '.'), true);
+  });
+}
 function cpHowtoAdd(screenName){
   const inp = document.createElement('input');
   inp.type = 'file'; inp.accept = 'video/*';
@@ -7748,7 +7828,7 @@ function cpHelpOpen(){
   const _unsynced = cpHowtoUnsynced().indexOf(scr) >= 0;
   vid.textContent = cpHowtoGet(scr)
     ? ('\u25b6 Watch how-to' + (_unsynced ? '  \u26a0 this device only' : ''))
-    : '\uff0b Add how-to video';
+    : '\u23fa Record how-to';
   if(_unsynced){
     // Rev-725: say it every time it is opened, not once in a flash that has gone
     setTimeout(() => { try{ ghPushHowto(scr).then(ok => { if(ok){ cpHowtoMarkUnsynced(scr, false);
@@ -7766,8 +7846,15 @@ function cpHelpOpen(){
     + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit; margin-right:auto;';
   vid.onclick = (e) => {
     e.preventDefault(); e.stopPropagation();
-    if(cpHowtoGet(scr)) cpHowtoPlay(scr); else cpHowtoAdd(scr);
+    if(cpHowtoGet(scr)) cpHowtoPlay(scr); else cpHowtoRecord(scr);
   };
+  // Rev-726: uploading an existing file stays available, but it is no longer the only way
+  const upl = document.createElement('button');
+  upl.type = 'button'; upl.textContent = '\u2191 Upload a file instead';
+  upl.title = 'Use a video you have already made, rather than recording now';
+  upl.style.cssText = 'font-size:11px; font-weight:700; padding:7px 10px; border:1px solid #c9c0b4;'
+    + ' border-radius:6px; background:#fff; color:#6b6257; cursor:pointer; font-family:inherit;';
+  upl.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpHowtoAdd(scr); };
   const pick = document.createElement('button');
   pick.type = 'button'; pick.textContent = '\u261d Point at something';
   pick.title = 'Click a control on the screen. Only WHAT it is gets sent \u2014 never a screenshot, '
@@ -7775,7 +7862,9 @@ function cpHelpOpen(){
   pick.style.cssText = 'font-size:12px; font-weight:700; padding:7px 14px; border:1px solid #c9c0b4;'
     + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit;';
   pick.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpHelpStartPick(); };
-  foot.appendChild(vid); foot.appendChild(pick); foot.appendChild(close); foot.appendChild(ask);
+  foot.appendChild(vid);
+  if(!cpHowtoGet(scr)) foot.appendChild(upl);
+  foot.appendChild(pick); foot.appendChild(close); foot.appendChild(ask);
   c.appendChild(ta); c.appendChild(chip); c.appendChild(out); c.appendChild(foot);
   ov.appendChild(c);
   ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
