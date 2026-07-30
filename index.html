@@ -1585,7 +1585,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-722";
+const APP_REV = "Rev-723";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1718,6 +1718,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-723", type: "App", changes: ["HOW-TO VIDEO PER SCREEN (Rev-723) \u2014 the \u2139 HELP window now carries \uff0b ADD HOW-TO VIDEO, which becomes \u25b6 WATCH HOW-TO once a clip is saved for the screen you are on. Help already knew which screen that was, so the video attaches itself to the right one with nothing to choose. Player has Close and a confirmed Delete. IT NEVER GOES TO A PUBLIC VIDEO HOST, AND THAT IS THE WHOLE POINT: a recording of the builder shows part numbers, tolerances, the ODS drawing and the customer name \u2014 ITAR-controlled export data. YouTube or any similar service would be a disclosure. The clip is stored on the DEVICE in IndexedDB and rides the same private-repo sync the ODS drawings already use, which is the one route in this app already trusted with drawing images. CAPPED AT 25 MB with a plain reason: every device downloads the whole file, and the repo is 16.7 MB today. A two-minute screen capture at moderate quality lands around 5\u201315 MB; anything larger asks for a shorter clip or a lower resolution rather than silently bloating every install."] },
   { ts: "2026-07-30", rev: "App Rev-722", type: "App", changes: ["THE MOVE-PIN QUESTION IS NO LONGER A BROWSER BOX (Rev-722) \u2014 the stray-click guard from Rev-517 asked \u2018Balloon 2 is already pinned. Move its pin?\u2019 through the browser\u2019s own confirm: black, unstyled, headed with the site address, with OK / Cancel that say nothing about what either does. It is now the themed window built at Rev-720, in BLUE rather than the deletion maroon \u2014 moving a pin is not destructive and should not wear the same colour as Delete drawing. The buttons say what they do: \ud83d\udccd MOVE THE PIN and LEAVE IT WHERE IT IS, so the choice can be read without matching OK to the question. It also mentions that dragging the red ring is easier for a small correction, which the old box said in a parenthesis nobody reads. STRUCTURAL PART: the themed box is a PROMISE and the pin handler is synchronous \u2014 it returns true/false to a click listener \u2014 so the pinning was split into cpDoPin(row, x, y), called straight away when no confirm is needed and from the promise when it is. cpConfirmBox gained a tone and a custom cancel label to serve both cases."] },
   { ts: "2026-07-30", rev: "App Rev-721", type: "App", changes: ["A DELETED DRAWING NO LONGER COMES BACK FROM THE PART-LEVEL COPY (Rev-721) \u2014 Rev-720 deleted OP-040\u2019s drawing correctly and said so, and Step 2 still read COMPLETED, because _idbGetOds falls back to a drawing stored under the PART alone when an operation has none of its own \u2014 a legacy shape from before Rev-600, when a part had one plan and one drawing. On 1000237620 that fallback file is 445,573 bytes against OP-040\u2019s 445,580: the same image, answering in its place. DELETING THE PART-LEVEL RECORD WAS THE WRONG FIX and was not done: on another part it may be the only drawing several operations have, so removing it to clear one op could blank the rest. Instead a TOMBSTONE records that this ONE operation has had its drawing deleted, and the lookup refuses the part-level fallback for that operation only. Uploading a new drawing for the op lifts the tombstone. OP-030 is untouched \u2014 it has its own op-specific drawing (737,296 bytes) and never relied on the fallback. NOTE: the repo still holds drawings/1000237620.json; the tombstone is local and syncs with settings, so a device that has not seen it will still find the part-level copy."] },
   { ts: "2026-07-30", rev: "App Rev-720", type: "App", changes: ["FIX \u2014 DELETING A DRAWING DID NOT ACTUALLY DELETE IT (Rev-720) \u2014 Rev-719 cleared the drawing by WRITING AN EMPTY IMAGE over it. _idbPutDrawing refuses a blank image on purpose, and says so in a comment left at Rev-575: \u2018it guards against wiping a drawing by accident, so removing one needs its own path.\u2019 That path, _idbDelDrawing, already existed. The result was a deletion that reported success while the drawing stayed in IndexedDB, so cpOpOdsImage still found it, hasOds stayed true and STEP 2 STILL READ COMPLETED \u2014 the app telling the QE a drawing was loaded when it had just been told to delete it. Now it calls _idbDelDrawing, then RE-CHECKS with cpOpOdsImage and only claims success if the drawing is really gone; if a legacy drawing stored under the PART alone is still answering for the operation, it says that instead of claiming a clean delete. THE BUTTON READS \ud83d\uddd1 DELETE DRAWING, not Remove \u2014 delete is what it does. AND THE CONFIRM IS NOW A THEMED WINDOW rather than the browser box: maroon header, the consequences in full (rows and typed values kept, pins cleared, Step 2 returns to not-done), Cancel focused, and the destructive button in red on the right."] },
@@ -2313,7 +2314,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:36 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "01:02 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7483,6 +7484,78 @@ function cpHelpStartPick(){
   document.addEventListener('click', click, true);
   document.addEventListener('keydown', key, true);
 }
+// ===== Rev-723: PER-SCREEN HOW-TO VIDEO =================================
+// A short recording attached to the screen it explains. Stored ON THE DEVICE in IndexedDB and
+// synced through the PRIVATE data repo, exactly like the ODS drawings \u2014 never a public video
+// host, because a recording of this app shows part numbers, tolerances, the drawing and the
+// customer, and that is ITAR-controlled export data.
+function cpHowtoKey(screenName){
+  return 'HOWTO::' + String(screenName || '').toUpperCase().replace(/[^A-Z0-9]+/g, '_');
+}
+function cpHowtoGet(screenName){
+  try{ const d = _idbGetDrawing(cpHowtoKey(screenName)); return (d && d.odsImage) || ''; }catch(_){ return ''; }
+}
+function cpHowtoSave(screenName, dataUrl){
+  try{ _idbPutDrawing(cpHowtoKey(screenName), dataUrl, null); return true; }catch(_){ return false; }
+}
+function cpHowtoDelete(screenName){
+  try{ _idbDelDrawing(cpHowtoKey(screenName)); }catch(_){ }
+}
+function cpHowtoPlay(screenName){
+  const src = cpHowtoGet(screenName);
+  if(!src){ flash('No how-to video saved for this screen yet.', true); return; }
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed; inset:0; z-index:10600; background:rgba(0,0,0,.85);'
+    + ' display:flex; align-items:center; justify-content:center; padding:20px; flex-direction:column; gap:10px;';
+  const v = document.createElement('video');
+  v.src = src; v.controls = true; v.autoplay = true;
+  v.style.cssText = 'max-width:96vw; max-height:82vh; background:#000; border-radius:8px;';
+  const bar = document.createElement('div');
+  bar.style.cssText = 'display:flex; gap:8px;';
+  const mk = (label, css, fn) => {
+    const b = document.createElement('button'); b.type='button'; b.textContent = label;
+    b.style.cssText = 'font-size:12px; font-weight:700; padding:7px 16px; border-radius:6px;'
+      + ' cursor:pointer; font-family:inherit; ' + css;
+    b.onclick = fn; bar.appendChild(b);
+  };
+  mk('Close', 'background:#fff; color:#3a352e; border:1px solid #c9c0b4;', () => ov.remove());
+  mk('\u2715 Delete this video', 'background:#a5342a; color:#fff; border:1px solid #7d2419;', async () => {
+    const ok = await cpConfirmBox('DELETE HOW-TO VIDEO',
+      'Delete the how-to video for <b>' + screenName + '</b>?<br><br>'
+      + 'Nothing else is affected. You can record and add another at any time.', '\ud83d\uddd1 Delete video');
+    if(!ok) return;
+    cpHowtoDelete(screenName); ov.remove();
+    flash('\u2713 How-to video deleted for ' + screenName + '.');
+  });
+  ov.appendChild(v); ov.appendChild(bar);
+  ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
+  document.body.appendChild(ov);
+}
+function cpHowtoAdd(screenName){
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'video/*';
+  inp.onchange = () => {
+    const f = inp.files && inp.files[0];
+    if(!f) return;
+    const MB = f.size / 1048576;
+    if(MB > 25){
+      flash('That video is ' + MB.toFixed(0) + ' MB. Keep how-to clips under 25 MB \u2014 every device '
+          + 'downloads it in full. Record a shorter clip or lower the resolution.', true);
+      return;
+    }
+    const r = new FileReader();
+    r.onload = () => {
+      if(cpHowtoSave(screenName, r.result)){
+        try{ logAct('howto', 'video saved \u00b7 ' + screenName); }catch(_){ }
+        flash('\u2713 How-to video saved for ' + screenName + ' (' + MB.toFixed(1) + ' MB). '
+            + 'It stays on this device and in your private repo \u2014 never a public host.');
+      } else flash('Could not save the video.', true);
+    };
+    r.onerror = () => flash('Could not read that file.', true);
+    r.readAsDataURL(f);
+  };
+  inp.click();
+}
 let _cpHelpOkThisSession = false;
 function cpHelpOpen(){
   const old = document.getElementById('cpHelpOv'); if(old) old.remove();
@@ -7579,14 +7652,28 @@ function cpHelpOpen(){
     }catch(e){ out.textContent = 'Could not reach the AI service: ' + (e && e.message ? e.message : e); }
     ask.disabled = false;
   };
+  // Rev-723: watch / add a how-to video for THIS screen
+  const scr = cpHelpScreen();
+  const vid = document.createElement('button');
+  vid.type = 'button';
+  vid.textContent = cpHowtoGet(scr) ? '\u25b6 Watch how-to' : '\uff0b Add how-to video';
+  vid.title = cpHowtoGet(scr)
+    ? 'Play the short recording saved for this screen'
+    : 'Attach a short screen recording for this screen. Stays on this device and in your private repo.';
+  vid.style.cssText = 'font-size:12px; font-weight:700; padding:7px 14px; border:1px solid #c9c0b4;'
+    + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit; margin-right:auto;';
+  vid.onclick = (e) => {
+    e.preventDefault(); e.stopPropagation();
+    if(cpHowtoGet(scr)) cpHowtoPlay(scr); else cpHowtoAdd(scr);
+  };
   const pick = document.createElement('button');
   pick.type = 'button'; pick.textContent = '\u261d Point at something';
   pick.title = 'Click a control on the screen. Only WHAT it is gets sent \u2014 never a screenshot, '
              + 'and never the contents of a cell.';
   pick.style.cssText = 'font-size:12px; font-weight:700; padding:7px 14px; border:1px solid #c9c0b4;'
-    + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit; margin-right:auto;';
+    + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit;';
   pick.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpHelpStartPick(); };
-  foot.appendChild(pick); foot.appendChild(close); foot.appendChild(ask);
+  foot.appendChild(vid); foot.appendChild(pick); foot.appendChild(close); foot.appendChild(ask);
   c.appendChild(ta); c.appendChild(chip); c.appendChild(out); c.appendChild(foot);
   ov.appendChild(c);
   ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
