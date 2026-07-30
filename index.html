@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-713";
+const APP_REV = "Rev-714";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-714", type: "App", changes: ["BACK NOW MEANS BACK, NOT MAIN MENU (Rev-714) \u2014 reviewed every back button: TEN called showMenu() outright and TWO called showAdmin(), so Back meant a fixed destination rather than \u2018where I came from\u2019. The bite was the route added at Rev-696 \u2014 open the Master List from inside the Build Control Plan grid to fix a control type, press Back, and the plan closed and you were at the top menu, several clicks from the row you were on. A history stack now records the screen you were on whenever another opens, and cpNavBack() returns to it: the wrapper does not record while going back, refuses to stack the same screen twice, and caps at 20 entries. An empty stack still falls through to the main menu, so a first screen behaves as before. FIXED IN ONE PLACE RATHER THAN FOURTEEN, so the next screen added inherits correct Back behaviour instead of copying showMenu() again. Side effects preserved: the Master List still saves an open inline edit and stops the feature-type tally first, and the builder\u2019s own Back is untouched because returning to the plan list is deliberate there. NOTE ON THE FIRST ATTEMPT AT THIS REV: the boot-line edit inserted a newline before a trailing // comment, which commented out the remainder of the original line and its braces. node --check caught it \u2014 the class of fault it CAN catch, unlike the scope error at Rev-706."] },
   { ts: "2026-07-29", rev: "App Rev-713", type: "App", changes: ["LIMITS NOW STACK, UPPER OVER LOWER (Rev-713) \u2014 .134/.124 written inline reads as a fraction or a range and leaves which number is which to be inferred; on a CNC print the upper limit sits ON TOP of the lower, and Instructions \u00a70.14 already says so \u2014 the app was breaking its own documented convention on screen while the .xlsx honoured it. One helper, cpSpecStackHtml, now renders the high limit on the top line and the low directly beneath, and it is used in both places a spec is DISPLAYED: the MACHINIST DOES NOT CHECK window header and the closed-row Product / Process Spec / Tol cell. IT DECIDES WHICH IS WHICH BY VALUE, not by position, so a limit typed low-first still displays upper-over-lower rather than repeating the entry error back as though it were correct. The original digits are preserved rather than reformatted, so .6040 does not become .604. Callouts that are not a clean pair \u2014 MAX, angular, single values, notes such as BURR IS OKAY \u2014 SEE ODS \u2014 pass through unchanged, and any trailing word is kept beside the stack at a smaller size. THE OPEN ROW\u2019S SPEC BOX IS DELIBERATELY UNCHANGED: it is a text input and has to stay typable; stacking would mean it could not be edited."] },
   { ts: "2026-07-29", rev: "App Rev-712", type: "App", changes: ["POINT AT SOMETHING \u2014 WITHOUT A SCREENSHOT (Rev-712) \u2014 the ask was for a screenshot the user could highlight. A screenshot of the Build Control Plan screen carries part numbers, tolerances, feature descriptions and the ODS drawing, which is exactly the leak the help agent was built to make impossible \u2014 and the ITAR gate\u2019s own wording (\u2018only if NON-ITAR\u2019) means the honest answer on that screen is always no. SO THE USEFUL HALF WAS BUILT WITHOUT THE PIXELS. \u261d POINT AT SOMETHING dims the window, banners the screen, outlines whatever is under the cursor, and on click sends WHAT IT IS rather than WHAT IT SAYS: a column heading, a button label, a named region. NO IMAGE IS EVER CAPTURED. Data cells and entry fields are handled by DESIGN, not by filtering \u2014 point at one and the app sends \u2018a cell in the MACHINIST CHECK FREQ column (its contents were NOT sent)\u2019, because the column heading names the concept the question is about while the cell holds the customer\u2019s data. The window shows the exact phrase before you press Ask, so nothing goes out unseen. Esc cancels."] },
   { ts: "2026-07-29", rev: "App Rev-711", type: "App", changes: ["THE ITAR GATE NOW SITS ABOVE EVERYTHING (Rev-711) \u2014 the help window added at Rev-707 was given z-index 10120 while the ITAR permission modal sat at 10070, so the gate opened BEHIND the window that triggered it: visible enough to be noticed, impossible to reach. THAT IS THE WORST WAY FOR THIS PARTICULAR CONTROL TO FAIL. Every other overlay in the app can be dismissed by clicking the backdrop; a permission gate exists specifically to be REFUSED, and one that cannot be answered is one that cannot be refused. Raised to 11000, above every overlay in the app, and also set programmatically each time it is shown so a future overlay with a higher number cannot bury it again without someone noticing. z-index only \u2014 no change to what the gate asks, what it protects, or what happens on Cancel."] },
@@ -2303,7 +2304,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "09:44 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:24 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7102,6 +7103,61 @@ const CP_HELP_SCREENS = [
   ['appInstructionsScreen','App instructions'], ['recentChangesScreen','Recent changes'],
   ['reportsScreen','Reports'], ['historyScreen','History']
 ];
+// ===== Rev-714: BACK MEANS BACK ==========================================
+// Nearly every back button called showMenu() outright, so Back meant a FIXED destination
+// rather than "where I came from". Reaching the Master List from inside the Build Control
+// Plan grid and pressing Back closed the plan and dropped you at the top menu.
+const CP_NAV_SCREENS = [
+  ['menuScreen','showMenu'], ['projectsScreen','showProjects'], ['cpBuilderScreen','showCPBuilder'],
+  ['masterListScreen','showMasterList'], ['gagesScreen','showGages'],
+  ['customersScreen','showCustomers'], ['instructionsScreen','showInstructions'],
+  ['settingsScreen','showSettings'], ['adminScreen','showAdmin'],
+  ['appInstructionsScreen','showAppInstructions'], ['recentChangesScreen','showRecentChanges'],
+  ['reportsScreen','showInspectionReports'], ['historyScreen','showHistory']
+];
+let _cpNavStack = [];
+let _cpNavGoingBack = false;
+function cpNavCurrentScreen(){
+  for(const [id] of CP_NAV_SCREENS){
+    const el = document.getElementById(id);
+    if(el && !el.classList.contains('hidden')) return id;
+  }
+  return '';
+}
+function cpNavBack(){
+  let target = '';
+  while(_cpNavStack.length){
+    const id = _cpNavStack.pop();
+    if(id && id !== cpNavCurrentScreen()){ target = id; break; }
+  }
+  const pair = CP_NAV_SCREENS.find(x => x[0] === target);
+  _cpNavGoingBack = true;
+  try{
+    if(pair && typeof window[pair[1]] === 'function') window[pair[1]]();
+    else if(typeof showMenu === 'function') showMenu();
+  } finally { _cpNavGoingBack = false; }
+}
+function cpNavWire(){
+  CP_NAV_SCREENS.forEach(function(pair){
+    const id = pair[0], fn = pair[1];
+    const orig = window[fn];
+    if(typeof orig !== 'function' || orig.__cpNavWrapped) return;
+    const wrapped = function(){
+      try{
+        if(!_cpNavGoingBack){
+          const from = cpNavCurrentScreen();
+          if(from && from !== id && _cpNavStack[_cpNavStack.length - 1] !== from){
+            _cpNavStack.push(from);
+            if(_cpNavStack.length > 20) _cpNavStack.shift();
+          }
+        }
+      }catch(_){ }
+      return orig.apply(this, arguments);
+    };
+    wrapped.__cpNavWrapped = true;
+    window[fn] = wrapped;
+  });
+}
 function cpHelpScreen(){
   for(const [id, name] of CP_HELP_SCREENS){
     const el = document.getElementById(id);
@@ -16974,11 +17030,11 @@ if($('cpWorkcenter')) $('cpWorkcenter').addEventListener('input', updateEditExis
 
 if($('mSaveApp')) $('mSaveApp').onclick = saveThisApp;
 try{   // Rev-521: boot-tail guard — any failure below REPORTS itself instead of silently dying
-try{ cpWireNavLogging(); logAct('nav', 'app-start ' + (typeof APP_REV !== 'undefined' ? APP_REV : '')); }catch(e){}   // Rev-624
+try{ cpWireNavLogging(); cpNavWire(); logAct('nav', 'app-start ' + (typeof APP_REV !== 'undefined' ? APP_REV : '')); }catch(e){}   // Rev-624
 $('mProjects').onclick = showProjects;
 if($('masterSaveBtn')) $('masterSaveBtn').onclick = cpMasterSaveChanges;   // Rev-617
 if($('mGages')) $('mGages').onclick = showGages;
-if($('gagesBack')) $('gagesBack').onclick = showMenu;
+if($('gagesBack')) $('gagesBack').onclick = cpNavBack;
 if($('gagesRefresh')) $('gagesRefresh').onclick = renderGages;
 if($('gagesFilter')) $('gagesFilter').onchange = renderGages;
 try{ cpUpdateGageBadge(); }catch(e){}
@@ -17026,23 +17082,23 @@ if($('reportsEmailBtn')) $('reportsEmailBtn').onclick = () => {
   location.href = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent('CAMCO Daily Inspection Results') + '&body=' + encodeURIComponent(body);
 };
 $('mAdmin').onclick = showAdmin;
-$('historyBack').onclick = showMenu;
+$('historyBack').onclick = cpNavBack;
 $('historyFilter').onchange = renderHistory;
 $('historyClearBtn').onclick = clearHistory;
 $('historyDownloadBtn').onclick = downloadHistory;
 $('masterHistoryIcon').onclick = () => showHistory('Master List');
 $('customerHistoryIcon').onclick = () => showHistory('Customer List');
-$('headerBack').onclick = showMenu;
-$('projectsBack').onclick = showMenu;
-$('masterListBack').onclick = () => { if(typeof masterEditingIdx !== 'undefined' && masterEditingIdx >= 0) saveInlineEdit(); stopFeatureTypeTally(); showMenu(); };   // Rev-292: auto-save pending edit on leave · Rev-331: stop tally timer
-$('customersBack').onclick = showMenu;
+$('headerBack').onclick = cpNavBack;
+$('projectsBack').onclick = cpNavBack;
+$('masterListBack').onclick = () => { if(typeof masterEditingIdx !== 'undefined' && masterEditingIdx >= 0) saveInlineEdit(); stopFeatureTypeTally(); cpNavBack(); };   // Rev-292: auto-save pending edit on leave · Rev-331: stop tally timer
+$('customersBack').onclick = cpNavBack;
 $('customerAddBtn').onclick = addCustomer;
 $('customerDownloadBtn').onclick = downloadCustomers;
-$('instructionsBack').onclick = showMenu;
-$('settingsBack').onclick = showAdmin;
-$('adminBack').onclick = showMenu;
-$('appInstructionsBack').onclick = showAdmin;
-$('recentChangesBack').onclick = showMenu;
+$('instructionsBack').onclick = cpNavBack;
+$('settingsBack').onclick = cpNavBack;
+$('adminBack').onclick = cpNavBack;
+$('appInstructionsBack').onclick = cpNavBack;
+$('recentChangesBack').onclick = cpNavBack;
 $('cpGenerateBtn').onclick = generateCP;
 $('cpSaveDraftBtn').onclick = saveDraft;
 // Rev-666: BUILDING THE .XLSX ISSUES THE REVISION. This is the moment the Control Plan
