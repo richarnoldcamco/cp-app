@@ -1608,7 +1608,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-747";
+const APP_REV = "Rev-748";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1741,6 +1741,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-748", type: "App", changes: ["FIX \u2014 AN INSPECTION SHOWED THE WRONG OPERATION\u2019S DRAWING (Rev-748) \u2014 inspecting 1000237620 OP-030 displayed L3H_912767-M_ODS-040, a different part\u2019s print. The validation builder fetched its drawing with _findLocalOdsImage(part), which looks up by PART NUMBER ALONE \u2014 correct before Rev-600, when a part had one plan and one drawing, and wrong ever since. On this part the bare key holds a legacy copy of the OP-040 print, so OP-030 got it and the operation\u2019s own 1000237620::OP030 drawing was never consulted. It now calls cpOpOdsImage(p) first, which resolves part::OPnnn and honours the Rev-721 tombstones, and only falls back to the part-wide lookup when the operation genuinely has none. The pinned balloon positions follow the same order. THIS IS WORTH MORE THAN A DISPLAY BUG: a machinist inspecting against the wrong print would take readings from dimensions that are not on the part in front of them, and every reading would be recorded as evidence. WHAT YOU MUST TEST (rule 8): Inspect on OP-030 shows ODS-030 and on OP-040 shows ODS-040."] },
   { ts: "2026-07-30", rev: "App Rev-747", type: "App", changes: ["OPEN MOVED NEXT TO THE PART NUMBER (Rev-747) \u2014 on the parts list the OPEN button sat at the far right edge, past Operations, Progress, Last Updated and Traveller: the longest reach on the row, for the thing you came to press. It now sits immediately after the part number, so the eye lands on the part and the button is already there. Left-aligned rather than right, since it is no longer the end of the row. HEADER AND CELL MOVED TOGETHER \u2014 the header string and the cell that builds the button are in different places in the file, and moving one without the other would have shifted every column label one place out of step with its data, which reads as correct until someone checks a date against the wrong heading."] },
   { ts: "2026-07-30", rev: "App Rev-746", type: "App", changes: ["THE WATCH BUTTON IS RED IN BOTH MODES (Rev-746) \u2014 it was green (#2c6e49) at rest and only went red while pulsing in NEW USER, so in EXPERT USER it sat in the same colour as Save to Project, New Row and Add Operation and read as one more routine action. Red now in both modes; the PULSE remains the NEW USER difference. Nothing else changed \u2014 same size, same position in the top bar, same behaviour, and the animation still stops under prefers-reduced-motion."] },
   { ts: "2026-07-30", rev: "App Rev-745", type: "App", changes: ["THE GRID NO LONGER SCROLLS SIDEWAYS \u2014 THE DRAWING GAVE UP THE ROOM (Rev-745) \u2014 the ODS panel held a flat 50% of the screen with a 520px floor, so on 5 \u00b7 Measurement Methods the thirteen visible columns came to roughly 1280px against about 1270px of table, and the last few pixels forced a horizontal scrollbar across the whole grid. The panel is now 38% with a 400px floor, handing the table around 300px more \u2014 comfortably clear on a 1920 or 2560 screen. THE DRAWING LOSES LESS THAN IT LOOKS: it is a zoom-and-pan view of a balloon, not a sheet to read whole \u2014 wheel zooms, drag pans, \ud83d\udd0d Full view resets, and clicking it opens the full-screen viewer. A NARROW SCREEN WILL STILL SCROLL: the 400px floor stops the drawing collapsing to nothing, so below roughly 1700px wide the columns win and the bar returns. That is the right trade \u2014 a drawing squeezed to a sliver helps nobody. WHAT YOU MUST TEST (rule 8): on 5 \u00b7 Measurement Methods there is no bar under the grid, and the drawing still zooms and pans."] },
@@ -2361,7 +2362,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "09:42 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:04 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4343,8 +4344,13 @@ async function mvBuildPartForProject(p){
   const workcenter = String(bs.workcenter || (bs.state && bs.state.workcenter) || '');
   if(!feats.length) return null;
 
+  // Rev-748: the pinned balloon positions belong to the operation too, so take them from the
+  // operation's own record before falling back to the part-wide one.
+  let _opRec = null;
+  try{ _opRec = _idbGetOds(part, p.opNum || bs.opNum); }catch(_){ }
   const planFeatures = (bs.features && bs.features.length) ? bs.features
-                     : (_findLocalOdsImage(part) || {}).features || [];
+                     : ((_opRec && _opRec.features && _opRec.features.length) ? _opRec.features
+                     : (_findLocalOdsImage(part) || {}).features || []);
   const featForBubble = b => {
     const key = String(b);
     return (planFeatures || []).find(f => String(f.n) === key) || null;
@@ -4403,7 +4409,12 @@ async function mvBuildPartForProject(p){
   });
 
   let odsImage = '';
-  try{ const found = _findLocalOdsImage(part); if(found && found.odsImage) odsImage = found.odsImage; }catch(_){ }
+  // Rev-748: THIS OPERATION'S drawing first. _findLocalOdsImage looks up by PART NUMBER only,
+  // a leftover from before Rev-600 when a part had one drawing — so an inspection of OP-030
+  // was handed whatever sat under the bare part key, which on 1000237620 is the OP-040 print.
+  // cpOpOdsImage resolves part::OPnnn and honours the Rev-721 deleted-for-this-op tombstones.
+  try{ const own = cpOpOdsImage(p); if(own) odsImage = own; }catch(_){ }
+  try{ if(!odsImage){ const found = _findLocalOdsImage(part); if(found && found.odsImage) odsImage = found.odsImage; } }catch(_){ }
   // Rev-506: this device has no drawing for the part — pull it from GitHub before building
   if(!odsImage){
     try{ if(await ghPullDrawing(part)){ const f2 = _findLocalOdsImage(part); if(f2 && f2.odsImage) odsImage = f2.odsImage; } }catch(_){ }
