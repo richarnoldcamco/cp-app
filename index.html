@@ -1608,7 +1608,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-748";
+const APP_REV = "Rev-749";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1741,6 +1741,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-749", type: "App", changes: ["FIX \u2014 SAVING A PLAN DELETED ITS LAST-UPDATED DATE (Rev-749) \u2014 1000237620 read 7/28 after a full day\u2019s work. Reading the stored data settled it: both of its operations had NO \u2018updated\u2019 field at all, while 912993, which had only ever auto-saved, still carried today\u2019s. Save to Project (and Build .xlsx, which runs the same code) builds a FRESH project object and assigns it over the stored one \u2014 and that object listed created but never updated, so every save destroyed the stamp the auto-save had just written, and the list fell back to an older date. The entry now carries updated, and the parts list falls back to created for plans saved before this rev rather than showing something plainly wrong. WHAT TO EXPECT: the date corrects itself on 1000237620 the next time you press Save to Project. THE SHAPE OF THIS FAULT IS WORTH REMEMBERING \u2014 a wholesale object replacement silently drops any field the newer object forgot, which looks like nothing happening rather than like an error."] },
   { ts: "2026-07-30", rev: "App Rev-748", type: "App", changes: ["FIX \u2014 AN INSPECTION SHOWED THE WRONG OPERATION\u2019S DRAWING (Rev-748) \u2014 inspecting 1000237620 OP-030 displayed L3H_912767-M_ODS-040, a different part\u2019s print. The validation builder fetched its drawing with _findLocalOdsImage(part), which looks up by PART NUMBER ALONE \u2014 correct before Rev-600, when a part had one plan and one drawing, and wrong ever since. On this part the bare key holds a legacy copy of the OP-040 print, so OP-030 got it and the operation\u2019s own 1000237620::OP030 drawing was never consulted. It now calls cpOpOdsImage(p) first, which resolves part::OPnnn and honours the Rev-721 tombstones, and only falls back to the part-wide lookup when the operation genuinely has none. The pinned balloon positions follow the same order. THIS IS WORTH MORE THAN A DISPLAY BUG: a machinist inspecting against the wrong print would take readings from dimensions that are not on the part in front of them, and every reading would be recorded as evidence. WHAT YOU MUST TEST (rule 8): Inspect on OP-030 shows ODS-030 and on OP-040 shows ODS-040."] },
   { ts: "2026-07-30", rev: "App Rev-747", type: "App", changes: ["OPEN MOVED NEXT TO THE PART NUMBER (Rev-747) \u2014 on the parts list the OPEN button sat at the far right edge, past Operations, Progress, Last Updated and Traveller: the longest reach on the row, for the thing you came to press. It now sits immediately after the part number, so the eye lands on the part and the button is already there. Left-aligned rather than right, since it is no longer the end of the row. HEADER AND CELL MOVED TOGETHER \u2014 the header string and the cell that builds the button are in different places in the file, and moving one without the other would have shifted every column label one place out of step with its data, which reads as correct until someone checks a date against the wrong heading."] },
   { ts: "2026-07-30", rev: "App Rev-746", type: "App", changes: ["THE WATCH BUTTON IS RED IN BOTH MODES (Rev-746) \u2014 it was green (#2c6e49) at rest and only went red while pulsing in NEW USER, so in EXPERT USER it sat in the same colour as Save to Project, New Row and Add Operation and read as one more routine action. Red now in both modes; the PULSE remains the NEW USER difference. Nothing else changed \u2014 same size, same position in the top bar, same behaviour, and the animation still stops under prefers-reduced-motion."] },
@@ -2362,7 +2363,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:04 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:26 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2927,7 +2928,9 @@ function renderPartsIndex(tbody, combined){
     const k = String(it.data.partNum || '').toUpperCase();
     if(!byPart[k]) byPart[k] = { part: it.data.partNum || '', ops: [], latest: '' };
     byPart[k].ops.push(it);
-    const d = it.data.updated || it.sortDate || '';
+    // Rev-749: plans saved before this rev have no 'updated' at all; fall back to the newest
+    // date the entry does carry rather than showing a date that is simply wrong.
+    const d = it.data.updated || it.sortDate || it.data.created || '';
     if(d > byPart[k].latest) byPart[k].latest = d;
   });
   const head = document.getElementById('cpPlanHeadRow');
@@ -5077,6 +5080,10 @@ function saveProject(partNum, rev, base64Data, customerName, qualityLevel){
     customer: customerName || '',
     qualityLevel: qualityLevel || '',
     created: new Date().toISOString(),
+    // Rev-749: SAVE STAMPS THE DATE TOO. This object REPLACES the stored plan wholesale, and
+    // it carried no 'updated', so every Save to Project / Build .xlsx wiped the timestamp the
+    // auto-save had written and the parts list fell back to an old date.
+    updated: new Date().toISOString(),
     data: base64Data,
     builderState: builderState
   };
