@@ -1584,7 +1584,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-714";
+const APP_REV = "Rev-715";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1717,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-29", rev: "App Rev-715", type: "App", changes: ["# RECORDED AND MEAS METHOD (CMM) CAN NOW BE OVERRIDDEN ON ONE ROW (Rev-715) \u2014 only the two FREQ cells were editable; the rest of the methods band was read-only, so a single line needing a different CMM technique could not be stated at all. Both now use the SAME declared-override mechanism as FREQ, not a free text box: orange fill with a heavy border, an OVERRIDE \u2014 MASTER: x chip, a \u21ba that snaps back, the who-and-when stamp from Rev-699, and the ? window from Rev-698 (whose labels now name all four columns). Type the master value back and the override clears itself. Closed rows show it too, so an override is never invisible from the grid. MEAS METHOD (MACHINIST) IS DELIBERATELY STILL NOT A TEXT BOX: it already has a declared route in \u270b MACHINIST DOES NOT CHECK THIS, plus the change-control-type and edit-master strip, and turning it into an input would throw all of that away for something worse. THE INSTRUCTIONS NOW NEED TO CATCH UP: CP-2C names all five columns as master-governed and says not to hand-edit them to disagree. Rev-499 already crossed that line for FREQ; this widens it. The mechanism records the deviation and who made it, which is the honest version, but Rev-92 does not yet describe ANY of it \u2014 the pending Rev-93 amendment should cover the declared override as well as the machinist exception."] },
   { ts: "2026-07-29", rev: "App Rev-714", type: "App", changes: ["BACK NOW MEANS BACK, NOT MAIN MENU (Rev-714) \u2014 reviewed every back button: TEN called showMenu() outright and TWO called showAdmin(), so Back meant a fixed destination rather than \u2018where I came from\u2019. The bite was the route added at Rev-696 \u2014 open the Master List from inside the Build Control Plan grid to fix a control type, press Back, and the plan closed and you were at the top menu, several clicks from the row you were on. A history stack now records the screen you were on whenever another opens, and cpNavBack() returns to it: the wrapper does not record while going back, refuses to stack the same screen twice, and caps at 20 entries. An empty stack still falls through to the main menu, so a first screen behaves as before. FIXED IN ONE PLACE RATHER THAN FOURTEEN, so the next screen added inherits correct Back behaviour instead of copying showMenu() again. Side effects preserved: the Master List still saves an open inline edit and stops the feature-type tally first, and the builder\u2019s own Back is untouched because returning to the plan list is deliberate there. NOTE ON THE FIRST ATTEMPT AT THIS REV: the boot-line edit inserted a newline before a trailing // comment, which commented out the remainder of the original line and its braces. node --check caught it \u2014 the class of fault it CAN catch, unlike the scope error at Rev-706."] },
   { ts: "2026-07-29", rev: "App Rev-713", type: "App", changes: ["LIMITS NOW STACK, UPPER OVER LOWER (Rev-713) \u2014 .134/.124 written inline reads as a fraction or a range and leaves which number is which to be inferred; on a CNC print the upper limit sits ON TOP of the lower, and Instructions \u00a70.14 already says so \u2014 the app was breaking its own documented convention on screen while the .xlsx honoured it. One helper, cpSpecStackHtml, now renders the high limit on the top line and the low directly beneath, and it is used in both places a spec is DISPLAYED: the MACHINIST DOES NOT CHECK window header and the closed-row Product / Process Spec / Tol cell. IT DECIDES WHICH IS WHICH BY VALUE, not by position, so a limit typed low-first still displays upper-over-lower rather than repeating the entry error back as though it were correct. The original digits are preserved rather than reformatted, so .6040 does not become .604. Callouts that are not a clean pair \u2014 MAX, angular, single values, notes such as BURR IS OKAY \u2014 SEE ODS \u2014 pass through unchanged, and any trailing word is kept beside the stack at a smaller size. THE OPEN ROW\u2019S SPEC BOX IS DELIBERATELY UNCHANGED: it is a text input and has to stay typable; stacking would mean it could not be edited."] },
   { ts: "2026-07-29", rev: "App Rev-712", type: "App", changes: ["POINT AT SOMETHING \u2014 WITHOUT A SCREENSHOT (Rev-712) \u2014 the ask was for a screenshot the user could highlight. A screenshot of the Build Control Plan screen carries part numbers, tolerances, feature descriptions and the ODS drawing, which is exactly the leak the help agent was built to make impossible \u2014 and the ITAR gate\u2019s own wording (\u2018only if NON-ITAR\u2019) means the honest answer on that screen is always no. SO THE USEFUL HALF WAS BUILT WITHOUT THE PIXELS. \u261d POINT AT SOMETHING dims the window, banners the screen, outlines whatever is under the cursor, and on click sends WHAT IT IS rather than WHAT IT SAYS: a column heading, a button label, a named region. NO IMAGE IS EVER CAPTURED. Data cells and entry fields are handled by DESIGN, not by filtering \u2014 point at one and the app sends \u2018a cell in the MACHINIST CHECK FREQ column (its contents were NOT sent)\u2019, because the column heading names the concept the question is about while the cell holds the customer\u2019s data. The window shows the exact phrase before you press Ask, so nothing goes out unseen. Esc cancels."] },
@@ -2304,7 +2305,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-29";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:24 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:47 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6579,13 +6580,17 @@ tr.appendChild(tdCT);
         // Rev-499: the two FREQ cells are editable. An edit that differs from the master
         // value marks the cell as an OVERRIDE — orange fill, OVR chip with the master's
         // original value in the tooltip, and a ↺ that snaps back to the master.
-        if(key === 'freqEvery' || key === 'freqQE'){
+        // Rev-715: the same DECLARED override now covers # Recorded and Meas Method (CMM),
+        // not just the two FREQ cells. Meas Method (MACHINIST) is deliberately excluded — it
+        // has its own declared route (\u270b MACHINIST DOES NOT CHECK THIS) plus the change-
+        // control-type strip, and turning it into a text box would lose both.
+        if(key === 'numRecorded' || key === 'freqEvery' || key === 'freqQE' || key === 'measMethodCMM'){
           const ov = row._freqOvr && row._freqOvr[key] !== undefined;
-          td.style.cssText = 'padding:6px; border:1px solid var(--line); font-size:13px; text-align:center;'
+          td.style.cssText = 'padding:6px; border:1px solid var(--line); font-size:13px; text-align:' + align + ';'
             + (ov ? 'background:#ffe8cc; border:2px solid #e67e22;' : (empty ? 'background:#fdecea;' : ''));
           const inp = document.createElement('input');
           inp.value = row[key] || '';
-          inp.style.cssText = 'width:100%; border:none; background:transparent; font-size:13px; text-align:center; font-weight:' + (ov ? '800' : '400') + ';';
+          inp.style.cssText = 'width:100%; border:none; background:transparent; font-size:13px; text-align:' + align + '; font-weight:' + (ov ? '800' : '400') + ';';
           inp.onchange = () => {
             const v = inp.value.trim().toUpperCase();
             row._freqOvr = row._freqOvr || {};
@@ -6727,11 +6732,8 @@ tr.appendChild(tdCT);
         const _c = compactCell(_nm || row.measMethod, 'left');
         if(_nm){ _c.style.background = '#fff4e6'; _c.style.fontWeight = '700'; _c.style.color = '#8a4b12'; }
         tr.appendChild(_c); })();
-      (function(){ const _t = compactCell(row.numRecorded, 'center'); cpTaperMark(_t, row.numRecorded); tr.appendChild(_t); })();
-      // Rev-702: the ? travels with the override onto CLOSED rows. The orange fill was
-      // visible everywhere; the explanation was only reachable by opening the row.
-      const _ovrCompact = (key) => {
-        const td = compactCell(row[key], 'center');
+      const _ovrCompact = (key, align) => {
+        const td = compactCell(row[key], align || 'center');
         if(row._freqOvr && row._freqOvr[key] !== undefined){
           td.style.background = '#ffe8cc'; td.style.fontWeight = '800';
           td.style.overflow = 'visible'; td.style.whiteSpace = 'nowrap';
@@ -6748,9 +6750,12 @@ tr.appendChild(tdCT);
         }
         return td;
       };
+      (function(){ const _t = _ovrCompact('numRecorded'); cpTaperMark(_t, row.numRecorded); tr.appendChild(_t); })();
+      // Rev-702: the ? travels with the override onto CLOSED rows. The orange fill was
+      // visible everywhere; the explanation was only reachable by opening the row.
       tr.appendChild(_ovrCompact('freqEvery'));
       tr.appendChild(_ovrCompact('freqQE'));
-      tr.appendChild(compactCell(row.measMethodCMM, 'left'));
+      tr.appendChild(_ovrCompact('measMethodCMM', 'left'));
       // Rev-571: special gage shows as a chip in the compact row (read-only at this size)
       tr.appendChild(cpGageCell(idx, row, true));   // Rev-675: button on closed rows too
       tr.appendChild(compactCell(row.reactionPlan, 'left'));
@@ -7017,7 +7022,9 @@ function cpOvrInfoModal(idx, key){
   const row = (cpBuildState && cpBuildState.rows) ? cpBuildState.rows[idx] : null;
   if(!row) return;
   const old = document.getElementById('cpOvrInfoOv'); if(old) old.remove();
-  const label = (key === 'freqEvery') ? 'MACHINIST CHECK FREQ' : 'FREQ (QUALITY ENGINEER)';
+  const label = ({ freqEvery: 'MACHINIST CHECK FREQ', freqQE: 'FREQ (QUALITY ENGINEER)',
+                   numRecorded: '# RECORDED MEASUREMENTS', measMethodCMM: 'MEAS METHOD (CMM)'
+                 })[key] || String(key);
   const masterVal = (row._freqOvr && row._freqOvr[key] !== undefined && row._freqOvr[key] !== '')
                     ? row._freqOvr[key] : '(blank)';
   const nowVal = row[key] || '(blank)';
