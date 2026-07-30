@@ -750,9 +750,9 @@
   <!-- Rev-586: three steps instead of one wall of columns -->
   <div id="cpStepBar" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 8px;">
     <span style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">STEP</span>
-    <button id="cpStepBtn1" onclick="cpSetStep('1')" class="cp-btn" style="border:1px solid #c2b9ab; background:#fff; color:#5c5349;">1 · Bubble Numbers</button>
-    <button id="cpStepBtn2" onclick="cpSetStep('2')" class="cp-btn" style="border:1px solid #c2b9ab; background:#fff; color:#5c5349;">2 · Control Type</button>
-    <button id="cpStepBtn3" onclick="cpSetStep('3')" class="cp-btn" style="border:1px solid #c2b9ab; background:#fff; color:#5c5349;">3 · Measurement Methods</button>
+    <button id="cpStepBtn1" onclick="cpSetStep('1')" class="cp-btn" style="border:1px solid #c2b9ab; background:#fff; color:#5c5349;">3 · Bubble Numbers</button>
+    <button id="cpStepBtn2" onclick="cpSetStep('2')" class="cp-btn" style="border:1px solid #c2b9ab; background:#fff; color:#5c5349;">4 · Control Type</button>
+    <button id="cpStepBtn3" onclick="cpSetStep('3')" class="cp-btn" style="border:1px solid #c2b9ab; background:#fff; color:#5c5349;">5 · Measurement Methods</button>
     <button id="cpStepBtnA" onclick="cpSetStep('A')" class="cp-btn" style="border:1px solid #c2b9ab; background:#fff; color:#5c5349;">All columns</button>
     <span id="cpStepHint" style="font-size:12px; color:#6b6257;"></span>
   </div>
@@ -1607,7 +1607,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-737";
+const APP_REV = "Rev-738";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1740,6 +1740,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-738", type: "App", changes: ["BUILDER TABS RENUMBERED 3 / 4 / 5 TO MATCH THE CONSTRUCTION STEPS (Rev-738) \u2014 the Control Plans list counts five steps \u2014 1 Edit op #, 2 Upload ODS, 3 Assign bubbles, 4 Assign control types, 5 Assign measurement types \u2014 while the builder called the same three jobs 1, 2 and 3. So Assign Bubbles was step 3 on one screen and step 1 on the next. The tabs now read 3 \u00b7 Bubble Numbers, 4 \u00b7 Control Type, 5 \u00b7 Measurement Methods. THE INTERNAL KEYS ARE DELIBERATELY UNCHANGED at \u20181\u2019, \u20182\u2019, \u20183\u2019: every approval already recorded is stored under stepDone[\u20181\u2019..\u20183\u2019] and the how-to videos are keyed on the same strings, so renumbering the keys would silently orphan every approval on every plan AND detach the video moved to Step 1 one rev ago. What the QE reads and what the data is keyed on are separate things, and only the first needed changing. WHAT YOU MUST TEST (rule 8): tabs read 3/4/5; your approvals on OP-030 are still there (96%, 12/14); the video still appears on 3 \u00b7 Bubble Numbers only."] },
   { ts: "2026-07-30", rev: "App Rev-737", type: "App", changes: ["A HOW-TO VIDEO NOW BELONGS TO A STEP, NOT THE WHOLE BUILDER (Rev-737) \u2014 HOW TO ASSIGN BUBBLE NUMBERS was appearing on 3 \u00b7 Measurement Methods, because a clip is keyed to the SCREEN and the builder reports one name across all four of its step views. The builder now identifies itself as \u2018Build Control Plan \u00b7 Step 1 \u00b7 Bubble Numbers\u2019 and so on, so each step carries its own video and shows only its own. The \u2139 HELP agent gets the same benefit \u2014 it now knows which step the question is about, not just which screen. THE EXISTING CLIP WAS MOVED, NOT ORPHANED: a one-time migration copies it to Step 1, carries its title across, pushes it to videos/ under the new name and removes the old copy from the device and the repo. Step 1 because the operator said plainly it belongs on the bubble-numbers page \u2014 not a guess. WHAT YOU MUST TEST (rule 8): on 1 \u00b7 Bubble Numbers the big red button is there; on 2 \u00b7 Control Type and 3 \u00b7 Measurement Methods it is NOT; \uff0b Record how-to on those steps offers to record a new one for that step."] },
   { ts: "2026-07-30", rev: "App Rev-736", type: "App", changes: ["STITCH ALL OPERATIONS INTO ONE PART CONTROL PLAN (Rev-736) \u2014 a new button on the PART header row, beside Add Operation and View Traveller: \u2018Stitch together all OP Control Plans into one Part Control Plan\u2019. It opens the same editable L3Harris sheet but built from EVERY operation of the part in routing order, with continuous Doc numbers. Placed on the part row rather than an operation row because that is what it covers \u2014 the per-operation Excel Control Plan buttons stay exactly where they are. THE TWO SHEETS ARE SEPARATE DOCUMENTS AND CANNOT OVERWRITE EACH OTHER: the operation sheet saves to custCP on its own plan, the part sheet to custCPPart, so editing one never rewrites the other and each keeps its own \u21bb Rebuild. The part sheet always lives on the FIRST operation of the part, so there is exactly one of them however many operations the part grows, and its plan number reads L3H_<part>_ALLOPS_CP. WHAT YOU MUST TEST (rule 8): the button appears on the 1000237620 header row; it opens a sheet containing BOTH OP-030 and OP-040 rows; the per-operation buttons still show one operation each."] },
   { ts: "2026-07-30", rev: "App Rev-735", type: "App", changes: ["EXCEL CONTROL PLAN \u2014 ONE PER OPERATION (Rev-735) \u2014 the button is renamed from Customer CP to EXCEL CONTROL PLAN, and the sheet it opens now covers THAT OPERATION ONLY. Rev-562 had it gather every operation of the part into a single sheet; the operation is the unit of work everywhere else in this app \u2014 plans are built, revised, approved and issued per operation \u2014 so the export now matches. Three things changed with it: opening no longer hops to a sibling operation\u2019s saved sheet (each operation keeps and edits its own), the header reads EXCEL CONTROL PLAN \u2014 <part> \u00b7 OP-nnn with the subtitle THIS OPERATION ONLY, and the plan number carries the operation: L3H_1000237620_OP030_CP. The architecture note in the handoff prompt was corrected too, so a future chat is not told the old behaviour. WHAT YOU MUST TEST (rule 8): open Excel Control Plan on OP-030 and confirm it holds ONLY OP-030\u2019s rows; then open it on OP-040 and confirm it holds only OP-040\u2019s. IF EITHER STILL SHOWS BOTH, press \u21bb REBUILD once \u2014 a sheet edited under the old behaviour is kept as you left it until rebuilt."] },
@@ -2350,7 +2351,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "06:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "06:31 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6210,19 +6211,24 @@ const CP_STEPS = {
   //  6 2nd Level  7 3rd Level  8 Feature/Process Description  9 Spec/Tol  10 Upper
   //  11 Lower  12 Class  13 Meas(Machinist)  14 #Rec  15 FREQ(Every)  16 FREQ(QE)
   //  17 Meas(CMM)  18 Special Gage  19 Reaction Plan
-  '1': { label: '1 \u00b7 Bubble Numbers',
+  '1': { label: '3 \u00b7 Bubble Numbers',
          hint: 'Give every ODS balloon its row, then pin each one on the drawing \u2014 the step is done when every row shows a green dot.',
          cols: [0,1,2,8,9,10,11,12] },
-  '2': { label: '2 \u00b7 Control Type',
+  '2': { label: '4 \u00b7 Control Type',
          hint: 'Narrow it down with Workcenter \u2192 Feature Type \u2192 2nd / 3rd Level. The Control Type ID resolves itself, and the methods fill from the Master List.',
          cols: [0,1,2,3,4,5,6,7,8,9,12] },
-  '3': { label: '3 \u00b7 Measurement Methods',
+  '3': { label: '5 \u00b7 Measurement Methods',
          hint: 'Review what the master filled in, set any special gage, and confirm the reaction plan.',
          cols: [0,1,2,8,9,12,13,14,15,16,17,18,19] },
   'A': { label: 'All columns',
          hint: 'Every column at once \u2014 the old single-screen view.',
          cols: null }
 };
+// Rev-738: the tabs now READ 3/4/5 to match the five construction steps on the Control Plans
+// list (1 Edit op #, 2 Upload ODS, 3 Assign bubbles, 4 Assign control types, 5 Assign
+// measurement types). The internal keys stay '1','2','3' on purpose: every approval already
+// recorded sits under stepDone['1'..'3'], and the how-to videos are keyed on them too, so
+// renumbering the keys would silently orphan both. Display and identity are separate here.
 function cpGetStep(){ const s = localStorage.getItem('cpBuildStep'); return CP_STEPS[s] ? s : '1'; }
 function cpSetStep(s){
   if(!CP_STEPS[s]) s = '1';
