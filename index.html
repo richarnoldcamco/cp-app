@@ -1585,7 +1585,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-726";
+const APP_REV = "Rev-728";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1718,6 +1718,8 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-728", type: "App", changes: ["RULE 9 REMOVED FROM THE INSTRUCTION STANDARD (Rev-728) \u2014 the operator has decided the GitHub token and the Anthropic API key live in the chat and in the app, so the rule forbidding Claude from handling credentials is deleted from CP_RICH_STANDARD and the old rule 10 (END-OF-SESSION) is renumbered to 9, leaving the list running 1\u20139 with no gap. Claude resumes pushing revisions straight to cp-app/index.html and cp-generator-data/cp_app.html, which is how every rev before 727 shipped. All other rules are untouched. WHAT YOU MUST TEST (rule 8): press \ud83d\udcac New Chat Prompt and confirm the copied text opens with \u2018INSTRUCTION STANDARD \u2014 RICH ARNOLD\u2019 and that the numbered list ends at 9 (END-OF-SESSION) with nothing about credentials."] },
+  { ts: "2026-07-30", rev: "App Rev-727", type: "App", changes: ["THE INSTRUCTION STANDARD IS NOW PART OF THE HANDOFF PROMPT (Rev-727) \u2014 Rich Arnold\u2019s INSTRUCTION STANDARD is baked in VERBATIM as CP_RICH_STANDARD and prepended to the text the \ud83d\udcac New Chat Prompt button copies, so every future chat inherits it without it being pasted again. WHAT YOU MUST TEST (rule 8): press \ud83d\udcac New Chat Prompt and confirm the copied text now OPENS with \u2018INSTRUCTION STANDARD \u2014 RICH ARNOLD\u2019 before the usual app description. RULE 9 TAKES EFFECT IMMEDIATELY AND CHANGES HOW THIS APP IS SHIPPED: Claude no longer handles the GitHub token, so this revision was NOT pushed by Claude \u2014 it is delivered as a file for the operator to load through Admin \u2192 Import App Code, and every revision from here follows that route. The claude-push token pasted into the session before this rule existed should be regenerated. NOTE ON WHERE THIS LIVES: the app tries to fetch the shared prompt block from a repo that does not exist (found at Rev-682), so the copy baked into the file IS the one in use \u2014 which is why baking it in works at all."] },
   { ts: "2026-07-30", rev: "App Rev-726", type: "App", changes: ["RECORD THE VIDEO IN THE APP \u2014 NO FILE, NO FOLDER (Rev-726) \u2014 Rev-723 built an UPLOAD, which asks the user to have already made a clip somewhere else and keep it as a local file: precisely the thing the operator said he did not want. \u23fa RECORD HOW-TO now captures the screen from inside the app and saves straight to videos/. Press it, do the steps, press \u23f9 STOP & SAVE. A red pill sits at the top of the screen while it runs with a live timer, and ending the share from Chrome\u2019s own bar stops the recording cleanly too. The HELP window closes itself first so it is not filmed. Narration is recorded if the microphone is allowed and skipped silently if it is not. Encoded at 12fps and ~0.9 Mbps \u2014 a screen recording of a static grid needs no more, and it keeps a two-minute clip near 10 MB, inside the 25 MB limit; anything over is refused with the size named rather than bloating every device. Upload-a-file remains as a secondary button for a clip made elsewhere. UNAVOIDABLE: the browser still asks WHICH window to share \u2014 that is Chrome\u2019s own permission prompt and no page can skip it."] },
   { ts: "2026-07-30", rev: "App Rev-725", type: "App", changes: ["THE VIDEO UPLOAD IS NOW READ BACK, AND A DEVICE-ONLY CLIP SAYS SO (Rev-725) \u2014 the operator has decided not to keep local source files: the app is the store of record. That is sound BECAUSE the copy in videos/ is version-controlled and therefore a real archive \u2014 but it puts all the weight on the upload actually landing. So the push now READS THE FILE BACK and compares its length before reporting success, the same check used on every app rev; a PUT that returns ok but does not land no longer counts. IF IT FAILS, THE WARNING PERSISTS: the screen is recorded in cpHowtoUnsynced, the HELP button reads \u2018\u25b6 Watch how-to \u26a0 this device only\u2019, and opening HELP quietly retries the upload and clears the mark when it succeeds. A one-off flash was not good enough for a message that means \u2018this is the only copy in existence\u2019 \u2014 it disappears in seconds and the browser storage holding that copy can be cleared without warning."] },
   { ts: "2026-07-30", rev: "App Rev-724", type: "App", changes: ["HOW-TO VIDEOS NOW LIVE IN videos/ IN THE PRIVATE REPO (Rev-724) \u2014 Rev-723 stored a clip in IndexedDB on ONE device, which is no use for training: the new user is on a different machine from whoever recorded it, and a browser cache is not a place to keep something the shop depends on. Saving now uploads to videos/HOWTO__SCREEN.json in the private data repo, modelled on the Rev-506 drawing sync (fetch the sha, PUT, report honestly if it fails rather than claiming success). Opening HELP on a screen with no local clip pulls it once per session and flips the button to \u25b6 WATCH HOW-TO when it lands. Deleting removes both copies and says plainly if the repo copy survived \u2014 otherwise the next pull would resurrect it. ITS OWN FOLDER, NOT drawings/: the two are different things with different lifetimes \u2014 drawings are ITAR part data tied to a part\u2019s retention, videos are training material \u2014 and a future clear-out of one must not take the other with it. Still the PRIVATE repo, never a public video host: a recording of this app shows part numbers, tolerances and the drawing."] },
@@ -2317,7 +2319,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "02:06 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "02:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -17165,6 +17167,69 @@ async function hcCopyPrompt(){
   }
 }
 
+
+const CP_RICH_STANDARD = `# INSTRUCTION STANDARD — RICH ARNOLD (paste into any working chat)
+
+TO CLAUDE: Adopt these rules immediately in this chat, AND bake this
+entire block verbatim into this app's NEW CHAT PROMPT / handoff text at
+the next revision, so every future chat inherits it without me pasting
+it again. Confirm both in one sentence when you've read this.
+
+## WHO I AM
+I am a quality engineer, NOT a developer. I do not know git, repos,
+service workers, cache, DOM, JSON, or any developer vocabulary. I am
+busy; every unclear instruction costs me a trip, a screenshot from a
+limited image budget, and trust.
+
+## HOW CLAUDE INSTRUCTS ME — NON-NEGOTIABLE
+
+1. NO JARGON without a plain-English translation in the same sentence.
+   Example: "repository" = the project's page on github.com. If a term
+   needs a definition, define it inline or do not use it.
+
+2. VERIFIED, NOT REMEMBERED. Never describe a button, icon, menu, or
+   screen from memory as if it were fact. If Claude cannot verify a UI
+   detail, state what is certain and what may vary, WITH the fallback
+   in the same message — so one message survives either layout.
+   (Past failures: "click the trash icon" — it was a red text link
+   reading "Delete file" at the bottom of the "..." menu; a file
+   location stated confidently and wrong, twice.)
+
+3. ONE STEP AT A TIME. One action. Wait for my confirmation. Verify.
+   Then the next. Never a wall of steps. If I ask for the full list,
+   give it — otherwise single steps.
+
+4. TEXT CONFIRMATIONS OVER SCREENSHOTS. Wherever Claude can verify a
+   result itself (fetching the public repo files, checking a served
+   page), it does so and I just reply "done" in text. Ask for a
+   screenshot only when nothing else can answer the question.
+
+5. EXACT WORDS AND LOCATIONS. Quote button labels verbatim ("Commit
+   changes...") and say where on the screen they sit. If the screen I
+   report doesn't match, Claude deciphers it — not me.
+
+6. MY MACHINE'S KNOWN FACTS (apply to every file exchange):
+   - Download cards render BELOW Claude's text, not above.
+   - .js files will not download — deliver as NAME-RENAME-TO-js.txt;
+     I rename them (file extensions are visible on my machine).
+   - Word hijacks .txt files when opened — I click Cancel; never ask
+     me to open a delivered file unless opening IS the task.
+   - Desktop and Documents are OneDrive-synced and have corrupted
+     uploads before (a saved error page got deployed to a live site).
+     All file staging happens in Downloads only.
+
+7. OWN FAILURES FAST. When Claude's instruction fails, one sentence of
+   root cause + the corrected step. No essays, no over-apology.
+
+8. BEFORE SHIPPING ANY APP REVISION: verify it actually loads (a
+   syntax error shows a blank page or endless spinner, not an error);
+   grep any new top-level constant name for duplicates first; and
+   state in the changelog what changed and what I must test.
+
+9. END-OF-SESSION: before I leave, Claude lists in one short block —
+   what was deployed and verified, what is mid-flight, what I must
+   download NOW (files in chat cards die with the chat), and the
+   exact first step for the next session.`;
 // ===== NEW CHAT PROMPT =====
 // The COMMON block is shared across all CAMCO apps and lives on GitHub so it can be
 // edited in ONE place. We fetch it live (raw host + cache-buster; github.io is blocked),
@@ -17174,7 +17239,8 @@ const SHARED_PROMPT_URL = 'https://raw.githubusercontent.com/richarnoldcamco/sha
 const NEWCHAT_COMMON_FALLBACK =
 "Follow the project's controlling instructions/spec for all content rules; never edit that controlling document without asking me first.\n" +
 "\n" +
-"About me / how to work with me: I am NOT a programmer \u2014 explain in plain language with click-by-click steps, and define any unavoidable technical term in one plain sentence. I use terse all-caps shorthand; resolve intent from minimal input without over-asking. This is ITAR aerospace/defense work (CAMCO Manufacturing) \u2014 drawing/part/feature data must stay on my device; any AI calls sit behind ITAR confirm gates.\n" +
+CP_RICH_STANDARD + "\n\n" +
+  "About me / how to work with me: I am NOT a programmer \u2014 explain in plain language with click-by-click steps, and define any unavoidable technical term in one plain sentence. I use terse all-caps shorthand; resolve intent from minimal input without over-asking. This is ITAR aerospace/defense work (CAMCO Manufacturing) \u2014 drawing/part/feature data must stay on my device; any AI calls sit behind ITAR confirm gates.\n" +
 "WALKING ME THROUGH ANYTHING ON MY MACHINE: give me ONE STEP AT A TIME and wait for a screenshot before the next one. Read what the screenshot actually shows and confirm it before moving on \u2014 do not assume a step worked because it should have. Never dump the whole list of steps at once. I am intolerant of rework, so verify rather than assume, and when something is wrong say so plainly with the root cause instead of softening it.\n" +
 "PHOTOS AND IMAGES EMBEDDED IN ANY CAMCO APP (operator rule, 2026-07-28): 500,000 bytes maximum raw per photo, 2400 px maximum on the long edge. ALWAYS re-encode from the ORIGINALS, never from an already-compressed set \u2014 a JPEG round trip does not reverse, and raising the cap after a crush does not bring the quality back. Keep PNG checklists and any image whose value is readable text as PNG; JPEG smears text.\n" +
 "NOTE ON OTHER CAMCO APPS: the PFMEA Builder (PF) ships as TWO files with a versioned asset crate and its own deploy order; the Control Plan Generator does NOT \u2014 it is a single file pushed straight to cp-app/index.html and cp-generator-data/cp_app.html. Do not carry PF deploy steps across to CP.\n" +
