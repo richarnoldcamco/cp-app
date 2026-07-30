@@ -1608,7 +1608,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-739";
+const APP_REV = "Rev-740";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1741,6 +1741,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-740", type: "App", changes: ["FIX \u2014 RENAMING THE TABS ORPHANED THE HOW-TO VIDEO (Rev-740) \u2014 the clip stopped appearing on Bubble Numbers. Rev-737 keyed each video on cpHelpScreen(), which includes the step LABEL; Rev-738 then renamed that label from \u20181 \u00b7 Bubble Numbers\u2019 to \u20183 \u00b7 Bubble Numbers\u2019, so the app looked for \u2018\u2026 Step 1 \u00b7 3 \u00b7 Bubble Numbers\u2019 while the file sat under \u2018\u2026 Step 1 \u00b7 Bubble Numbers\u2019. Storage keyed on display text breaks the moment the display changes. Videos now key on cpHowtoScreenKey() \u2014 \u2018Build Control Plan \u00b7 Step 1\u2019 \u2014 an identity with no caption in it, so any future renaming of the tabs is harmless. A migration rescues clips filed under either of the two label-based keys and re-uploads them under the stable one. MY CHECK AT REV-738 WAS WORTHLESS AND SHOULD BE RECORDED AS SUCH: it confirmed the code SHAPE was unchanged, not the string it produced, and I reported the video key as stable on that basis. Verifying the input and not the output is not verification."] },
   { ts: "2026-07-30", rev: "App Rev-739", type: "App", changes: ["\ud83e\uddf9 REMOVE EMPTY ROWS (Rev-739) \u2014 a plan is created with a guessed row count and the drawing often carries fewer balloons; ODS-040 has FOUR and the plan was built with fifteen, leaving eleven rows that will never be filled and eleven balloons that do not exist counting against every completion figure. The new button sits beside \uff0b New Row and clears them. ONLY GENUINELY EMPTY ROWS GO: no description, no tolerance, no limits, no class, no control type, no method, no reaction plan, no special gage, no declared machinist exception, no approval on any step, and no pin on the drawing. A ghosted row is never touched. Anything carrying a trace of work stays, so this cannot quietly destroy a half-finished line. The confirm names HOW MANY and WHICH BALLOON NUMBERS before anything is removed, and says how many rows will remain \u2014 and \uff0b New Row puts one back if the drawing turns out to have more balloons than first thought."] },
   { ts: "2026-07-30", rev: "App Rev-738", type: "App", changes: ["BUILDER TABS RENUMBERED 3 / 4 / 5 TO MATCH THE CONSTRUCTION STEPS (Rev-738) \u2014 the Control Plans list counts five steps \u2014 1 Edit op #, 2 Upload ODS, 3 Assign bubbles, 4 Assign control types, 5 Assign measurement types \u2014 while the builder called the same three jobs 1, 2 and 3. So Assign Bubbles was step 3 on one screen and step 1 on the next. The tabs now read 3 \u00b7 Bubble Numbers, 4 \u00b7 Control Type, 5 \u00b7 Measurement Methods. THE INTERNAL KEYS ARE DELIBERATELY UNCHANGED at \u20181\u2019, \u20182\u2019, \u20183\u2019: every approval already recorded is stored under stepDone[\u20181\u2019..\u20183\u2019] and the how-to videos are keyed on the same strings, so renumbering the keys would silently orphan every approval on every plan AND detach the video moved to Step 1 one rev ago. What the QE reads and what the data is keyed on are separate things, and only the first needed changing. WHAT YOU MUST TEST (rule 8): tabs read 3/4/5; your approvals on OP-030 are still there (96%, 12/14); the video still appears on 3 \u00b7 Bubble Numbers only."] },
   { ts: "2026-07-30", rev: "App Rev-737", type: "App", changes: ["A HOW-TO VIDEO NOW BELONGS TO A STEP, NOT THE WHOLE BUILDER (Rev-737) \u2014 HOW TO ASSIGN BUBBLE NUMBERS was appearing on 3 \u00b7 Measurement Methods, because a clip is keyed to the SCREEN and the builder reports one name across all four of its step views. The builder now identifies itself as \u2018Build Control Plan \u00b7 Step 1 \u00b7 Bubble Numbers\u2019 and so on, so each step carries its own video and shows only its own. The \u2139 HELP agent gets the same benefit \u2014 it now knows which step the question is about, not just which screen. THE EXISTING CLIP WAS MOVED, NOT ORPHANED: a one-time migration copies it to Step 1, carries its title across, pushes it to videos/ under the new name and removes the old copy from the device and the repo. Step 1 because the operator said plainly it belongs on the bubble-numbers page \u2014 not a guess. WHAT YOU MUST TEST (rule 8): on 1 \u00b7 Bubble Numbers the big red button is there; on 2 \u00b7 Control Type and 3 \u00b7 Measurement Methods it is NOT; \uff0b Record how-to on those steps offers to record a new one for that step."] },
@@ -2353,7 +2354,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "07:02 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "07:26 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7721,6 +7722,16 @@ try{
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', cpModeButton);
   else cpModeButton();
 }catch(_){ }
+// Rev-740: the video key must NEVER be built from anything a label can change. Rev-737 keyed
+// it on cpHelpScreen(), which includes the step LABEL; Rev-738 renamed that label 1\u21923 and every
+// clip on the builder was orphaned instantly. This returns an identity, not a caption.
+function cpHowtoScreenKey(){
+  try{
+    const el = document.getElementById('cpBuilderScreen');
+    if(el && !el.classList.contains('hidden')) return 'Build Control Plan \u00b7 Step ' + cpGetStep();
+  }catch(_){ }
+  return cpHelpScreen();
+}
 function cpHowtoTitles(){
   try{ return JSON.parse(localStorage.getItem('cpHowtoTitles') || '{}') || {}; }catch(_){ return {}; }
 }
@@ -7775,11 +7786,31 @@ function cpPromptBox(heading, label, value){
 // than being guessed at or left showing on every step.
 function cpHowtoMigrateStep(){
   try{
+    // Rev-740: also rescue clips filed under the label-based keys used by Rev-737/738.
+    if(localStorage.getItem('cpHowtoKeyV2') !== '1'){
+      ['Build Control Plan \u00b7 Step 1 \u00b7 Bubble Numbers',
+       'Build Control Plan \u00b7 Step 1 \u00b7 3 \u00b7 Bubble Numbers'].forEach(oldKey => {
+        try{
+          const v = cpHowtoGet(oldKey);
+          if(!v) return;
+          const nk = 'Build Control Plan \u00b7 Step 1';
+          if(!cpHowtoGet(nk)){
+            cpHowtoSave(nk, v);
+            const t = cpHowtoTitle(oldKey); if(t) cpHowtoSetTitle(nk, t);
+            try{ ghPushHowto(nk); }catch(_){ }
+          }
+          cpHowtoDelete(oldKey); cpHowtoSetTitle(oldKey, '');
+          try{ ghDeleteHowto(oldKey); }catch(_){ }
+        }catch(_){ }
+      });
+      localStorage.setItem('cpHowtoKeyV2', '1');
+      try{ cpHowtoFab(); }catch(_){ }
+    }
     if(localStorage.getItem('cpHowtoStepMigrated') === '1') return;
     const legacy = 'Build Control Plan';
     const src = cpHowtoGet(legacy);
     if(src){
-      const target = 'Build Control Plan \u00b7 Step 1 \u00b7 Bubble Numbers';
+      const target = 'Build Control Plan \u00b7 Step 1';
       if(!cpHowtoGet(target)){
         cpHowtoSave(target, src);
         const t = cpHowtoTitle(legacy); if(t) cpHowtoSetTitle(target, t);
@@ -7795,7 +7826,7 @@ function cpHowtoMigrateStep(){
 try{ setTimeout(cpHowtoMigrateStep, 2500); }catch(_){ }
 function cpHowtoFab(){
   try{
-    const scr = cpHelpScreen();
+    const scr = cpHowtoScreenKey();
     let b = document.getElementById('cpHowtoFab');
     const has = !!cpHowtoGet(scr);
     if(!has){ if(b) b.remove(); return; }
@@ -7809,7 +7840,7 @@ function cpHowtoFab(){
         + ' border-radius:999px; border:2px solid #215236; background:#2c6e49; color:#fff;'
         + ' cursor:pointer; font-family:inherit; box-shadow:0 4px 14px rgba(0,0,0,.35);'
         + ' max-width:56vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;';
-      b.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpHowtoPlay(cpHelpScreen()); };
+      b.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpHowtoPlay(cpHowtoScreenKey()); };
       const strip = cpTopStrip();
       const helpB = document.getElementById('cpHelpFab');
       if(helpB && helpB.parentElement === strip) strip.insertBefore(b, helpB); else strip.appendChild(b);
@@ -8097,7 +8128,7 @@ function cpHelpOpen(){
     ask.disabled = false;
   };
   // Rev-723: watch / add a how-to video for THIS screen
-  const scr = cpHelpScreen();
+  const scr = cpHowtoScreenKey();
   const vid = document.createElement('button');
   vid.type = 'button';
   const _unsynced = cpHowtoUnsynced().indexOf(scr) >= 0;
