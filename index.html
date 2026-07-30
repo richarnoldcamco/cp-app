@@ -1220,15 +1220,20 @@
     <div style="font-size:12px; font-weight:800; letter-spacing:.14em; margin:0 0 6px;">ACTION LOG</div>
     <p style="font-size:11.5px; margin:0 0 10px; color:var(--ink-dim); line-height:1.5;">
       Everything you do in the app — which screens you open, which buttons you press, which fields you type in,
-      saves, and any error — recorded on THIS machine only (last 600 entries). Field <i>names</i> are recorded,
-      never what you typed, so no part or drawing data is in here. When something misbehaves, press
+      saves, and any error. Field <i>names</i> are recorded, never what you typed, so no part or drawing data
+      is in here. The last 3,000 entries are kept on this machine and are also archived to this app's
+      private data store — one file per device, so two machines never overwrite each other, and nothing
+      is lost when the on-device list rolls over. When something misbehaves, press
       <b>Copy log</b> and paste it into the chat.
     </p>
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
       <button class="cp-btn cp-btn-primary" id="cpLogCopy" style="width:120px;">Copy log</button>
       <button class="cp-btn cp-btn-quiet" id="cpLogDl" style="width:130px;">Download .txt</button>
+      <button class="cp-btn cp-btn-quiet" id="cpLogPush" style="width:130px;">Archive now</button>
+      <button class="cp-btn cp-btn-quiet" id="cpLogAllBtn" style="width:130px;">All devices</button>
       <button class="cp-btn cp-btn-danger" id="cpLogClear" style="width:96px;">Clear</button>
     </div>
+    <div id="cpLogStat" style="font-size:11px; color:var(--ink-dim); margin:0 0 8px;"></div>
     <pre id="cpLogView" style="max-height:260px; overflow:auto; border:1px solid var(--line); background:#fbfaf7; padding:8px; font-size:10.5px; line-height:1.5; margin:0; white-space:pre-wrap;"></pre>
   </div>
 
@@ -1608,7 +1613,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-755";
+const APP_REV = "Rev-756";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1630,7 +1635,7 @@ function setDeviceMode(v){
 // to the failure can be read back instead of guessed at — which is what several of
 // today's faults cost hours for.
 const CP_LOG_KEY = 'cpActionLog';          // own key: apps on this origin must not share one
-const CP_LOG_CAP = 600;
+const CP_LOG_CAP = 3000;                   // Rev-756: raised — logs/ in the data repo is now the archive
 function logAct(kind, detail){
   try{
     const L = JSON.parse(localStorage.getItem(CP_LOG_KEY) || '[]');
@@ -1686,26 +1691,60 @@ function cpWireNavLogging(){
 function renderActionLogPanel(){
   const lv = document.getElementById('cpLogView');
   if(!lv) return;
-  const txt = logDump();
+  const txt = _cpLogAll ? logDumpMerged(_cpLogAll) : logDump();
   const lines = txt.split('\n');
   lv.textContent = lines.length > 3 ? lines.slice(-60).join('\n') : '(no entries yet)';
   lv.scrollTop = lv.scrollHeight;
+  // Rev-756: say plainly what is archived and when it last landed
+  const st = document.getElementById('cpLogStat');
+  if(st){
+    const at = localStorage.getItem('cpLogSyncAt');
+    const n  = localStorage.getItem('cpLogSyncCount');
+    st.textContent = 'This device: ' + cpDeviceId() + ' \u00b7 ' + cpLogLocal().length + ' entries here' +
+      (at ? ' \u00b7 archived ' + n + ' to logs/' + cpDeviceId() + '.json at ' + new Date(at).toLocaleString()
+          : ' \u00b7 not archived yet');
+  }
   const c = document.getElementById('cpLogCopy');
   if(c) c.onclick = async () => {
-    try{ await navigator.clipboard.writeText(logDump()); flash('\u2713 Action log copied \u2014 paste it into the chat.'); }
+    const out = _cpLogAll ? logDumpMerged(_cpLogAll) : logDump();
+    try{ await navigator.clipboard.writeText(out); flash('\u2713 Action log copied \u2014 paste it into the chat.'); }
     catch(e){ flash('Copy was blocked by the browser \u2014 use Download .txt instead.', true); }
   };
   const d = document.getElementById('cpLogDl');
   if(d) d.onclick = () => {
+    const out = _cpLogAll ? logDumpMerged(_cpLogAll) : logDump();
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([logDump()], { type: 'text/plain' }));
-    a.download = 'cp-action-log.txt'; a.click();
+    a.href = URL.createObjectURL(new Blob([out], { type: 'text/plain' }));
+    a.download = _cpLogAll ? 'cp-action-log-all-devices.txt' : 'cp-action-log.txt'; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   };
+  const pb = document.getElementById('cpLogPush');
+  if(pb) pb.onclick = async () => {
+    pb.disabled = true; const was = pb.textContent; pb.textContent = 'Archiving\u2026';
+    try{ await ghPushLog(false); }finally{ pb.disabled = false; pb.textContent = was; renderActionLogPanel(); }
+  };
+  const ab = document.getElementById('cpLogAllBtn');
+  if(ab){
+    ab.textContent = _cpLogAll ? 'This device only' : 'All devices';
+    ab.onclick = async () => {
+      if(_cpLogAll){ _cpLogAll = null; renderActionLogPanel(); return; }
+      ab.disabled = true; const was = ab.textContent; ab.textContent = 'Loading\u2026';
+      try{
+        const res = await ghFetchAllLogs();
+        _cpLogAll = res.entries;
+        flash('\u2713 ' + res.entries.length + ' entries from ' + res.devices + ' device(s)' +
+              (res.failed ? ' \u2014 ' + res.failed + ' file(s) could not be read' : ''), !!res.failed);
+      }catch(e){
+        console.warn('Merged log read failed:', e);
+        flash('\u26a0 Could not read the archives \u2014 ' + ((e && e.message) || e), true);
+      }finally{ ab.disabled = false; ab.textContent = was; renderActionLogPanel(); }
+    };
+  }
   const x = document.getElementById('cpLogClear');
   if(x) x.onclick = () => {
-    if(!confirm('Clear the action log on this device?')) return;
-    try{ localStorage.removeItem(CP_LOG_KEY); }catch(e){}
+    if(!confirm('Clear the action log on THIS device? The archived copy in logs/ is not touched.')) return;
+    try{ localStorage.removeItem(CP_LOG_KEY); localStorage.removeItem('cpLogSyncSig'); }catch(e){}
+    _cpLogAll = null;
     renderActionLogPanel();
   };
 }
@@ -1740,7 +1779,162 @@ async function cpSyncBuildStamp(){
   }catch(e){}
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
+// ===== Rev-756: THE ACTION LOG GETS ITS OWN FILE ================================
+// Until now the log lived only in this browser, capped at 600 entries with the oldest
+// silently dropped — a few hours of work at Rich's pace — and it never reached GitHub,
+// so a log asked for during diagnosis was often already gone. It now has its own file
+// in the PRIVATE data repo: logs/{DEVICE}.json, ONE FILE PER DEVICE so two machines can
+// never overwrite each other, and MERGED on read rather than replaced. Modelled on the
+// Rev-506 drawing sync and the Rev-724 videos sync: fetch the sha, PUT, then READ IT
+// BACK and only report success if it actually landed (Rev-725).
+// ITAR unchanged: entries hold screen names, control names and field NAMES only — never
+// part, drawing or feature data — so nothing controlled leaves the device.
+const CP_LOG_FILE_CAP = 5000;              // the archive holds more than the device does
+function cpDeviceId(){
+  try{
+    let v = (localStorage.getItem('cpDeviceId') || '').trim();
+    if(v) return v;
+    v = (cpIsMobile() ? 'PHONE' : 'DESKTOP') + '-' + Math.random().toString(16).slice(2, 8).toUpperCase();
+    localStorage.setItem('cpDeviceId', v);
+    return v;
+  }catch(e){ return 'DEVICE-UNKNOWN'; }
+}
+function ghLogUrl(dev){
+  const c = ghConfig();
+  return 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/logs/' + encodeURIComponent(dev) + '.json';
+}
+function _logKey(e){ return String(e.d) + ' ' + String(e.t) + ' ' + String(e.k) + ' ' + String(e.x); }
+function cpLogLocal(){ try{ return JSON.parse(localStorage.getItem(CP_LOG_KEY) || '[]'); }catch(e){ return []; } }
+// merge, de-duplicate and sort oldest-first; the same entry pushed twice collapses to one
+function _logMerge(a, b){
+  const seen = Object.create(null), out = [];
+  for(const e of [].concat(a || [], b || [])){
+    if(!e || !e.d || !e.t) continue;
+    const k = _logKey(e);
+    if(seen[k]) continue;
+    seen[k] = 1; out.push(e);
+  }
+  out.sort((x, y) => { const A = x.d + x.t, B = y.d + y.t; return A < B ? -1 : A > B ? 1 : 0; });
+  while(out.length > CP_LOG_FILE_CAP) out.shift();
+  return out;
+}
+let _cpLogSyncBusy = false;
+async function ghPushLog(silent){
+  if(_cpLogSyncBusy) return false;
+  if(!ghConfigured()){
+    if(!silent) flash('GitHub is not set up on this device, so there is nowhere to archive the log to.', true);
+    return false;
+  }
+  _cpLogSyncBusy = true;
+  const dev = cpDeviceId();
+  try{
+    const local = cpLogLocal();
+    if(!local.length){ if(!silent) flash('Nothing in the log on this device yet.'); return false; }
+    const sig = local.length + ':' + _logKey(local[local.length - 1]);
+    if(silent && localStorage.getItem('cpLogSyncSig') === sig) return true;   // nothing new since last time
+    const c = ghConfig(), url = ghLogUrl(dev);
+    const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+    let sha = null, remote = [];
+    const g = await fetch(url + '?cb=' + Date.now(), { headers: hdrs, cache: 'no-store' });
+    if(g.ok){
+      const j = await g.json();
+      sha = j.sha || null;
+      try{
+        const txt = decodeURIComponent(escape(atob(String(j.content || '').replace(/\s/g, ''))));
+        const obj = JSON.parse(txt);
+        remote = (obj && Array.isArray(obj.entries)) ? obj.entries : [];
+      }catch(pe){
+        // speak, do not swallow: an unreadable archive is a fact worth knowing
+        console.warn('Action log archive was unreadable, starting a fresh one:', pe);
+        remote = [];
+      }
+    }else if(g.status !== 404){
+      throw new Error('could not read the existing archive (' + g.status + ')');
+    }
+    const merged = _logMerge(remote, local);
+    if(sha && merged.length === remote.length){
+      localStorage.setItem('cpLogSyncSig', sig);
+      localStorage.setItem('cpLogSyncCount', String(remote.length));
+      if(!silent) flash('\u2713 Archive already up to date \u2014 ' + remote.length + ' entries.');
+      return true;
+    }
+    const payload = JSON.stringify({ device: dev, rev: (typeof APP_REV !== 'undefined' ? APP_REV : ''),
+                                     updated: new Date().toISOString(), entries: merged });
+    const body = { message: 'Action log ' + dev + ' ' + new Date().toISOString(),
+                   content: btoa(unescape(encodeURIComponent(payload))) };
+    if(sha) body.sha = sha;
+    const r = await fetch(url, { method: 'PUT', headers: { ...hdrs, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if(!r.ok) throw new Error('GitHub refused the write (' + r.status + ')');
+    // Rev-725 rule: prove it landed rather than trusting the response
+    const v = await fetch(url + '?cb=' + Date.now(),
+      { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw' }, cache: 'no-store' });
+    if(!v.ok) throw new Error('wrote it but could not read it back (' + v.status + ')');
+    const back = JSON.parse(await v.text());
+    const got = (back && Array.isArray(back.entries)) ? back.entries : [];
+    const want = _logKey(merged[merged.length - 1]);
+    if(!got.some(e => _logKey(e) === want)) throw new Error('read-back did not contain the newest entry');
+    localStorage.setItem('cpLogSyncSig', sig);
+    localStorage.setItem('cpLogSyncAt', new Date().toISOString());
+    localStorage.setItem('cpLogSyncCount', String(got.length));
+    if(!silent) flash('\u2713 Action log archived \u2014 ' + got.length + ' entries in logs/' + dev + '.json');
+    return true;
+  }catch(e){
+    const msg = (e && e.message) ? e.message : String(e);
+    console.warn('Action log archive failed:', e);
+    try{ logAct('logsync-fail', msg.slice(0, 120)); }catch(_){ }
+    if(!silent) flash('\u26a0 Action log archive failed \u2014 ' + msg, true);
+    return false;
+  }finally{ _cpLogSyncBusy = false; }
+}
+// read every device's archive back and merge it, so Admin shows the whole picture
+async function ghFetchAllLogs(){
+  if(!ghConfigured()) throw new Error('GitHub is not set up on this device');
+  const c = ghConfig();
+  const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+  const dirUrl = 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/logs?cb=' + Date.now();
+  const r = await fetch(dirUrl, { headers: hdrs, cache: 'no-store' });
+  if(r.status === 404) return { entries: [], devices: 0 };
+  if(!r.ok) throw new Error('could not list logs/ (' + r.status + ')');
+  const files = await r.json();
+  const names = (Array.isArray(files) ? files : []).filter(f => f && /\.json$/i.test(f.name || ''));
+  let all = [], devices = 0, failed = 0;
+  for(const f of names){
+    try{
+      const u = 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/logs/' +
+                encodeURIComponent(f.name) + '?cb=' + Date.now();
+      const g = await fetch(u, { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw' }, cache: 'no-store' });
+      if(!g.ok){ failed++; console.warn('Could not read log file', f.name, g.status); continue; }
+      const j = JSON.parse(await g.text());
+      const ent = (j && Array.isArray(j.entries)) ? j.entries : [];
+      const tag = (j && j.device) || String(f.name).replace(/\.json$/i, '');
+      devices++;
+      for(const e of ent) all.push({ d: e.d, t: e.t, k: e.k, x: e.x, dev: tag });
+    }catch(e){ failed++; console.warn('Log file unreadable:', f.name, e); }
+  }
+  const mine = cpDeviceId();
+  for(const e of cpLogLocal()) all.push({ d: e.d, t: e.t, k: e.k, x: e.x, dev: mine });
+  return { entries: _logMerge(all, []), devices: devices, failed: failed };
+}
+let _cpLogAll = null;          // merged view once fetched; null = showing this device only
+function logDumpMerged(list){
+  const head = 'CONTROL PLAN GENERATOR ' + (typeof APP_REV !== 'undefined' ? APP_REV : '') +
+    '  \u00b7  action log \u00b7 ALL DEVICES  \u00b7  ' + list.length + ' entries\n' + '-'.repeat(72) + '\n';
+  return head + list.map(e => e.d + ' ' + e.t + '  ' + String(e.dev || '').padEnd(15) + ' ' +
+    String(e.k).toUpperCase().padEnd(11) + ' ' + e.x).join('\n');
+}
+// hands-free: archive shortly after start-up, then every two minutes, and when the tab
+// comes back into view. Silent — it only speaks when something is wrong.
+function cpStartLogArchive(){
+  try{
+    setTimeout(() => { ghPushLog(true); }, 20000);
+    setInterval(() => { ghPushLog(true); }, 120000);
+    document.addEventListener('visibilitychange', () => { if(!document.hidden) ghPushLog(true); });
+  }catch(e){ console.warn('Could not start the log archiver:', e); }
+}
+// ===== end Rev-756 log archive ==================================================
+
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-756", type: "App", changes: ["KEEP THE LOG \u2014 THE ACTION LOG NOW HAS ITS OWN FILE (Rev-756) \u2014 the log recorded what was actually done, which is what settles a fault in a minute instead of three revisions of guessing, but it lived only in this browser: 600 entries, oldest silently dropped, absent from cp_data.json, never on GitHub, never across devices. At Rich\u2019s working pace that is a few hours \u2014 which is why a log asked for during diagnosis was often already gone. It now archives to logs/{DEVICE}.json in the private data repo, ONE FILE PER DEVICE (PHONE-xxxxxx / DESKTOP-xxxxxx, made once and kept on the machine) so two devices can never overwrite each other, MERGED on read rather than replaced, de-duplicated and sorted oldest-first. The push follows the Rev-506 drawing and Rev-724 video shape plus the Rev-725 rule: read the existing archive, merge, fetch the sha, PUT, then READ IT BACK and only report success if the newest entry is genuinely in the stored file \u2014 a write that returns OK but does not land is treated as a failure. It runs hands-free 20 seconds after start-up, every 2 minutes, and whenever the tab comes back into view, and stays silent unless it fails. On-device cap raised 600 to 3,000 now that the file is the archive; the archive holds 5,000. Admin \u2192 ACTION LOG gained Archive now, All devices (merges every device\u2019s archive with this device\u2019s live log and tags each line with the device it came from) and a status line naming this device and when its last archive landed; Clear now wipes only the device copy and says so, leaving the archive intact. Every failure path SPEAKS \u2014 console warning, a logsync-fail entry and a red banner \u2014 deliberately against the 321 silent catch blocks the audit found, since a swallowed error here would hide the very evidence this feature exists to keep. ITAR unchanged: screen names, control names and field NAMES only, never part, drawing or feature data."] },
   { ts: "2026-07-30", rev: "App Rev-755", type: "App", changes: ["PIPELINE TEST \u2014 REV TRANSFER CHECK (Rev-755) \u2014 no functional change. Rich asked for a deliberate smoke test of the ship-a-change path before any real work started: bump the rev, push the same file to BOTH targets (cp-generator-data/cp_app.html and cp-app/index.html), read both back, and confirm the device picks the new rev up on its own through the open / 60s / every-tap / tab-return self-update. Only APP_REV, BUILD_TIME and this entry changed, so if the badge on the device does not move to Rev-755 the fault is in the transfer, not in the code \u2014 which is the whole point of testing it with nothing else in flight."] },
   { ts: "2026-07-30", rev: "App Rev-754", type: "App", changes: ["\u2018KEEP THE LOG\u2019 IS NOW THE FIRST JOB IN THE HANDOFF PROMPT (Rev-754) \u2014 the next chat is told to walk Rich through pushing the action log to its own file, and is given the measurements rather than a description: the log lives only in localStorage under cpActionLog, capped at 600 entries with the oldest silently discarded, and is ABSENT from cp_data.json \u2014 verified by reading the synced file, not assumed. The contrast is recorded too: the DATA history is strong (cp_data.json committed on every sync, 100 commits in a single day, changeHistory 107 entries capped at 500 back to 26 June). SO THE GAP IS NAMED PRECISELY: the STATE of an approval or a Step 6 sign-off is saved properly, but the RECORD OF THE ATTEMPT \u2014 including approvals REFUSED under Rev-706 and every JS error the window handler catches \u2014 lasts only until 600 entries roll past, a few hours at Rich\u2019s pace, which is also why a log asked for during diagnosis may already be gone. The design is specified: logs/{DEVICE}.json, one file per device so two can never overwrite each other, merged on read, modelled on the Rev-506 drawing sync and Rev-724 videos/ sync, with the Rev-725 read-back check before reporting success. And it repeats how to run it: one step at a time, wait for \u2018done\u2019, verify from the Claude side, never a wall of steps."] },
   { ts: "2026-07-30", rev: "App Rev-753", type: "App", changes: ["THE DIAGNOSTIC RULE NOW TRAVELS TOO (Rev-753) \u2014 at the end of the session Claude said it had chased three bugs by reading code when the data would have answered in a minute, and asked to be held to it next time. Rich pointed out that a lesson living in a chat message dies with the chat. It is now in the handoff prompt as CP_DIAGNOSIS, so every future chat inherits it. IT NAMES THE THREE EVIDENCE SOURCES IN ORDER \u2014 the Action Log (Admin \u2192 Action Log \u2192 Copy log), cp_data.json, and the actual stored artefact from drawings/ or videos/ \u2014 and it records what skipping them cost on 30 Jul: THREE revisions on a video that turned out to be perfectly recorded, a \u2018button does nothing\u2019 that was one read of the saved rows away, a date fault that was an ABSENT field rather than a stale one, and several steps of code-reading before asking for the log. It also records the check that proved worthless: reporting a key as \u2018stable\u2019 because the CODE SHAPE had not changed when the STRING it produced had \u2014 verify the output by running it, not the input by reading it \u2014 and that node --check proves a file parses, not that it runs, which is how Rev-706 passed and still blanked the grid."] },
@@ -2369,7 +2563,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "1:33 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "1:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -17847,24 +18041,19 @@ THE ONE THAT MATTERS: 321 empty catch blocks swallow errors silently. This cause
   SECOND JOB: the 19 genuine smells — 5 function reassignments, 1 unreachable line, 1 redeclare,
   12 inner declarations. Do NOT run Prettier: it fixes none of the 554 and rewrites every line.
 
-FIRST JOB REQUESTED BY RICH — 'KEEP THE LOG': PUSH THE ACTION LOG TO ITS OWN FILE.
-  MEASURED 30 Jul 2026, not assumed:
-    · The action log lives ONLY in this browser: localStorage key 'cpActionLog', CP_LOG_CAP = 600
-      entries, oldest silently discarded. It is ABSENT from cp_data.json — confirmed by reading
-      the synced file — so it never reaches GitHub and never crosses devices.
-    · By contrast the DATA history is strong: cp_data.json is committed on every sync (100 commits
-      in one day), and changeHistory inside it holds 107 entries capped at 500 back to 26 Jun.
-    · So the STATE of an approval, a hand-edit or a Step 6 sign-off is saved properly, but the
-      RECORD OF THE ATTEMPT — including approvals REFUSED under Rev-706 and every JS error caught
-      by the window error handler — survives only until 600 entries roll past, which at Rich's
-      working pace is a few hours. It is also why a log asked for during diagnosis may be gone.
-  WHAT TO BUILD: give the log its own file in the PRIVATE data repo, e.g. logs/{DEVICE}.json,
-  one file per device so two devices can never overwrite each other, MERGED on read rather than
-  replaced. Model it on the Rev-506 drawing sync and the Rev-724 videos/ sync: fetch the sha,
-  PUT, then READ IT BACK and only report success if it landed (Rev-725). Raise the on-device cap
-  once the file is the archive. Keep Admin → Action Log reading the merged view.
-  HOW TO RUN IT WITH RICH: he is a quality engineer, not a developer. ONE STEP AT A TIME, wait
-  for 'done' between steps, verify from this side wherever possible, and never a wall of steps.
+DONE AT REV-756 — 'KEEP THE LOG': THE ACTION LOG NOW HAS ITS OWN FILE.
+  Built as specified: logs/{DEVICE}.json in the PRIVATE data repo, one file per device
+  (cpDeviceId = PHONE-xxxxxx / DESKTOP-xxxxxx, made once and kept in localStorage), MERGED
+  on read rather than replaced, de-duplicated and sorted oldest-first. Push path follows the
+  Rev-506/724 shape and the Rev-725 rule: read the existing archive, merge, fetch the sha,
+  PUT, then READ IT BACK and only claim success if the newest entry is actually in the file.
+  On-device cap raised 600 -> 3,000; archive cap 5,000. Runs silently 20s after start-up,
+  every 2 minutes, and whenever the tab comes back into view; it only speaks when it fails.
+  Admin -> ACTION LOG gained 'Archive now', 'All devices' (merges every device's archive with
+  this device's live log and tags each line with its device) and a status line naming this
+  device and when it last landed. Clear now wipes only the device copy, never the archive.
+  ITAR unchanged: screen names, control names and field NAMES only.
+  WHAT IS NOT DONE: nothing prunes logs/ — files grow to 5,000 entries each and stay.
 
 STILL OUTSTANDING:
   · Instructions Rev-93 is drafted and NOT issued. Two approved changes: the CP-2C declared
@@ -18696,6 +18885,7 @@ if($('cpCardRev')) $('cpCardRev').textContent = APP_REV.toUpperCase() + ' · ' +
 try{ $('brandRev').innerHTML = APP_REV.toUpperCase() + ' <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">' + BUILD_DATE + ' ' + BUILD_TIME + '</span>';}catch(e){}
 $('headerTitle').textContent = `CONTROL PLAN GENERATOR`;
 if($('headerRev')) $('headerRev').textContent = APP_REV + ' · ' + BUILD_DATE + ' ' + BUILD_TIME;
+try{ cpStartLogArchive(); }catch(e){ console.warn('log archiver did not start:', e); }   // Rev-756
 
 // Show/hide header "Push App" button based on GitHub config
 function updateHeaderPushBtn(){
