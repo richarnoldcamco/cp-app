@@ -518,6 +518,7 @@
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
     <button id="headerSyncNowBtn" title="Pull the latest data from GitHub and check for a newer app version" onclick="headerSyncNow()" style="background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-left:8px;">⬇️ Sync Now</button>
+    <button id="cpShotBtn" title="Take a picture of this screen and put it in your private data store" onclick="cpShotPush()" style="background:#7a1414; color:#fff; border:1px solid #5a0f0f; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-left:8px;">📷 Screenshot</button>
     <button id="newChatPromptBtn" title="Move this work to a fresh chat — guided, checked and quizzed" onclick="hcOpenWizard()" style="background:#1a5276; color:#fff; border:1px solid #154360; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-left:8px;">💬 New Chat Prompt</button>
   </div>
   <div class="menu-inner" style="display:flex; justify-content:center; align-items:center; min-height:calc(100vh - 230px); padding:26px 16px;">
@@ -1613,7 +1614,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-758";
+const APP_REV = "Rev-759";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1945,7 +1946,128 @@ function cpStartLogArchive(){
 }
 // ===== end Rev-756 log archive ==================================================
 
+// ===== Rev-759: SCREENSHOT TO THE PRIVATE DATA STORE ============================
+// One button in the header. It photographs the screen and puts the picture in shots/
+// inside the PRIVATE data repo, so Rich can say "SHOT" in the chat and the picture is
+// fetched from there instead of being saved, found and uploaded by hand.
+// ITAR: a picture of a Control Plan screen carries part, drawing and feature data. The
+// repo itself is no new exposure — drawings/ and cp_data.json already live there — but
+// putting it somewhere Claude can read IS a deliberate act, so it sits behind a confirm
+// gate that names exactly that, every time. No silent uploads.
+// Capture: the real Screen Capture API on desktop (true pixels, browser asks which
+// surface to share); on a phone Chrome does not offer it, so it falls back to redrawing
+// the page with html2canvas. PNG throughout — a screenshot is readable text and JPEG
+// smears text, per the operator rule.
+const CP_SHOT_MAXEDGE = 2400;              // operator rule: 2400 px on the long edge
+function cpShotStamp(){
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds());
+}
+function _cpShotScale(cv){
+  const long = Math.max(cv.width, cv.height);
+  if(long <= CP_SHOT_MAXEDGE) return cv;
+  const k = CP_SHOT_MAXEDGE / long;
+  const out = document.createElement('canvas');
+  out.width = Math.round(cv.width * k); out.height = Math.round(cv.height * k);
+  out.getContext('2d').drawImage(cv, 0, 0, out.width, out.height);
+  return out;
+}
+async function _cpShotViaDisplayMedia(){
+  const stream = await navigator.mediaDevices.getDisplayMedia({
+    video: { displaySurface: 'browser' }, audio: false, preferCurrentTab: true });
+  try{
+    const v = document.createElement('video');
+    v.srcObject = stream; v.muted = true; v.playsInline = true;
+    await v.play();
+    await new Promise(r => setTimeout(r, 250));          // let a real frame arrive
+    const cv = document.createElement('canvas');
+    cv.width = v.videoWidth || 1920; cv.height = v.videoHeight || 1080;
+    cv.getContext('2d').drawImage(v, 0, 0, cv.width, cv.height);
+    return _cpShotScale(cv).toDataURL('image/png');
+  }finally{ try{ stream.getTracks().forEach(t => t.stop()); }catch(_){ } }
+}
+function _cpLoadScript(src){
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = () => rej(new Error('could not load ' + src));
+    document.head.appendChild(s);
+  });
+}
+async function _cpShotViaRedraw(){
+  if(typeof html2canvas === 'undefined'){
+    await _cpLoadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+  }
+  const cv = await html2canvas(document.body, { backgroundColor: '#ffffff', useCORS: true, scale: 1, logging: false });
+  return _cpShotScale(cv).toDataURL('image/png');
+}
+async function cpCaptureScreen(){
+  const canDisplay = !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) && !cpIsMobile();
+  if(canDisplay){
+    try{ return await _cpShotViaDisplayMedia(); }
+    catch(e){
+      if(String((e && e.name) || '') === 'NotAllowedError') throw new Error('you cancelled the share picker');
+      console.warn('Screen capture unavailable, redrawing the page instead:', e);
+    }
+  }
+  return await _cpShotViaRedraw();
+}
+function ghShotUrl(name){
+  const c = ghConfig();
+  return 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/shots/' + encodeURIComponent(name);
+}
+let _cpShotBusy = false;
+async function cpShotPush(){
+  if(_cpShotBusy) return;
+  if(!ghConfigured()){ flash('GitHub is not set up on this device, so there is nowhere to put the picture.', true); return; }
+  if(!confirm('Take a picture of this screen and store it in your PRIVATE data store?\n\n' +
+              'The picture may show part numbers, drawings and feature data. It goes to shots/ in ' +
+              'cp-generator-data, where it can be read in the chat when you type SHOT.\n\n' +
+              'Press Cancel if this screen should not leave the device.')) return;
+  const btn = document.getElementById('cpShotBtn');
+  const was = btn ? btn.textContent : '';
+  _cpShotBusy = true;
+  if(btn){ btn.disabled = true; btn.textContent = '\u23f3 Capturing\u2026'; }
+  try{
+    const dataUrl = await cpCaptureScreen();
+    const b64 = String(dataUrl).split(',')[1] || '';
+    if(!b64) throw new Error('the capture came back empty');
+    const bytes = Math.round(b64.length * 3 / 4);
+    const name = cpDeviceId() + '-' + cpShotStamp() + '.png';
+    if(btn) btn.textContent = '\u23f3 Uploading\u2026';
+    const c = ghConfig(), url = ghShotUrl(name);
+    const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+    const r = await fetch(url, { method: 'PUT', headers: { ...hdrs, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'Screenshot ' + name, content: b64 }) });
+    if(!r.ok) throw new Error('GitHub refused the upload (' + r.status + ')');
+    // Rev-757 lesson: GitHub does not serve a new file instantly. Retry before failing.
+    let landed = 0, lastErr = '';
+    for(let i = 0; i < 4 && !landed; i++){
+      await new Promise(res => setTimeout(res, 1200 * (i + 1)));
+      try{
+        const g = await fetch(url + '?cb=' + Date.now(), { headers: hdrs, cache: 'no-store' });
+        if(!g.ok){ lastErr = 'read-back returned ' + g.status; continue; }
+        const j = await g.json();
+        if(j && j.size > 0) landed = j.size; else lastErr = 'file is there but empty';
+      }catch(re){ lastErr = (re && re.message) ? re.message : String(re); }
+    }
+    if(!landed) throw new Error('uploaded it, but could not confirm it landed within ~12s (' + lastErr + ')');
+    try{ logAct('shot', name + ' ' + Math.round(landed / 1024) + 'KB'); }catch(_){ }
+    localStorage.setItem('cpLastShot', name);
+    flash('\u2713 Screenshot stored \u2014 shots/' + name + ' (' + Math.round(landed / 1024) + ' KB). Type SHOT in the chat.');
+  }catch(e){
+    const msg = (e && e.message) ? e.message : String(e);
+    console.warn('Screenshot failed:', e);
+    try{ logAct('shot-fail', msg.slice(0, 120)); }catch(_){ }
+    flash('\u26a0 Screenshot failed \u2014 ' + msg, true);
+  }finally{
+    _cpShotBusy = false;
+    if(btn){ btn.disabled = false; btn.textContent = was || '\ud83d\udcf7 Screenshot'; }
+  }
+}
+// ===== end Rev-759 screenshot ===================================================
+
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-759", type: "App", changes: ["\ud83d\udcf7 SCREENSHOT BUTTON \u2014 ONE CLICK, STRAIGHT INTO THE PRIVATE DATA STORE (Rev-759) \u2014 showing a screen in the chat cost a save, a hunt through Downloads and an upload, every time. The header now carries a Screenshot button: it photographs the screen and puts the PNG in shots/ inside cp-generator-data, named DEVICE-YYYYMMDD-HHMMSS.png, and Rich just types SHOT in the chat for it to be fetched and read. On the desktop it uses the real Screen Capture API \u2014 true pixels, the browser asks which surface to share \u2014 and on the phone, where Chrome does not offer that, it falls back to redrawing the page. PNG throughout, capped at 2400 px on the long edge, because a screenshot is readable text and JPEG smears text. ITAR: a picture of a Control Plan screen carries part, drawing and feature data, so it sits behind a confirm gate that says exactly that and names where it is going \u2014 every time, no silent uploads; the repo itself is no new exposure since drawings/ and cp_data.json already live there, but putting a screen somewhere it can be read is a deliberate act and is treated as one. The upload is verified the Rev-757 way: PUT, then read back with a growing pause before it is allowed to claim success. Failures speak \u2014 red banner, console warning and a shot-fail entry in the action log."] },
   { ts: "2026-07-30", rev: "App Rev-758", type: "App", changes: ["FEATURE DRAWING \u2014 YOU CAN SEE THE CROP EDGES THROUGH A WHITE-OUT NOW (Rev-758, embedded validation REV-159) \u2014 the white-out boxes were solid white and sat over the crop rectangle, so the moment you erased clutter near an edge the green crop boundary vanished underneath it and you were positioning blind. REV-158 had already tried to fix this with a border-only twin of the crop box on a higher layer; it was not enough on its own. Two changes: the white-out is now SEE-THROUGH on screen \u2014 82% white \u2014 so both the crop edge and the drawing beneath stay readable while you work, and the crop edge itself moved to the very top layer and went dashed so it reads clearly over white. Checked before changing anything: the SAVED reference image is not affected in any way, because saveOdsCrop paints solid #ffffff straight onto the canvas from the stored white-out rectangles and never from the on-screen styling \u2014 so what gets erased in the saved image is exactly what was erased before. On screen you now see what you are covering; in the saved file it is fully white."] },
   { ts: "2026-07-30", rev: "App Rev-758", type: "App", changes: ["THE CROP EDGE NOW SHOWS THROUGH A WHITE-OUT (embedded validation REV-158) \u2014 on the FEATURE DRAWING screen the white-out boxes are solid white and were stacked ABOVE the green crop rectangle, so wherever a white-out crossed the crop boundary it swallowed it and there was no way to see where the crop actually ran \u2014 which matters most in exactly the case you use white-out for, clearing clutter that sits near the edge of the frame. The crop rectangle now carries a border-only twin that rides above everything, outlined in a thin white halo so the green edge reads against both the drawing and a white-out. The white-out preview itself is left untinted, so it still shows exactly what will be erased rather than being shaded green. The twin is mirrored to the real box every frame while the screen is open and stops the instant it closes \u2014 the box is moved from six different places (first draw, restore, live drag, zoom-in, auto-advance, clear) and editing each one was the more likely way to miss a path. Nothing about what gets SAVED changed: the crop, the highlight and the white-outs are stored exactly as before."] },
   { ts: "2026-07-30", rev: "App Rev-757", type: "App", changes: ["FIX \u2014 THE LOG ARCHIVE CALLED ITSELF A FAILURE WHEN IT HAD WORKED (Rev-757) \u2014 the Rev-756 archive landed correctly on the very first run (607 entries), but its own stored log showed three logsync-fail entries: one \u2018wrote it but could not read it back (404)\u2019 and two \u2018read-back did not contain the newest entry\u2019. Read from the stored file, not guessed from the code. Cause: GitHub does not serve a file the instant it is written \u2014 a read a moment after the write still returns the OLD copy, and a brand-new file 404s briefly. The same thing happened to the Rev-756 app push itself, which read back as Rev-755 seconds after landing. So the Rev-725 read-back rule is right, but it was being applied too eagerly. It now retries with a growing pause \u2014 1.2s, 2.4s, 3.6s, 4.8s, about 12 seconds in total \u2014 and only calls it a failure if the newest entry is still missing after all four. The cost of the false failure was not just a misleading log line: because success was never recorded, the up-to-date marker was never written and the whole log was re-pushed every two minutes instead of stopping. Verification stays strict; it is only patient now."] },
