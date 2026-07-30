@@ -1600,7 +1600,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-731";
+const APP_REV = "Rev-732";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1733,6 +1733,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-732", type: "App", changes: ["FIX \u2014 THE VIDEO WOULD NOT PLAY, AND DELETE NOW NEEDS A CODE (Rev-732) \u2014 the recording was never the problem: the stored clip is a valid 10.97 MB video/webm vp9+opus, correctly titled, sitting in videos/. It was handed to the player as an 11 MB DATA URL, and a <video> element will not reliably play one \u2014 there are no range requests behind a data: URL, so the browser reports 0:00 and refuses. The clip is now converted to a BLOB URL before playing, which the browser treats like a real file, and the blob is released when the window closes so it does not sit in memory. A failure to play now says so instead of showing a dead player. DELETE REQUIRES CODE 7312, then still asks to confirm. It guards against an accidental click on a clip that exists in no other place \u2014 the operator has chosen not to keep local source files, so a deleted video is gone. IT IS NOT SECURITY AND IS NOT DESCRIBED AS SUCH: the code is in the page and anyone who can open the browser\u2019s developer tools can read it. WHAT YOU MUST TEST (rule 8): the video plays; a wrong code refuses and deletes nothing."] },
   { ts: "2026-07-30", rev: "App Rev-731", type: "App", changes: ["NEW USER / EXPERT USER TOGGLE ON EVERY SCREEN (Rev-731) \u2014 a \ud83d\udc64 NEW USER / \ud83c\udf93 EXPERT USER button now sits at the top right of every screen and remembers the setting on that device. In NEW USER the how-to button turns RED, pulses with a growing glow, and reads \ud83d\udc49 WATCH FIRST \u2014 <title>, so someone who has never seen the app cannot walk past it. EXPERT USER returns it to plain green; the video stays available, it just stops shouting. NEW USER IS THE DEFAULT, deliberately: the cost of a stranger missing the help is a wrong Control Plan, and the cost to an expert is one click. The animation stops entirely under prefers-reduced-motion. ONE FIXED STRIP INSTEAD OF THREE FLOATING BUTTONS: the mode button, the video button and \u2139 HELP now share a flex row anchored top-right, because they were positioned by individual pixel offsets and a longer video title would have slid one under another. WHAT YOU MUST TEST (rule 8): the toggle shows on the menu AND inside a plan; in NEW USER the video button is red and pulsing on Build Control Plan; in EXPERT USER it is green and still plays."] },
   { ts: "2026-07-30", rev: "App Rev-730", type: "App", changes: ["THE VIDEO GETS A NAME AND ITS OWN BUTTON (Rev-730) \u2014 a clip was only reachable by opening \u2139 HELP and reading \u2018Watch how-to\u2019, which tells a new user nothing about what it covers. A green button now sits immediately LEFT of \u2139 HELP on any screen that has a video, showing the title \u2014 \u25b6 HOW TO ASSIGN BUBBLE NUMBERS \u2014 and playing it on click. It appears and disappears with the screen you are on, so each screen advertises only its own. NAMING: after a recording finishes the app asks what the clip is called, in a themed box rather than the browser\u2019s grey prompt, and the player gained \u270e RENAME. Titles are stored beside the clip AND written into videos/ with it, so another device gets the name as well as the recording; deleting a video clears its name and removes the button. An untitled clip falls back to \u25b6 HOW-TO VIDEO rather than showing nothing. WHAT YOU MUST TEST (rule 8): on Build Control Plan, confirm the green button reads your title, plays the clip, and is NOT there on the Control Plans list."] },
   { ts: "2026-07-30", rev: "App Rev-729", type: "App", changes: ["TOKENS RULE ADDED AS RULE 9 (Rev-729) \u2014 the standard now states, as a firm rule carried into every future chat, that the GitHub token and the Anthropic API key live in the chat and in the app by DELIBERATE decision of the account owner, that Claude pushes revisions directly with the token, and that the risk is noted ONCE on a newly pasted credential and then not raised again. THE WORDING MATTERS MORE THAN THE INSTRUCTION: deleting the subject at Rev-728 left nothing to inherit, so each new chat met a token with no context and re-argued it from scratch \u2014 which is what the PFMEA chat has been doing. Recording it as a CONSIDERED DECISION BY THE OWNER, rather than as silence, is what stops it being re-litigated. It keeps one note on a newly pasted credential, because a credential appearing somewhere unexpected is worth one sentence \u2014 what it forbids is repetition after the decision is known. END-OF-SESSION moves back to rule 10; the list runs 1\u201310. WHAT YOU MUST TEST (rule 8): press \ud83d\udcac New Chat Prompt and confirm rule 9 reads TOKENS AND KEYS LIVE IN THE CHAT AND IN THE APP and rule 10 is END-OF-SESSION."] },
@@ -2337,7 +2338,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "03:58 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "04:22 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7739,7 +7740,21 @@ function cpHowtoPlay(screenName){
   ov.style.cssText = 'position:fixed; inset:0; z-index:10600; background:rgba(0,0,0,.85);'
     + ' display:flex; align-items:center; justify-content:center; padding:20px; flex-direction:column; gap:10px;';
   const v = document.createElement('video');
-  v.src = src; v.controls = true; v.autoplay = true;
+  // Rev-732: a <video> will NOT reliably play an 11 MB data: URL — no range requests, so the
+  // browser reports 0:00 and refuses. Convert to a blob URL, which behaves like a real file.
+  let _objUrl = '';
+  try{
+    const comma = src.indexOf(',');
+    const meta = src.slice(5, comma);                       // e.g. video/webm;codecs=vp9,opus;base64
+    const mime = meta.split(';')[0] || 'video/webm';
+    const bin = atob(src.slice(comma + 1));
+    const buf = new Uint8Array(bin.length);
+    for(let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    _objUrl = URL.createObjectURL(new Blob([buf], { type: mime }));
+  }catch(e){ _objUrl = ''; }
+  v.src = _objUrl || src; v.controls = true; v.autoplay = true;
+  v.onerror = () => { flash('The video could not be played. It may have been saved incompletely — '
+    + 'record it again.', true); };
   v.style.cssText = 'max-width:96vw; max-height:82vh; background:#000; border-radius:8px;';
   const bar = document.createElement('div');
   bar.style.cssText = 'display:flex; gap:8px;';
@@ -7749,7 +7764,7 @@ function cpHowtoPlay(screenName){
       + ' cursor:pointer; font-family:inherit; ' + css;
     b.onclick = fn; bar.appendChild(b);
   };
-  mk('Close', 'background:#fff; color:#3a352e; border:1px solid #c9c0b4;', () => ov.remove());
+  mk('Close', 'background:#fff; color:#3a352e; border:1px solid #c9c0b4;', () => { try{ if(_objUrl) URL.revokeObjectURL(_objUrl); }catch(_){ } ov.remove(); });
   mk('\u270e Rename', 'background:#fff; color:#1a5276; border:1px solid #9dbdd4;', async () => {
     const nm = await cpPromptBox('RENAME VIDEO', 'What should the button say?',
       cpHowtoTitle(screenName) || 'HOW TO ');
@@ -7757,9 +7772,18 @@ function cpHowtoPlay(screenName){
       ghPushHowto(screenName); flash('\u2713 Renamed to ' + (nm || 'HOW-TO VIDEO') + '.'); }
   });
   mk('\u2715 Delete this video', 'background:#a5342a; color:#fff; border:1px solid #7d2419;', async () => {
+    // Rev-732: a code is required to delete. This stops an accidental or casual deletion of a
+    // clip that exists nowhere else — it is NOT security: the code sits in the page and anyone
+    // who can open the developer tools can read it.
+    const code = await cpPromptBox('DELETE HOW-TO VIDEO \u2014 CODE REQUIRED',
+      'Deleting removes the clip from this device AND from videos/ in the repo. '
+      + 'There is no other copy.<br><br>Enter the delete code to continue.', '');
+    if(code === null) return;
+    if(String(code).trim() !== '7312'){ flash('Wrong code \u2014 the video was NOT deleted.', true); return; }
     const ok = await cpConfirmBox('DELETE HOW-TO VIDEO',
-      'Delete the how-to video for <b>' + screenName + '</b>?<br><br>'
-      + 'Nothing else is affected. You can record and add another at any time.', '\ud83d\uddd1 Delete video');
+      'Code accepted. Delete <b>' + (cpHowtoTitle(screenName) || 'the how-to video') + '</b> for <b>'
+      + screenName + '</b>?<br><br>This removes it here and from the repo. It cannot be undone \u2014 '
+      + 'you would have to record it again.', '\ud83d\uddd1 Delete video');
     if(!ok) return;
     cpHowtoDelete(screenName); cpHowtoSetTitle(screenName, ''); cpHowtoFab(); ov.remove();
     ghDeleteHowto(screenName).then(ok => {
