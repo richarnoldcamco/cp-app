@@ -1608,7 +1608,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-745";
+const APP_REV = "Rev-746";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1741,6 +1741,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-746", type: "App", changes: ["THE WATCH BUTTON IS RED IN BOTH MODES (Rev-746) \u2014 it was green (#2c6e49) at rest and only went red while pulsing in NEW USER, so in EXPERT USER it sat in the same colour as Save to Project, New Row and Add Operation and read as one more routine action. Red now in both modes; the PULSE remains the NEW USER difference. Nothing else changed \u2014 same size, same position in the top bar, same behaviour, and the animation still stops under prefers-reduced-motion."] },
   { ts: "2026-07-30", rev: "App Rev-745", type: "App", changes: ["THE GRID NO LONGER SCROLLS SIDEWAYS \u2014 THE DRAWING GAVE UP THE ROOM (Rev-745) \u2014 the ODS panel held a flat 50% of the screen with a 520px floor, so on 5 \u00b7 Measurement Methods the thirteen visible columns came to roughly 1280px against about 1270px of table, and the last few pixels forced a horizontal scrollbar across the whole grid. The panel is now 38% with a 400px floor, handing the table around 300px more \u2014 comfortably clear on a 1920 or 2560 screen. THE DRAWING LOSES LESS THAN IT LOOKS: it is a zoom-and-pan view of a balloon, not a sheet to read whole \u2014 wheel zooms, drag pans, \ud83d\udd0d Full view resets, and clicking it opens the full-screen viewer. A NARROW SCREEN WILL STILL SCROLL: the 400px floor stops the drawing collapsing to nothing, so below roughly 1700px wide the columns win and the bar returns. That is the right trade \u2014 a drawing squeezed to a sliver helps nobody. WHAT YOU MUST TEST (rule 8): on 5 \u00b7 Measurement Methods there is no bar under the grid, and the drawing still zooms and pans."] },
   { ts: "2026-07-30", rev: "App Rev-744", type: "App", changes: ["FIX \u2014 THE VIDEO BAR WAS COVERING THE PIN EDITOR (Rev-744) \u2014 the WATCH bar was given z-index 9500 at Rev-742 and the bottom-right controls 9000, both numbers chosen without checking what they had to sit under. The pin editor overlay is 500, so the bar painted straight over its toolbar and hid \u2713 Save, \uff0b Add and the close button while a balloon was being framed. Listing every z-index in the file settles it: ordinary page furniture tops out at 300 and the LOWEST overlay is that editor at 500. Both floating controls are now 310 \u2014 above the page, beneath every overlay \u2014 so a modal always wins and they reappear when it closes. THE ROOT MISTAKE IS THE SAME ONE AS REV-731 AND REV-733: a fixed element is a claim about stacking as well as position, and the claim has to be checked against what is already there rather than guessed at with a large number."] },
   { ts: "2026-07-30", rev: "App Rev-743", type: "App", changes: ["FIX \u2014 REMOVE EMPTY ROWS FOUND NOTHING TO REMOVE (Rev-743) \u2014 the button did nothing because every row on the plan qualified as \u2018not empty\u2019. Checking the actual saved data showed why: a new row is BORN carrying the CP-7 reaction plan, FOLLOW SHOP NON-CONFORMING PARTS FLOW CHART (CW843-1), plus the operation\u2019s workcenter. The test counted those as work, so no row was ever removable. A row\u2019s DEFAULTS are not work: the two standard flowchart sentences and the auto-set workcenter are now ignored, while a reaction plan someone has CHANGED still counts and protects the row. AND IT NOW EXPLAINS ITSELF: finding nothing used to be a flash that vanished in seconds, which is indistinguishable from a dead button \u2014 it now opens a window stating that nothing was removed and what actually counts as empty. THE LESSON, AGAIN: this was written from an assumption about what a blank row looks like, and settled in one minute by reading the real rows out of cp_data.json. Check the data first."] },
@@ -2359,7 +2360,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "09:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "09:26 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7867,8 +7868,10 @@ function cpHowtoFab(){
       b.id = 'cpHowtoFab'; b.type = 'button';
       // Rev-734: 100% larger — 22px text, doubled padding. This is the control a new user is
       // meant to find first, so it is the biggest thing on the screen that is not the work itself.
+      // Rev-746: RED in both modes. It was green when not pulsing, which read as a routine
+      // action sitting next to the other green buttons; red is the colour that says look here.
       b.style.cssText = 'font-size:22px; font-weight:900; letter-spacing:.04em; padding:14px 26px;'
-        + ' border-radius:999px; border:2px solid #215236; background:#2c6e49; color:#fff;'
+        + ' border-radius:999px; border:2px solid #7d2419; background:#a5342a; color:#fff;'
         + ' cursor:pointer; font-family:inherit; box-shadow:0 4px 14px rgba(0,0,0,.35);'
         + ' max-width:56vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;';
       b.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpHowtoPlay(cpHowtoScreenKey()); };
