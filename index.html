@@ -783,6 +783,7 @@
         <button type="button" id="cpOdsUploadBtn" style="background:#1d4e89; color:#fff; border:none; border-radius:5px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; margin-left:auto;" title="Upload or replace this plan's ODS drawing (PDF, PNG, or JPG)">📄 Upload / Replace drawing</button>
         <input type="file" id="cpOdsUploadFile" accept="image/*,application/pdf" style="display:none">
         <button type="button" id="cpOdsMinBtn" onclick="cpOdsToggleMin()" style="background:#444; color:#fff; border:none; border-radius:5px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer;" title="Collapse the drawing so the Control Plan grid gets the full width">▬ Minimize drawing</button>
+        <button type="button" id="cpReadDimsBtn" onclick="aiLocateBubbles(event)" title="Read each balloon's dimension off the drawing and fill EMPTY Spec/Tol cells. Sends the drawing to Anthropic — you will be asked to confirm. Pins are not changed." style="background:#6b3fa0; color:#fff; border:none; border-radius:5px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; margin-left:6px;">🔎 Read dimensions (AI)</button>
         <span id="cpLocateHint" style="display:none; font-size:11px; font-weight:700; color:#c0392b;">← no pin yet — tap 📍 Pin Manually, then click this balloon on the drawing</span>
       </div>
       <div style="flex:1; overflow:auto; border:1px solid var(--line); border-radius:6px; background:#fff; cursor:zoom-in; touch-action:none;" id="cpOdsPanelImgWrap" title="Click to enlarge">
@@ -1584,7 +1585,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-716";
+const APP_REV = "Rev-717";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1717,6 +1718,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-717", type: "App", changes: ["THE DIMENSION READ IS BACK \u2014 WITHOUT UNDOING REV-350 (Rev-717) \u2014 \ud83d\udd0e READ DIMENSIONS (AI) now sits in the ODS panel header. WHY IT WENT MISSING: Locate Bubbles did TWO jobs \u2014 it found balloon POSITIONS and it read each balloon\u2019s DIMENSION into empty Spec/Tol cells (Rev-214). Rev-350 removed the button because manual pinning had become the better way to do the first job, and recorded no fault with the second; the dimension read was collateral, nothing replaced it, and that is why a fresh operation comes up with every Spec/Tol cell blank. RESTORED AS A READER ONLY: it fills EMPTY Spec/Tol cells, never overwrites a typed value, and a balloon already pinned KEEPS THE POSITION YOU CLICKED \u2014 the run merges descriptions into the existing feature list instead of replacing it, so pinning stays manual exactly as Rev-350 intended. THE DRAWING LEAVES THE DEVICE ON THIS ONE, so it runs behind the existing ITAR confirm gate, untouched. The finish message says how many cells were filled and, in capitals, to check every one against the print \u2014 the AI reads digits off an image, and .323 against .328 is a difference only the print settles."] },
   { ts: "2026-07-30", rev: "App Rev-716", type: "App", changes: ["HAND-EDIT COUNT BESIDE THE OP NUMBER (Rev-716) \u2014 an amber \u270e n HAND-EDITED chip now sits next to OP-nnn on the Control Plans list wherever a plan carries cells that differ from the Master List. It counts declared FREQ / # Recorded / CMM overrides and declared machinist exceptions together, because both are the same thing from a reviewer\u2019s seat: a line where the master no longer governs. Hovering lists every one \u2014 balloon, column, master value \u2192 current value \u2014 so the chip is a way IN to the deviations rather than just a number. DERIVED, NOT STORED, AND THAT WAS THE REAL DECISION. The brief said \u2018keep track of the number of times\u2019, which suggests an event tally; a tally counts a revert-then-redo as 2 and would overstate the deviation for the life of the plan, while the count that matters at review time is how many cells differ RIGHT NOW. So it is computed from the rows on every render: it cannot drift out of step with the data, needs no migration for existing plans, and drops back on its own when an override is snapped back to the master. If the historical event count is wanted as well, that needs the append-only cell history discussed earlier, not a counter."] },
   { ts: "2026-07-29", rev: "App Rev-715", type: "App", changes: ["# RECORDED AND MEAS METHOD (CMM) CAN NOW BE OVERRIDDEN ON ONE ROW (Rev-715) \u2014 only the two FREQ cells were editable; the rest of the methods band was read-only, so a single line needing a different CMM technique could not be stated at all. Both now use the SAME declared-override mechanism as FREQ, not a free text box: orange fill with a heavy border, an OVERRIDE \u2014 MASTER: x chip, a \u21ba that snaps back, the who-and-when stamp from Rev-699, and the ? window from Rev-698 (whose labels now name all four columns). Type the master value back and the override clears itself. Closed rows show it too, so an override is never invisible from the grid. MEAS METHOD (MACHINIST) IS DELIBERATELY STILL NOT A TEXT BOX: it already has a declared route in \u270b MACHINIST DOES NOT CHECK THIS, plus the change-control-type and edit-master strip, and turning it into an input would throw all of that away for something worse. THE INSTRUCTIONS NOW NEED TO CATCH UP: CP-2C names all five columns as master-governed and says not to hand-edit them to disagree. Rev-499 already crossed that line for FREQ; this widens it. The mechanism records the deviation and who made it, which is the honest version, but Rev-92 does not yet describe ANY of it \u2014 the pending Rev-93 amendment should cover the declared override as well as the machinist exception."] },
   { ts: "2026-07-29", rev: "App Rev-714", type: "App", changes: ["BACK NOW MEANS BACK, NOT MAIN MENU (Rev-714) \u2014 reviewed every back button: TEN called showMenu() outright and TWO called showAdmin(), so Back meant a fixed destination rather than \u2018where I came from\u2019. The bite was the route added at Rev-696 \u2014 open the Master List from inside the Build Control Plan grid to fix a control type, press Back, and the plan closed and you were at the top menu, several clicks from the row you were on. A history stack now records the screen you were on whenever another opens, and cpNavBack() returns to it: the wrapper does not record while going back, refuses to stack the same screen twice, and caps at 20 entries. An empty stack still falls through to the main menu, so a first screen behaves as before. FIXED IN ONE PLACE RATHER THAN FOURTEEN, so the next screen added inherits correct Back behaviour instead of copying showMenu() again. Side effects preserved: the Master List still saves an open inline edit and stops the feature-type tally first, and the builder\u2019s own Back is untouched because returning to the plan list is deliberate there. NOTE ON THE FIRST ATTEMPT AT THIS REV: the boot-line edit inserted a newline before a trailing // comment, which commented out the remainder of the original line and its braces. node --check caught it \u2014 the class of fault it CAN catch, unlike the scope error at Rev-706."] },
@@ -2306,7 +2308,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:07 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:38 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -8091,8 +8093,12 @@ function updateOdsPanel(){
     const feat = row ? cpFeatureForBubble(row.bubble) : null;
     const zBtn = $('cpPanelZoomBtn');
     if(zBtn) zBtn.style.display = feat ? 'inline-block' : 'none';
-    const lBtn = $('cpLocateBubblesBtn');   // Rev-350: AI Locate removed — manual pinning is the only method
+    // Rev-717: the old AI Locate button stays gone; what came back is READ DIMENSIONS, which
+    // fills Spec/Tol and never touches pins. Manual pinning remains the only way to pin.
+    const lBtn = $('cpLocateBubblesBtn');
     if(lBtn) lBtn.style.display = 'none';
+    const rdBtn = $('cpReadDimsBtn');
+    if(rdBtn) rdBtn.style.display = (cpBuildState && cpBuildState.odsImage) ? 'inline-block' : 'none';
     // Rev-353: PIN MODE IS ALWAYS ON in the builder — the Pin Manually button is gone.
     // Every click on the drawing pins the focused balloon; drag still pans; wheel still zooms.
     window._cpPinMode = true;
@@ -9372,7 +9378,22 @@ async function aiLocateBubbles(ev){
     const result = { bubbles: merged };
     if(!result.bubbles || !result.bubbles.length){ window._locateErrMsg = '⚠ AI found no circled numbers on this drawing.'; if(typeof updateOdsPanel === 'function') updateOdsPanel(); flash('No circled bubble numbers found on this drawing.', true); return; }
     window._locateErrMsg = '';   // success — clear any prior error
-    beFeatures = result.bubbles.map(b => ({ n: String(b.n), x: +b.x, y: +b.y, tipX: +b.x, tipY: +b.y, description: String(b.dim || '') }));
+    // Rev-717: KEEP EXISTING PINS. Rev-350 made manual pinning the only way to place a balloon,
+    // deliberately. This run reads DIMENSIONS, so a balloon already pinned keeps the position you
+    // clicked and only gains its description; unpinned balloons take the AI position as a start.
+    const _prev = Array.isArray(beFeatures) ? beFeatures : [];
+    beFeatures = result.bubbles.map(b => {
+      const old = _prev.find(f => String(f.n) === String(b.n));
+      const keep = !!(old && (old.x || old.y));
+      return {
+        n: String(b.n),
+        x: keep ? old.x : +b.x, y: keep ? old.y : +b.y,
+        tipX: keep ? (old.tipX != null ? old.tipX : old.x) : +b.x,
+        tipY: keep ? (old.tipY != null ? old.tipY : old.y) : +b.y,
+        description: String(b.dim || (old ? old.description : '') || '')
+      };
+    });
+    _prev.forEach(f => { if(!beFeatures.some(x => String(x.n) === String(f.n))) beFeatures.push(f); });
     if(typeof saveWorkingCopy === 'function') saveWorkingCopy();
     if(cpBuildState){ cpBuildState.features = JSON.parse(JSON.stringify(beFeatures)); if(typeof cpAutoSaveProject === 'function') cpAutoSaveProject(); }   // Rev-294: save located balloons with the plan (and sync)
     // Rev-214: fill the Product/Process Spec/Tol column from each bubble's read dimension
@@ -9385,7 +9406,7 @@ async function aiLocateBubbles(ev){
       });
       if(filled) renderCPBuilder();
     }
-    flash('🎯 Located ' + beFeatures.length + ' bubbles' + (filled ? (' — filled ' + filled + ' Spec/Tol cells (verify each against the print)') : '') + '.');
+    flash('🔎 Read ' + beFeatures.length + ' balloons' + (filled ? (' — filled ' + filled + ' empty Spec/Tol cell' + (filled===1?'':'s') + '. CHECK EVERY ONE AGAINST THE PRINT.') : ' — no empty Spec/Tol cells to fill.') + ' Pins were not changed.');
     updateOdsPanel();
   } catch(err){
     aiAnalyzeController = null;
