@@ -1608,7 +1608,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-742";
+const APP_REV = "Rev-743";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1741,6 +1741,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-743", type: "App", changes: ["FIX \u2014 REMOVE EMPTY ROWS FOUND NOTHING TO REMOVE (Rev-743) \u2014 the button did nothing because every row on the plan qualified as \u2018not empty\u2019. Checking the actual saved data showed why: a new row is BORN carrying the CP-7 reaction plan, FOLLOW SHOP NON-CONFORMING PARTS FLOW CHART (CW843-1), plus the operation\u2019s workcenter. The test counted those as work, so no row was ever removable. A row\u2019s DEFAULTS are not work: the two standard flowchart sentences and the auto-set workcenter are now ignored, while a reaction plan someone has CHANGED still counts and protects the row. AND IT NOW EXPLAINS ITSELF: finding nothing used to be a flash that vanished in seconds, which is indistinguishable from a dead button \u2014 it now opens a window stating that nothing was removed and what actually counts as empty. THE LESSON, AGAIN: this was written from an assumption about what a blank row looks like, and settled in one minute by reading the real rows out of cp_data.json. Check the data first."] },
   { ts: "2026-07-30", rev: "App Rev-742", type: "App", changes: ["\u23f9 STOP IN THE PLAYER, AND THE WATCH BUTTON MOVES TO THE TOP (Rev-742) \u2014 (1) A red \u23f9 STOP now sits first in the player: it pauses, releases the video and closes in one press, and Esc does the same. \u2018Close\u2019 alone read as dismissing a dialog, not as stopping something that is running and talking. Both buttons now run the same stop, and clicking the dark backdrop does too, so there is no way out that leaves the clip playing. (2) The WATCH button moves from the bottom-right corner to a FULL-WIDTH BAR AT THE VERY TOP. It is fixed, but the page is padded by exactly the bar\u2019s height, so it PUSHES the content down instead of covering it \u2014 which is the mistake made at Rev-731, when floating it over the top hid New Chat Prompt. The bar hides itself, and the padding comes off, on any screen with no video. NEW USER and \u2139 HELP stay in the bottom-right corner where they are out of the way."] },
   { ts: "2026-07-30", rev: "App Rev-741", type: "App", changes: ["FIX \u2014 THE VIDEO STILL WOULD NOT PLAY: SPLIT ON THE WRONG COMMA (Rev-741) \u2014 Rev-732 converted the stored clip to a blob URL by cutting the data URL at the FIRST comma. A webm data URL reads data:video/webm;codecs=vp9,opus;base64,\u2026 and that first comma sits inside the CODEC LIST, so the code fed \u2018opus;base64,GkX\u2026\u2019 to atob, which threw \u2018Incorrect padding\u2019, was swallowed by the catch, and the player silently fell back to the unplayable data URL \u2014 the exact symptom Rev-732 claimed to fix. It now splits on \u2018base64,\u2019. VERIFIED AGAINST THE ACTUAL STORED FILE this time, not by reading the code: decoding from the correct offset yields first bytes 1a45dfa3, the WebM EBML header, so the recording was always sound. TWO REVS SPENT ON THIS BECAUSE BOTH EARLIER \u2018FIXES\u2019 WERE CHECKED BY INSPECTION RATHER THAN BY RUNNING THE CODE ON THE REAL DATA \u2014 and a try/catch around the conversion turned a hard failure into a silent one, which is why it looked like a video problem rather than a parsing problem."] },
   { ts: "2026-07-30", rev: "App Rev-740", type: "App", changes: ["FIX \u2014 RENAMING THE TABS ORPHANED THE HOW-TO VIDEO (Rev-740) \u2014 the clip stopped appearing on Bubble Numbers. Rev-737 keyed each video on cpHelpScreen(), which includes the step LABEL; Rev-738 then renamed that label from \u20181 \u00b7 Bubble Numbers\u2019 to \u20183 \u00b7 Bubble Numbers\u2019, so the app looked for \u2018\u2026 Step 1 \u00b7 3 \u00b7 Bubble Numbers\u2019 while the file sat under \u2018\u2026 Step 1 \u00b7 Bubble Numbers\u2019. Storage keyed on display text breaks the moment the display changes. Videos now key on cpHowtoScreenKey() \u2014 \u2018Build Control Plan \u00b7 Step 1\u2019 \u2014 an identity with no caption in it, so any future renaming of the tabs is harmless. A migration rescues clips filed under either of the two label-based keys and re-uploads them under the stable one. MY CHECK AT REV-738 WAS WORTHLESS AND SHOULD BE RECORDED AS SUCH: it confirmed the code SHAPE was unchanged, not the string it produced, and I reported the video key as stable on that basis. Verifying the input and not the output is not verification."] },
@@ -2356,7 +2357,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:12 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "08:34 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -9122,11 +9123,20 @@ function cpPinStepBack(ev){
 // balloons than that. This clears the leftovers \u2014 but only rows that are genuinely EMPTY:
 // nothing typed, no control type, no pin on the drawing, no approval, not ghosted. Anything
 // with a trace of work on it is kept, and the count is stated before anything is removed.
+// Rev-743: the DEFAULTS a row is born with are not work. Every new row arrives carrying the
+// CP-7 reaction plan and the operation's workcenter, so the first version of this test found
+// no empty rows anywhere and the button did nothing.
+const CP_ROW_DEFAULTS = [
+  'FOLLOW SHOP NON-CONFORMING PARTS FLOW CHART (CW843-1)',
+  'FOLLOW VENDOR RMA FLOWCHART (CW854-1)'
+];
 function cpRowIsEmpty(r){
   if(!r || r.ghost) return false;
+  const rp = String(r.reactionPlan == null ? '' : r.reactionPlan).trim().toUpperCase();
+  if(rp && CP_ROW_DEFAULTS.indexOf(rp) < 0) return false;   // a reaction plan someone CHANGED is work
   const any = ['desc','featureDesc','spec','upperLimit','lowerLimit','classification','controlTypeId',
-               'measMethod','numRecorded','freqEvery','freqQE','measMethodCMM','reactionPlan',
-               'specialGage','workcenter','featureType','secondLevel','thirdLevel']
+               'measMethod','numRecorded','freqEvery','freqQE','measMethodCMM',
+               'specialGage','featureType','secondLevel','thirdLevel']
     .some(k => String(r[k] == null ? '' : r[k]).trim() !== '');
   if(any) return false;
   if(r.noMachCheck) return false;
@@ -9138,7 +9148,15 @@ async function cpTrimEmptyRows(ev){
   if(ev) ev.stopPropagation();
   if(!cpBuildState || !cpBuildState.rows) return;
   const empties = cpBuildState.rows.filter(cpRowIsEmpty);
-  if(!empties.length){ flash('No empty rows to remove \u2014 every row has something on it.'); return; }
+  if(!empties.length){
+    await cpConfirmBox('NO EMPTY ROWS FOUND',
+      'Every row on this plan has something on it, so nothing was removed.<br><br>'
+      + 'A row counts as empty only when it has no description, tolerance, class, control type, '
+      + 'method, special gage or approval, and no pin on the drawing. The reaction plan every '
+      + 'row is born with (CW843-1) does NOT count as work \u2014 but a reaction plan you have '
+      + 'changed does.', 'OK', { tone:'move', cancelLabel:'Close' });
+    return;
+  }
   const nums = empties.map(r => r.bubble).join(', ');
   const keep = cpBuildState.rows.length - empties.length;
   const ok = await cpConfirmBox('REMOVE EMPTY ROWS',
