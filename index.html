@@ -1607,7 +1607,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-736";
+const APP_REV = "Rev-737";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1740,6 +1740,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-737", type: "App", changes: ["A HOW-TO VIDEO NOW BELONGS TO A STEP, NOT THE WHOLE BUILDER (Rev-737) \u2014 HOW TO ASSIGN BUBBLE NUMBERS was appearing on 3 \u00b7 Measurement Methods, because a clip is keyed to the SCREEN and the builder reports one name across all four of its step views. The builder now identifies itself as \u2018Build Control Plan \u00b7 Step 1 \u00b7 Bubble Numbers\u2019 and so on, so each step carries its own video and shows only its own. The \u2139 HELP agent gets the same benefit \u2014 it now knows which step the question is about, not just which screen. THE EXISTING CLIP WAS MOVED, NOT ORPHANED: a one-time migration copies it to Step 1, carries its title across, pushes it to videos/ under the new name and removes the old copy from the device and the repo. Step 1 because the operator said plainly it belongs on the bubble-numbers page \u2014 not a guess. WHAT YOU MUST TEST (rule 8): on 1 \u00b7 Bubble Numbers the big red button is there; on 2 \u00b7 Control Type and 3 \u00b7 Measurement Methods it is NOT; \uff0b Record how-to on those steps offers to record a new one for that step."] },
   { ts: "2026-07-30", rev: "App Rev-736", type: "App", changes: ["STITCH ALL OPERATIONS INTO ONE PART CONTROL PLAN (Rev-736) \u2014 a new button on the PART header row, beside Add Operation and View Traveller: \u2018Stitch together all OP Control Plans into one Part Control Plan\u2019. It opens the same editable L3Harris sheet but built from EVERY operation of the part in routing order, with continuous Doc numbers. Placed on the part row rather than an operation row because that is what it covers \u2014 the per-operation Excel Control Plan buttons stay exactly where they are. THE TWO SHEETS ARE SEPARATE DOCUMENTS AND CANNOT OVERWRITE EACH OTHER: the operation sheet saves to custCP on its own plan, the part sheet to custCPPart, so editing one never rewrites the other and each keeps its own \u21bb Rebuild. The part sheet always lives on the FIRST operation of the part, so there is exactly one of them however many operations the part grows, and its plan number reads L3H_<part>_ALLOPS_CP. WHAT YOU MUST TEST (rule 8): the button appears on the 1000237620 header row; it opens a sheet containing BOTH OP-030 and OP-040 rows; the per-operation buttons still show one operation each."] },
   { ts: "2026-07-30", rev: "App Rev-735", type: "App", changes: ["EXCEL CONTROL PLAN \u2014 ONE PER OPERATION (Rev-735) \u2014 the button is renamed from Customer CP to EXCEL CONTROL PLAN, and the sheet it opens now covers THAT OPERATION ONLY. Rev-562 had it gather every operation of the part into a single sheet; the operation is the unit of work everywhere else in this app \u2014 plans are built, revised, approved and issued per operation \u2014 so the export now matches. Three things changed with it: opening no longer hops to a sibling operation\u2019s saved sheet (each operation keeps and edits its own), the header reads EXCEL CONTROL PLAN \u2014 <part> \u00b7 OP-nnn with the subtitle THIS OPERATION ONLY, and the plan number carries the operation: L3H_1000237620_OP030_CP. The architecture note in the handoff prompt was corrected too, so a future chat is not told the old behaviour. WHAT YOU MUST TEST (rule 8): open Excel Control Plan on OP-030 and confirm it holds ONLY OP-030\u2019s rows; then open it on OP-040 and confirm it holds only OP-040\u2019s. IF EITHER STILL SHOWS BOTH, press \u21bb REBUILD once \u2014 a sheet edited under the old behaviour is kept as you left it until rebuilt."] },
   { ts: "2026-07-30", rev: "App Rev-734", type: "App", changes: ["THE WATCH-VIDEO BUTTON IS TWICE THE SIZE AND PULSES HARDER (Rev-734) \u2014 text 11px \u2192 22px, padding doubled, border thickened: it is now the largest control on the screen that is not the work itself, which is right for the one thing a new user is meant to find before anything else. THE PULSE IS REBUILT rather than sped up: 1.5s \u2192 0.85s, and instead of one soft halo it now throws TWO expanding rings, grows to 1.14 (was 1.06), dips slightly below full size on the way back so there is a beat rather than a breath, and lifts the fill from #a5342a to a brighter #d9342a at the peak so it reads as flashing. The arrow nudge doubled in speed to match. It still stops completely under prefers-reduced-motion \u2014 a flashing red control at this strength is exactly what that setting exists for, and the button stays perfectly usable without it. Size applies in BOTH modes; only the pulse is NEW USER."] },
@@ -2349,7 +2350,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "05:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "06:14 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7418,7 +7419,19 @@ function cpNavWire(){
 function cpHelpScreen(){
   for(const [id, name] of CP_HELP_SCREENS){
     const el = document.getElementById(id);
-    if(el && !el.classList.contains('hidden')) return name;
+    if(el && !el.classList.contains('hidden')){
+      // Rev-737: the builder is FOUR screens wearing one name. A how-to about assigning
+      // bubble numbers has no business appearing on Measurement Methods, so the step is
+      // part of the identity.
+      if(id === 'cpBuilderScreen'){
+        try{
+          const st = cpGetStep();
+          const def = (typeof CP_STEPS !== 'undefined') ? CP_STEPS[st] : null;
+          if(def) return name + ' \u00b7 Step ' + st + ' \u00b7 ' + (def.label || '');
+        }catch(_){ }
+      }
+      return name;
+    }
   }
   return 'Unknown screen';
 }
@@ -7749,6 +7762,29 @@ function cpPromptBox(heading, label, value){
   });
 }
 // Rev-730: the titled button that sits LEFT of ℹ HELP on whichever screen has a video
+// Rev-737: one-time move of the clip recorded before steps were part of the key. The
+// operator has stated it belongs on the bubble-numbers page, so it goes to Step 1 rather
+// than being guessed at or left showing on every step.
+function cpHowtoMigrateStep(){
+  try{
+    if(localStorage.getItem('cpHowtoStepMigrated') === '1') return;
+    const legacy = 'Build Control Plan';
+    const src = cpHowtoGet(legacy);
+    if(src){
+      const target = 'Build Control Plan \u00b7 Step 1 \u00b7 Bubble Numbers';
+      if(!cpHowtoGet(target)){
+        cpHowtoSave(target, src);
+        const t = cpHowtoTitle(legacy); if(t) cpHowtoSetTitle(target, t);
+        try{ ghPushHowto(target); }catch(_){ }
+      }
+      cpHowtoDelete(legacy); cpHowtoSetTitle(legacy, '');
+      try{ ghDeleteHowto(legacy); }catch(_){ }
+      try{ logAct('howto', 'video moved to Step 1'); }catch(_){ }
+    }
+    localStorage.setItem('cpHowtoStepMigrated', '1');
+  }catch(_){ }
+}
+try{ setTimeout(cpHowtoMigrateStep, 2500); }catch(_){ }
 function cpHowtoFab(){
   try{
     const scr = cpHelpScreen();
