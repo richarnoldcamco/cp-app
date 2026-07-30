@@ -1607,7 +1607,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-735";
+const APP_REV = "Rev-736";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1740,6 +1740,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-736", type: "App", changes: ["STITCH ALL OPERATIONS INTO ONE PART CONTROL PLAN (Rev-736) \u2014 a new button on the PART header row, beside Add Operation and View Traveller: \u2018Stitch together all OP Control Plans into one Part Control Plan\u2019. It opens the same editable L3Harris sheet but built from EVERY operation of the part in routing order, with continuous Doc numbers. Placed on the part row rather than an operation row because that is what it covers \u2014 the per-operation Excel Control Plan buttons stay exactly where they are. THE TWO SHEETS ARE SEPARATE DOCUMENTS AND CANNOT OVERWRITE EACH OTHER: the operation sheet saves to custCP on its own plan, the part sheet to custCPPart, so editing one never rewrites the other and each keeps its own \u21bb Rebuild. The part sheet always lives on the FIRST operation of the part, so there is exactly one of them however many operations the part grows, and its plan number reads L3H_<part>_ALLOPS_CP. WHAT YOU MUST TEST (rule 8): the button appears on the 1000237620 header row; it opens a sheet containing BOTH OP-030 and OP-040 rows; the per-operation buttons still show one operation each."] },
   { ts: "2026-07-30", rev: "App Rev-735", type: "App", changes: ["EXCEL CONTROL PLAN \u2014 ONE PER OPERATION (Rev-735) \u2014 the button is renamed from Customer CP to EXCEL CONTROL PLAN, and the sheet it opens now covers THAT OPERATION ONLY. Rev-562 had it gather every operation of the part into a single sheet; the operation is the unit of work everywhere else in this app \u2014 plans are built, revised, approved and issued per operation \u2014 so the export now matches. Three things changed with it: opening no longer hops to a sibling operation\u2019s saved sheet (each operation keeps and edits its own), the header reads EXCEL CONTROL PLAN \u2014 <part> \u00b7 OP-nnn with the subtitle THIS OPERATION ONLY, and the plan number carries the operation: L3H_1000237620_OP030_CP. The architecture note in the handoff prompt was corrected too, so a future chat is not told the old behaviour. WHAT YOU MUST TEST (rule 8): open Excel Control Plan on OP-030 and confirm it holds ONLY OP-030\u2019s rows; then open it on OP-040 and confirm it holds only OP-040\u2019s. IF EITHER STILL SHOWS BOTH, press \u21bb REBUILD once \u2014 a sheet edited under the old behaviour is kept as you left it until rebuilt."] },
   { ts: "2026-07-30", rev: "App Rev-734", type: "App", changes: ["THE WATCH-VIDEO BUTTON IS TWICE THE SIZE AND PULSES HARDER (Rev-734) \u2014 text 11px \u2192 22px, padding doubled, border thickened: it is now the largest control on the screen that is not the work itself, which is right for the one thing a new user is meant to find before anything else. THE PULSE IS REBUILT rather than sped up: 1.5s \u2192 0.85s, and instead of one soft halo it now throws TWO expanding rings, grows to 1.14 (was 1.06), dips slightly below full size on the way back so there is a beat rather than a breath, and lifts the fill from #a5342a to a brighter #d9342a at the peak so it reads as flashing. The arrow nudge doubled in speed to match. It still stops completely under prefers-reduced-motion \u2014 a flashing red control at this strength is exactly what that setting exists for, and the button stays perfectly usable without it. Size applies in BOTH modes; only the pulse is NEW USER."] },
   { ts: "2026-07-30", rev: "App Rev-733", type: "App", changes: ["FIX \u2014 THE NEW BUTTONS WERE SITTING ON TOP OF THE HEADER (Rev-733) \u2014 Rev-731 pinned the mode toggle, the video button and \u2139 HELP to the TOP RIGHT of the window without checking what was already there. The menu screen has its own dark bar with New Chat Prompt in that exact spot, and the other screens use <header id=\u2019header\u2019>; the new strip covered both. Moved to the BOTTOM-RIGHT corner, which is empty on every screen in this app and is where help controls conventionally sit. Also restyled as pills with a stronger shadow so they read as floating controls rather than as part of whatever is behind them, and the row wraps rather than growing off-screen when a video title is long. MY ERROR AND THE LESSON: a fixed position is a claim that nothing else owns that corner, and this app has two different headers depending on the screen \u2014 the claim should have been checked against both before shipping. WHAT YOU MUST TEST (rule 8): on the MENU, New Chat Prompt is fully visible and uncovered; the three controls sit bottom-right; opening a plan keeps them there and out of the way of the grid."] },
@@ -2348,7 +2349,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "05:24 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "05:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3827,6 +3828,24 @@ function renderProjects(){
         + (_hasTrav ? '' : ' background:#7a5c2a; border-color:#63481f;');
       trav.onclick = () => _hasTrav ? cpViewTraveller(item.data.partNum) : cpTravellerPick(item.data.partNum);
       htd.appendChild(trav);
+      // Rev-736: the PART-level sheet — every operation of this part in one document. It sits
+      // on the part header row, not on an operation row, because that is what it covers.
+      const stitch = document.createElement('button');
+      stitch.className = 'cp-btn cp-btn-quiet';
+      stitch.textContent = 'Stitch together all OP Control Plans into one Part Control Plan';
+      stitch.title = 'Build ONE Control Plan for the whole part, combining every operation in '
+        + 'routing order. Separate document from each operation\u2019s own Excel Control Plan.';
+      stitch.style.cssText = 'margin-left:8px; vertical-align:middle; white-space:normal;'
+        + ' max-width:340px; line-height:1.25; text-align:left;';
+      stitch.onclick = () => {
+        try{
+          const pj = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+          const first = pj.findIndex(x => String(x.partNum||'') === String(item.data.partNum||''));
+          if(first < 0){ flash('No saved plans for this part yet.', true); return; }
+          cpCustomerExport(first, true);
+        }catch(e){ flash('Could not open the part Control Plan: ' + (e && e.message || e), true); }
+      };
+      htd.appendChild(stitch);
       htr.appendChild(hNameTd);
       htr.appendChild(htd);
       tbody.appendChild(htr);
@@ -4780,12 +4799,15 @@ function cpCustGroup(projects, p){
   g.sort((a, b) => (parseInt(a.x.opNum || '0') || 0) - (parseInt(b.x.opNum || '0') || 0));
   return g;
 }
-function cpCustBuildModel(p, projects){
-  if(p.custCP && p.custCP.rows && p.custCP.rows.length) return JSON.parse(JSON.stringify(p.custCP));
+function cpCustBuildModel(p, projects, allOps){
+  // Rev-736: the part sheet and the operation sheet are SEPARATE documents, stored under
+  // separate keys, so editing one never silently rewrites the other.
+  const _key = allOps ? 'custCPPart' : 'custCP';
+  if(p[_key] && p[_key].rows && p[_key].rows.length) return JSON.parse(JSON.stringify(p[_key]));
   // Rev-735: THIS OPERATION ONLY. Rev-562 gathered every operation of the part into one
   // sheet; the operator wants one Excel Control Plan per operation, matching how the plans
   // are built, revised and approved — an operation is the unit of work everywhere else.
-  const group = [{ x: p, i: -1 }];
+  const group = allOps ? (projects ? cpCustGroup(projects, p) : [{ x: p, i: -1 }]) : [{ x: p, i: -1 }];
   const today = new Date();
   const fmtD = (d) => (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear();
   const created = p.created ? new Date(p.created) : today;
@@ -4800,7 +4822,7 @@ function cpCustBuildModel(p, projects){
   let lastStep = null;
   return {
     tb: {
-      cpNum: 'L3H_' + String(p.partNum||'') + (p.opNum ? ('_OP' + p.opNum) : '') + '_CP',
+      cpNum: 'L3H_' + String(p.partNum||'') + (allOps ? '_ALLOPS' : (p.opNum ? ('_OP' + p.opNum) : '')) + '_CP',
       dateOrig: fmtD(created), dateRev: fmtD(today),
       partNum: String(p.partNum||''), dwgRev: '', family: '', program: 'N/A',
       owner: 'SARAH ETZL, CUSTOMER COORDINATOR   sarah.etzl@camcomfginc.com',
@@ -4852,19 +4874,25 @@ function cpCustSave(idx){
   try{
     const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
     if(!projects[idx]) return;
-    projects[idx].custCP = cpCustReadModelFromDom();
+    projects[idx][window._ccAllOps ? 'custCPPart' : 'custCP'] = cpCustReadModelFromDom();
     projects[idx].updatedAt = new Date().toISOString();
     localStorage.setItem('cpProjects', JSON.stringify(projects));
     try{ if(typeof ghAutoSyncPush === 'function') ghAutoSyncPush(); }catch(_){ }
   }catch(e){}
 }
-async function cpCustomerExport(idx){
+async function cpCustomerExport(idx, allOps){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   let p = projects[idx];
   if(!p || !p.builderState){ alert('This plan has no editable data to export.'); return; }
-  // Rev-735: no longer hops to a sibling operation's saved sheet — each operation keeps and
-  // edits its OWN Excel Control Plan, stored on that operation.
-  const m = cpCustBuildModel(p, projects);
+  // Rev-735: an operation sheet never hops to a sibling's copy.
+  // Rev-736: a PART sheet always lives on the FIRST operation of the part, so there is exactly
+  // one of them however many operations the part grows.
+  if(allOps){
+    const grp = cpCustGroup(projects, p);
+    if(grp.length && grp[0].i >= 0){ idx = grp[0].i; p = projects[idx]; }
+  }
+  window._ccAllOps = !!allOps;
+  const m = cpCustBuildModel(p, projects, allOps);
   const old = document.getElementById('ccPanel'); if(old) old.remove();
   const panel = document.createElement('div');
   panel.id = 'ccPanel';
@@ -4877,9 +4905,10 @@ async function cpCustomerExport(idx){
   const heads = ['Doc (Line) #','Process Step','Process Description','Machine, Device, Jig, Tools For Mfg.','Reference','Product','Process','Classification','Product / Process Specification/ Tolerance','Evaluation Measurement Technique','Size','Frequency','Control Method','Reaction Plan'];
   panel.innerHTML =
     '<div style="flex:none; display:flex; align-items:center; gap:10px; padding:10px 14px; background:#7a1a1c; color:#fff;">' +
-      '<b style="font-size:15px; letter-spacing:.05em;">EXCEL CONTROL PLAN \u2014 ' + String(p.partNum||'')
-        + (p.opNum ? ('  \u00b7  OP-' + p.opNum) : '') + '</b>' +
-      '<span style="font-size:12px; opacity:.85;">THIS OPERATION ONLY \u00b7 every cell is editable \u00b7 edits save automatically</span>' +
+      '<b style="font-size:15px; letter-spacing:.05em;">' + (allOps ? 'PART CONTROL PLAN \u2014 ALL OPERATIONS' : 'EXCEL CONTROL PLAN')
+        + ' \u2014 ' + String(p.partNum||'') + (!allOps && p.opNum ? ('  \u00b7  OP-' + p.opNum) : '') + '</b>' +
+      '<span style="font-size:12px; opacity:.85;">' + (allOps ? 'EVERY OPERATION of this part, in routing order' : 'THIS OPERATION ONLY')
+        + ' \u00b7 every cell is editable \u00b7 edits save automatically</span>' +
       '<span style="flex:1"></span>' +
       '<button id="ccRebuild" style="background:#b8860b; color:#fff; border:0; border-radius:8px; padding:10px 16px; font-weight:800; font-size:13px; cursor:pointer;" title="Throw away screen edits and rebuild fresh from the current op-plans">\u21bb Rebuild from plans</button>' +
       '<button id="ccDl" style="background:#1e7e34; color:#fff; border:0; border-radius:8px; padding:10px 22px; font-weight:800; font-size:14px; cursor:pointer;">\u2b07 Download .xlsx</button>' +
@@ -4914,7 +4943,7 @@ async function cpCustomerExport(idx){
   document.getElementById('ccRebuild').onclick = function(){
     if(!confirm('Rebuild the customer sheet fresh from the current op-plans? Your screen edits will be discarded.')) return;
     const pj = JSON.parse(localStorage.getItem('cpProjects') || '[]');
-    if(pj[idx]){ delete pj[idx].custCP; localStorage.setItem('cpProjects', JSON.stringify(pj)); }
+    if(pj[idx]){ delete pj[idx][window._ccAllOps ? 'custCPPart' : 'custCP']; localStorage.setItem('cpProjects', JSON.stringify(pj)); }
     panel.remove(); cpCustomerExport(idx);
   };
   document.getElementById('ccDl').onclick = function(){ cpCustSave(idx); cpCustXlsx(idx); };
@@ -4922,7 +4951,7 @@ async function cpCustomerExport(idx){
 async function cpCustXlsx(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   const p = projects[idx]; if(!p) return;
-  const m = p.custCP || cpCustBuildModel(p);
+  const m = (window._ccAllOps ? p.custCPPart : p.custCP) || cpCustBuildModel(p, JSON.parse(localStorage.getItem('cpProjects') || '[]'), window._ccAllOps);
   flash('Building the .xlsx\u2026');
   if(typeof ExcelJS === 'undefined'){
     await new Promise((res, rej) => {
