@@ -1608,7 +1608,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-746";
+const APP_REV = "Rev-747";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1741,6 +1741,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-747", type: "App", changes: ["OPEN MOVED NEXT TO THE PART NUMBER (Rev-747) \u2014 on the parts list the OPEN button sat at the far right edge, past Operations, Progress, Last Updated and Traveller: the longest reach on the row, for the thing you came to press. It now sits immediately after the part number, so the eye lands on the part and the button is already there. Left-aligned rather than right, since it is no longer the end of the row. HEADER AND CELL MOVED TOGETHER \u2014 the header string and the cell that builds the button are in different places in the file, and moving one without the other would have shifted every column label one place out of step with its data, which reads as correct until someone checks a date against the wrong heading."] },
   { ts: "2026-07-30", rev: "App Rev-746", type: "App", changes: ["THE WATCH BUTTON IS RED IN BOTH MODES (Rev-746) \u2014 it was green (#2c6e49) at rest and only went red while pulsing in NEW USER, so in EXPERT USER it sat in the same colour as Save to Project, New Row and Add Operation and read as one more routine action. Red now in both modes; the PULSE remains the NEW USER difference. Nothing else changed \u2014 same size, same position in the top bar, same behaviour, and the animation still stops under prefers-reduced-motion."] },
   { ts: "2026-07-30", rev: "App Rev-745", type: "App", changes: ["THE GRID NO LONGER SCROLLS SIDEWAYS \u2014 THE DRAWING GAVE UP THE ROOM (Rev-745) \u2014 the ODS panel held a flat 50% of the screen with a 520px floor, so on 5 \u00b7 Measurement Methods the thirteen visible columns came to roughly 1280px against about 1270px of table, and the last few pixels forced a horizontal scrollbar across the whole grid. The panel is now 38% with a 400px floor, handing the table around 300px more \u2014 comfortably clear on a 1920 or 2560 screen. THE DRAWING LOSES LESS THAN IT LOOKS: it is a zoom-and-pan view of a balloon, not a sheet to read whole \u2014 wheel zooms, drag pans, \ud83d\udd0d Full view resets, and clicking it opens the full-screen viewer. A NARROW SCREEN WILL STILL SCROLL: the 400px floor stops the drawing collapsing to nothing, so below roughly 1700px wide the columns win and the bar returns. That is the right trade \u2014 a drawing squeezed to a sliver helps nobody. WHAT YOU MUST TEST (rule 8): on 5 \u00b7 Measurement Methods there is no bar under the grid, and the drawing still zooms and pans."] },
   { ts: "2026-07-30", rev: "App Rev-744", type: "App", changes: ["FIX \u2014 THE VIDEO BAR WAS COVERING THE PIN EDITOR (Rev-744) \u2014 the WATCH bar was given z-index 9500 at Rev-742 and the bottom-right controls 9000, both numbers chosen without checking what they had to sit under. The pin editor overlay is 500, so the bar painted straight over its toolbar and hid \u2713 Save, \uff0b Add and the close button while a balloon was being framed. Listing every z-index in the file settles it: ordinary page furniture tops out at 300 and the LOWEST overlay is that editor at 500. Both floating controls are now 310 \u2014 above the page, beneath every overlay \u2014 so a modal always wins and they reappear when it closes. THE ROOT MISTAKE IS THE SAME ONE AS REV-731 AND REV-733: a fixed element is a claim about stacking as well as position, and the claim has to be checked against what is already there rather than guessed at with a large number."] },
@@ -2360,7 +2361,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "09:26 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "09:42 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -2931,11 +2932,11 @@ function renderPartsIndex(tbody, combined){
   const head = document.getElementById('cpPlanHeadRow');
   if(head) head.innerHTML =
       '<th>Part Number</th>'
+    + '<th>Open</th>'
     + '<th>Operations</th>'
     + '<th>Progress</th>'
     + '<th>Last Updated</th>'
-    + '<th style="border-left:2px solid #c9c0b4;">Traveller</th>'
-    + '<th style="text-align:right;">Open</th>';
+    + '<th style="border-left:2px solid #c9c0b4;">Traveller</th>';
 
   Object.keys(byPart).sort((a, b) => (byPart[b].latest || '').localeCompare(byPart[a].latest || ''))
     .forEach(k => {
@@ -2960,6 +2961,17 @@ function renderPartsIndex(tbody, combined){
       pen.onclick = (e) => { e.stopPropagation(); cpRenamePart(g.part); };
       tdName.appendChild(pen);
       tr.appendChild(tdName);
+
+      // Rev-747: OPEN sits right after the part number — it is the thing you came to press,
+      // and it was parked at the far right edge, the longest reach on the row.
+      const tdOpen = cell('', 'left');
+      const ob = document.createElement('button');
+      ob.className = 'cp-btn cp-btn-primary';
+      ob.textContent = 'Open \u2192';
+      ob.style.width = '94px';
+      ob.onclick = (e) => { e.stopPropagation(); cpOpenPart(g.part); };
+      tdOpen.appendChild(ob);
+      tr.appendChild(tdOpen);
 
       const opLabels = g.ops.map(o => o.data.opNum ? ('OP-' + o.data.opNum) : null).filter(Boolean);
       tr.appendChild(cell('<b>' + g.ops.length + '</b>'
@@ -2987,15 +2999,6 @@ function renderPartsIndex(tbody, combined){
       tb.onclick = (e) => { e.stopPropagation(); hasTrav ? cpViewTraveller(g.part) : cpTravellerPick(g.part); };
       tdTrav.appendChild(tb);
       tr.appendChild(tdTrav);
-
-      const tdOpen = cell('', 'right');
-      const ob = document.createElement('button');
-      ob.className = 'cp-btn cp-btn-primary';
-      ob.textContent = 'Open \u2192';
-      ob.style.width = '94px';
-      ob.onclick = (e) => { e.stopPropagation(); cpOpenPart(g.part); };
-      tdOpen.appendChild(ob);
-      tr.appendChild(tdOpen);
 
       tbody.appendChild(tr);
     });
