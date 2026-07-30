@@ -1608,7 +1608,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-741";
+const APP_REV = "Rev-742";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1741,6 +1741,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-742", type: "App", changes: ["\u23f9 STOP IN THE PLAYER, AND THE WATCH BUTTON MOVES TO THE TOP (Rev-742) \u2014 (1) A red \u23f9 STOP now sits first in the player: it pauses, releases the video and closes in one press, and Esc does the same. \u2018Close\u2019 alone read as dismissing a dialog, not as stopping something that is running and talking. Both buttons now run the same stop, and clicking the dark backdrop does too, so there is no way out that leaves the clip playing. (2) The WATCH button moves from the bottom-right corner to a FULL-WIDTH BAR AT THE VERY TOP. It is fixed, but the page is padded by exactly the bar\u2019s height, so it PUSHES the content down instead of covering it \u2014 which is the mistake made at Rev-731, when floating it over the top hid New Chat Prompt. The bar hides itself, and the padding comes off, on any screen with no video. NEW USER and \u2139 HELP stay in the bottom-right corner where they are out of the way."] },
   { ts: "2026-07-30", rev: "App Rev-741", type: "App", changes: ["FIX \u2014 THE VIDEO STILL WOULD NOT PLAY: SPLIT ON THE WRONG COMMA (Rev-741) \u2014 Rev-732 converted the stored clip to a blob URL by cutting the data URL at the FIRST comma. A webm data URL reads data:video/webm;codecs=vp9,opus;base64,\u2026 and that first comma sits inside the CODEC LIST, so the code fed \u2018opus;base64,GkX\u2026\u2019 to atob, which threw \u2018Incorrect padding\u2019, was swallowed by the catch, and the player silently fell back to the unplayable data URL \u2014 the exact symptom Rev-732 claimed to fix. It now splits on \u2018base64,\u2019. VERIFIED AGAINST THE ACTUAL STORED FILE this time, not by reading the code: decoding from the correct offset yields first bytes 1a45dfa3, the WebM EBML header, so the recording was always sound. TWO REVS SPENT ON THIS BECAUSE BOTH EARLIER \u2018FIXES\u2019 WERE CHECKED BY INSPECTION RATHER THAN BY RUNNING THE CODE ON THE REAL DATA \u2014 and a try/catch around the conversion turned a hard failure into a silent one, which is why it looked like a video problem rather than a parsing problem."] },
   { ts: "2026-07-30", rev: "App Rev-740", type: "App", changes: ["FIX \u2014 RENAMING THE TABS ORPHANED THE HOW-TO VIDEO (Rev-740) \u2014 the clip stopped appearing on Bubble Numbers. Rev-737 keyed each video on cpHelpScreen(), which includes the step LABEL; Rev-738 then renamed that label from \u20181 \u00b7 Bubble Numbers\u2019 to \u20183 \u00b7 Bubble Numbers\u2019, so the app looked for \u2018\u2026 Step 1 \u00b7 3 \u00b7 Bubble Numbers\u2019 while the file sat under \u2018\u2026 Step 1 \u00b7 Bubble Numbers\u2019. Storage keyed on display text breaks the moment the display changes. Videos now key on cpHowtoScreenKey() \u2014 \u2018Build Control Plan \u00b7 Step 1\u2019 \u2014 an identity with no caption in it, so any future renaming of the tabs is harmless. A migration rescues clips filed under either of the two label-based keys and re-uploads them under the stable one. MY CHECK AT REV-738 WAS WORTHLESS AND SHOULD BE RECORDED AS SUCH: it confirmed the code SHAPE was unchanged, not the string it produced, and I reported the video key as stable on that basis. Verifying the input and not the output is not verification."] },
   { ts: "2026-07-30", rev: "App Rev-739", type: "App", changes: ["\ud83e\uddf9 REMOVE EMPTY ROWS (Rev-739) \u2014 a plan is created with a guessed row count and the drawing often carries fewer balloons; ODS-040 has FOUR and the plan was built with fifteen, leaving eleven rows that will never be filled and eleven balloons that do not exist counting against every completion figure. The new button sits beside \uff0b New Row and clears them. ONLY GENUINELY EMPTY ROWS GO: no description, no tolerance, no limits, no class, no control type, no method, no reaction plan, no special gage, no declared machinist exception, no approval on any step, and no pin on the drawing. A ghosted row is never touched. Anything carrying a trace of work stays, so this cannot quietly destroy a half-finished line. The confirm names HOW MANY and WHICH BALLOON NUMBERS before anything is removed, and says how many rows will remain \u2014 and \uff0b New Row puts one back if the drawing turns out to have more balloons than first thought."] },
@@ -2355,7 +2356,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "07:48 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "08:12 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7671,6 +7672,28 @@ async function ghDeleteHowto(screenName){
 // into videos/ so other devices get the title as well as the recording.
 // Rev-731: all three top-right controls share ONE fixed strip. They used to be positioned
 // individually by pixel offset, which breaks the moment a video title changes length.
+// Rev-742: the WATCH button now lives in a full-width bar at the very TOP. It is fixed, but
+// the page is padded by exactly its height, so it pushes content down instead of covering it
+// — which is what went wrong at Rev-731 when it was simply floated over the header.
+function cpVideoBar(){
+  let bar = document.getElementById('cpVideoBar');
+  if(!bar){
+    bar = document.createElement('div');
+    bar.id = 'cpVideoBar';
+    bar.style.cssText = 'position:fixed; top:0; left:0; right:0; z-index:9500; display:none;'
+      + ' justify-content:center; align-items:center; padding:8px 12px; background:rgba(0,0,0,.06);'
+      + ' backdrop-filter:blur(2px);';
+    document.body.appendChild(bar);
+  }
+  return bar;
+}
+function cpVideoBarSync(){
+  const bar = cpVideoBar();
+  const b = document.getElementById('cpHowtoFab');
+  const on = !!b && bar.contains(b);
+  bar.style.display = on ? 'flex' : 'none';
+  try{ document.body.style.paddingTop = on ? (bar.offsetHeight + 'px') : ''; }catch(_){ }
+}
 function cpTopStrip(){
   let el = document.getElementById('cpTopStrip');
   if(!el){
@@ -7830,7 +7853,7 @@ function cpHowtoFab(){
     const scr = cpHowtoScreenKey();
     let b = document.getElementById('cpHowtoFab');
     const has = !!cpHowtoGet(scr);
-    if(!has){ if(b) b.remove(); return; }
+    if(!has){ if(b) b.remove(); cpVideoBarSync(); return; }
     const label = '\u25b6 ' + (cpHowtoTitle(scr) || 'HOW-TO VIDEO');
     if(!b){
       b = document.createElement('button');
@@ -7842,15 +7865,14 @@ function cpHowtoFab(){
         + ' cursor:pointer; font-family:inherit; box-shadow:0 4px 14px rgba(0,0,0,.35);'
         + ' max-width:56vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;';
       b.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpHowtoPlay(cpHowtoScreenKey()); };
-      const strip = cpTopStrip();
-      const helpB = document.getElementById('cpHelpFab');
-      if(helpB && helpB.parentElement === strip) strip.insertBefore(b, helpB); else strip.appendChild(b);
+      cpVideoBar().appendChild(b);   // Rev-742: top bar, not the bottom-right corner
     }
     // Rev-731: NEW USER — make it impossible to miss
     const isNew = (typeof cpUserMode === 'function') && cpUserMode() === 'new';
     const want = (isNew ? '\ud83d\udc49 WATCH FIRST \u2014 ' : '') + label;
     if(b.textContent !== want){ b.textContent = want; b.title = label + ' \u2014 click to play'; }
     b.classList.toggle('cp-newuser-pulse', isNew);
+    cpVideoBarSync();
   }catch(_){ }
 }
 try{ setInterval(cpHowtoFab, 1200); }catch(_){ }
@@ -7890,7 +7912,19 @@ function cpHowtoPlay(screenName){
       + ' cursor:pointer; font-family:inherit; ' + css;
     b.onclick = fn; bar.appendChild(b);
   };
-  mk('Close', 'background:#fff; color:#3a352e; border:1px solid #c9c0b4;', () => { try{ if(_objUrl) URL.revokeObjectURL(_objUrl); }catch(_){ } ov.remove(); });
+  // Rev-742: STOP is the primary way out — it halts playback and closes in one press, and
+  // Esc does the same. 'Close' on its own read as a dialog dismissal, not as a way to stop
+  // a video that is running and talking.
+  const _stopAll = () => {
+    try{ v.pause(); v.removeAttribute('src'); v.load(); }catch(_){ }
+    try{ if(_objUrl) URL.revokeObjectURL(_objUrl); }catch(_){ }
+    try{ document.removeEventListener('keydown', _escStop, true); }catch(_){ }
+    ov.remove();
+  };
+  const _escStop = (e) => { if(e.key === 'Escape'){ e.preventDefault(); _stopAll(); } };
+  document.addEventListener('keydown', _escStop, true);
+  mk('⏹ STOP', 'background:#a5342a; color:#fff; border:1px solid #7d2419; font-size:15px; padding:10px 26px;', _stopAll);
+  mk('Close', 'background:#fff; color:#3a352e; border:1px solid #c9c0b4;', _stopAll);
   mk('\u270e Rename', 'background:#fff; color:#1a5276; border:1px solid #9dbdd4;', async () => {
     const nm = await cpPromptBox('RENAME VIDEO', 'What should the button say?',
       cpHowtoTitle(screenName) || 'HOW TO ');
