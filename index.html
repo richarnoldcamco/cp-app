@@ -1585,7 +1585,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-717";
+const APP_REV = "Rev-718";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1718,6 +1718,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-718", type: "App", changes: ["OTHER ADDED TO THE GAGE CHIPS \u2014 AND IT DOES NOT TYPE \u2018OTHER\u2019 (Rev-718) \u2014 an eighth chip sits after HOLDING FIXTURE. Every other chip inserts its own label at the cursor; this one deliberately does not, because \u2018OTHER\u2019 is not a description of a gage. It would land in the Special Gage / Fixture cell, travel into the .xlsx, and reach a toolmaker as an instruction to build something called OTHER \u2014 the one thing on that line that cannot be made. Pressing it puts the cursor in the box with a one-line prompt to say what the thing actually is. The chip is there because reaching for a button and finding none reads as \u2018this list is all there is\u2019, which the seven fixed types are not; what it must not do is make it easy to record a placeholder in place of a description."] },
   { ts: "2026-07-30", rev: "App Rev-717", type: "App", changes: ["THE DIMENSION READ IS BACK \u2014 WITHOUT UNDOING REV-350 (Rev-717) \u2014 \ud83d\udd0e READ DIMENSIONS (AI) now sits in the ODS panel header. WHY IT WENT MISSING: Locate Bubbles did TWO jobs \u2014 it found balloon POSITIONS and it read each balloon\u2019s DIMENSION into empty Spec/Tol cells (Rev-214). Rev-350 removed the button because manual pinning had become the better way to do the first job, and recorded no fault with the second; the dimension read was collateral, nothing replaced it, and that is why a fresh operation comes up with every Spec/Tol cell blank. RESTORED AS A READER ONLY: it fills EMPTY Spec/Tol cells, never overwrites a typed value, and a balloon already pinned KEEPS THE POSITION YOU CLICKED \u2014 the run merges descriptions into the existing feature list instead of replacing it, so pinning stays manual exactly as Rev-350 intended. THE DRAWING LEAVES THE DEVICE ON THIS ONE, so it runs behind the existing ITAR confirm gate, untouched. The finish message says how many cells were filled and, in capitals, to check every one against the print \u2014 the AI reads digits off an image, and .323 against .328 is a difference only the print settles."] },
   { ts: "2026-07-30", rev: "App Rev-716", type: "App", changes: ["HAND-EDIT COUNT BESIDE THE OP NUMBER (Rev-716) \u2014 an amber \u270e n HAND-EDITED chip now sits next to OP-nnn on the Control Plans list wherever a plan carries cells that differ from the Master List. It counts declared FREQ / # Recorded / CMM overrides and declared machinist exceptions together, because both are the same thing from a reviewer\u2019s seat: a line where the master no longer governs. Hovering lists every one \u2014 balloon, column, master value \u2192 current value \u2014 so the chip is a way IN to the deviations rather than just a number. DERIVED, NOT STORED, AND THAT WAS THE REAL DECISION. The brief said \u2018keep track of the number of times\u2019, which suggests an event tally; a tally counts a revert-then-redo as 2 and would overstate the deviation for the life of the plan, while the count that matters at review time is how many cells differ RIGHT NOW. So it is computed from the rows on every render: it cannot drift out of step with the data, needs no migration for existing plans, and drops back on its own when an override is snapped back to the master. If the historical event count is wanted as well, that needs the append-only cell history discussed earlier, not a counter."] },
   { ts: "2026-07-29", rev: "App Rev-715", type: "App", changes: ["# RECORDED AND MEAS METHOD (CMM) CAN NOW BE OVERRIDDEN ON ONE ROW (Rev-715) \u2014 only the two FREQ cells were editable; the rest of the methods band was read-only, so a single line needing a different CMM technique could not be stated at all. Both now use the SAME declared-override mechanism as FREQ, not a free text box: orange fill with a heavy border, an OVERRIDE \u2014 MASTER: x chip, a \u21ba that snaps back, the who-and-when stamp from Rev-699, and the ? window from Rev-698 (whose labels now name all four columns). Type the master value back and the override clears itself. Closed rows show it too, so an override is never invisible from the grid. MEAS METHOD (MACHINIST) IS DELIBERATELY STILL NOT A TEXT BOX: it already has a declared route in \u270b MACHINIST DOES NOT CHECK THIS, plus the change-control-type and edit-master strip, and turning it into an input would throw all of that away for something worse. THE INSTRUCTIONS NOW NEED TO CATCH UP: CP-2C names all five columns as master-governed and says not to hand-edit them to disagree. Rev-499 already crossed that line for FREQ; this widens it. The mechanism records the deviation and who made it, which is the honest version, but Rev-92 does not yet describe ANY of it \u2014 the pending Rev-93 amendment should cover the declared override as well as the machinist exception."] },
@@ -2308,7 +2309,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:38 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:52 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7548,7 +7549,7 @@ function cpGagePopup(idx){
       // INSERT at the cursor rather than replacing, so a tap can be followed by the size,
       // the tolerance and whatever else the toolmaker needs.
       '<div id="cpGageChips" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; flex:0 0 auto;">' +
-        ['PLUG GAGE','RING GAGE','THREAD PLUG GAGE','THREAD RING GAGE','SNAP GAGE','GO/NO-GO PINS','HOLDING FIXTURE']
+        ['PLUG GAGE','RING GAGE','THREAD PLUG GAGE','THREAD RING GAGE','SNAP GAGE','GO/NO-GO PINS','HOLDING FIXTURE','OTHER']
           .map(t => '<button type="button" class="cpGageChip" data-t="' + t + '" '
             + 'style="font-size:11px; font-weight:700; padding:4px 10px; border:1px solid #c9c0b4; '
             + 'border-radius:999px; background:#fff; color:#3a352e; cursor:pointer; font-family:inherit;">'
@@ -7576,6 +7577,16 @@ function cpGagePopup(idx){
       btn.onclick = (e) => {
         e.preventDefault(); e.stopPropagation();
         const t = btn.getAttribute('data-t') || '';
+        // Rev-718: OTHER does NOT write the word 'OTHER'. A gage described as OTHER tells the
+        // toolmaker nothing and would travel into the .xlsx as the description. It puts the
+        // cursor in the box instead, which is the actual job: say what the thing is.
+        if(t === 'OTHER'){
+          ta.focus();
+          const end = ta.value.length;
+          ta.setSelectionRange(end, end);
+          try{ flash('Type what the gage or fixture is \u2014 the toolmaker reads this, so \u201cother\u201d will not build anything.'); }catch(_){ }
+          return;
+        }
         const v = ta.value;
         let a = (typeof ta.selectionStart === 'number') ? ta.selectionStart : v.length;
         let b = (typeof ta.selectionEnd === 'number') ? ta.selectionEnd : v.length;
