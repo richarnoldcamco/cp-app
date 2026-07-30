@@ -1608,7 +1608,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-751";
+const APP_REV = "Rev-752";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1741,6 +1741,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-752", type: "App", changes: ["THE OPEN WORK NOW TRAVELS WITH THE HANDOFF (Rev-752) \u2014 the \ud83d\udcac New Chat Prompt button now carries a measured summary of what is unfinished, so a fresh chat starts knowing it instead of rediscovering it. It holds the ESLint figures (CP app 340 errors / 145 warnings over 17,575 lines = 27.6 per 1,000; validation app 16.7 per 1,000; rule-by-rule breakdown; NONE auto-fixable), the finding that 321 empty catch blocks are the systemic fault and cost three revisions on the video bug alone, the recommended two-job order and the explicit warning NOT to run Prettier. It also lists what is genuinely outstanding: Instructions Rev-93 drafted and unissued (now needing a third clause for the Rev-715 per-row override), the .xlsx FREQ (EVERY) header rename, the legacy part-level drawing that caused Rev-721 and Rev-748, and the ~30-line change to give the validation app a message listener so Step 6 can return to the exact feature. WRITTEN AS MEASUREMENTS WITH THEIR DATE, not impressions \u2014 a handoff that says \u2018the code is a bit messy\u2019 is worth nothing to whoever reads it next."] },
   { ts: "2026-07-30", rev: "App Rev-751", type: "App", changes: ["STEP 6 \u2014 GO AND FIX A PIN, COME STRAIGHT BACK (Rev-751) \u2014 a reference image can be framed on the wrong feature because the BALLOON PIN sits in the wrong place, and a pin is fixed in the builder, not in the inspection program. \ud83d\udccd FIX A BALLOON\u2019S PIN in the Step 6 window asks which balloon is wrong (listing the ones on the operation), drops you on 3 \u00b7 Bubble Numbers with that row already open, and LEAVES A RETURN ADDRESS: pressing Back returns to the part, reopens Step 6, and you carry on. Without it, Back landed on the parts list and the way back into Step 6 was four clicks and a memory of where you were. WHAT THIS DOES NOT YET DO, PLAINLY: it returns to Step 6, not to the exact FEATURE you were looking at inside the inspection program. That last hop needs a change inside the embedded Machinist Validation app \u2014 a separate app, 486,000 characters, baked in as REV-157 \u2014 which is a bigger job than one revision and should be done there rather than bolted on from outside."] },
   { ts: "2026-07-30", rev: "App Rev-750", type: "App", changes: ["STEP 6 \u2014 REVIEW INSPECTION BEFORE PRODUCTION (Rev-750) \u2014 a sixth construction step on every operation. Steps 3 to 5 describe what SHOULD be measured; Step 6 is the last look at what the machinist is actually handed \u2014 the order of the features, the low/high limits, the decimal places, the reference image on each one. Pressing it opens a window with two separate actions: \u270e OPEN THE INSPECTION PROGRAM, which loads the Machinist Validation so it can be walked and tweaked, and \u2713 MARK READY FOR PRODUCTION, which is the sign-off. KEPT APART DELIBERATELY: opening it is not reviewing it, and no amount of plan data can establish that a sample run was walked through \u2014 only a person can say so. The sign-off is stamped with the name and date (Rev-699) and appears in the step\u2019s hover text; \u21bb WITHDRAW RELEASE takes it back if something changes. THE PERCENTAGE WAS RE-WEIGHTED rather than left to exceed 100: the three row-by-row stages give up five points each (30\u219225) to fund a 15-point review, so the six still sum to 100 and a plan cannot read 100% until someone has said the inspection program is right."] },
   { ts: "2026-07-30", rev: "App Rev-749", type: "App", changes: ["FIX \u2014 SAVING A PLAN DELETED ITS LAST-UPDATED DATE (Rev-749) \u2014 1000237620 read 7/28 after a full day\u2019s work. Reading the stored data settled it: both of its operations had NO \u2018updated\u2019 field at all, while 912993, which had only ever auto-saved, still carried today\u2019s. Save to Project (and Build .xlsx, which runs the same code) builds a FRESH project object and assigns it over the stored one \u2014 and that object listed created but never updated, so every save destroyed the stamp the auto-save had just written, and the list fell back to an older date. The entry now carries updated, and the parts list falls back to created for plans saved before this rev rather than showing something plainly wrong. WHAT TO EXPECT: the date corrects itself on 1000237620 the next time you press Save to Project. THE SHAPE OF THIS FAULT IS WORTH REMEMBERING \u2014 a wholesale object replacement silently drops any field the newer object forgot, which looks like nothing happening rather than like an error."] },
@@ -2365,7 +2366,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:26 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -17791,6 +17792,42 @@ limited image budget, and trust.
     what was deployed and verified, what is mid-flight, what I must
     download NOW (files in chat cards die with the chat), and the
     exact first step for the next session.`;
+
+const CP_OPEN_WORK = `
+=== OPEN WORK HANDED OVER AT REV-751 (measured 30 Jul 2026, not remembered) ===
+
+CODE AUDIT — run with ESLint 8.57 'eslint:recommended' on the largest script block:
+  CP app        : 17,575 lines JS — 340 errors, 145 warnings = 27.6 issues per 1,000 lines
+  Validation app:  4,121 lines JS —  38 errors,  31 warnings = 16.7 per 1,000
+  Breakdown (CP): no-empty 321 · no-unused-vars 85 · eqeqeq 60 · no-inner-declarations 12
+                  no-useless-escape 4 · no-constant-condition 1 · no-unreachable 1 · no-func-assign 1
+  Validation    : no-empty 32 · eqeqeq 23 · no-unused-vars 8 · no-func-assign 4 · no-redeclare 1
+  ZERO of these are auto-fixable — eslint --fix produced no output. Every one needs judgment.
+  The CP app has NO 'use strict'; the validation app has it.
+
+THE ONE THAT MATTERS: 321 empty catch blocks swallow errors silently. This caused, in one day,
+  (a) the how-to video that would not play — an atob() failure hidden by catch{}, three revs to find
+  (b) 'Edit master row does nothing' — same shape
+  RECOMMENDED FIRST JOB: make the ~20 catches on DATA paths speak — saves, GitHub sync, drawing
+  lookups, video, master list. Not all 321; the rest sit where nothing can go wrong.
+  SECOND JOB: the 19 genuine smells — 5 function reassignments, 1 unreachable line, 1 redeclare,
+  12 inner declarations. Do NOT run Prettier: it fixes none of the 554 and rewrites every line.
+
+STILL OUTSTANDING:
+  · Instructions Rev-93 is drafted and NOT issued. Two approved changes: the CP-2C declared
+    machinist exception, and FREQ (EVERY) → MACHINIST CHECK FREQ. Rev-715 added a THIRD thing
+    needing wording — the declared per-row override of # Recorded and Meas Method (CMM).
+    Never edit the Instructions without asking first.
+  · .xlsx export still writes the header FREQ (EVERY); the import map must accept both spellings.
+  · drawings/1000237620.json is a legacy PART-level copy of the OP-040 print. It caused the
+    wrong drawing to appear in an inspection (Rev-748) and defeated a deletion (Rev-721).
+    Both operations now have their own drawing, so it can go — ask before deleting a repo file.
+  · Step 6 returns to the STEP, not to the feature you were on inside the inspection program.
+    The validation app posts to the parent 3 times but has NO message listener — add one plus
+    a post of the current feature index in renderStage(). ~30 lines. The baked copy IS the
+    source of truth; the standalone machinist app is no longer used.
+  · AUDIT should count declared machinist exceptions so plans carrying many are visible.
+`;
 // ===== NEW CHAT PROMPT =====
 // The COMMON block is shared across all CAMCO apps and lives on GitHub so it can be
 // edited in ONE place. We fetch it live (raw host + cache-buster; github.io is blocked),
@@ -17800,7 +17837,7 @@ const SHARED_PROMPT_URL = 'https://raw.githubusercontent.com/richarnoldcamco/sha
 const NEWCHAT_COMMON_FALLBACK =
 "Follow the project's controlling instructions/spec for all content rules; never edit that controlling document without asking me first.\n" +
 "\n" +
-CP_RICH_STANDARD + "\n\n" +
+CP_RICH_STANDARD + "\n\n" + CP_OPEN_WORK + "\n\n" +
   "About me / how to work with me: I am NOT a programmer \u2014 explain in plain language with click-by-click steps, and define any unavoidable technical term in one plain sentence. I use terse all-caps shorthand; resolve intent from minimal input without over-asking. This is ITAR aerospace/defense work (CAMCO Manufacturing) \u2014 drawing/part/feature data must stay on my device; any AI calls sit behind ITAR confirm gates.\n" +
 "WALKING ME THROUGH ANYTHING ON MY MACHINE: give me ONE STEP AT A TIME and wait for a screenshot before the next one. Read what the screenshot actually shows and confirm it before moving on \u2014 do not assume a step worked because it should have. Never dump the whole list of steps at once. I am intolerant of rework, so verify rather than assume, and when something is wrong say so plainly with the root cause instead of softening it.\n" +
 "PHOTOS AND IMAGES EMBEDDED IN ANY CAMCO APP (operator rule, 2026-07-28): 500,000 bytes maximum raw per photo, 2400 px maximum on the long edge. ALWAYS re-encode from the ORIGINALS, never from an already-compressed set \u2014 a JPEG round trip does not reverse, and raising the cap after a crush does not bring the quality back. Keep PNG checklists and any image whose value is readable text as PNG; JPEG smears text.\n" +
