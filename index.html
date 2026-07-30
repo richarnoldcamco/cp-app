@@ -1608,7 +1608,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-753";
+const APP_REV = "Rev-754";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1741,6 +1741,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-754", type: "App", changes: ["\u2018KEEP THE LOG\u2019 IS NOW THE FIRST JOB IN THE HANDOFF PROMPT (Rev-754) \u2014 the next chat is told to walk Rich through pushing the action log to its own file, and is given the measurements rather than a description: the log lives only in localStorage under cpActionLog, capped at 600 entries with the oldest silently discarded, and is ABSENT from cp_data.json \u2014 verified by reading the synced file, not assumed. The contrast is recorded too: the DATA history is strong (cp_data.json committed on every sync, 100 commits in a single day, changeHistory 107 entries capped at 500 back to 26 June). SO THE GAP IS NAMED PRECISELY: the STATE of an approval or a Step 6 sign-off is saved properly, but the RECORD OF THE ATTEMPT \u2014 including approvals REFUSED under Rev-706 and every JS error the window handler catches \u2014 lasts only until 600 entries roll past, a few hours at Rich\u2019s pace, which is also why a log asked for during diagnosis may already be gone. The design is specified: logs/{DEVICE}.json, one file per device so two can never overwrite each other, merged on read, modelled on the Rev-506 drawing sync and Rev-724 videos/ sync, with the Rev-725 read-back check before reporting success. And it repeats how to run it: one step at a time, wait for \u2018done\u2019, verify from the Claude side, never a wall of steps."] },
   { ts: "2026-07-30", rev: "App Rev-753", type: "App", changes: ["THE DIAGNOSTIC RULE NOW TRAVELS TOO (Rev-753) \u2014 at the end of the session Claude said it had chased three bugs by reading code when the data would have answered in a minute, and asked to be held to it next time. Rich pointed out that a lesson living in a chat message dies with the chat. It is now in the handoff prompt as CP_DIAGNOSIS, so every future chat inherits it. IT NAMES THE THREE EVIDENCE SOURCES IN ORDER \u2014 the Action Log (Admin \u2192 Action Log \u2192 Copy log), cp_data.json, and the actual stored artefact from drawings/ or videos/ \u2014 and it records what skipping them cost on 30 Jul: THREE revisions on a video that turned out to be perfectly recorded, a \u2018button does nothing\u2019 that was one read of the saved rows away, a date fault that was an ABSENT field rather than a stale one, and several steps of code-reading before asking for the log. It also records the check that proved worthless: reporting a key as \u2018stable\u2019 because the CODE SHAPE had not changed when the STRING it produced had \u2014 verify the output by running it, not the input by reading it \u2014 and that node --check proves a file parses, not that it runs, which is how Rev-706 passed and still blanked the grid."] },
   { ts: "2026-07-30", rev: "App Rev-752", type: "App", changes: ["THE OPEN WORK NOW TRAVELS WITH THE HANDOFF (Rev-752) \u2014 the \ud83d\udcac New Chat Prompt button now carries a measured summary of what is unfinished, so a fresh chat starts knowing it instead of rediscovering it. It holds the ESLint figures (CP app 340 errors / 145 warnings over 17,575 lines = 27.6 per 1,000; validation app 16.7 per 1,000; rule-by-rule breakdown; NONE auto-fixable), the finding that 321 empty catch blocks are the systemic fault and cost three revisions on the video bug alone, the recommended two-job order and the explicit warning NOT to run Prettier. It also lists what is genuinely outstanding: Instructions Rev-93 drafted and unissued (now needing a third clause for the Rev-715 per-row override), the .xlsx FREQ (EVERY) header rename, the legacy part-level drawing that caused Rev-721 and Rev-748, and the ~30-line change to give the validation app a message listener so Step 6 can return to the exact feature. WRITTEN AS MEASUREMENTS WITH THEIR DATE, not impressions \u2014 a handoff that says \u2018the code is a bit messy\u2019 is worth nothing to whoever reads it next."] },
   { ts: "2026-07-30", rev: "App Rev-751", type: "App", changes: ["STEP 6 \u2014 GO AND FIX A PIN, COME STRAIGHT BACK (Rev-751) \u2014 a reference image can be framed on the wrong feature because the BALLOON PIN sits in the wrong place, and a pin is fixed in the builder, not in the inspection program. \ud83d\udccd FIX A BALLOON\u2019S PIN in the Step 6 window asks which balloon is wrong (listing the ones on the operation), drops you on 3 \u00b7 Bubble Numbers with that row already open, and LEAVES A RETURN ADDRESS: pressing Back returns to the part, reopens Step 6, and you carry on. Without it, Back landed on the parts list and the way back into Step 6 was four clicks and a memory of where you were. WHAT THIS DOES NOT YET DO, PLAINLY: it returns to Step 6, not to the exact FEATURE you were looking at inside the inspection program. That last hop needs a change inside the embedded Machinist Validation app \u2014 a separate app, 486,000 characters, baked in as REV-157 \u2014 which is a bigger job than one revision and should be done there rather than bolted on from outside."] },
@@ -2367,7 +2368,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:02 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:20 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -17844,6 +17845,25 @@ THE ONE THAT MATTERS: 321 empty catch blocks swallow errors silently. This cause
   lookups, video, master list. Not all 321; the rest sit where nothing can go wrong.
   SECOND JOB: the 19 genuine smells — 5 function reassignments, 1 unreachable line, 1 redeclare,
   12 inner declarations. Do NOT run Prettier: it fixes none of the 554 and rewrites every line.
+
+FIRST JOB REQUESTED BY RICH — 'KEEP THE LOG': PUSH THE ACTION LOG TO ITS OWN FILE.
+  MEASURED 30 Jul 2026, not assumed:
+    · The action log lives ONLY in this browser: localStorage key 'cpActionLog', CP_LOG_CAP = 600
+      entries, oldest silently discarded. It is ABSENT from cp_data.json — confirmed by reading
+      the synced file — so it never reaches GitHub and never crosses devices.
+    · By contrast the DATA history is strong: cp_data.json is committed on every sync (100 commits
+      in one day), and changeHistory inside it holds 107 entries capped at 500 back to 26 Jun.
+    · So the STATE of an approval, a hand-edit or a Step 6 sign-off is saved properly, but the
+      RECORD OF THE ATTEMPT — including approvals REFUSED under Rev-706 and every JS error caught
+      by the window error handler — survives only until 600 entries roll past, which at Rich's
+      working pace is a few hours. It is also why a log asked for during diagnosis may be gone.
+  WHAT TO BUILD: give the log its own file in the PRIVATE data repo, e.g. logs/{DEVICE}.json,
+  one file per device so two devices can never overwrite each other, MERGED on read rather than
+  replaced. Model it on the Rev-506 drawing sync and the Rev-724 videos/ sync: fetch the sha,
+  PUT, then READ IT BACK and only report success if it landed (Rev-725). Raise the on-device cap
+  once the file is the archive. Keep Admin → Action Log reading the merged view.
+  HOW TO RUN IT WITH RICH: he is a quality engineer, not a developer. ONE STEP AT A TIME, wait
+  for 'done' between steps, verify from this side wherever possible, and never a wall of steps.
 
 STILL OUTSTANDING:
   · Instructions Rev-93 is drafted and NOT issued. Two approved changes: the CP-2C declared
