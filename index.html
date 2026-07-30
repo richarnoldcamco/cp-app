@@ -1585,7 +1585,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-728";
+const APP_REV = "Rev-729";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1718,6 +1718,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-729", type: "App", changes: ["TOKENS RULE ADDED AS RULE 9 (Rev-729) \u2014 the standard now states, as a firm rule carried into every future chat, that the GitHub token and the Anthropic API key live in the chat and in the app by DELIBERATE decision of the account owner, that Claude pushes revisions directly with the token, and that the risk is noted ONCE on a newly pasted credential and then not raised again. THE WORDING MATTERS MORE THAN THE INSTRUCTION: deleting the subject at Rev-728 left nothing to inherit, so each new chat met a token with no context and re-argued it from scratch \u2014 which is what the PFMEA chat has been doing. Recording it as a CONSIDERED DECISION BY THE OWNER, rather than as silence, is what stops it being re-litigated. It keeps one note on a newly pasted credential, because a credential appearing somewhere unexpected is worth one sentence \u2014 what it forbids is repetition after the decision is known. END-OF-SESSION moves back to rule 10; the list runs 1\u201310. WHAT YOU MUST TEST (rule 8): press \ud83d\udcac New Chat Prompt and confirm rule 9 reads TOKENS AND KEYS LIVE IN THE CHAT AND IN THE APP and rule 10 is END-OF-SESSION."] },
   { ts: "2026-07-30", rev: "App Rev-728", type: "App", changes: ["RULE 9 REMOVED FROM THE INSTRUCTION STANDARD (Rev-728) \u2014 the operator has decided the GitHub token and the Anthropic API key live in the chat and in the app, so the rule forbidding Claude from handling credentials is deleted from CP_RICH_STANDARD and the old rule 10 (END-OF-SESSION) is renumbered to 9, leaving the list running 1\u20139 with no gap. Claude resumes pushing revisions straight to cp-app/index.html and cp-generator-data/cp_app.html, which is how every rev before 727 shipped. All other rules are untouched. WHAT YOU MUST TEST (rule 8): press \ud83d\udcac New Chat Prompt and confirm the copied text opens with \u2018INSTRUCTION STANDARD \u2014 RICH ARNOLD\u2019 and that the numbered list ends at 9 (END-OF-SESSION) with nothing about credentials."] },
   { ts: "2026-07-30", rev: "App Rev-727", type: "App", changes: ["THE INSTRUCTION STANDARD IS NOW PART OF THE HANDOFF PROMPT (Rev-727) \u2014 Rich Arnold\u2019s INSTRUCTION STANDARD is baked in VERBATIM as CP_RICH_STANDARD and prepended to the text the \ud83d\udcac New Chat Prompt button copies, so every future chat inherits it without it being pasted again. WHAT YOU MUST TEST (rule 8): press \ud83d\udcac New Chat Prompt and confirm the copied text now OPENS with \u2018INSTRUCTION STANDARD \u2014 RICH ARNOLD\u2019 before the usual app description. RULE 9 TAKES EFFECT IMMEDIATELY AND CHANGES HOW THIS APP IS SHIPPED: Claude no longer handles the GitHub token, so this revision was NOT pushed by Claude \u2014 it is delivered as a file for the operator to load through Admin \u2192 Import App Code, and every revision from here follows that route. The claude-push token pasted into the session before this rule existed should be regenerated. NOTE ON WHERE THIS LIVES: the app tries to fetch the shared prompt block from a repo that does not exist (found at Rev-682), so the copy baked into the file IS the one in use \u2014 which is why baking it in works at all."] },
   { ts: "2026-07-30", rev: "App Rev-726", type: "App", changes: ["RECORD THE VIDEO IN THE APP \u2014 NO FILE, NO FOLDER (Rev-726) \u2014 Rev-723 built an UPLOAD, which asks the user to have already made a clip somewhere else and keep it as a local file: precisely the thing the operator said he did not want. \u23fa RECORD HOW-TO now captures the screen from inside the app and saves straight to videos/. Press it, do the steps, press \u23f9 STOP & SAVE. A red pill sits at the top of the screen while it runs with a live timer, and ending the share from Chrome\u2019s own bar stops the recording cleanly too. The HELP window closes itself first so it is not filmed. Narration is recorded if the microphone is allowed and skipped silently if it is not. Encoded at 12fps and ~0.9 Mbps \u2014 a screen recording of a static grid needs no more, and it keeps a two-minute clip near 10 MB, inside the 25 MB limit; anything over is refused with the size named rather than bloating every device. Upload-a-file remains as a secondary button for a clip made elsewhere. UNAVOIDABLE: the browser still asks WHICH window to share \u2014 that is Chrome\u2019s own permission prompt and no page can skip it."] },
@@ -2319,7 +2320,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "02:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "03:11 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -17226,10 +17227,20 @@ limited image budget, and trust.
    grep any new top-level constant name for duplicates first; and
    state in the changelog what changed and what I must test.
 
-9. END-OF-SESSION: before I leave, Claude lists in one short block —
-   what was deployed and verified, what is mid-flight, what I must
-   download NOW (files in chat cards die with the chat), and the
-   exact first step for the next session.`;
+9. TOKENS AND KEYS LIVE IN THE CHAT AND IN THE APP. The GitHub token
+   and the Anthropic API key are pasted into the chat and stored in the
+   app on purpose. This is a considered decision by the account owner,
+   who owns these repositories (the project's pages on github.com) and
+   accepts the exposure. Claude PUSHES revisions directly using the
+   token. Note the risk ONCE if a credential is newly pasted, then
+   proceed — do not re-raise it, do not ask me to revoke or regenerate,
+   and do not route pushes through me by hand. Repeating this after I
+   have decided is friction, not diligence.
+
+10. END-OF-SESSION: before I leave, Claude lists in one short block —
+    what was deployed and verified, what is mid-flight, what I must
+    download NOW (files in chat cards die with the chat), and the
+    exact first step for the next session.`;
 // ===== NEW CHAT PROMPT =====
 // The COMMON block is shared across all CAMCO apps and lives on GitHub so it can be
 // edited in ONE place. We fetch it live (raw host + cache-buster; github.io is blocked),
