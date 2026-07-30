@@ -1608,7 +1608,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-750";
+const APP_REV = "Rev-751";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1741,6 +1741,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-751", type: "App", changes: ["STEP 6 \u2014 GO AND FIX A PIN, COME STRAIGHT BACK (Rev-751) \u2014 a reference image can be framed on the wrong feature because the BALLOON PIN sits in the wrong place, and a pin is fixed in the builder, not in the inspection program. \ud83d\udccd FIX A BALLOON\u2019S PIN in the Step 6 window asks which balloon is wrong (listing the ones on the operation), drops you on 3 \u00b7 Bubble Numbers with that row already open, and LEAVES A RETURN ADDRESS: pressing Back returns to the part, reopens Step 6, and you carry on. Without it, Back landed on the parts list and the way back into Step 6 was four clicks and a memory of where you were. WHAT THIS DOES NOT YET DO, PLAINLY: it returns to Step 6, not to the exact FEATURE you were looking at inside the inspection program. That last hop needs a change inside the embedded Machinist Validation app \u2014 a separate app, 486,000 characters, baked in as REV-157 \u2014 which is a bigger job than one revision and should be done there rather than bolted on from outside."] },
   { ts: "2026-07-30", rev: "App Rev-750", type: "App", changes: ["STEP 6 \u2014 REVIEW INSPECTION BEFORE PRODUCTION (Rev-750) \u2014 a sixth construction step on every operation. Steps 3 to 5 describe what SHOULD be measured; Step 6 is the last look at what the machinist is actually handed \u2014 the order of the features, the low/high limits, the decimal places, the reference image on each one. Pressing it opens a window with two separate actions: \u270e OPEN THE INSPECTION PROGRAM, which loads the Machinist Validation so it can be walked and tweaked, and \u2713 MARK READY FOR PRODUCTION, which is the sign-off. KEPT APART DELIBERATELY: opening it is not reviewing it, and no amount of plan data can establish that a sample run was walked through \u2014 only a person can say so. The sign-off is stamped with the name and date (Rev-699) and appears in the step\u2019s hover text; \u21bb WITHDRAW RELEASE takes it back if something changes. THE PERCENTAGE WAS RE-WEIGHTED rather than left to exceed 100: the three row-by-row stages give up five points each (30\u219225) to fund a 15-point review, so the six still sum to 100 and a plan cannot read 100% until someone has said the inspection program is right."] },
   { ts: "2026-07-30", rev: "App Rev-749", type: "App", changes: ["FIX \u2014 SAVING A PLAN DELETED ITS LAST-UPDATED DATE (Rev-749) \u2014 1000237620 read 7/28 after a full day\u2019s work. Reading the stored data settled it: both of its operations had NO \u2018updated\u2019 field at all, while 912993, which had only ever auto-saved, still carried today\u2019s. Save to Project (and Build .xlsx, which runs the same code) builds a FRESH project object and assigns it over the stored one \u2014 and that object listed created but never updated, so every save destroyed the stamp the auto-save had just written, and the list fell back to an older date. The entry now carries updated, and the parts list falls back to created for plans saved before this rev rather than showing something plainly wrong. WHAT TO EXPECT: the date corrects itself on 1000237620 the next time you press Save to Project. THE SHAPE OF THIS FAULT IS WORTH REMEMBERING \u2014 a wholesale object replacement silently drops any field the newer object forgot, which looks like nothing happening rather than like an error."] },
   { ts: "2026-07-30", rev: "App Rev-748", type: "App", changes: ["FIX \u2014 AN INSPECTION SHOWED THE WRONG OPERATION\u2019S DRAWING (Rev-748) \u2014 inspecting 1000237620 OP-030 displayed L3H_912767-M_ODS-040, a different part\u2019s print. The validation builder fetched its drawing with _findLocalOdsImage(part), which looks up by PART NUMBER ALONE \u2014 correct before Rev-600, when a part had one plan and one drawing, and wrong ever since. On this part the bare key holds a legacy copy of the OP-040 print, so OP-030 got it and the operation\u2019s own 1000237620::OP030 drawing was never consulted. It now calls cpOpOdsImage(p) first, which resolves part::OPnnn and honours the Rev-721 tombstones, and only falls back to the part-wide lookup when the operation genuinely has none. The pinned balloon positions follow the same order. THIS IS WORTH MORE THAN A DISPLAY BUG: a machinist inspecting against the wrong print would take readings from dimensions that are not on the part in front of them, and every reading would be recorded as evidence. WHAT YOU MUST TEST (rule 8): Inspect on OP-030 shows ODS-030 and on OP-040 shows ODS-040."] },
@@ -2364,7 +2365,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:58 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:26 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4750,6 +4751,31 @@ async function cpReviewInspection(idx){
   mk('Close', 'background:#fff; color:#3a352e; border:1px solid #c9c0b4;', () => ov.remove());
   mk('\u270e Open the inspection program', 'background:#1a5276; color:#fff; border:1px solid #154360;',
      () => { ov.remove(); createMachinistValidation(idx); });
+  // Rev-751: a reference image can be framed on the wrong feature because the BALLOON PIN is
+  // in the wrong place, and that is fixed in the builder, not here. This leaves a return
+  // address so Back comes straight back to Step 6 instead of the parts list.
+  mk('\ud83d\udccd Fix a balloon\u2019s pin', 'background:#8a5a00; color:#fff; border:1px solid #6b4600;',
+     async () => {
+       const rows = ((p.builderState || {}).rows) || [];
+       const list = rows.filter(r => String(r.bubble || '').trim())
+         .map(r => String(r.bubble).trim() + (r.desc ? ('  \u2014  ' + r.desc) : '')).slice(0, 40);
+       const b = await cpPromptBox('WHICH BALLOON IS WRONG?',
+         'Type the balloon number whose pin sits on the wrong feature. You will land on '
+         + '3 \u00b7 Bubble Numbers with that row open \u2014 click the correct spot on the drawing, '
+         + 'then press Back and you will return here.'
+         + (list.length ? ('<div style="margin-top:8px; font-size:10.5px; color:#6b6257;">On this '
+            + 'operation: ' + list.join('  \u00b7  ') + '</div>') : ''), '');
+       if(b === null) return;
+       const want = String(b).trim().toUpperCase();
+       const at = rows.findIndex(r => String(r.bubble || '').trim().toUpperCase() === want);
+       if(at < 0){ flash('Balloon ' + want + ' is not on this operation.', true); return; }
+       try{ localStorage.setItem('cpStep6Return', JSON.stringify({ id: p.id || '', bubble: want })); }catch(_){ }
+       ov.remove();
+       try{ cpSetStep('1'); }catch(_){ }
+       editProject(idx);
+       setTimeout(() => { try{ if(cpBuildState){ cpBuildState.focusIdx = at; renderCPBuilder();
+         cpScrollFocusIntoView(); } }catch(_){ } }, 350);
+     });
   if(done){
     mk('\u21ba Withdraw release', 'background:#a5342a; color:#fff; border:1px solid #7d2419;', async () => {
       const ok = await cpConfirmBox('WITHDRAW RELEASE',
@@ -18318,6 +18344,20 @@ if($('cpBuilderBack')) $('cpBuilderBack').onclick = () => {
   // you were working on and you had to find it again. Return to THAT PART's operations.
   $('cpBuilderScreen').classList.add('hidden');
   const nvb=$('newerVersionBanner'); if(nvb && window._nvbWasVisible) nvb.style.display='flex';
+  // Rev-751: came here from Step 6 to fix a pin — go straight back to Step 6.
+  try{
+    const ret = JSON.parse(localStorage.getItem('cpStep6Return') || 'null');
+    if(ret && ret.id){
+      localStorage.removeItem('cpStep6Return');
+      const pj = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+      const j = pj.findIndex(x => x.id === ret.id);
+      showProjects();
+      const back = String((pj[j] && pj[j].partNum) || '').toUpperCase();
+      if(back && typeof cpOpenPart === 'function'){ try{ cpOpenPart(back); }catch(_){ } }
+      if(j >= 0) setTimeout(() => { try{ cpReviewInspection(j); }catch(_){ } }, 250);
+      return;
+    }
+  }catch(_){ }
   if(cpBuildState && cpBuildState.srcId && typeof showProjects === 'function'){
     const backTo = String((cpBuildState && cpBuildState.partNum) || '').toUpperCase();
     showProjects();
