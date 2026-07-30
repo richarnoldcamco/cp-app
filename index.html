@@ -1608,7 +1608,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-749";
+const APP_REV = "Rev-750";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1741,6 +1741,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-750", type: "App", changes: ["STEP 6 \u2014 REVIEW INSPECTION BEFORE PRODUCTION (Rev-750) \u2014 a sixth construction step on every operation. Steps 3 to 5 describe what SHOULD be measured; Step 6 is the last look at what the machinist is actually handed \u2014 the order of the features, the low/high limits, the decimal places, the reference image on each one. Pressing it opens a window with two separate actions: \u270e OPEN THE INSPECTION PROGRAM, which loads the Machinist Validation so it can be walked and tweaked, and \u2713 MARK READY FOR PRODUCTION, which is the sign-off. KEPT APART DELIBERATELY: opening it is not reviewing it, and no amount of plan data can establish that a sample run was walked through \u2014 only a person can say so. The sign-off is stamped with the name and date (Rev-699) and appears in the step\u2019s hover text; \u21bb WITHDRAW RELEASE takes it back if something changes. THE PERCENTAGE WAS RE-WEIGHTED rather than left to exceed 100: the three row-by-row stages give up five points each (30\u219225) to fund a 15-point review, so the six still sum to 100 and a plan cannot read 100% until someone has said the inspection program is right."] },
   { ts: "2026-07-30", rev: "App Rev-749", type: "App", changes: ["FIX \u2014 SAVING A PLAN DELETED ITS LAST-UPDATED DATE (Rev-749) \u2014 1000237620 read 7/28 after a full day\u2019s work. Reading the stored data settled it: both of its operations had NO \u2018updated\u2019 field at all, while 912993, which had only ever auto-saved, still carried today\u2019s. Save to Project (and Build .xlsx, which runs the same code) builds a FRESH project object and assigns it over the stored one \u2014 and that object listed created but never updated, so every save destroyed the stamp the auto-save had just written, and the list fell back to an older date. The entry now carries updated, and the parts list falls back to created for plans saved before this rev rather than showing something plainly wrong. WHAT TO EXPECT: the date corrects itself on 1000237620 the next time you press Save to Project. THE SHAPE OF THIS FAULT IS WORTH REMEMBERING \u2014 a wholesale object replacement silently drops any field the newer object forgot, which looks like nothing happening rather than like an error."] },
   { ts: "2026-07-30", rev: "App Rev-748", type: "App", changes: ["FIX \u2014 AN INSPECTION SHOWED THE WRONG OPERATION\u2019S DRAWING (Rev-748) \u2014 inspecting 1000237620 OP-030 displayed L3H_912767-M_ODS-040, a different part\u2019s print. The validation builder fetched its drawing with _findLocalOdsImage(part), which looks up by PART NUMBER ALONE \u2014 correct before Rev-600, when a part had one plan and one drawing, and wrong ever since. On this part the bare key holds a legacy copy of the OP-040 print, so OP-030 got it and the operation\u2019s own 1000237620::OP030 drawing was never consulted. It now calls cpOpOdsImage(p) first, which resolves part::OPnnn and honours the Rev-721 tombstones, and only falls back to the part-wide lookup when the operation genuinely has none. The pinned balloon positions follow the same order. THIS IS WORTH MORE THAN A DISPLAY BUG: a machinist inspecting against the wrong print would take readings from dimensions that are not on the part in front of them, and every reading would be recorded as evidence. WHAT YOU MUST TEST (rule 8): Inspect on OP-030 shows ODS-030 and on OP-040 shows ODS-040."] },
   { ts: "2026-07-30", rev: "App Rev-747", type: "App", changes: ["OPEN MOVED NEXT TO THE PART NUMBER (Rev-747) \u2014 on the parts list the OPEN button sat at the far right edge, past Operations, Progress, Last Updated and Traveller: the longest reach on the row, for the thing you came to press. It now sits immediately after the part number, so the eye lands on the part and the button is already there. Left-aligned rather than right, since it is no longer the end of the row. HEADER AND CELL MOVED TOGETHER \u2014 the header string and the cell that builds the button are in different places in the file, and moving one without the other would have shifted every column label one place out of step with its data, which reads as correct until someone checks a date against the wrong heading."] },
@@ -2363,7 +2364,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:26 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:58 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3485,12 +3486,20 @@ function cpOpStages(p){
   const s3 = { done: pr.s1Done, open: true, ready: numbered && hasOds, left: pr.s1Left, total: pr.total };
   const s4 = { done: pr.s2Done, open: true, ready: numbered && hasOds && pr.s1DataDone, left: pr.s2Left, total: pr.total };
   const s5 = { done: pr.s3Done, open: true, ready: numbered && hasOds && pr.s2DataDone, left: pr.s3Left, total: pr.total };
+  // Rev-750: STEP 6 — review the inspection program before it reaches production. Everything
+  // up to Step 5 describes what SHOULD be measured; this is the last look at what the machinist
+  // will actually be handed. Done only when a person says so — nothing about the plan data can
+  // tell you a sample run has been walked through.
+  const rev6 = (p && p.inspReviewed) ? p.inspReviewed : null;
+  const s6 = { done: !!(rev6 && rev6.when), open: true,
+               ready: numbered && hasOds && pr.s3DataDone,
+               left: (rev6 && rev6.when) ? 0 : 1, total: 1 };
   const labelSummary = [
     numbered ? 'numbered' : 'no op number',
     hasOds ? 'ODS loaded' : 'no ODS drawing',
     pr.s1Note, pr.s2Note, pr.s3Note
   ].join(' \u00b7 ');
-  return { s1, s2, s3, s4, s5, labelSummary };
+  return { s1, s2, s3, s4, s5, s6, labelSummary };
 }
 // Rev-634: percentage that reflects the WORK, not the step count. Two faults in the
 // old sum, both of which flattered the figure:
@@ -3506,7 +3515,7 @@ function cpOpStages(p){
 // the points it contributed — the sum is checkable at a glance.
 function cpPercentBreakdown(p){
   const st = cpOpStages(p);
-  const names = { s1: 'Edit op #', s2: 'Upload ODS', s3: 'Assign bubbles', s4: 'Control types', s5: 'Measurement methods' };
+  const names = { s1: 'Edit op #', s2: 'Upload ODS', s3: 'Assign bubbles', s4: 'Control types', s5: 'Measurement methods', s6: 'Review inspection' };
   const lines = [];
   let total = 0;
   ['s1','s2','s3','s4','s5'].forEach(k => {
@@ -3521,7 +3530,9 @@ function cpPercentBreakdown(p){
   });
   return lines.join('\n') + '\n' + '—'.repeat(18) + '\nTOTAL ' + Math.round(total) + '%';
 }
-const CP_STAGE_WEIGHTS = { s1: 5, s2: 5, s3: 30, s4: 30, s5: 30 };   // sums to 100
+// Rev-750: re-weighted for six stages — the three row-by-row stages give up 5 points each
+// to fund the review, which is a single decision but the one that releases the plan.
+const CP_STAGE_WEIGHTS = { s1: 5, s2: 5, s3: 25, s4: 25, s5: 25, s6: 15 };   // sums to 100
 function cpPlanPercent(p){
   const st = cpOpStages(p);
   let pct = 0;
@@ -4064,6 +4075,14 @@ function renderProjects(){
         st.s5.open ? ('STEP 5 \u2014 review the measurement methods, set any special gage, confirm the reaction plan.\n' + prog.s3Note + '.' + stepNote)
                    : 'LOCKED \u2014 finish the control types first. The methods band is filled BY the control type.',
         () => openAt('3'));
+
+      mkStep(6, 'REVIEW INSPECTION', stateOf(st.s6),
+        (st.s6.done
+          ? ('STEP 6 \u2014 reviewed by ' + ((p.inspReviewed && p.inspReviewed.who) || 'someone') + '.\n'
+             + 'Open it again to re-check, or to withdraw the release.')
+          : 'STEP 6 \u2014 walk the inspection program the machinist will actually run, tweak what needs '
+            + 'tweaking, then mark it ready for production.'),
+        () => cpReviewInspection(i));
 
       // Rev-620: built here, hung on its own row below
       _cpBarFor = (() => {
@@ -4692,6 +4711,82 @@ function mvMarkCreated(p){ try{ const m=JSON.parse(localStorage.getItem('cpMvCre
 // Per-row button: open validation for a SINGLE control plan (kept as a quick shortcut).
 // Rev-483: one-tap real inspection for a saved plan — same build as Create/Edit
 // Machinist Validation, but boots straight into the Start Inspection flow.
+// Rev-750: Step 6. Two things a person does here, kept apart on purpose: OPEN the inspection
+// program and try it, and separately SAY it is ready. Nothing in the plan data can tell you a
+// sample run has been walked through, so this is a human sign-off or it is nothing.
+async function cpReviewInspection(idx){
+  const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+  const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
+  const done = p.inspReviewed && p.inspReviewed.when;
+  let when = '';
+  if(done){ try{ when = new Date(p.inspReviewed.when).toLocaleDateString(undefined,
+      { year:'numeric', month:'long', day:'numeric' }); }catch(_){ when = p.inspReviewed.when; } }
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed; inset:0; z-index:10550; background:rgba(0,0,0,.6);'
+    + ' display:flex; align-items:center; justify-content:center; padding:20px;';
+  const c = document.createElement('div');
+  c.style.cssText = 'background:#fff; border-radius:10px; max-width:640px; width:100%;'
+    + ' box-shadow:0 12px 46px rgba(0,0,0,.45); font-family:inherit; overflow:hidden;';
+  c.innerHTML = '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.04em;'
+    + ' padding:10px 16px; font-size:13px;">STEP 6 \u2014 REVIEW THE INSPECTION PROGRAM \u00b7 '
+    + String(p.partNum||'') + (p.opNum ? ('  \u00b7  OP-' + p.opNum) : '') + '</div>'
+    + '<div style="padding:14px 16px; font-size:12.5px; line-height:1.6; color:#3a352e;">'
+    + (done ? ('<b style="color:#1d6b3f;">Marked ready by ' + ((p.inspReviewed.who)||'someone')
+              + ' on ' + when + '.</b><br><br>') : '')
+    + 'Steps 3 to 5 describe what <i>should</i> be measured. This is the last look at what the '
+    + 'machinist is actually handed: the order of the features, the low/high limits, the decimal '
+    + 'places, the reference image on each one.<br><br>'
+    + 'Open it, walk it as though you were running the part, and change what reads wrong. '
+    + 'Then mark it ready \u2014 that is a person saying so, which is the only thing that can '
+    + 'establish it.</div>';
+  const foot = document.createElement('div');
+  foot.style.cssText = 'display:flex; justify-content:flex-end; gap:8px; padding:0 16px 14px; flex-wrap:wrap;';
+  const mk = (label, css, fn2) => {
+    const b = document.createElement('button'); b.type='button'; b.textContent = label;
+    b.style.cssText = 'font-size:12px; font-weight:800; padding:8px 16px; border-radius:6px;'
+      + ' cursor:pointer; font-family:inherit; ' + css;
+    b.onclick = fn2; foot.appendChild(b);
+  };
+  mk('Close', 'background:#fff; color:#3a352e; border:1px solid #c9c0b4;', () => ov.remove());
+  mk('\u270e Open the inspection program', 'background:#1a5276; color:#fff; border:1px solid #154360;',
+     () => { ov.remove(); createMachinistValidation(idx); });
+  if(done){
+    mk('\u21ba Withdraw release', 'background:#a5342a; color:#fff; border:1px solid #7d2419;', async () => {
+      const ok = await cpConfirmBox('WITHDRAW RELEASE',
+        'Mark this inspection program as NOT reviewed?<br><br>Step 6 goes back to outstanding and '
+        + 'the operation drops below 100%. Nothing about the program itself changes.', '\u21ba Withdraw');
+      if(!ok) return;
+      const pj = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+      if(pj[idx]){ delete pj[idx].inspReviewed; pj[idx].updated = new Date().toISOString();
+        localStorage.setItem('cpProjects', JSON.stringify(pj)); }
+      try{ logAct('insp-review', 'release withdrawn'); }catch(_){ }
+      ov.remove(); renderProjects();
+      try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(_){ }
+    });
+  } else {
+    mk('\u2713 Mark ready for production', 'background:#2c6e49; color:#fff; border:1px solid #215236;', async () => {
+      const ok = await cpConfirmBox('READY FOR PRODUCTION',
+        'Confirm you have walked the inspection program for <b>' + String(p.partNum||'')
+        + (p.opNum ? (' OP-' + p.opNum) : '') + '</b> and it is right.<br><br>'
+        + 'It is recorded against your name and today\u2019s date, and Step 6 counts as complete.',
+        '\u2713 Mark ready', { tone:'move' });
+      if(!ok) return;
+      const pj = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+      if(pj[idx]){
+        pj[idx].inspReviewed = { who: cpWhoAmI(), when: new Date().toISOString() };
+        pj[idx].updated = new Date().toISOString();
+        localStorage.setItem('cpProjects', JSON.stringify(pj));
+      }
+      try{ logAct('insp-review', 'marked ready for production'); }catch(_){ }
+      ov.remove(); renderProjects();
+      flash('\u2713 Inspection program marked ready for production.');
+      try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(_){ }
+    });
+  }
+  c.appendChild(foot); ov.appendChild(c);
+  ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
+  document.body.appendChild(ov);
+}
 async function inspectMachinistValidation(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
