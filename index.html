@@ -1585,7 +1585,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-720";
+const APP_REV = "Rev-721";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1718,6 +1718,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-721", type: "App", changes: ["A DELETED DRAWING NO LONGER COMES BACK FROM THE PART-LEVEL COPY (Rev-721) \u2014 Rev-720 deleted OP-040\u2019s drawing correctly and said so, and Step 2 still read COMPLETED, because _idbGetOds falls back to a drawing stored under the PART alone when an operation has none of its own \u2014 a legacy shape from before Rev-600, when a part had one plan and one drawing. On 1000237620 that fallback file is 445,573 bytes against OP-040\u2019s 445,580: the same image, answering in its place. DELETING THE PART-LEVEL RECORD WAS THE WRONG FIX and was not done: on another part it may be the only drawing several operations have, so removing it to clear one op could blank the rest. Instead a TOMBSTONE records that this ONE operation has had its drawing deleted, and the lookup refuses the part-level fallback for that operation only. Uploading a new drawing for the op lifts the tombstone. OP-030 is untouched \u2014 it has its own op-specific drawing (737,296 bytes) and never relied on the fallback. NOTE: the repo still holds drawings/1000237620.json; the tombstone is local and syncs with settings, so a device that has not seen it will still find the part-level copy."] },
   { ts: "2026-07-30", rev: "App Rev-720", type: "App", changes: ["FIX \u2014 DELETING A DRAWING DID NOT ACTUALLY DELETE IT (Rev-720) \u2014 Rev-719 cleared the drawing by WRITING AN EMPTY IMAGE over it. _idbPutDrawing refuses a blank image on purpose, and says so in a comment left at Rev-575: \u2018it guards against wiping a drawing by accident, so removing one needs its own path.\u2019 That path, _idbDelDrawing, already existed. The result was a deletion that reported success while the drawing stayed in IndexedDB, so cpOpOdsImage still found it, hasOds stayed true and STEP 2 STILL READ COMPLETED \u2014 the app telling the QE a drawing was loaded when it had just been told to delete it. Now it calls _idbDelDrawing, then RE-CHECKS with cpOpOdsImage and only claims success if the drawing is really gone; if a legacy drawing stored under the PART alone is still answering for the operation, it says that instead of claiming a clean delete. THE BUTTON READS \ud83d\uddd1 DELETE DRAWING, not Remove \u2014 delete is what it does. AND THE CONFIRM IS NOW A THEMED WINDOW rather than the browser box: maroon header, the consequences in full (rows and typed values kept, pins cleared, Step 2 returns to not-done), Cancel focused, and the destructive button in red on the right."] },
   { ts: "2026-07-30", rev: "App Rev-719", type: "App", changes: ["THE ODS DRAWING CAN NOW BE REMOVED, NOT ONLY REPLACED (Rev-719) \u2014 Upload / Replace could only swap one drawing for another, so a drawing attached to the wrong operation could not be taken off; the only way out was to upload something else over it. That matters more than a stray file, because the drawing is what every balloon, pin and Spec/Tol reading is taken from. cpRemoveOpOds clears ALL FOUR PLACES it lives \u2014 IndexedDB, the saved project, the open builder state, and the pinned feature positions \u2014 then re-renders and syncs. THE PINS GO WITH IT, DELIBERATELY: a pin is an x/y coordinate on the drawing that has just been removed, so keeping them would leave every balloon pointing at a place on a picture that no longer exists, and zoom-to-bubble would frame nothing. The rows, the descriptions, the specs, the control types and the approvals are all KEPT. The confirm says exactly that in those words before anything is touched, and the removal is written to the action log."] },
   { ts: "2026-07-30", rev: "App Rev-718", type: "App", changes: ["OTHER ADDED TO THE GAGE CHIPS \u2014 AND IT DOES NOT TYPE \u2018OTHER\u2019 (Rev-718) \u2014 an eighth chip sits after HOLDING FIXTURE. Every other chip inserts its own label at the cursor; this one deliberately does not, because \u2018OTHER\u2019 is not a description of a gage. It would land in the Special Gage / Fixture cell, travel into the .xlsx, and reach a toolmaker as an instruction to build something called OTHER \u2014 the one thing on that line that cannot be made. Pressing it puts the cursor in the box with a one-line prompt to say what the thing actually is. The chip is there because reaching for a button and finding none reads as \u2018this list is all there is\u2019, which the seven fixed types are not; what it must not do is make it easy to record a placeholder in place of a description."] },
@@ -2311,7 +2312,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:52 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:14 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3361,11 +3362,33 @@ function cpRenamePart(part){
 }
 // Rev-599: an operation's ODS drawing. The plan carries its own copy; if the GitHub
 // sync stripped it, fall back to the per-part drawing store.
+// Rev-721: DELETED-FOR-THIS-OPERATION tombstones. _idbGetOds falls back to a drawing stored
+// under the PART alone when an operation has none of its own (a legacy shape from before
+// Rev-600). That fallback defeated deletion: remove OP-040's drawing and the part-level copy
+// answered in its place, so Step 2 stayed COMPLETED. Deleting the part-level record outright
+// was the wrong fix — on another part it may be the only drawing several operations have.
+// A tombstone blocks the fallback for the ONE operation you deleted from, and nothing else.
+function cpOdsTombstones(){
+  try{ return JSON.parse(localStorage.getItem('cpOdsDeleted') || '[]') || []; }catch(_){ return []; }
+}
+function cpOdsIsDeleted(part, op){
+  return cpOdsTombstones().indexOf(cpOdsKey(part, op)) >= 0;
+}
+function cpOdsSetDeleted(part, op, on){
+  try{
+    const k = cpOdsKey(part, op);
+    let t = cpOdsTombstones().filter(x => x !== k);
+    if(on) t.push(k);
+    localStorage.setItem('cpOdsDeleted', JSON.stringify(t));
+  }catch(_){ }
+}
 function cpOpOdsImage(p){
   try{
     const bs = p && p.builderState;
+    const op = p.opNum || (bs && bs.opNum);
     if(bs && bs.odsImage) return bs.odsImage;
-    const d = _idbGetOds(p.partNum, p.opNum || (bs && bs.opNum));   // Rev-600
+    if(cpOdsIsDeleted(p.partNum, op)) return null;   // Rev-721: deleted for THIS operation
+    const d = _idbGetOds(p.partNum, op);   // Rev-600
     if(d && d.odsImage) return d.odsImage;
   }catch(e){}
   return null;
@@ -3509,6 +3532,7 @@ function cpRemoveOpOds(p){
   // Rev-720: _idbPutDrawing REFUSES a blank image on purpose (Rev-575), so writing '' left the
   // drawing in place and Step 2 stayed COMPLETED. Deletion has its own path; use it.
   try{ _idbDelDrawing(cpOdsKey(part, op)); }catch(e){}
+  try{ cpOdsSetDeleted(part, op, true); }catch(e){}   // Rev-721: block the part-level fallback
   try{
     const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
     let hit = false;
@@ -3562,6 +3586,7 @@ function cpUploadOpOds(p){
     extraBtn: { label: '\ud83d\uddd1 DELETE DRAWING', onClick: () => { cpRemoveOpOds(p); } },
     onSave: (url) => {
       _idbPutOds(part, op, url, null);
+      try{ cpOdsSetDeleted(part, op, false); }catch(e){}   // Rev-721: a new drawing lifts the tombstone
       try{
         const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
         let hit = false;
