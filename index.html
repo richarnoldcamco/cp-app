@@ -1607,7 +1607,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-734";
+const APP_REV = "Rev-735";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1740,6 +1740,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-735", type: "App", changes: ["EXCEL CONTROL PLAN \u2014 ONE PER OPERATION (Rev-735) \u2014 the button is renamed from Customer CP to EXCEL CONTROL PLAN, and the sheet it opens now covers THAT OPERATION ONLY. Rev-562 had it gather every operation of the part into a single sheet; the operation is the unit of work everywhere else in this app \u2014 plans are built, revised, approved and issued per operation \u2014 so the export now matches. Three things changed with it: opening no longer hops to a sibling operation\u2019s saved sheet (each operation keeps and edits its own), the header reads EXCEL CONTROL PLAN \u2014 <part> \u00b7 OP-nnn with the subtitle THIS OPERATION ONLY, and the plan number carries the operation: L3H_1000237620_OP030_CP. The architecture note in the handoff prompt was corrected too, so a future chat is not told the old behaviour. WHAT YOU MUST TEST (rule 8): open Excel Control Plan on OP-030 and confirm it holds ONLY OP-030\u2019s rows; then open it on OP-040 and confirm it holds only OP-040\u2019s. IF EITHER STILL SHOWS BOTH, press \u21bb REBUILD once \u2014 a sheet edited under the old behaviour is kept as you left it until rebuilt."] },
   { ts: "2026-07-30", rev: "App Rev-734", type: "App", changes: ["THE WATCH-VIDEO BUTTON IS TWICE THE SIZE AND PULSES HARDER (Rev-734) \u2014 text 11px \u2192 22px, padding doubled, border thickened: it is now the largest control on the screen that is not the work itself, which is right for the one thing a new user is meant to find before anything else. THE PULSE IS REBUILT rather than sped up: 1.5s \u2192 0.85s, and instead of one soft halo it now throws TWO expanding rings, grows to 1.14 (was 1.06), dips slightly below full size on the way back so there is a beat rather than a breath, and lifts the fill from #a5342a to a brighter #d9342a at the peak so it reads as flashing. The arrow nudge doubled in speed to match. It still stops completely under prefers-reduced-motion \u2014 a flashing red control at this strength is exactly what that setting exists for, and the button stays perfectly usable without it. Size applies in BOTH modes; only the pulse is NEW USER."] },
   { ts: "2026-07-30", rev: "App Rev-733", type: "App", changes: ["FIX \u2014 THE NEW BUTTONS WERE SITTING ON TOP OF THE HEADER (Rev-733) \u2014 Rev-731 pinned the mode toggle, the video button and \u2139 HELP to the TOP RIGHT of the window without checking what was already there. The menu screen has its own dark bar with New Chat Prompt in that exact spot, and the other screens use <header id=\u2019header\u2019>; the new strip covered both. Moved to the BOTTOM-RIGHT corner, which is empty on every screen in this app and is where help controls conventionally sit. Also restyled as pills with a stronger shadow so they read as floating controls rather than as part of whatever is behind them, and the row wraps rather than growing off-screen when a video title is long. MY ERROR AND THE LESSON: a fixed position is a claim that nothing else owns that corner, and this app has two different headers depending on the screen \u2014 the claim should have been checked against both before shipping. WHAT YOU MUST TEST (rule 8): on the MENU, New Chat Prompt is fully visible and uncovered; the three controls sit bottom-right; opening a plan keeps them there and out of the way of the grid."] },
   { ts: "2026-07-30", rev: "App Rev-732", type: "App", changes: ["FIX \u2014 THE VIDEO WOULD NOT PLAY, AND DELETE NOW NEEDS A CODE (Rev-732) \u2014 the recording was never the problem: the stored clip is a valid 10.97 MB video/webm vp9+opus, correctly titled, sitting in videos/. It was handed to the player as an 11 MB DATA URL, and a <video> element will not reliably play one \u2014 there are no range requests behind a data: URL, so the browser reports 0:00 and refuses. The clip is now converted to a BLOB URL before playing, which the browser treats like a real file, and the blob is released when the window closes so it does not sit in memory. A failure to play now says so instead of showing a dead player. DELETE REQUIRES CODE 7312, then still asks to confirm. It guards against an accidental click on a clip that exists in no other place \u2014 the operator has chosen not to keep local source files, so a deleted video is gone. IT IS NOT SECURITY AND IS NOT DESCRIBED AS SUCH: the code is in the page and anyone who can open the browser\u2019s developer tools can read it. WHAT YOU MUST TEST (rule 8): the video plays; a wrong code refuses and deletes nothing."] },
@@ -2347,7 +2348,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "05:02 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "05:24 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4050,7 +4051,7 @@ function renderProjects(){
         ? 'Open / edit the Machinist Validation for this Control Plan'
         : 'Create a Machinist Validation inspection from this Control Plan')
         + (has ? '' : ' \u2014 no plan data to build a validation from'), () => createMachinistValidation(i), has);
-      mkBtn('Customer CP', 'quiet', 106, 'Build the L3Harris-format Control Plan xlsx for customer submittal'
+      mkBtn('Excel Control Plan', 'quiet', 132, 'Build the L3Harris-format Control Plan xlsx for THIS operation'
         + (has ? '' : ' \u2014 no plan data to export'), () => cpCustomerExport(i), has);
       mkBtn('Download', 'quiet', 90, 'Download this plan\u2019s .xlsx', () => downloadProject(i));
       mkBtn('Rename', 'quiet', 80, 'Change this plan\u2019s part number (and rev) IN PLACE \u2014 no duplicate is created', () => renameProject(i));
@@ -4781,7 +4782,10 @@ function cpCustGroup(projects, p){
 }
 function cpCustBuildModel(p, projects){
   if(p.custCP && p.custCP.rows && p.custCP.rows.length) return JSON.parse(JSON.stringify(p.custCP));
-  const group = projects ? cpCustGroup(projects, p) : [{ x: p, i: -1 }];
+  // Rev-735: THIS OPERATION ONLY. Rev-562 gathered every operation of the part into one
+  // sheet; the operator wants one Excel Control Plan per operation, matching how the plans
+  // are built, revised and approved — an operation is the unit of work everywhere else.
+  const group = [{ x: p, i: -1 }];
   const today = new Date();
   const fmtD = (d) => (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear();
   const created = p.created ? new Date(p.created) : today;
@@ -4796,7 +4800,7 @@ function cpCustBuildModel(p, projects){
   let lastStep = null;
   return {
     tb: {
-      cpNum: 'L3H_' + String(p.partNum||'') + '_CP',
+      cpNum: 'L3H_' + String(p.partNum||'') + (p.opNum ? ('_OP' + p.opNum) : '') + '_CP',
       dateOrig: fmtD(created), dateRev: fmtD(today),
       partNum: String(p.partNum||''), dwgRev: '', family: '', program: 'N/A',
       owner: 'SARAH ETZL, CUSTOMER COORDINATOR   sarah.etzl@camcomfginc.com',
@@ -4858,11 +4862,8 @@ async function cpCustomerExport(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   let p = projects[idx];
   if(!p || !p.builderState){ alert('This plan has no editable data to export.'); return; }
-  // Rev-562: the customer sheet is per PART — if any sibling op-plan already holds the
-  // edited customer copy, open THAT one so edits are shared across all the part's rows.
-  const grp = cpCustGroup(projects, p);
-  const holder = grp.find(o => o.x.custCP && o.x.custCP.rows && o.x.custCP.rows.length);
-  if(holder){ idx = holder.i; p = projects[idx]; }
+  // Rev-735: no longer hops to a sibling operation's saved sheet — each operation keeps and
+  // edits its OWN Excel Control Plan, stored on that operation.
   const m = cpCustBuildModel(p, projects);
   const old = document.getElementById('ccPanel'); if(old) old.remove();
   const panel = document.createElement('div');
@@ -4876,8 +4877,9 @@ async function cpCustomerExport(idx){
   const heads = ['Doc (Line) #','Process Step','Process Description','Machine, Device, Jig, Tools For Mfg.','Reference','Product','Process','Classification','Product / Process Specification/ Tolerance','Evaluation Measurement Technique','Size','Frequency','Control Method','Reaction Plan'];
   panel.innerHTML =
     '<div style="flex:none; display:flex; align-items:center; gap:10px; padding:10px 14px; background:#7a1a1c; color:#fff;">' +
-      '<b style="font-size:15px; letter-spacing:.05em;">CUSTOMER CONTROL PLAN \u2014 ' + String(p.partNum||'') + '</b>' +
-      '<span style="font-size:12px; opacity:.85;">ALL OPERATIONS of this part \u00b7 every cell is editable \u00b7 edits save automatically</span>' +
+      '<b style="font-size:15px; letter-spacing:.05em;">EXCEL CONTROL PLAN \u2014 ' + String(p.partNum||'')
+        + (p.opNum ? ('  \u00b7  OP-' + p.opNum) : '') + '</b>' +
+      '<span style="font-size:12px; opacity:.85;">THIS OPERATION ONLY \u00b7 every cell is editable \u00b7 edits save automatically</span>' +
       '<span style="flex:1"></span>' +
       '<button id="ccRebuild" style="background:#b8860b; color:#fff; border:0; border-radius:8px; padding:10px 16px; font-weight:800; font-size:13px; cursor:pointer;" title="Throw away screen edits and rebuild fresh from the current op-plans">\u21bb Rebuild from plans</button>' +
       '<button id="ccDl" style="background:#1e7e34; color:#fff; border:0; border-radius:8px; padding:10px 22px; font-weight:800; font-size:14px; cursor:pointer;">\u2b07 Download .xlsx</button>' +
@@ -4977,7 +4979,7 @@ async function cpCustXlsx(idx){
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     flash('Customer Control Plan downloaded \u2014 review before submittal');
-  }catch(e){ alert('Customer CP export failed: ' + (e && e.message || e)); }
+  }catch(e){ alert('Excel Control Plan export failed: ' + (e && e.message || e)); }
 }
 async function downloadProject(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
@@ -17485,7 +17487,7 @@ function buildCpSpecific(){
 '\u00b7 PART-FIRST CREATION: New CP = part fields + REQUIRED traveller (image/PDF, stored via _idbPutDrawing under key PART::TRAVELLER, ghPushDrawing-synced) + first op. cpPartInfo (localStorage) holds per-part rev/owner/customer/QL. + Add Op prefills + LOCKS part fields, hides traveller (cpAddOpToPart, window._cpTravWaive).',
 '\u00b7 VALIDATION KEYING: injected validation part name = cpMvKey(p) = partNum + " OP-nnn". ALL parent writeback channels resolve via cpMvFindProject (accepts keyed OR bare part): cpMvSaveRefImage(part,op,bubble,image,edit) stores p.valRefImages + p.valRefEdits[bubble]; cpMvGetRefEdit(part,bubble) returns saved edit state; cpMvApplyRowEdit(part,bubble,fields) whitelisted row edits.',
 '\u00b7 FEATURE DRAWING EDITOR (embedded val openOdsMarker): modes crop/highlight/white-out \u00b7 wheel zoom \u00b7 right-drag pan \u00b7 Enter zooms-and-stays then Enter saves \u00b7 white-outs are selectable objects (click activates, click-drag draws new, fresh boxes auto-active, edge grips + active-edge arrows w/ hold-acceleration, Delete removes) \u00b7 highlight click-select/Delete/drag/wheel-resize \u00b7 modal owns the keyboard (capture-phase) \u00b7 Esc backs out of the action only \u00b7 saveOdsCrop writes image+edit state to the PROJECT (direct parent call w/ green \u2713 confirmation) and reopening restores zoomed into the crop.',
-'\u00b7 CUSTOMER CP: \ud83d\udce4 Customer CP button opens a full-screen editable L3Harris-format sheet (cpCustomerExport) combining ALL ops of the part in routing order; edits stored once per part in p.custCP; \u21bb Rebuild regenerates from plans; \u2b07 Download builds .xlsx via ExcelJS (cdnjs, on-device). CAMCO plan (working, revs forever) vs Customer CP (submitted once) are separate documents.',
+'\u00b7 EXCEL CONTROL PLAN: the Excel Control Plan button opens a full-screen editable L3Harris-format sheet (cpCustomerExport) for THAT OPERATION ONLY (Rev-735); edits stored once per part in p.custCP; \u21bb Rebuild regenerates from plans; \u2b07 Download builds .xlsx via ExcelJS (cdnjs, on-device). CAMCO plan (working, revs forever) vs Customer CP (submitted once) are separate documents.',
 '\u00b7 EDIT/INSPECT open with an animated curtain until the app posts cpValLanded.',
 '',
 'SAVED PLANS ON THIS DEVICE (' + projects.length + '):',
