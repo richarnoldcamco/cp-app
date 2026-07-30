@@ -1585,7 +1585,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-721";
+const APP_REV = "Rev-722";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1718,6 +1718,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-722", type: "App", changes: ["THE MOVE-PIN QUESTION IS NO LONGER A BROWSER BOX (Rev-722) \u2014 the stray-click guard from Rev-517 asked \u2018Balloon 2 is already pinned. Move its pin?\u2019 through the browser\u2019s own confirm: black, unstyled, headed with the site address, with OK / Cancel that say nothing about what either does. It is now the themed window built at Rev-720, in BLUE rather than the deletion maroon \u2014 moving a pin is not destructive and should not wear the same colour as Delete drawing. The buttons say what they do: \ud83d\udccd MOVE THE PIN and LEAVE IT WHERE IT IS, so the choice can be read without matching OK to the question. It also mentions that dragging the red ring is easier for a small correction, which the old box said in a parenthesis nobody reads. STRUCTURAL PART: the themed box is a PROMISE and the pin handler is synchronous \u2014 it returns true/false to a click listener \u2014 so the pinning was split into cpDoPin(row, x, y), called straight away when no confirm is needed and from the promise when it is. cpConfirmBox gained a tone and a custom cancel label to serve both cases."] },
   { ts: "2026-07-30", rev: "App Rev-721", type: "App", changes: ["A DELETED DRAWING NO LONGER COMES BACK FROM THE PART-LEVEL COPY (Rev-721) \u2014 Rev-720 deleted OP-040\u2019s drawing correctly and said so, and Step 2 still read COMPLETED, because _idbGetOds falls back to a drawing stored under the PART alone when an operation has none of its own \u2014 a legacy shape from before Rev-600, when a part had one plan and one drawing. On 1000237620 that fallback file is 445,573 bytes against OP-040\u2019s 445,580: the same image, answering in its place. DELETING THE PART-LEVEL RECORD WAS THE WRONG FIX and was not done: on another part it may be the only drawing several operations have, so removing it to clear one op could blank the rest. Instead a TOMBSTONE records that this ONE operation has had its drawing deleted, and the lookup refuses the part-level fallback for that operation only. Uploading a new drawing for the op lifts the tombstone. OP-030 is untouched \u2014 it has its own op-specific drawing (737,296 bytes) and never relied on the fallback. NOTE: the repo still holds drawings/1000237620.json; the tombstone is local and syncs with settings, so a device that has not seen it will still find the part-level copy."] },
   { ts: "2026-07-30", rev: "App Rev-720", type: "App", changes: ["FIX \u2014 DELETING A DRAWING DID NOT ACTUALLY DELETE IT (Rev-720) \u2014 Rev-719 cleared the drawing by WRITING AN EMPTY IMAGE over it. _idbPutDrawing refuses a blank image on purpose, and says so in a comment left at Rev-575: \u2018it guards against wiping a drawing by accident, so removing one needs its own path.\u2019 That path, _idbDelDrawing, already existed. The result was a deletion that reported success while the drawing stayed in IndexedDB, so cpOpOdsImage still found it, hasOds stayed true and STEP 2 STILL READ COMPLETED \u2014 the app telling the QE a drawing was loaded when it had just been told to delete it. Now it calls _idbDelDrawing, then RE-CHECKS with cpOpOdsImage and only claims success if the drawing is really gone; if a legacy drawing stored under the PART alone is still answering for the operation, it says that instead of claiming a clean delete. THE BUTTON READS \ud83d\uddd1 DELETE DRAWING, not Remove \u2014 delete is what it does. AND THE CONFIRM IS NOW A THEMED WINDOW rather than the browser box: maroon header, the consequences in full (rows and typed values kept, pins cleared, Step 2 returns to not-done), Cancel focused, and the destructive button in red on the right."] },
   { ts: "2026-07-30", rev: "App Rev-719", type: "App", changes: ["THE ODS DRAWING CAN NOW BE REMOVED, NOT ONLY REPLACED (Rev-719) \u2014 Upload / Replace could only swap one drawing for another, so a drawing attached to the wrong operation could not be taken off; the only way out was to upload something else over it. That matters more than a stray file, because the drawing is what every balloon, pin and Spec/Tol reading is taken from. cpRemoveOpOds clears ALL FOUR PLACES it lives \u2014 IndexedDB, the saved project, the open builder state, and the pinned feature positions \u2014 then re-renders and syncs. THE PINS GO WITH IT, DELIBERATELY: a pin is an x/y coordinate on the drawing that has just been removed, so keeping them would leave every balloon pointing at a place on a picture that no longer exists, and zoom-to-bubble would frame nothing. The rows, the descriptions, the specs, the control types and the approvals are all KEPT. The confirm says exactly that in those words before anything is touched, and the removal is written to the action log."] },
@@ -2312,7 +2313,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:36 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3481,7 +3482,7 @@ function cpPlanPercent(p){
 }
 // Rev-720: a themed confirm. The browser's own box cannot be styled, says the site name at
 // the top, and looks nothing like the rest of the app — wrong for a destructive step.
-function cpConfirmBox(title, bodyHtml, okLabel){
+function cpConfirmBox(title, bodyHtml, okLabel, opts){
   return new Promise(resolve => {
     const ov = document.createElement('div');
     ov.style.cssText = 'position:fixed; inset:0; z-index:10500; background:rgba(0,0,0,0.6);'
@@ -3489,7 +3490,8 @@ function cpConfirmBox(title, bodyHtml, okLabel){
     const c = document.createElement('div');
     c.style.cssText = 'background:#fff; border-radius:10px; max-width:560px; width:100%;'
       + ' box-shadow:0 12px 46px rgba(0,0,0,.45); font-family:inherit; overflow:hidden;';
-    c.innerHTML = '<div style="background:#7a1a1c; color:#fff; font-weight:800; letter-spacing:.04em;'
+    c.innerHTML = '<div style="background:' + ((opts && opts.tone === 'move') ? '#1a5276' : '#7a1a1c')
+      + '; color:#fff; font-weight:800; letter-spacing:.04em;'
       + ' padding:10px 16px; font-size:13px;">' + title + '</div>'
       + '<div style="padding:14px 16px; font-size:12.5px; line-height:1.6; color:#3a352e;">'
       + bodyHtml + '</div>';
@@ -3501,8 +3503,12 @@ function cpConfirmBox(title, bodyHtml, okLabel){
       + ' border-radius:6px; background:#fff; cursor:pointer; font-family:inherit;';
     const yes = document.createElement('button');
     yes.type = 'button'; yes.textContent = okLabel || 'Delete';
-    yes.style.cssText = 'font-size:12px; font-weight:800; padding:7px 18px; border:1px solid #7d2419;'
-      + ' border-radius:6px; background:#a5342a; color:#fff; cursor:pointer; font-family:inherit;';
+    // Rev-722: not every confirm is a deletion. tone 'move' is the blue, non-destructive one.
+    const _blue = (opts && opts.tone === 'move');
+    yes.style.cssText = 'font-size:12px; font-weight:800; padding:7px 18px; border:1px solid '
+      + (_blue ? '#154360' : '#7d2419') + '; border-radius:6px; background:'
+      + (_blue ? '#1a5276' : '#a5342a') + '; color:#fff; cursor:pointer; font-family:inherit;';
+    if(opts && opts.cancelLabel) no.textContent = opts.cancelLabel;
     const done = (v) => { ov.remove(); resolve(v); };
     no.onclick = () => done(false);
     yes.onclick = () => done(true);
@@ -8581,8 +8587,23 @@ function cpManualPinClick(e){
   // yes/no. (One accidental click on the drawing used to silently re-pin the focused
   // balloon wherever it landed — how bubble 3's highlight ended up sitting on balloon 11.)
   if(f && (f.x || f.y)){
-    if(!confirm('Balloon ' + row.bubble + ' is already pinned.\n\nMove its pin to where you just clicked?\n(You can also drag the red ring instead.)')) return true;
+    // Rev-722: themed confirm instead of the browser box. It is async, so the pin itself is
+    // done in cpDoPin() and this click just swallows itself while the question is answered.
+    cpConfirmBox('MOVE PIN \u2014 BALLOON ' + row.bubble,
+        'Balloon <b>' + row.bubble + '</b> already has a pin on the drawing.<br><br>'
+      + 'Move it to where you just clicked?<br><br>'
+      + '<span style="color:#6b6257;">Nothing else on the row changes. You can also drag the red '
+      + 'ring on the drawing to nudge a pin, which is easier for a small correction.</span>',
+        '\ud83d\udccd Move the pin', { tone:'move', cancelLabel:'Leave it where it is' })
+      .then(ok => { if(ok) cpDoPin(row, x, y); });
+    return true;
   }
+  cpDoPin(row, x, y);
+  return true;
+}
+// Rev-722: the pin itself, so it can run straight away or after a confirm.
+function cpDoPin(row, x, y){
+  let f = cpFeatureForBubble(row.bubble);
   if(!f){ f = { n:String(row.bubble), x:0, y:0, tipX:0, tipY:0, description:'' }; if(typeof beFeatures !== 'undefined') beFeatures.push(f); }
   f.x = x; f.y = y; f.tipX = x; f.tipY = y;   // rough pin at the click point — refined in the freeze view
   cpPinFlashAt(x, y);   // Rev-340: yellow confirmation hue right where you clicked
