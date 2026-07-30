@@ -1613,7 +1613,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-756";
+const APP_REV = "Rev-757";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1865,18 +1865,30 @@ async function ghPushLog(silent){
     if(sha) body.sha = sha;
     const r = await fetch(url, { method: 'PUT', headers: { ...hdrs, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if(!r.ok) throw new Error('GitHub refused the write (' + r.status + ')');
-    // Rev-725 rule: prove it landed rather than trusting the response
-    const v = await fetch(url + '?cb=' + Date.now(),
-      { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw' }, cache: 'no-store' });
-    if(!v.ok) throw new Error('wrote it but could not read it back (' + v.status + ')');
-    const back = JSON.parse(await v.text());
-    const got = (back && Array.isArray(back.entries)) ? back.entries : [];
+    // Rev-725 rule: prove it landed rather than trusting the response.
+    // Rev-757: GitHub does NOT serve a file the instant it is written — a read a moment
+    // later still returns the OLD copy, or 404 on a brand-new file. Rev-756 checked too
+    // eagerly, logged three false failures, and never recorded that it was up to date, so
+    // it re-pushed the whole log every two minutes. Retry with a growing pause instead.
     const want = _logKey(merged[merged.length - 1]);
-    if(!got.some(e => _logKey(e) === want)) throw new Error('read-back did not contain the newest entry');
+    let landed = 0, lastErr = '';
+    for(let i = 0; i < 4 && !landed; i++){
+      await new Promise(res => setTimeout(res, 1200 * (i + 1)));
+      try{
+        const v = await fetch(url + '?cb=' + Date.now(),
+          { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw' }, cache: 'no-store' });
+        if(!v.ok){ lastErr = 'read-back returned ' + v.status; continue; }
+        const back = JSON.parse(await v.text());
+        const got = (back && Array.isArray(back.entries)) ? back.entries : [];
+        if(got.some(e => _logKey(e) === want)) landed = got.length;
+        else lastErr = 'newest entry not visible yet';
+      }catch(re){ lastErr = (re && re.message) ? re.message : String(re); }
+    }
+    if(!landed) throw new Error('wrote it, but could not confirm it landed within ~12s (' + lastErr + ')');
     localStorage.setItem('cpLogSyncSig', sig);
     localStorage.setItem('cpLogSyncAt', new Date().toISOString());
-    localStorage.setItem('cpLogSyncCount', String(got.length));
-    if(!silent) flash('\u2713 Action log archived \u2014 ' + got.length + ' entries in logs/' + dev + '.json');
+    localStorage.setItem('cpLogSyncCount', String(landed));
+    if(!silent) flash('\u2713 Action log archived \u2014 ' + landed + ' entries in logs/' + dev + '.json');
     return true;
   }catch(e){
     const msg = (e && e.message) ? e.message : String(e);
@@ -1934,6 +1946,7 @@ function cpStartLogArchive(){
 // ===== end Rev-756 log archive ==================================================
 
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-757", type: "App", changes: ["FIX \u2014 THE LOG ARCHIVE CALLED ITSELF A FAILURE WHEN IT HAD WORKED (Rev-757) \u2014 the Rev-756 archive landed correctly on the very first run (607 entries), but its own stored log showed three logsync-fail entries: one \u2018wrote it but could not read it back (404)\u2019 and two \u2018read-back did not contain the newest entry\u2019. Read from the stored file, not guessed from the code. Cause: GitHub does not serve a file the instant it is written \u2014 a read a moment after the write still returns the OLD copy, and a brand-new file 404s briefly. The same thing happened to the Rev-756 app push itself, which read back as Rev-755 seconds after landing. So the Rev-725 read-back rule is right, but it was being applied too eagerly. It now retries with a growing pause \u2014 1.2s, 2.4s, 3.6s, 4.8s, about 12 seconds in total \u2014 and only calls it a failure if the newest entry is still missing after all four. The cost of the false failure was not just a misleading log line: because success was never recorded, the up-to-date marker was never written and the whole log was re-pushed every two minutes instead of stopping. Verification stays strict; it is only patient now."] },
   { ts: "2026-07-30", rev: "App Rev-756", type: "App", changes: ["KEEP THE LOG \u2014 THE ACTION LOG NOW HAS ITS OWN FILE (Rev-756) \u2014 the log recorded what was actually done, which is what settles a fault in a minute instead of three revisions of guessing, but it lived only in this browser: 600 entries, oldest silently dropped, absent from cp_data.json, never on GitHub, never across devices. At Rich\u2019s working pace that is a few hours \u2014 which is why a log asked for during diagnosis was often already gone. It now archives to logs/{DEVICE}.json in the private data repo, ONE FILE PER DEVICE (PHONE-xxxxxx / DESKTOP-xxxxxx, made once and kept on the machine) so two devices can never overwrite each other, MERGED on read rather than replaced, de-duplicated and sorted oldest-first. The push follows the Rev-506 drawing and Rev-724 video shape plus the Rev-725 rule: read the existing archive, merge, fetch the sha, PUT, then READ IT BACK and only report success if the newest entry is genuinely in the stored file \u2014 a write that returns OK but does not land is treated as a failure. It runs hands-free 20 seconds after start-up, every 2 minutes, and whenever the tab comes back into view, and stays silent unless it fails. On-device cap raised 600 to 3,000 now that the file is the archive; the archive holds 5,000. Admin \u2192 ACTION LOG gained Archive now, All devices (merges every device\u2019s archive with this device\u2019s live log and tags each line with the device it came from) and a status line naming this device and when its last archive landed; Clear now wipes only the device copy and says so, leaving the archive intact. Every failure path SPEAKS \u2014 console warning, a logsync-fail entry and a red banner \u2014 deliberately against the 321 silent catch blocks the audit found, since a swallowed error here would hide the very evidence this feature exists to keep. ITAR unchanged: screen names, control names and field NAMES only, never part, drawing or feature data."] },
   { ts: "2026-07-30", rev: "App Rev-755", type: "App", changes: ["PIPELINE TEST \u2014 REV TRANSFER CHECK (Rev-755) \u2014 no functional change. Rich asked for a deliberate smoke test of the ship-a-change path before any real work started: bump the rev, push the same file to BOTH targets (cp-generator-data/cp_app.html and cp-app/index.html), read both back, and confirm the device picks the new rev up on its own through the open / 60s / every-tap / tab-return self-update. Only APP_REV, BUILD_TIME and this entry changed, so if the badge on the device does not move to Rev-755 the fault is in the transfer, not in the code \u2014 which is the whole point of testing it with nothing else in flight."] },
   { ts: "2026-07-30", rev: "App Rev-754", type: "App", changes: ["\u2018KEEP THE LOG\u2019 IS NOW THE FIRST JOB IN THE HANDOFF PROMPT (Rev-754) \u2014 the next chat is told to walk Rich through pushing the action log to its own file, and is given the measurements rather than a description: the log lives only in localStorage under cpActionLog, capped at 600 entries with the oldest silently discarded, and is ABSENT from cp_data.json \u2014 verified by reading the synced file, not assumed. The contrast is recorded too: the DATA history is strong (cp_data.json committed on every sync, 100 commits in a single day, changeHistory 107 entries capped at 500 back to 26 June). SO THE GAP IS NAMED PRECISELY: the STATE of an approval or a Step 6 sign-off is saved properly, but the RECORD OF THE ATTEMPT \u2014 including approvals REFUSED under Rev-706 and every JS error the window handler catches \u2014 lasts only until 600 entries roll past, a few hours at Rich\u2019s pace, which is also why a log asked for during diagnosis may already be gone. The design is specified: logs/{DEVICE}.json, one file per device so two can never overwrite each other, merged on read, modelled on the Rev-506 drawing sync and Rev-724 videos/ sync, with the Rev-725 read-back check before reporting success. And it repeats how to run it: one step at a time, wait for \u2018done\u2019, verify from the Claude side, never a wall of steps."] },
@@ -2563,7 +2576,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "1:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "1:51 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
