@@ -1600,7 +1600,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-732";
+const APP_REV = "Rev-733";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1733,6 +1733,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-733", type: "App", changes: ["FIX \u2014 THE NEW BUTTONS WERE SITTING ON TOP OF THE HEADER (Rev-733) \u2014 Rev-731 pinned the mode toggle, the video button and \u2139 HELP to the TOP RIGHT of the window without checking what was already there. The menu screen has its own dark bar with New Chat Prompt in that exact spot, and the other screens use <header id=\u2019header\u2019>; the new strip covered both. Moved to the BOTTOM-RIGHT corner, which is empty on every screen in this app and is where help controls conventionally sit. Also restyled as pills with a stronger shadow so they read as floating controls rather than as part of whatever is behind them, and the row wraps rather than growing off-screen when a video title is long. MY ERROR AND THE LESSON: a fixed position is a claim that nothing else owns that corner, and this app has two different headers depending on the screen \u2014 the claim should have been checked against both before shipping. WHAT YOU MUST TEST (rule 8): on the MENU, New Chat Prompt is fully visible and uncovered; the three controls sit bottom-right; opening a plan keeps them there and out of the way of the grid."] },
   { ts: "2026-07-30", rev: "App Rev-732", type: "App", changes: ["FIX \u2014 THE VIDEO WOULD NOT PLAY, AND DELETE NOW NEEDS A CODE (Rev-732) \u2014 the recording was never the problem: the stored clip is a valid 10.97 MB video/webm vp9+opus, correctly titled, sitting in videos/. It was handed to the player as an 11 MB DATA URL, and a <video> element will not reliably play one \u2014 there are no range requests behind a data: URL, so the browser reports 0:00 and refuses. The clip is now converted to a BLOB URL before playing, which the browser treats like a real file, and the blob is released when the window closes so it does not sit in memory. A failure to play now says so instead of showing a dead player. DELETE REQUIRES CODE 7312, then still asks to confirm. It guards against an accidental click on a clip that exists in no other place \u2014 the operator has chosen not to keep local source files, so a deleted video is gone. IT IS NOT SECURITY AND IS NOT DESCRIBED AS SUCH: the code is in the page and anyone who can open the browser\u2019s developer tools can read it. WHAT YOU MUST TEST (rule 8): the video plays; a wrong code refuses and deletes nothing."] },
   { ts: "2026-07-30", rev: "App Rev-731", type: "App", changes: ["NEW USER / EXPERT USER TOGGLE ON EVERY SCREEN (Rev-731) \u2014 a \ud83d\udc64 NEW USER / \ud83c\udf93 EXPERT USER button now sits at the top right of every screen and remembers the setting on that device. In NEW USER the how-to button turns RED, pulses with a growing glow, and reads \ud83d\udc49 WATCH FIRST \u2014 <title>, so someone who has never seen the app cannot walk past it. EXPERT USER returns it to plain green; the video stays available, it just stops shouting. NEW USER IS THE DEFAULT, deliberately: the cost of a stranger missing the help is a wrong Control Plan, and the cost to an expert is one click. The animation stops entirely under prefers-reduced-motion. ONE FIXED STRIP INSTEAD OF THREE FLOATING BUTTONS: the mode button, the video button and \u2139 HELP now share a flex row anchored top-right, because they were positioned by individual pixel offsets and a longer video title would have slid one under another. WHAT YOU MUST TEST (rule 8): the toggle shows on the menu AND inside a plan; in NEW USER the video button is red and pulsing on Build Control Plan; in EXPERT USER it is green and still plays."] },
   { ts: "2026-07-30", rev: "App Rev-730", type: "App", changes: ["THE VIDEO GETS A NAME AND ITS OWN BUTTON (Rev-730) \u2014 a clip was only reachable by opening \u2139 HELP and reading \u2018Watch how-to\u2019, which tells a new user nothing about what it covers. A green button now sits immediately LEFT of \u2139 HELP on any screen that has a video, showing the title \u2014 \u25b6 HOW TO ASSIGN BUBBLE NUMBERS \u2014 and playing it on click. It appears and disappears with the screen you are on, so each screen advertises only its own. NAMING: after a recording finishes the app asks what the clip is called, in a themed box rather than the browser\u2019s grey prompt, and the player gained \u270e RENAME. Titles are stored beside the clip AND written into videos/ with it, so another device gets the name as well as the recording; deleting a video clears its name and removes the button. An untitled clip falls back to \u25b6 HOW-TO VIDEO rather than showing nothing. WHAT YOU MUST TEST (rule 8): on Build Control Plan, confirm the green button reads your title, plays the clip, and is NOT there on the Control Plans list."] },
@@ -2338,7 +2339,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "04:22 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "04:41 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7613,8 +7614,11 @@ function cpTopStrip(){
   if(!el){
     el = document.createElement('div');
     el.id = 'cpTopStrip';
-    el.style.cssText = 'position:fixed; top:8px; right:12px; z-index:9000; display:flex;'
-      + ' align-items:center; gap:8px; max-width:70vw;';
+    // Rev-733: BOTTOM-right, not top-right. The menu screen has its own dark bar and the other
+    // screens use <header id="header">, so anything pinned to the top lands ON one of them —
+    // it covered New Chat Prompt. The bottom-right corner is empty on every screen.
+    el.style.cssText = 'position:fixed; bottom:14px; right:14px; z-index:9000; display:flex;'
+      + ' align-items:center; gap:8px; max-width:70vw; flex-wrap:wrap; justify-content:flex-end;';
     document.body.appendChild(el);
   }
   return el;
@@ -7647,9 +7651,9 @@ function cpModeButton(){
   b.title = isNew
     ? 'NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER.'
     : 'EXPERT USER: nothing is highlighted. Click to switch to NEW USER.';
-  b.style.cssText = 'font-size:11px; font-weight:800; letter-spacing:.05em; padding:6px 12px;'
-    + ' border-radius:6px; cursor:pointer; font-family:inherit; white-space:nowrap;'
-    + ' box-shadow:0 2px 6px rgba(0,0,0,.25); '
+  b.style.cssText = 'font-size:10.5px; font-weight:800; letter-spacing:.05em; padding:7px 12px;'
+    + ' border-radius:999px; cursor:pointer; font-family:inherit; white-space:nowrap;'
+    + ' box-shadow:0 3px 10px rgba(0,0,0,.3); '
     + (isNew ? 'background:#8a4b12; color:#fff; border:1px solid #6b3a0e;'
              : 'background:#efe9df; color:#3a352e; border:1px solid #c9c0b4;');
 }
@@ -7716,9 +7720,9 @@ function cpHowtoFab(){
     if(!b){
       b = document.createElement('button');
       b.id = 'cpHowtoFab'; b.type = 'button';
-      b.style.cssText = 'font-size:11px; font-weight:800; letter-spacing:.05em; padding:6px 12px;'
-        + ' border-radius:6px; border:1px solid #215236; background:#2c6e49; color:#fff;'
-        + ' cursor:pointer; font-family:inherit; box-shadow:0 2px 6px rgba(0,0,0,.25);'
+      b.style.cssText = 'font-size:11px; font-weight:800; letter-spacing:.05em; padding:7px 13px;'
+        + ' border-radius:999px; border:1px solid #215236; background:#2c6e49; color:#fff;'
+        + ' cursor:pointer; font-family:inherit; box-shadow:0 3px 10px rgba(0,0,0,.3);'
         + ' max-width:38vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;';
       b.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpHowtoPlay(cpHelpScreen()); };
       const strip = cpTopStrip();
@@ -8062,9 +8066,9 @@ function cpHelpMountButton(){
   const b = document.createElement('button');
   b.id = 'cpHelpFab'; b.type = 'button'; b.textContent = '\u2139 HELP';
   b.title = 'Ask how to do something in this app';
-  b.style.cssText = 'font-size:11px; font-weight:800; letter-spacing:.05em; padding:6px 12px;'
-    + ' border-radius:6px; border:1px solid #154360; background:#1a5276; color:#fff;'
-    + ' cursor:pointer; font-family:inherit; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;';
+  b.style.cssText = 'font-size:11px; font-weight:800; letter-spacing:.05em; padding:7px 13px;'
+    + ' border-radius:999px; border:1px solid #154360; background:#1a5276; color:#fff;'
+    + ' cursor:pointer; font-family:inherit; box-shadow:0 3px 10px rgba(0,0,0,.3); white-space:nowrap;';
   b.onclick = (e) => { e.preventDefault(); e.stopPropagation(); cpHelpOpen(); };
   cpTopStrip().appendChild(b);
   try{ cpModeButton(); }catch(_){ }
