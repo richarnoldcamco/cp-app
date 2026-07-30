@@ -1585,7 +1585,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-718";
+const APP_REV = "Rev-719";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1718,6 +1718,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-719", type: "App", changes: ["THE ODS DRAWING CAN NOW BE REMOVED, NOT ONLY REPLACED (Rev-719) \u2014 Upload / Replace could only swap one drawing for another, so a drawing attached to the wrong operation could not be taken off; the only way out was to upload something else over it. That matters more than a stray file, because the drawing is what every balloon, pin and Spec/Tol reading is taken from. cpRemoveOpOds clears ALL FOUR PLACES it lives \u2014 IndexedDB, the saved project, the open builder state, and the pinned feature positions \u2014 then re-renders and syncs. THE PINS GO WITH IT, DELIBERATELY: a pin is an x/y coordinate on the drawing that has just been removed, so keeping them would leave every balloon pointing at a place on a picture that no longer exists, and zoom-to-bubble would frame nothing. The rows, the descriptions, the specs, the control types and the approvals are all KEPT. The confirm says exactly that in those words before anything is touched, and the removal is written to the action log."] },
   { ts: "2026-07-30", rev: "App Rev-718", type: "App", changes: ["OTHER ADDED TO THE GAGE CHIPS \u2014 AND IT DOES NOT TYPE \u2018OTHER\u2019 (Rev-718) \u2014 an eighth chip sits after HOLDING FIXTURE. Every other chip inserts its own label at the cursor; this one deliberately does not, because \u2018OTHER\u2019 is not a description of a gage. It would land in the Special Gage / Fixture cell, travel into the .xlsx, and reach a toolmaker as an instruction to build something called OTHER \u2014 the one thing on that line that cannot be made. Pressing it puts the cursor in the box with a one-line prompt to say what the thing actually is. The chip is there because reaching for a button and finding none reads as \u2018this list is all there is\u2019, which the seven fixed types are not; what it must not do is make it easy to record a placeholder in place of a description."] },
   { ts: "2026-07-30", rev: "App Rev-717", type: "App", changes: ["THE DIMENSION READ IS BACK \u2014 WITHOUT UNDOING REV-350 (Rev-717) \u2014 \ud83d\udd0e READ DIMENSIONS (AI) now sits in the ODS panel header. WHY IT WENT MISSING: Locate Bubbles did TWO jobs \u2014 it found balloon POSITIONS and it read each balloon\u2019s DIMENSION into empty Spec/Tol cells (Rev-214). Rev-350 removed the button because manual pinning had become the better way to do the first job, and recorded no fault with the second; the dimension read was collateral, nothing replaced it, and that is why a fresh operation comes up with every Spec/Tol cell blank. RESTORED AS A READER ONLY: it fills EMPTY Spec/Tol cells, never overwrites a typed value, and a balloon already pinned KEEPS THE POSITION YOU CLICKED \u2014 the run merges descriptions into the existing feature list instead of replacing it, so pinning stays manual exactly as Rev-350 intended. THE DRAWING LEAVES THE DEVICE ON THIS ONE, so it runs behind the existing ITAR confirm gate, untouched. The finish message says how many cells were filled and, in capitals, to check every one against the print \u2014 the AI reads digits off an image, and .323 against .328 is a difference only the print settles."] },
   { ts: "2026-07-30", rev: "App Rev-716", type: "App", changes: ["HAND-EDIT COUNT BESIDE THE OP NUMBER (Rev-716) \u2014 an amber \u270e n HAND-EDITED chip now sits next to OP-nnn on the Control Plans list wherever a plan carries cells that differ from the Master List. It counts declared FREQ / # Recorded / CMM overrides and declared machinist exceptions together, because both are the same thing from a reviewer\u2019s seat: a line where the master no longer governs. Hovering lists every one \u2014 balloon, column, master value \u2192 current value \u2014 so the chip is a way IN to the deviations rather than just a number. DERIVED, NOT STORED, AND THAT WAS THE REAL DECISION. The brief said \u2018keep track of the number of times\u2019, which suggests an event tally; a tally counts a revert-then-redo as 2 and would overstate the deviation for the life of the plan, while the count that matters at review time is how many cells differ RIGHT NOW. So it is computed from the rows on every render: it cannot drift out of step with the data, needs no migration for existing plans, and drops back on its own when an override is snapped back to the master. If the historical event count is wanted as well, that needs the append-only cell history discussed earlier, not a counter."] },
@@ -2309,7 +2310,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:52 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:14 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3454,6 +3455,49 @@ function cpPlanPercent(p){
   });
   return Math.round(pct);
 }
+// Rev-719: REMOVE the ODS drawing from an operation. Upload/Replace could only ever swap
+// one drawing for another — there was no way to take a wrong drawing off, which matters
+// because the drawing is what every balloon, pin and Spec/Tol reading is taken from.
+// Clears all four places it lives: IndexedDB, the saved project, the open builder state,
+// and the pinned feature positions, which belong to the drawing that has just gone.
+function cpRemoveOpOds(p){
+  const part = p.partNum || '', op = String(p.opNum || '');
+  const label = part + (op ? '  \u00b7  OP-' + op : '');
+  if(!confirm('Remove the ODS drawing from ' + label + '?\n\n'
+    + 'The balloon rows and everything you have typed are KEPT.\n'
+    + 'The pinned balloon positions are cleared, because they point at this drawing.\n\n'
+    + 'You can upload a different drawing afterwards.')) return;
+  try{ _idbPutOds(part, op, '', null); }catch(e){}
+  try{
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    let hit = false;
+    projects.forEach(x => {
+      if(String(x.partNum || '') !== String(part) || String(x.opNum || '') !== op) return;
+      if(x.builderState){
+        delete x.builderState.odsImage; delete x.builderState.cleanOdsImage;
+        x.builderState.features = [];
+        x.updated = new Date().toISOString(); hit = true;
+      }
+      delete x.odsImage; delete x.cleanOdsImage;
+    });
+    if(hit) localStorage.setItem('cpProjects', JSON.stringify(projects));
+  }catch(e){}
+  try{
+    if(cpBuildState && String(cpBuildState.partNum||'') === String(part)
+       && String(cpBuildState.opNum||'') === op){
+      delete cpBuildState.odsImage; delete cpBuildState.cleanOdsImage;
+      cpBuildState.features = [];
+      if(typeof beFeatures !== 'undefined') beFeatures = [];
+      if(typeof cpAutoSaveProject === 'function') cpAutoSaveProject();
+      if(typeof renderCPBuilder === 'function' && document.getElementById('cpBuilderTbody')) renderCPBuilder();
+      if(typeof updateOdsPanel === 'function') updateOdsPanel();
+    }
+  }catch(e){}
+  try{ logAct('drawing', 'ODS removed \u00b7 ' + label); }catch(e){}
+  flash('\u2713 ODS drawing removed from ' + label + '. Rows and typed values kept; pins cleared.');
+  try{ renderProjects(); }catch(e){}
+  try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
+}
 // Load (or replace) the ODS drawing for one operation, from the Control Plans list
 function cpUploadOpOds(p){
   const part = p.partNum || '', op = String(p.opNum || '');
@@ -3463,6 +3507,7 @@ function cpUploadOpOds(p){
     dropHint: 'The ballooned operation drawing. Image or PDF \u2014 any PDF, including a Chrome PDF Document. Ctrl+V pastes a screenshot.',
     seedKey: cpOdsKey(part, op),
     saveLabel: 'Save ODS drawing',
+    extraBtn: { label: '\ud83d\uddd1 Remove drawing', onClick: () => { cpRemoveOpOds(p); } },
     onSave: (url) => {
       _idbPutOds(part, op, url, null);
       try{
@@ -5658,6 +5703,11 @@ async function cpImageStudio(opts){
     '<div style="background:#7a1a1c; color:#fff; font-weight:800; letter-spacing:.06em; padding:8px 16px; font-size:13px;">' + String(o.title || 'UPLOAD') + '</div>' +
     '<div id="cptvBody" style="padding:10px 14px; flex:1 1 auto; min-height:0; display:flex; flex-direction:column;"></div>' +
     '<div style="background:#e5ddd1; padding:8px 14px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; border-top:1px solid #c9c0b4; flex:0 0 auto;">' +
+      // Rev-719: optional destructive action, pushed to the LEFT away from Save so it is not
+      // hit by muscle memory reaching for the green button.
+      (o.extraBtn ? ('<button id="cptvExtra" style="padding:8px 16px; font-weight:700; cursor:pointer;'
+        + ' background:#fff; color:#a5342a; border:1px solid #d9b3ad; border-radius:6px; margin-right:auto;">'
+        + String(o.extraBtn.label || 'Remove') + '</button>') : '') +
       '<button id="cptvCancel" style="padding:8px 18px; font-weight:700; cursor:pointer;">Cancel</button>' +
       '<button id="cptvSave" style="padding:8px 22px; font-weight:800; cursor:pointer; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px;">\u2713 ' + String(o.saveLabel || 'Save') + '</button>' +
     '</div>' +
@@ -5666,6 +5716,10 @@ async function cpImageStudio(opts){
   o.fill = true;                              // Rev-579: preview takes every spare pixel
   const file = cpImageStudioInline(document.getElementById('cptvBody'), o);
   document.getElementById('cptvCancel').onclick = _cptvClose;
+  if(o.extraBtn){
+    const xb = document.getElementById('cptvExtra');
+    if(xb) xb.onclick = () => { _cptvClose(); try{ o.extraBtn.onClick(); }catch(e){} };
+  }
   document.getElementById('cptvSave').onclick = async () => {
     const url = await cpStudioResult();
     if(!url){ alert('Load at least one page first.'); return; }
