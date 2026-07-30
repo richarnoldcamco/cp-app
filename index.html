@@ -741,6 +741,7 @@
     <button class="btn-ghost" id="cpBuilderSaveBtn" style="min-height:40px; font-weight:600; background:#5a6c7d; border:1px solid #4a5a68; color:#fff; padding:6px 18px; white-space:nowrap;">💾 Save to Project</button>
     <button class="btn-primary" id="cpBuildXlsxBtn" style="min-height:40px; width:auto; margin:0; padding:6px 20px; white-space:nowrap;">📥 Build .xlsx</button>
     <button id="cpAddRowBtn" onclick="cpBuilderAddRow(event)" style="min-height:40px; width:auto; margin:0; padding:6px 16px; white-space:nowrap; background:#1e8449; color:#fff; border:1px solid #196f3d; border-radius:8px; font-weight:700; cursor:pointer;" title="Add a new row (new balloon) to this control plan">➕ New Row</button>
+<button id="cpTrimRowsBtn" onclick="cpTrimEmptyRows(event)" style="min-height:40px; width:auto; margin:0 0 0 8px; padding:6px 16px; white-space:nowrap; background:#8a5a00; color:#fff; border:1px solid #6b4600; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer;" title="Remove rows that have nothing in them and no balloon pinned — use when the plan was created with more rows than the drawing has balloons">🧹 Remove empty rows</button>
     <button id="cpUnderConstructionBtn" onclick="toggleUnderConstruction()" style="min-height:40px; margin:0; padding:6px 16px; white-space:nowrap; font-weight:700; border-radius:6px; cursor:pointer; background:#e6a817; color:#3a2c00; border:1px solid #c98f00;">🚧 Under Construction</button>
     <button class="btn-ghost" id="cpAcceptAllBtn" onclick="cpAcceptAllProposed()" style="min-height:40px; font-weight:600; background:#1a5276; border:1px solid #154360; color:#fff; padding:6px 16px; white-space:nowrap;" title="Fill every unset row with the app's best-match control type from the Master List — review and change any that are off">🎯 Auto-fill Proposed</button>
     <button class="btn-ghost" id="cpAiProposeBtn" onclick="aiProposeControlTypes()" style="min-height:40px; font-weight:600; background:#6e1414; border:1px solid #581010; color:#fff; padding:6px 16px; white-space:nowrap;" title="Claude reads the drawing and proposes a control type for every balloon. Sends the drawing to the Anthropic API (ITAR confirm required). Populates the Proposed column — you still ✓ Use or override.">🤖 AI Propose Types</button>
@@ -1607,7 +1608,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-738";
+const APP_REV = "Rev-739";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1740,6 +1741,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-739", type: "App", changes: ["\ud83e\uddf9 REMOVE EMPTY ROWS (Rev-739) \u2014 a plan is created with a guessed row count and the drawing often carries fewer balloons; ODS-040 has FOUR and the plan was built with fifteen, leaving eleven rows that will never be filled and eleven balloons that do not exist counting against every completion figure. The new button sits beside \uff0b New Row and clears them. ONLY GENUINELY EMPTY ROWS GO: no description, no tolerance, no limits, no class, no control type, no method, no reaction plan, no special gage, no declared machinist exception, no approval on any step, and no pin on the drawing. A ghosted row is never touched. Anything carrying a trace of work stays, so this cannot quietly destroy a half-finished line. The confirm names HOW MANY and WHICH BALLOON NUMBERS before anything is removed, and says how many rows will remain \u2014 and \uff0b New Row puts one back if the drawing turns out to have more balloons than first thought."] },
   { ts: "2026-07-30", rev: "App Rev-738", type: "App", changes: ["BUILDER TABS RENUMBERED 3 / 4 / 5 TO MATCH THE CONSTRUCTION STEPS (Rev-738) \u2014 the Control Plans list counts five steps \u2014 1 Edit op #, 2 Upload ODS, 3 Assign bubbles, 4 Assign control types, 5 Assign measurement types \u2014 while the builder called the same three jobs 1, 2 and 3. So Assign Bubbles was step 3 on one screen and step 1 on the next. The tabs now read 3 \u00b7 Bubble Numbers, 4 \u00b7 Control Type, 5 \u00b7 Measurement Methods. THE INTERNAL KEYS ARE DELIBERATELY UNCHANGED at \u20181\u2019, \u20182\u2019, \u20183\u2019: every approval already recorded is stored under stepDone[\u20181\u2019..\u20183\u2019] and the how-to videos are keyed on the same strings, so renumbering the keys would silently orphan every approval on every plan AND detach the video moved to Step 1 one rev ago. What the QE reads and what the data is keyed on are separate things, and only the first needed changing. WHAT YOU MUST TEST (rule 8): tabs read 3/4/5; your approvals on OP-030 are still there (96%, 12/14); the video still appears on 3 \u00b7 Bubble Numbers only."] },
   { ts: "2026-07-30", rev: "App Rev-737", type: "App", changes: ["A HOW-TO VIDEO NOW BELONGS TO A STEP, NOT THE WHOLE BUILDER (Rev-737) \u2014 HOW TO ASSIGN BUBBLE NUMBERS was appearing on 3 \u00b7 Measurement Methods, because a clip is keyed to the SCREEN and the builder reports one name across all four of its step views. The builder now identifies itself as \u2018Build Control Plan \u00b7 Step 1 \u00b7 Bubble Numbers\u2019 and so on, so each step carries its own video and shows only its own. The \u2139 HELP agent gets the same benefit \u2014 it now knows which step the question is about, not just which screen. THE EXISTING CLIP WAS MOVED, NOT ORPHANED: a one-time migration copies it to Step 1, carries its title across, pushes it to videos/ under the new name and removes the old copy from the device and the repo. Step 1 because the operator said plainly it belongs on the bubble-numbers page \u2014 not a guess. WHAT YOU MUST TEST (rule 8): on 1 \u00b7 Bubble Numbers the big red button is there; on 2 \u00b7 Control Type and 3 \u00b7 Measurement Methods it is NOT; \uff0b Record how-to on those steps offers to record a new one for that step."] },
   { ts: "2026-07-30", rev: "App Rev-736", type: "App", changes: ["STITCH ALL OPERATIONS INTO ONE PART CONTROL PLAN (Rev-736) \u2014 a new button on the PART header row, beside Add Operation and View Traveller: \u2018Stitch together all OP Control Plans into one Part Control Plan\u2019. It opens the same editable L3Harris sheet but built from EVERY operation of the part in routing order, with continuous Doc numbers. Placed on the part row rather than an operation row because that is what it covers \u2014 the per-operation Excel Control Plan buttons stay exactly where they are. THE TWO SHEETS ARE SEPARATE DOCUMENTS AND CANNOT OVERWRITE EACH OTHER: the operation sheet saves to custCP on its own plan, the part sheet to custCPPart, so editing one never rewrites the other and each keeps its own \u21bb Rebuild. The part sheet always lives on the FIRST operation of the part, so there is exactly one of them however many operations the part grows, and its plan number reads L3H_<part>_ALLOPS_CP. WHAT YOU MUST TEST (rule 8): the button appears on the 1000237620 header row; it opens a sheet containing BOTH OP-030 and OP-040 rows; the per-operation buttons still show one operation each."] },
@@ -2351,7 +2353,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "06:31 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "07:02 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -9045,6 +9047,44 @@ function cpPinStepBack(ev){
 }
 // Rev-347: ➕ NEW ROW in the builder — adds a row (new balloon) to the open control plan.
 // Rev-350: opens a styled dialog instead of the raw browser prompt() (which rendered as a plain black box).
+// Rev-739: a plan is created with a guessed row count, and a drawing often carries fewer
+// balloons than that. This clears the leftovers \u2014 but only rows that are genuinely EMPTY:
+// nothing typed, no control type, no pin on the drawing, no approval, not ghosted. Anything
+// with a trace of work on it is kept, and the count is stated before anything is removed.
+function cpRowIsEmpty(r){
+  if(!r || r.ghost) return false;
+  const any = ['desc','featureDesc','spec','upperLimit','lowerLimit','classification','controlTypeId',
+               'measMethod','numRecorded','freqEvery','freqQE','measMethodCMM','reactionPlan',
+               'specialGage','workcenter','featureType','secondLevel','thirdLevel']
+    .some(k => String(r[k] == null ? '' : r[k]).trim() !== '');
+  if(any) return false;
+  if(r.noMachCheck) return false;
+  if(r.stepDone && Object.keys(r.stepDone).some(k => r.stepDone[k])) return false;
+  try{ const f = cpFeatureForBubble(r.bubble); if(f && (f.x || f.y)) return false; }catch(_){ }
+  return true;
+}
+async function cpTrimEmptyRows(ev){
+  if(ev) ev.stopPropagation();
+  if(!cpBuildState || !cpBuildState.rows) return;
+  const empties = cpBuildState.rows.filter(cpRowIsEmpty);
+  if(!empties.length){ flash('No empty rows to remove \u2014 every row has something on it.'); return; }
+  const nums = empties.map(r => r.bubble).join(', ');
+  const keep = cpBuildState.rows.length - empties.length;
+  const ok = await cpConfirmBox('REMOVE EMPTY ROWS',
+      'Remove <b>' + empties.length + '</b> row' + (empties.length === 1 ? '' : 's') + ' with nothing '
+    + 'on them?<br><br>Balloon numbers: <b>' + nums + '</b><br><br>'
+    + 'These have no description, no tolerance, no control type, no pin on the drawing and no '
+    + 'approval. <b>' + keep + '</b> row' + (keep === 1 ? '' : 's') + ' will remain.<br><br>'
+    + 'You can always add rows back with \uff0b New Row.', '\ud83e\uddf9 Remove ' + empties.length + ' rows');
+  if(!ok) return;
+  cpBuildState.rows = cpBuildState.rows.filter(r => !cpRowIsEmpty(r));
+  if(cpBuildState.focusIdx >= cpBuildState.rows.length) cpBuildState.focusIdx = -1;
+  try{ logAct('row-edit', 'removed ' + empties.length + ' empty rows'); }catch(_){ }
+  renderCPBuilder();
+  try{ cpAutoSaveProject(); }catch(_){ }
+  flash('\u2713 Removed ' + empties.length + ' empty row' + (empties.length === 1 ? '' : 's') + '. '
+      + keep + ' left.');
+}
 function cpBuilderAddRow(ev){
   if(ev) ev.stopPropagation();
   if(!cpBuildState){ flash('No build in progress', true); return; }
