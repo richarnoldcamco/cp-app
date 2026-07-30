@@ -1585,7 +1585,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-723";
+const APP_REV = "Rev-724";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1718,6 +1718,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-724", type: "App", changes: ["HOW-TO VIDEOS NOW LIVE IN videos/ IN THE PRIVATE REPO (Rev-724) \u2014 Rev-723 stored a clip in IndexedDB on ONE device, which is no use for training: the new user is on a different machine from whoever recorded it, and a browser cache is not a place to keep something the shop depends on. Saving now uploads to videos/HOWTO__SCREEN.json in the private data repo, modelled on the Rev-506 drawing sync (fetch the sha, PUT, report honestly if it fails rather than claiming success). Opening HELP on a screen with no local clip pulls it once per session and flips the button to \u25b6 WATCH HOW-TO when it lands. Deleting removes both copies and says plainly if the repo copy survived \u2014 otherwise the next pull would resurrect it. ITS OWN FOLDER, NOT drawings/: the two are different things with different lifetimes \u2014 drawings are ITAR part data tied to a part\u2019s retention, videos are training material \u2014 and a future clear-out of one must not take the other with it. Still the PRIVATE repo, never a public video host: a recording of this app shows part numbers, tolerances and the drawing."] },
   { ts: "2026-07-30", rev: "App Rev-723", type: "App", changes: ["HOW-TO VIDEO PER SCREEN (Rev-723) \u2014 the \u2139 HELP window now carries \uff0b ADD HOW-TO VIDEO, which becomes \u25b6 WATCH HOW-TO once a clip is saved for the screen you are on. Help already knew which screen that was, so the video attaches itself to the right one with nothing to choose. Player has Close and a confirmed Delete. IT NEVER GOES TO A PUBLIC VIDEO HOST, AND THAT IS THE WHOLE POINT: a recording of the builder shows part numbers, tolerances, the ODS drawing and the customer name \u2014 ITAR-controlled export data. YouTube or any similar service would be a disclosure. The clip is stored on the DEVICE in IndexedDB and rides the same private-repo sync the ODS drawings already use, which is the one route in this app already trusted with drawing images. CAPPED AT 25 MB with a plain reason: every device downloads the whole file, and the repo is 16.7 MB today. A two-minute screen capture at moderate quality lands around 5\u201315 MB; anything larger asks for a shorter clip or a lower resolution rather than silently bloating every install."] },
   { ts: "2026-07-30", rev: "App Rev-722", type: "App", changes: ["THE MOVE-PIN QUESTION IS NO LONGER A BROWSER BOX (Rev-722) \u2014 the stray-click guard from Rev-517 asked \u2018Balloon 2 is already pinned. Move its pin?\u2019 through the browser\u2019s own confirm: black, unstyled, headed with the site address, with OK / Cancel that say nothing about what either does. It is now the themed window built at Rev-720, in BLUE rather than the deletion maroon \u2014 moving a pin is not destructive and should not wear the same colour as Delete drawing. The buttons say what they do: \ud83d\udccd MOVE THE PIN and LEAVE IT WHERE IT IS, so the choice can be read without matching OK to the question. It also mentions that dragging the red ring is easier for a small correction, which the old box said in a parenthesis nobody reads. STRUCTURAL PART: the themed box is a PROMISE and the pin handler is synchronous \u2014 it returns true/false to a click listener \u2014 so the pinning was split into cpDoPin(row, x, y), called straight away when no confirm is needed and from the promise when it is. cpConfirmBox gained a tone and a custom cancel label to serve both cases."] },
   { ts: "2026-07-30", rev: "App Rev-721", type: "App", changes: ["A DELETED DRAWING NO LONGER COMES BACK FROM THE PART-LEVEL COPY (Rev-721) \u2014 Rev-720 deleted OP-040\u2019s drawing correctly and said so, and Step 2 still read COMPLETED, because _idbGetOds falls back to a drawing stored under the PART alone when an operation has none of its own \u2014 a legacy shape from before Rev-600, when a part had one plan and one drawing. On 1000237620 that fallback file is 445,573 bytes against OP-040\u2019s 445,580: the same image, answering in its place. DELETING THE PART-LEVEL RECORD WAS THE WRONG FIX and was not done: on another part it may be the only drawing several operations have, so removing it to clear one op could blank the rest. Instead a TOMBSTONE records that this ONE operation has had its drawing deleted, and the lookup refuses the part-level fallback for that operation only. Uploading a new drawing for the op lifts the tombstone. OP-030 is untouched \u2014 it has its own op-specific drawing (737,296 bytes) and never relied on the fallback. NOTE: the repo still holds drawings/1000237620.json; the tombstone is local and syncs with settings, so a device that has not seen it will still find the part-level copy."] },
@@ -2314,7 +2315,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "01:02 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "01:26 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7501,6 +7502,63 @@ function cpHowtoSave(screenName, dataUrl){
 function cpHowtoDelete(screenName){
   try{ _idbDelDrawing(cpHowtoKey(screenName)); }catch(_){ }
 }
+// Rev-724: how-to videos live in videos/ in the PRIVATE data repo, so a clip recorded on
+// one machine plays on every other. Modelled on the Rev-506 drawing sync, and kept in its OWN
+// folder rather than mixed into drawings/ \u2014 drawings are ITAR part data with their own
+// retention, videos are training material, and a future clear-out of one must not take the other.
+function ghVideoUrl(name){
+  const c = ghConfig();
+  return 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/videos/'
+       + encodeURIComponent(cpHowtoKey(name)) + '.json';
+}
+async function ghPushHowto(screenName){
+  try{
+    if(!ghConfigured()) return false;
+    const src = cpHowtoGet(screenName); if(!src) return false;
+    const c = ghConfig(), url = ghVideoUrl(screenName);
+    const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+    let sha = null;
+    try{ const g = await fetch(url, { headers: hdrs, cache: 'no-store' });
+      if(g.ok){ const j = await g.json(); sha = j.sha || null; } }catch(e){}
+    const payload = JSON.stringify({ screen: screenName, video: src, ut: new Date().toISOString() });
+    const body = { message: 'How-to video ' + screenName + ' ' + new Date().toISOString(),
+                   content: btoa(unescape(encodeURIComponent(payload))) };
+    if(sha) body.sha = sha;
+    const r = await fetch(url, { method: 'PUT',
+      headers: { ...hdrs, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    return r.ok;
+  }catch(e){ return false; }
+}
+const _howtoPullTried = {};
+async function ghPullHowto(screenName){
+  try{
+    if(!ghConfigured()) return false;
+    if(cpHowtoGet(screenName)) return true;                  // already on this device
+    if(_howtoPullTried[screenName]) return false;            // one network try per session
+    _howtoPullTried[screenName] = 1;
+    const c = ghConfig();
+    const r = await fetch(ghVideoUrl(screenName), { headers: { 'Authorization': 'Bearer ' + c.token,
+      'Accept': 'application/vnd.github.raw' }, cache: 'no-store' });
+    if(!r.ok) return false;
+    const j = JSON.parse(await r.text());
+    if(!j || !j.video) return false;
+    cpHowtoSave(screenName, j.video);
+    return true;
+  }catch(e){ return false; }
+}
+async function ghDeleteHowto(screenName){
+  try{
+    if(!ghConfigured()) return false;
+    const c = ghConfig(), url = ghVideoUrl(screenName);
+    const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+    const g = await fetch(url, { headers: hdrs, cache: 'no-store' });
+    if(!g.ok) return false;
+    const j = await g.json();
+    const r = await fetch(url, { method: 'DELETE', headers: { ...hdrs, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'How-to video removed ' + screenName, sha: j.sha }) });
+    return r.ok;
+  }catch(e){ return false; }
+}
 function cpHowtoPlay(screenName){
   const src = cpHowtoGet(screenName);
   if(!src){ flash('No how-to video saved for this screen yet.', true); return; }
@@ -7525,7 +7583,11 @@ function cpHowtoPlay(screenName){
       + 'Nothing else is affected. You can record and add another at any time.', '\ud83d\uddd1 Delete video');
     if(!ok) return;
     cpHowtoDelete(screenName); ov.remove();
-    flash('\u2713 How-to video deleted for ' + screenName + '.');
+    ghDeleteHowto(screenName).then(ok => {
+      flash(ok ? '\u2713 How-to video deleted here and from videos/ in the repo.'
+               : 'Deleted on this device. The copy in videos/ is still there \u2014 it will come back '
+               + 'on the next pull unless it is removed from the repo too.', !ok);
+    });
   });
   ov.appendChild(v); ov.appendChild(bar);
   ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
@@ -7547,8 +7609,12 @@ function cpHowtoAdd(screenName){
     r.onload = () => {
       if(cpHowtoSave(screenName, r.result)){
         try{ logAct('howto', 'video saved \u00b7 ' + screenName); }catch(_){ }
-        flash('\u2713 How-to video saved for ' + screenName + ' (' + MB.toFixed(1) + ' MB). '
-            + 'It stays on this device and in your private repo \u2014 never a public host.');
+        flash('\u2713 Saved for ' + screenName + ' (' + MB.toFixed(1) + ' MB) \u2014 uploading to your private repo\u2026');
+        ghPushHowto(screenName).then(ok => {
+          flash(ok ? ('\u2713 How-to video stored in videos/ \u2014 it will play on your other devices too.')
+                   : ('Saved on THIS device only \u2014 the upload to videos/ did not go through. '
+                    + 'Check the GitHub token in Admin, then re-add it to retry.'), !ok);
+        });
       } else flash('Could not save the video.', true);
     };
     r.onerror = () => flash('Could not read that file.', true);
@@ -7657,6 +7723,11 @@ function cpHelpOpen(){
   const vid = document.createElement('button');
   vid.type = 'button';
   vid.textContent = cpHowtoGet(scr) ? '\u25b6 Watch how-to' : '\uff0b Add how-to video';
+  // Rev-724: a clip recorded on another machine is fetched on demand, then the label flips
+  if(!cpHowtoGet(scr)){
+    try{ ghPullHowto(scr).then(got => { if(got){ vid.textContent = '\u25b6 Watch how-to';
+      vid.title = 'Play the recording saved for this screen'; } }); }catch(_){ }
+  }
   vid.title = cpHowtoGet(scr)
     ? 'Play the short recording saved for this screen'
     : 'Attach a short screen recording for this screen. Stays on this device and in your private repo.';
