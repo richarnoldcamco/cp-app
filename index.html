@@ -1585,7 +1585,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-724";
+const APP_REV = "Rev-725";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -1718,6 +1718,7 @@ async function cpSyncBuildStamp(){
 }
 try{ setTimeout(cpSyncBuildStamp, 900); }catch(e){}
 const CHANGE_LOG = [
+  { ts: "2026-07-30", rev: "App Rev-725", type: "App", changes: ["THE VIDEO UPLOAD IS NOW READ BACK, AND A DEVICE-ONLY CLIP SAYS SO (Rev-725) \u2014 the operator has decided not to keep local source files: the app is the store of record. That is sound BECAUSE the copy in videos/ is version-controlled and therefore a real archive \u2014 but it puts all the weight on the upload actually landing. So the push now READS THE FILE BACK and compares its length before reporting success, the same check used on every app rev; a PUT that returns ok but does not land no longer counts. IF IT FAILS, THE WARNING PERSISTS: the screen is recorded in cpHowtoUnsynced, the HELP button reads \u2018\u25b6 Watch how-to \u26a0 this device only\u2019, and opening HELP quietly retries the upload and clears the mark when it succeeds. A one-off flash was not good enough for a message that means \u2018this is the only copy in existence\u2019 \u2014 it disappears in seconds and the browser storage holding that copy can be cleared without warning."] },
   { ts: "2026-07-30", rev: "App Rev-724", type: "App", changes: ["HOW-TO VIDEOS NOW LIVE IN videos/ IN THE PRIVATE REPO (Rev-724) \u2014 Rev-723 stored a clip in IndexedDB on ONE device, which is no use for training: the new user is on a different machine from whoever recorded it, and a browser cache is not a place to keep something the shop depends on. Saving now uploads to videos/HOWTO__SCREEN.json in the private data repo, modelled on the Rev-506 drawing sync (fetch the sha, PUT, report honestly if it fails rather than claiming success). Opening HELP on a screen with no local clip pulls it once per session and flips the button to \u25b6 WATCH HOW-TO when it lands. Deleting removes both copies and says plainly if the repo copy survived \u2014 otherwise the next pull would resurrect it. ITS OWN FOLDER, NOT drawings/: the two are different things with different lifetimes \u2014 drawings are ITAR part data tied to a part\u2019s retention, videos are training material \u2014 and a future clear-out of one must not take the other with it. Still the PRIVATE repo, never a public video host: a recording of this app shows part numbers, tolerances and the drawing."] },
   { ts: "2026-07-30", rev: "App Rev-723", type: "App", changes: ["HOW-TO VIDEO PER SCREEN (Rev-723) \u2014 the \u2139 HELP window now carries \uff0b ADD HOW-TO VIDEO, which becomes \u25b6 WATCH HOW-TO once a clip is saved for the screen you are on. Help already knew which screen that was, so the video attaches itself to the right one with nothing to choose. Player has Close and a confirmed Delete. IT NEVER GOES TO A PUBLIC VIDEO HOST, AND THAT IS THE WHOLE POINT: a recording of the builder shows part numbers, tolerances, the ODS drawing and the customer name \u2014 ITAR-controlled export data. YouTube or any similar service would be a disclosure. The clip is stored on the DEVICE in IndexedDB and rides the same private-repo sync the ODS drawings already use, which is the one route in this app already trusted with drawing images. CAPPED AT 25 MB with a plain reason: every device downloads the whole file, and the repo is 16.7 MB today. A two-minute screen capture at moderate quality lands around 5\u201315 MB; anything larger asks for a shorter clip or a lower resolution rather than silently bloating every install."] },
   { ts: "2026-07-30", rev: "App Rev-722", type: "App", changes: ["THE MOVE-PIN QUESTION IS NO LONGER A BROWSER BOX (Rev-722) \u2014 the stray-click guard from Rev-517 asked \u2018Balloon 2 is already pinned. Move its pin?\u2019 through the browser\u2019s own confirm: black, unstyled, headed with the site address, with OK / Cancel that say nothing about what either does. It is now the themed window built at Rev-720, in BLUE rather than the deletion maroon \u2014 moving a pin is not destructive and should not wear the same colour as Delete drawing. The buttons say what they do: \ud83d\udccd MOVE THE PIN and LEAVE IT WHERE IT IS, so the choice can be read without matching OK to the question. It also mentions that dragging the red ring is easier for a small correction, which the old box said in a parenthesis nobody reads. STRUCTURAL PART: the themed box is a PROMISE and the pin handler is synchronous \u2014 it returns true/false to a click listener \u2014 so the pinning was split into cpDoPin(row, x, y), called straight away when no confirm is needed and from the promise when it is. cpConfirmBox gained a tone and a custom cancel label to serve both cases."] },
@@ -2315,7 +2316,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-07-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "01:26 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "01:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7526,8 +7527,28 @@ async function ghPushHowto(screenName){
     if(sha) body.sha = sha;
     const r = await fetch(url, { method: 'PUT',
       headers: { ...hdrs, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    return r.ok;
+    if(!r.ok) return false;
+    // Rev-725: READ IT BACK. The app is now the only place these clips live, so a push that
+    // reports success without landing would leave one browser holding the sole copy.
+    try{
+      const v = await fetch(url, { headers: { ...hdrs, 'Accept': 'application/vnd.github.raw' }, cache: 'no-store' });
+      if(!v.ok) return false;
+      const back = JSON.parse(await v.text());
+      if(!back || !back.video || back.video.length !== src.length) return false;
+    }catch(e){ return false; }
+    return true;
   }catch(e){ return false; }
+}
+// Rev-725: clips that exist ONLY on this device, so the warning survives the flash message.
+function cpHowtoUnsynced(){
+  try{ return JSON.parse(localStorage.getItem('cpHowtoUnsynced') || '[]') || []; }catch(_){ return []; }
+}
+function cpHowtoMarkUnsynced(screenName, on){
+  try{
+    let t = cpHowtoUnsynced().filter(x => x !== screenName);
+    if(on) t.push(screenName);
+    localStorage.setItem('cpHowtoUnsynced', JSON.stringify(t));
+  }catch(_){ }
 }
 const _howtoPullTried = {};
 async function ghPullHowto(screenName){
@@ -7611,9 +7632,11 @@ function cpHowtoAdd(screenName){
         try{ logAct('howto', 'video saved \u00b7 ' + screenName); }catch(_){ }
         flash('\u2713 Saved for ' + screenName + ' (' + MB.toFixed(1) + ' MB) \u2014 uploading to your private repo\u2026');
         ghPushHowto(screenName).then(ok => {
-          flash(ok ? ('\u2713 How-to video stored in videos/ \u2014 it will play on your other devices too.')
-                   : ('Saved on THIS device only \u2014 the upload to videos/ did not go through. '
-                    + 'Check the GitHub token in Admin, then re-add it to retry.'), !ok);
+          cpHowtoMarkUnsynced(screenName, !ok);
+          flash(ok ? ('\u2713 Stored in videos/ and read back \u2014 the repo now holds the archive copy, '
+                    + 'so it plays on your other devices too.')
+                   : ('\u26a0 THIS DEVICE ONLY \u2014 the upload to videos/ did not land, so this is the '
+                    + 'ONLY copy of the clip. Check the GitHub token in Admin and re-add the video.'), !ok);
         });
       } else flash('Could not save the video.', true);
     };
@@ -7722,7 +7745,15 @@ function cpHelpOpen(){
   const scr = cpHelpScreen();
   const vid = document.createElement('button');
   vid.type = 'button';
-  vid.textContent = cpHowtoGet(scr) ? '\u25b6 Watch how-to' : '\uff0b Add how-to video';
+  const _unsynced = cpHowtoUnsynced().indexOf(scr) >= 0;
+  vid.textContent = cpHowtoGet(scr)
+    ? ('\u25b6 Watch how-to' + (_unsynced ? '  \u26a0 this device only' : ''))
+    : '\uff0b Add how-to video';
+  if(_unsynced){
+    // Rev-725: say it every time it is opened, not once in a flash that has gone
+    setTimeout(() => { try{ ghPushHowto(scr).then(ok => { if(ok){ cpHowtoMarkUnsynced(scr, false);
+      vid.textContent = '\u25b6 Watch how-to'; } }); }catch(_){ } }, 0);
+  }
   // Rev-724: a clip recorded on another machine is fetched on demand, then the label flips
   if(!cpHowtoGet(scr)){
     try{ ghPullHowto(scr).then(got => { if(got){ vid.textContent = '\u25b6 Watch how-to';
