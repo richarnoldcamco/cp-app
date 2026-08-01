@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-567</title>
+<title>CONTROL PLAN GENERATOR - Rev-786</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-467 · Jul 15, 2026</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-786 · 2026-08-01 3:52 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-567 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-07-27 12:25 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-786 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-01 3:52 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -1614,7 +1614,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-785";
+const APP_REV = "Rev-786";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2067,6 +2067,7 @@ async function cpShotPush(){
 // ===== end Rev-759 screenshot ===================================================
 
 const CHANGE_LOG = [
+  { ts: "2026-08-01", rev: "App Rev-786", type: "App", changes: ["FIX \u2014 THE REV-567 FLASH ON EVERY LOAD (Rev-786) \u2014 Rich asked why REV-567 still flashes in the top-left. Because it is literally written there: the header badge\u2019s STATIC text was hand-typed at Rev-567 on July 27 and never bumped again, the page title likewise, and a second badge (headerRev) still said Rev-467 from July 15. The Rev-627 self-correcting stamp rewrites all of them at boot from APP_REV and the real GitHub publish time \u2014 which is exactly why the stale text only ever appeared as a flash, and why 218 revisions of the ship procedure never caught it: the boot correction papered over the drift on every load. All three static strings now read Rev-786, and the ship procedure from this revision on stamps the title and both badges\u2019 static text alongside APP_REV, so what flashes before the script runs is the truth, not an archaeology exhibit. The build-stamp self-correction stays \u2014 it remains the authority once booted."] },
   { ts: "2026-08-01", rev: "App Rev-785", type: "App", changes: ["THE APPROVED STAMP LOST ITS SEAMS (Rev-785, embedded validation REV-183) \u2014 the watermark\u2019s outline lettering left small square notches wherever letter strokes joined, and Rich circled three of them: an artifact of drawing a stroke around each glyph, visible at this size and worse where the stamp crossed panel edges. The outline is gone. The stamp is now solid letters at very low opacity \u2014 no seams to render, quieter over the three panels, and the content underneath stays exactly as readable."] },
   { ts: "2026-08-01", rev: "App Rev-784", type: "App", changes: ["SELECT & STRETCH IS NOW ONE-AXIS ONLY (Rev-784, embedded validation REV-182) \u2014 corner handles stretched a lifted selection in both directions at once, which is wrong for the job this tool actually does on an engineering drawing: lengthening a dimension line or opening up a cramped callout wants ONE axis to move while the other stays put, and a corner drag distorts both. The corner handles are gone. Each edge of a selected patch now carries a grip at its midpoint \u2014 left and right stretch horizontally, top and bottom stretch vertically \u2014 and each grip moves only its own axis, never the other. Moving the patch is unchanged: drag anywhere inside it. The hint shown when a selection is lifted now describes the edge grips instead of the corners."] },
   { ts: "2026-08-01", rev: "App Rev-783", type: "App", changes: ["THE APPROVED STAMP NOW SPANS ALL THREE SECTIONS AT 20 DEGREES (Rev-783, embedded validation REV-181) \u2014 the watermark sat inside the middle workflow column only, so on a wide screen it read as a stamp on the reading card rather than on the feature. It now anchors to the container holding all three panels \u2014 reference image, workflow and ODS drawing \u2014 and stretches across the full width, with the type scaled up to suit the span and the angle changed from 30 to 20 degrees as asked. Everything else about it is unchanged: outline lettering so the content stays readable through it, mouse-transparent so nothing underneath becomes unclickable, named from the stored approval record, and shown only in the Step 6 walk."] },
