@@ -1614,7 +1614,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-803";
+const APP_REV = "Rev-804";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2066,7 +2066,29 @@ async function cpShotPush(){
 }
 // ===== end Rev-759 screenshot ===================================================
 
+// Rev-804: full-screen animated curtain shown across a self-update reload. Drawn immediately
+// before location.replace, and again at boot while the just-updated flag is present, so the
+// old page's last frame and the new page's first frame are the same calm screen.
+function cpUpdateCurtain(msg){
+  try{
+    let c = document.getElementById('cpUpdateCurtain');
+    if(!c){
+      c = document.createElement('div');
+      c.id = 'cpUpdateCurtain';
+      c.style.cssText = 'position:fixed; inset:0; z-index:2147483000; background:#2b0f10;'
+        + ' display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;';
+      c.innerHTML = '<div style="width:52px; height:52px; border:5px solid rgba(255,255,255,.25);'
+        + ' border-top-color:#fff; border-radius:50%; animation:cpUpSpin 0.9s linear infinite;"></div>'
+        + '<div id="cpUpdateCurtainMsg" style="color:#fff; font:800 17px system-ui; letter-spacing:.04em;"></div>'
+        + '<style>@keyframes cpUpSpin{to{transform:rotate(360deg)}}</style>';
+      document.body.appendChild(c);
+    }
+    const m = document.getElementById('cpUpdateCurtainMsg');
+    if(m) m.textContent = msg || 'Updating\u2026';
+  }catch(e){ console.warn('update curtain failed:', e); }
+}
 const CHANGE_LOG = [
+  { ts: "2026-08-01", rev: "App Rev-804", type: "App", changes: ["THE SELF-UPDATE BLINK IS NOW A PROPER UPDATING SCREEN (Rev-804) \u2014 when a tab on an older rev pulled the newer one, the cache-skipping reload (the Rev-526 cure for half-dead in-place rewrites) hit as a bare white blink \u2014 correct, but it read as a glitch. Now a full-screen curtain \u2014 dark red, spinner, \u2018Updating to Rev-NNN\u2026\u2019 \u2014 is painted one frame BEFORE the reload fires, and when the new rev boots with the just-updated flag present the same curtain is up instantly reading \u2018Now on Rev-NNN\u2019, holding about a second before fading out. The old page\u2019s last frame and the new page\u2019s first frame are the same calm screen, so the transition reads as one deliberate update instead of a flicker. The reload mechanism itself is untouched \u2014 only dressed."] },
   { ts: "2026-08-01", rev: "App Rev-803", type: "App", changes: ["THE UNDO BUTTON IS RED (Rev-803, embedded validation REV-199) \u2014 in the Feature Drawing editor the \u21a9 Undo button now wears the app\u2019s red with white text, standing apart from the neutral tool buttons around it \u2014 the one that takes something back should not look like the ones that add. Its greyed-out state keeps the existing opacity dimming, which reads correctly on the red."] },
   { ts: "2026-08-01", rev: "App Rev-802", type: "App", changes: ["PRECISION ZOOM ON EVERY GRAB, NOT JUST EDGE DOTS (Rev-802, embedded validation REV-198) \u2014 Rev-801 wired the 3\u00d7 zoom-on-grab to the edge handles only, and Rich found it by its absence: grabbing a white-out\u2019s body, the highlight, the crop box or a lifted selection did nothing. Now ANY grab of an existing mark zooms to 3\u00d7 anchored at the pointer \u2014 the area closest to the mouse is exactly what grows \u2014 and releasing restores the view, no-op if it never engaged. The one deliberate exception: DRAWING a new box (crop, white-out or selection sketch) stays un-zoomed, because zooming mid-sketch would move the target under the pen. The grab offsets are computed through odsToBase, which divides by the zoom, so the grabbed point stays pinned to the cursor through the transition \u2014 same maths that made the edge version safe."] },
   { ts: "2026-08-01", rev: "App Rev-801", type: "App", changes: ["PRECISION ZOOM ON EDGE GRABS (Rev-801, embedded validation REV-197) \u2014 placing an edge exactly meant zooming in by hand first, or nudging blind at 1\u00d7. Now grabbing ANY edge \u2014 a white-out\u2019s, the crop box\u2019s, or a selection\u2019s \u2014 zooms the view to 3\u00d7 anchored on the exact grab point, so the line lands big under the cursor and the edge stays pinned to it through the zoom; single-pixel placement becomes a normal drag. Release, and the view returns exactly where it was, so the flow of the work is not lost. Already zoomed to 3\u00d7 or closer, nothing changes and nothing snaps back. The maths rides odsToBase, which already divides by the zoom, so mid-drag geometry stays correct through the transition."] },
@@ -15659,6 +15681,10 @@ async function ghPullApp(silent, autoApply){
       // (GitHub token, customers, projects, master list) is fully preserved. This is what
       // lets a pinned tab move to a new rev with no re-download, no re-pin, no re-paste.
       ghSetStatus('Updating to ' + remoteRev + '…');
+      // Rev-804: the reload used to hit as a bare white blink. Draw the curtain FIRST, so
+      // the transition reads as one deliberate updating screen instead of a flicker.
+      cpUpdateCurtain('Updating to ' + remoteRev + '\u2026');
+      await new Promise(r => setTimeout(r, 60));   // one frame, so the curtain actually paints
       document.open();
       // Rev-526: in-place rewrite (document.write) is BANNED — in installed-app windows it
       // loads the new markup but silently never runs its JavaScript, leaving a half-dead page
@@ -19097,6 +19123,10 @@ try{ $('revFooter').textContent = `App ${APP_REV} · Built ${BUILD_DATE} ${BUILD
 if($('cpCardRev')) $('cpCardRev').textContent = APP_REV.toUpperCase() + ' · ' + BUILD_DATE + ' ' + BUILD_TIME;
 try{ $('brandRev').innerHTML = APP_REV.toUpperCase() + ' <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">' + BUILD_DATE + ' ' + BUILD_TIME + '</span>';}catch(e){}
 $('headerTitle').textContent = `CONTROL PLAN GENERATOR`;
+// Rev-804: landing from a self-update? keep the curtain up through boot, then fade it
+try{ if(localStorage.getItem('cpJustUpdatedTo')){ cpUpdateCurtain('Now on ' + APP_REV);
+  setTimeout(() => { const c = document.getElementById('cpUpdateCurtain');
+    if(c){ c.style.transition = 'opacity .35s'; c.style.opacity = '0'; setTimeout(() => c.remove(), 400); } }, 700); } }catch(e){ console.warn(e); }
 if($('headerRev')) $('headerRev').textContent = APP_REV + ' · ' + BUILD_DATE + ' ' + BUILD_TIME;
 try{ cpStartLogArchive(); }catch(e){ console.warn('log archiver did not start:', e); }   // Rev-756
 
