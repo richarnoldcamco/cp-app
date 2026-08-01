@@ -1614,7 +1614,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-770";
+const APP_REV = "Rev-771";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2067,6 +2067,7 @@ async function cpShotPush(){
 // ===== end Rev-759 screenshot ===================================================
 
 const CHANGE_LOG = [
+  { ts: "2026-08-01", rev: "App Rev-771", type: "App", changes: ["LEAVING THE STEP 6 WALK NO LONGER ASKS A QUESTION (Rev-771) \u2014 every exit from the inspection program threw up a panel asking whether to release the operation, including when the answer was obviously no because only 2 of 14 features had been looked at. A question asked at the wrong moment is just an obstacle, and one asked every time stops being read. Pressing \u2190 Control Plans now goes straight back to the steps screen. The release was NOT dropped with it \u2014 it is the only thing that writes the sign-off and takes Step 6 to 100%, so it moved to where there is actually something to decide: the Step 6 tile opens the program as before while any feature is still unapproved, and asks about releasing ONLY once every feature carries an approval. Already-released operations open the panel directly, as before, so a release can still be withdrawn. The tile\u2019s own tooltip now says this plainly rather than leaving the behaviour to be discovered."] },
   { ts: "2026-08-01", rev: "App Rev-770", type: "App", changes: ["BACK AND NEXT NOW PULSE IN SYNC (Rev-770, embedded validation REV-169) \u2014 the two buttons looked out of step, and the reason was not timing. They always shared one clock: Back was the SAME animation flipped horizontally with scaleX(-1), and flipping mirrors the ORDER of the arrows, so arrow one sat on the right for Back and on the left for Next. Identical timing, opposite-looking phase \u2014 which is why chasing the delays would never have fixed it. The flip is gone: Back now uses genuine left-pointing arrows with reversed delays, so the pair reads as one motion travelling outward from the middle. Alongside that, the arrows are 50% larger and the cycle is 30% slower \u2014 1.25 to 1.63 seconds \u2014 with the stagger scaled by the same amount so the chase keeps its shape rather than bunching up at the new speed."] },
   { ts: "2026-08-01", rev: "App Rev-769", type: "App", changes: ["THE RESUME QUESTION IS TWICE THE SIZE AND HAS A WAY OUT (Rev-769, embedded validation REV-168) \u2014 the \u2018you have been here before\u2019 panel was sized for a phone and sat small in the middle of a 1920-wide screen, and it offered only two doors: start at the beginning, or jump to the first unapproved feature. Both MOVE you. If neither was wanted there was nothing to press. The panel is now roughly twice as large throughout \u2014 heading, text and both choice buttons \u2014 so it can be read and hit without leaning in. A small red \u2715 Cancel sits on the far left, deliberately away from the two big buttons and deliberately smaller: it closes the question and leaves you exactly where you are, changing nothing. Sizing it down and separating it is the point \u2014 the escape should never be as easy to hit by accident as the two real choices."] },
   { ts: "2026-08-01", rev: "App Rev-768", type: "App", changes: ["FIX \u2014 DECIMAL PLACES WERE BEING THROWN AWAY BETWEEN SESSIONS (Rev-768, embedded validation REV-167) \u2014 Rich set WALL THICKNESS to four decimal places last session and found it back at three. The setting was not failing to save; it was saving to the WRONG PLACE. Decimal places were written into the validation app\u2019s own store, but the Step 6 walk REBUILDS the inspection program from the Control Plan every time it opens, so the rebuilt program never carried them \u2014 the same shape of fault as reference images before Rev-506, and invisible from the code alone because the save genuinely ran. Decimal places now write through to the plan itself, keyed by balloon number, and are re-applied whenever the program is built, so a choice survives closing the app and reaches other devices with everything else. If that write is ever refused, it says so in red rather than silently reverting later. Alongside it, small changes now confirm themselves: a compact green \u2713 Saved pill pops up briefly and fades, instead of a full-width banner that reads like something needing attention. The hint under the picker used to read \u2018Saved to this feature when you tap Next or Exit\u2019 \u2014 which was the behaviour that lost the setting \u2014 and now reads that it saves the moment you change it, because it does."] },
@@ -4427,8 +4428,9 @@ function renderProjects(){
         (st.s6.done
           ? ('STEP 6 \u2014 reviewed by ' + ((p.inspReviewed && p.inspReviewed.who) || 'someone') + '.\n'
              + 'Open it again to re-check, or to withdraw the release.')
-          : 'STEP 6 \u2014 walk the inspection program the machinist will actually run, tweak what needs '
-            + 'tweaking, then mark it ready for production.'),
+          : ('STEP 6 \u2014 walk the inspection program the machinist will actually run, tweak what needs '
+            + 'tweaking, and approve each feature as you go. Once every feature is approved, this button '
+            + 'asks whether to release the operation to production.')),
         () => cpReviewInspection(i));
 
       // Rev-620: built here, hung on its own row below
@@ -5071,6 +5073,15 @@ async function cpReviewInspection(idx){
   // looked at yet. Releasing belongs at the END of the walk, not in front of it. Clicking Step 6
   // goes straight into the inspection program; the release is offered when you come back out.
   if(p.inspReviewed && p.inspReviewed.when){ cpStep6Release(idx, true); return; }
+  // Rev-771: the release is no longer thrown up every time you leave the walk. It is
+  // asked ONCE, when there is actually something to release: every feature approved.
+  // Until then the tile just opens the program, which is what Step 6 is for.
+  try{
+    const rows = (((p.builderState || {}).rows) || []).filter(r => String(r.bubble || '').trim());
+    const feat = p.step6Feat || {};
+    const approved = rows.filter(r => feat[String(r.bubble).trim()]).length;
+    if(rows.length && approved >= rows.length){ cpStep6Release(idx); return; }
+  }catch(e){ console.warn('Could not count approvals:', e); }
   window._cpStep6Walk = idx;
   createMachinistValidation(idx);
 }
@@ -5218,9 +5229,9 @@ function openMachinistValidationPanel(html, part, rev, featCount, hadImage, part
   back.textContent = '\u2190 Control Plans';
   back.style.cssText = 'position:fixed; top:7px; left:10px; z-index:100002; background:#7a1414; color:#fff; border:none; border-radius:6px; font-weight:800; padding:7px 12px; cursor:pointer; font-size:13px; box-shadow:0 2px 6px rgba(0,0,0,.3);';
   back.onclick = () => { panel.remove();
-    // Rev-761: coming back out of a Step 6 walk is the moment to offer the release
-    try{ if(window._cpStep6Walk != null){ const j = window._cpStep6Walk; window._cpStep6Walk = null;
-      setTimeout(() => { try{ cpStep6Release(j); }catch(e){ console.warn('release prompt failed:', e); } }, 300); } }catch(e){ console.warn(e); }
+    // Rev-771: leaving the walk now goes STRAIGHT back to the steps screen. The release
+    // question moved onto the Step 6 tile itself - see cpReviewInspection.
+    try{ window._cpStep6Walk = null; }catch(e){ console.warn(e); }
   };
 
   panel.appendChild(frame); panel.appendChild(back);
