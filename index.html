@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-467 · Built Jul 15, 2026</span>
+    <span id="revFooter">App Rev-787 · Built Aug 1, 2026</span>
   </div>
 </div>
 
@@ -1614,7 +1614,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-786";
+const APP_REV = "Rev-787";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2067,6 +2067,7 @@ async function cpShotPush(){
 // ===== end Rev-759 screenshot ===================================================
 
 const CHANGE_LOG = [
+  { ts: "2026-08-01", rev: "App Rev-787", type: "App", changes: ["FIX \u2014 ONE MORE STALE STATIC REV: THE FOOTER (Rev-787) \u2014 the Rev-786 sweep claimed the stale hand-typed rev strings were gone and its own verification immediately found a fourth: the page footer\u2019s static text still read App Rev-467, Built Jul 15 \u2014 the same flash-then-corrected pattern as the header badge, at the bottom of the page. Now stamped with the current rev, and the ship procedure covers all FOUR static locations from here on: title, brand badge, headerRev and revFooter."] },
   { ts: "2026-08-01", rev: "App Rev-786", type: "App", changes: ["FIX \u2014 THE REV-567 FLASH ON EVERY LOAD (Rev-786) \u2014 Rich asked why REV-567 still flashes in the top-left. Because it is literally written there: the header badge\u2019s STATIC text was hand-typed at Rev-567 on July 27 and never bumped again, the page title likewise, and a second badge (headerRev) still said Rev-467 from July 15. The Rev-627 self-correcting stamp rewrites all of them at boot from APP_REV and the real GitHub publish time \u2014 which is exactly why the stale text only ever appeared as a flash, and why 218 revisions of the ship procedure never caught it: the boot correction papered over the drift on every load. All three static strings now read Rev-786, and the ship procedure from this revision on stamps the title and both badges\u2019 static text alongside APP_REV, so what flashes before the script runs is the truth, not an archaeology exhibit. The build-stamp self-correction stays \u2014 it remains the authority once booted."] },
   { ts: "2026-08-01", rev: "App Rev-785", type: "App", changes: ["THE APPROVED STAMP LOST ITS SEAMS (Rev-785, embedded validation REV-183) \u2014 the watermark\u2019s outline lettering left small square notches wherever letter strokes joined, and Rich circled three of them: an artifact of drawing a stroke around each glyph, visible at this size and worse where the stamp crossed panel edges. The outline is gone. The stamp is now solid letters at very low opacity \u2014 no seams to render, quieter over the three panels, and the content underneath stays exactly as readable."] },
   { ts: "2026-08-01", rev: "App Rev-784", type: "App", changes: ["SELECT & STRETCH IS NOW ONE-AXIS ONLY (Rev-784, embedded validation REV-182) \u2014 corner handles stretched a lifted selection in both directions at once, which is wrong for the job this tool actually does on an engineering drawing: lengthening a dimension line or opening up a cramped callout wants ONE axis to move while the other stays put, and a corner drag distorts both. The corner handles are gone. Each edge of a selected patch now carries a grip at its midpoint \u2014 left and right stretch horizontally, top and bottom stretch vertically \u2014 and each grip moves only its own axis, never the other. Moving the patch is unchanged: drag anywhere inside it. The hint shown when a selection is lifted now describes the edge grips instead of the corners."] },
