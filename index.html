@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-786</title>
+<title>CONTROL PLAN GENERATOR - Rev-829</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-786 · 2026-08-01 3:52 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-829 · 2026-08-02 4:47 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-786 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-01 3:52 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-829 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-02 4:47 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-787 · Built Aug 1, 2026</span>
+    <span id="revFooter">App Rev-829 · Built Aug 2, 2026</span>
   </div>
 </div>
 
@@ -1614,7 +1614,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-828";
+const APP_REV = "Rev-829";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2088,6 +2088,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-02", rev: "App Rev-829", type: "App", changes: ["FIX — THE REV-786 FLASH, BECAUSE REV-786’S FIX FIXED THE NUMBERS AND NOT THE PROCEDURE (Rev-829) — the four static rev locations (title, brand badge, headerRev, footer) were stamped once at Rev-786/787 and then frozen for forty-two revisions, because the ship procedure never actually gained the stamping step it promised — the boot self-correction papered over the drift on every load, exactly as before. Structural cure this time: the build stamps all four locations by PATTERN — any rev number in those spots is rewritten to the current rev — and an assertion refuses to push if any static stamp disagrees with APP_REV, so drift now fails the build instead of flashing at Rich. First attempt of this very fix died on a bad escape in the replacement template and got caught by the same live verification it was installing."] },
   { ts: "2026-08-02", rev: "App Rev-828", type: "App", changes: ["THE REFERENCE IMAGE ZOOMS UNDER THE WHEEL (Rev-828, embedded validation REV-221) \u2014 the finished reference on the entry screen was fixed-size; checking a small callout meant opening the editor. The preview now zooms with the mouse wheel, anchored on the pointer \u2014 the spot under the cursor is what grows \u2014 up to the same 16\u00d7 as the editor, with left-drag panning while zoomed (grab cursor), double-click to reset, and the image clipped to its card. View-only by construction: it is the same saved picture looked at closer, and nothing on this path can alter it."] },
   { ts: "2026-08-02", rev: "App Rev-827", type: "App", changes: ["SELECT & STRETCH: EDGES ONLY, NO MORE MOVE (Rev-827, embedded validation REV-220) \u2014 the cross Rich kept seeing was the four-arrow MOVE cursor over the patch body, advertising a function he never wants and inviting exactly the accidental shifts the Rev-825 dead-zone was patched around. Move-by-drag is deleted outright: clicking a patch only SELECTS it, the cursor stays normal, and the edge grips are the whole interface \u2014 drag a grip, one axis moves, done. Selecting is no longer an Undo step either, since it changes nothing. Arrow-key nudging stays as the silent precise escape hatch. Simplest tool wins: the failure mode is not guarded against, it is gone."] },
   { ts: "2026-08-02", rev: "App Rev-826", type: "App", changes: ["\U0001f4a7 COLOUR EYEDROPPER FOR THE PIXEL PENCIL (Rev-826, embedded validation REV-219) \u2014 the pencil offered black or white; Rich asked to match colours EXACTLY. A \U0001f4a7 Match button now sits beside \u25a0/\u25a1: press it, click the exact spot on the drawing, and the pencil takes that pixel\u2019s true colour \u2014 sampled from the image raster itself at natural resolution \u2014 so greys, anti-aliased edges and any scanned tone are matchable, not approximated. The button tints to the loaded colour with the red active ring, the hex is announced in the banner, and picking \u25a0 or \u25a1 returns to pure black or white. The sample canvas is built once per editor session and reset per feature. Pixels always stored their colour per entry, so saved files and history carry matched colours with no format change."] },
@@ -2793,7 +2794,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-02";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "4:47 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
