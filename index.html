@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-836</title>
+<title>CONTROL PLAN GENERATOR - Rev-837</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-836 · 2026-08-02 6:27 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-837 · 2026-08-02 6:47 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-836 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-02 6:27 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-837 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-02 6:47 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-836 · Built Aug 2, 2026</span>
+    <span id="revFooter">App Rev-837 · Built Aug 2, 2026</span>
   </div>
 </div>
 
@@ -1614,7 +1614,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-836";
+const APP_REV = "Rev-837";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2088,6 +2088,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-02", rev: "App Rev-837", type: "App", changes: ["THE UPDATE BLINK, ACTUALLY KILLED THIS TIME (Rev-837) — Rich asked why the app blinks while waiting for a new rev. Two mechanisms, read from the code: document.open() was wiping the page — Rev-804’s curtain included — before the reload even began; and when GitHub Pages was still serving the older copy, the app booted old, flashed Now-on over the old rev, faded, and retried 45 seconds later — blink, blink, blink until the site caught up. Both cured: the vestigial wipe is deleted so the curtain survives into the navigation, and boot now compares the wanted rev against the one that actually loaded — still older, and ONE continuous Publishing curtain stays up while retries happen invisibly behind it, fading only when the new rev truly arrives, with a 60-second give-up so it can never stick. The update experience is now: one calm screen, then the new rev."] },
   { ts: "2026-08-02", rev: "App Rev-836", type: "App", changes: ["64× ZOOM (Rev-836, embedded validation REV-226) — the ceiling doubled a third time on request, 32× to 64×, in all six zoom paths, for single-pixel pencil work where one image cell now spans roughly a fingertip of screen. The true-grid pixelated view and the constant-1-screen-pixel editing marks carry all the way up, so precision holds at the extreme. Verified live in both repos before this entry."] },
   { ts: "2026-08-02", rev: "App Rev-835", type: "App", changes: ["SELECT & STRETCH: DRAG ANYWHERE, THE NEAREST EDGE FOLLOWS (Rev-835, embedded validation REV-225) — hunting a 6-pixel grip after every lift was the cumbersome part. With a selection made, dragging ANYWHERE now pulls its nearest edge — whole screen as the handle, one axis at a time by whichever edge sits closest to the pointer, with the precision zoom on grab and an Undo step per drag. Enter sets the patch and Esc deselects, and only then does a drag draw a fresh selection — a clean two-phase flow: sketch, then shape. The grips remain visible as indicators and still work directly. Shipped atomically, feature verified live in both repos before this entry."] },
   { ts: "2026-08-02", rev: "App Rev-834", type: "App", changes: ["32× ZOOM AND THE 40-STATE HISTORY WITH A SIZE BUDGET (Rev-834, embedded validation REV-224) — two changes on Rich’s GO, shipped atomically. Zoom: the ceiling doubled again, 16× to 32×, in all six zoom paths — wheel, buttons, Zoom to crop, Enter, restore, and the reference preview — so single pixels are big, easy targets for the pencil; the true-grid pixelated view carries through. History: every feature’s cross-session undo now keeps up to 40 saved states, guarded by a 300 KB per-feature byte budget that drops the oldest states first when pencil-heavy work would bloat the plan — a light feature keeps all 40, a pixel-heavy one keeps what fits, and the browser’s storage quota can never be threatened by history. Verified live in both repos before this entry was written."] },
@@ -2801,7 +2802,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-02";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "6:27 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "6:47 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -15720,7 +15721,9 @@ async function ghPullApp(silent, autoApply){
       // the transition reads as one deliberate updating screen instead of a flicker.
       cpUpdateCurtain('Updating to ' + remoteRev + '\u2026');
       await new Promise(r => setTimeout(r, 60));   // one frame, so the curtain actually paints
-      document.open();
+      // Rev-837: the wipe is gone - document.open() blanked the page, CURTAIN INCLUDED,
+      // before the reload even began, which was the white blink. The curtain now stays
+      // painted until the navigation itself takes over.
       // Rev-526: in-place rewrite (document.write) is BANNED — in installed-app windows it
       // loads the new markup but silently never runs its JavaScript, leaving a half-dead page
       // (new badge, dead buttons, stale footer). Every update now applies the way
@@ -19159,9 +19162,22 @@ if($('cpCardRev')) $('cpCardRev').textContent = APP_REV.toUpperCase() + ' · ' +
 try{ $('brandRev').innerHTML = APP_REV.toUpperCase() + ' <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">' + BUILD_DATE + ' ' + BUILD_TIME + '</span>';}catch(e){}
 $('headerTitle').textContent = `CONTROL PLAN GENERATOR`;
 // Rev-804: landing from a self-update? keep the curtain up through boot, then fade it
-try{ if(localStorage.getItem('cpJustUpdatedTo')){ cpUpdateCurtain('Now on ' + APP_REV);
+try{ if(localStorage.getItem('cpJustUpdatedTo')){
+  // Rev-837: if the site is still serving the OLDER rev (publishing lag), keep ONE
+  // continuous curtain up while the retries happen behind it - no blink cycles. It
+  // fades when the wanted rev truly arrives, and gives up after 60s so it can never stick.
+  const _want = localStorage.getItem('cpJustUpdatedTo') || '';
+  const _wn = parseInt((_want.match(/\d+/) || ['0'])[0]);
+  const _ln = parseInt((APP_REV.match(/\d+/) || ['0'])[0]);
+  if(_ln < _wn){
+    cpUpdateCurtain('Publishing ' + _want + ' \u2014 the site is catching up\u2026');
+    setTimeout(() => { const c = document.getElementById('cpUpdateCurtain');
+      if(c){ c.style.transition = 'opacity .35s'; c.style.opacity = '0'; setTimeout(() => c.remove(), 400); }
+      try{ localStorage.removeItem('cpJustUpdatedTo'); }catch(_){ } }, 60000);
+  } else {
+  cpUpdateCurtain('Now on ' + APP_REV);
   setTimeout(() => { const c = document.getElementById('cpUpdateCurtain');
-    if(c){ c.style.transition = 'opacity .35s'; c.style.opacity = '0'; setTimeout(() => c.remove(), 400); } }, 700); } }catch(e){ console.warn(e); }
+    if(c){ c.style.transition = 'opacity .35s'; c.style.opacity = '0'; setTimeout(() => c.remove(), 400); } }, 700); } } }catch(e){ console.warn(e); }
 if($('headerRev')) $('headerRev').textContent = APP_REV + ' · ' + BUILD_DATE + ' ' + BUILD_TIME;
 try{ cpStartLogArchive(); }catch(e){ console.warn('log archiver did not start:', e); }   // Rev-756
 
