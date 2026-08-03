@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-871</title>
+<title>CONTROL PLAN GENERATOR - Rev-872</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-871 · 2026-08-03 6:58 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-872 · 2026-08-03 7:31 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-871 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 6:58 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-872 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 7:31 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-871 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-872 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -622,7 +622,7 @@
   <div style="font-weight:800; letter-spacing:.06em; color:#7a1a1c; margin:14px 0 4px;">TRAVELLER <span style="font-weight:400; font-size:12px; color:#6b6257;">(required the first time a part is created — the routing that lists its operations)</span></div>
   <div id="travDrop" style="border:2px dashed #b8a; border-color:#b89; border-radius:10px; background:#fff; padding:14px; text-align:center; cursor:pointer;">
     <span id="travDropLabel">📄 Tap to upload the traveller (image or PDF)</span>
-    <div id="travPasteHint" style="font-size:12px; color:#6b6257; margin-top:6px;">…or press <b>Ctrl+V</b> to paste a copied image</div>   <!-- Rev-871 -->
+    <div id="travPasteHint" style="font-size:12px; color:#6b6257; margin-top:6px;">Tap to load <b>every page</b> and sew them into one · or press <b>Ctrl+V</b> to paste a single copied page</div>   <!-- Rev-872 -->
     <img id="travThumb" style="display:none; max-height:120px; margin:8px auto 0; border:1px solid #ccc; border-radius:6px;">
   </div>
   <input id="travFile" type="file" accept="image/*,.pdf" style="display:none">
@@ -1615,7 +1615,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-871";
+const APP_REV = "Rev-872";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2128,6 +2128,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-872", type: "App", changes: ["THE NEW-PLAN TRAVELLER BOX OPENS THE REAL TRAVELLER STUDIO (Rev-872, embedded validation REV-255) — Rich pasted a traveller on the new plan screen and asked where the stitching went. It was never on this box: it opened a bare file picker - one image, no pages, no sewing - while the traveller screen reached from the Control Plans list opens the full studio with load every page, sew pages into one, nudge, trim and background. A traveller is nearly always more than one page, so the bare picker was simply the wrong door. Tapping the box now opens that same studio, keyed to the Part Number typed on the form, and whatever it saves is pulled straight back onto the form thumbnail - so the plan is created with the sewn traveller, not a single page of it. With the Part Number still blank there is no key to file the traveller under, so the old picker stands in and says why; the pages can be sewn later from the Control Plans list. Ctrl+V still takes a single pasted page for speed and now says outright that tapping the box is how to add the rest. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-871", type: "App", changes: ["ODS SECTION OFF THE NEW PLAN SCREEN; THE TRAVELLER TAKES A PASTE (Rev-871, embedded validation REV-255) — two from Rich. The ODS Drawing section and its Input Files heading are gone from NEW CONTROL PLAN - the ODS belongs to Step 2 on the operation screen and asking for it twice only invited the two copies to disagree. It is hidden rather than deleted: its inner controls (the drop zone, the file input, enhance, add balloons, download ballooned, drawing revisions) are wired by name from other parts of the app, and ripping the nodes out would strand those references for no visible gain. Step 2 is unaffected - it opens its own image studio and never touched these controls. Second, the traveller drop zone now takes Ctrl+V like every other upload in the app, with the hint said on screen. The listener sits on the document, because a div cannot hold focus to receive a paste, and it acts only while the New Control Plan screen is the one on show and the traveller section is visible - pasting into a text field, or on any other screen, is untouched. Verified live in both repos before this entry."] },
   { ts: "2026-08-02", rev: "App Rev-870", type: "App", changes: ["STEP 6 NOW SAYS WHICH HALF OF IT IS LEFT (Rev-870, embedded validation REV-255) — Rich approved every row and the Step 6 tile still read DO THIS NEXT, which reads as nothing done. Step 6 is two acts - approve every feature, then mark the operation ready for production - and only the second writes the sign-off, so the tile was telling the truth in the least useful way. It now reports which half is outstanding, counted from the stored plan rather than assumed: ROWS DONE, MARK READY when every ballooned row carries an approval and the release is still outstanding, shown in green so it reads as finished work waiting on one action; APPROVING n of total while the walk is part way through; and the old DO THIS NEXT only when nothing has been approved at all. Its tooltip says the same thing in full - all rows approved, not yet released, releasing is what completes the step. Verified live in both repos before this entry."] },
   { ts: "2026-08-02", rev: "App Rev-869", type: "App", changes: ["THE WALK NOW ENDS AT THE RELEASE, WHICH IS WHAT ACTUALLY COMPLETES STEP 6 (Rev-869, embedded validation REV-255) — Rich approved all 14 features and asked why Step 6 still read DO THIS NEXT at 85 percent. Read from the code rather than assumed: approving features records approvals, but the ONLY thing that writes the sign-off (inspReviewed, with the name and the date) and takes Step 6 to 100 percent is Mark ready for production in the release prompt. Those are two separate acts and the second one was left to be discovered. Now, when the last feature is approved and the panel closes, the release prompt is raised automatically - the walk ends where the decision is. Guarded so it cannot misfire or loop: the approval count is read back from the STORED plan, not taken on the walk's word, and the prompt is only raised when every ballooned row genuinely carries an approval; in any other state nothing happens rather than risk reopening the walk. Not yet, Fix a balloon's pin and Open it again all still work from that prompt exactly as before. Verified live in both repos before this entry."] },
@@ -2876,7 +2877,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "6:58 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:31 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6069,7 +6070,27 @@ function cpTravellerWire(){
     if(rem) rem.style.display = img ? 'inline-block' : 'none';
     if(lab) lab.textContent = img ? '📄 Traveller attached ✓ (tap to replace)' : '📄 Tap to upload the traveller (image or PDF)';
   };
-  drop.onclick = () => file && file.click();
+  /* Rev-872: this box used to open a bare file picker - one image, no pages, no stitching -
+     while the traveller screen reached from the Control Plans list opens the full studio
+     (load every page, sew them into one, nudge, trim). A traveller is nearly always more than
+     one page, so the bare picker was the wrong door. Tapping the box now opens that same
+     studio, keyed to the part number on this form, and what it saves is pulled straight back
+     onto the form. With the part number still blank there is no key to save under, so the
+     old picker stands in and the pages can be stitched later from the Control Plans list. */
+  drop.onclick = async () => {
+    const pn = (($('cpPartNum') && $('cpPartNum').value) || '').trim().toUpperCase();
+    if(!pn){
+      try{ flash('Enter the Part Number first \u2014 the traveller is filed under it', true); }catch(_){ }
+      if(file) file.click();
+      return;
+    }
+    if(typeof cpTravellerPick !== 'function'){ if(file) file.click(); return; }
+    try{
+      await cpTravellerPick(pn);
+      const d = await _idbGetDrawing(pn + '::TRAVELLER');
+      if(d && d.odsImage) show(d.odsImage);
+    }catch(e){ console.warn('traveller studio failed:', e); if(file) file.click(); }
+  };
   /* Rev-871: Ctrl+V pastes the traveller, the way every other upload on this app does.
      The listener sits on the document because a div cannot take focus to receive a paste,
      and it only acts when the New Control Plan screen is the one on show and the traveller
@@ -6088,7 +6109,8 @@ function cpTravellerWire(){
             const blob = items[i].getAsFile(); if(!blob) continue;
             ev.preventDefault();
             const r = new FileReader();
-            r.onload = () => { show(String(r.result)); try{ flash('\u2713 Traveller pasted'); }catch(_){ } };
+            r.onload = () => { show(String(r.result));
+              try{ flash('\u2713 Traveller pasted \u2014 tap the box for more pages or to sew them together'); }catch(_){ } };
             r.onerror = () => { try{ flash('Could not read the pasted image', true); }catch(_){ } };
             r.readAsDataURL(blob);
             return;
