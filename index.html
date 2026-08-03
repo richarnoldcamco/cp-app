@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-874</title>
+<title>CONTROL PLAN GENERATOR - Rev-875</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-874 · 2026-08-03 7:35 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-875 · 2026-08-03 7:38 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-874 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 7:35 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-875 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 7:38 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-874 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-875 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -1615,7 +1615,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-874";
+const APP_REV = "Rev-875";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2093,6 +2093,7 @@ function cpUpdateCurtain(msg){
         +   '<div class="cpUpCore">CP</div>'
         + '</div>'
         + '<div id="cpUpdateCurtainMsg" class="cpUpMsg"></div>'
+        + '<div id="cpUpdateCurtainTimer" style="color:#ffd54a; font:800 30px system-ui; letter-spacing:.08em; font-variant-numeric:tabular-nums;">0:00</div>'   /* Rev-875 */
         + '<div class="cpUpBar"><i></i></div>'
         + '<style>'
         + '@keyframes cpUpSpin{to{transform:rotate(360deg)}}'
@@ -2125,9 +2126,24 @@ function cpUpdateCurtain(msg){
     }
     const m = document.getElementById('cpUpdateCurtainMsg');
     if(m) m.textContent = msg || 'Updating\u2026';
+    /* Rev-875: a live clock under the message. It answers the only question this screen
+       raises - how long has this been going - and makes a stall visible: the publish wait
+       gives up at 60 seconds, so a reader can see where they stand against that. Counts
+       from when the curtain FIRST went up, not from each message change, and one interval
+       only - re-entering here re-uses it. Gold, tabular digits so it does not wobble. */
+    if(!window._cpUpCurtainT0){
+      window._cpUpCurtainT0 = Date.now();
+      window._cpUpCurtainTick = setInterval(function(){
+        const el = document.getElementById('cpUpdateCurtainTimer');
+        if(!el){ clearInterval(window._cpUpCurtainTick); window._cpUpCurtainTick = null; window._cpUpCurtainT0 = null; return; }
+        const t = Math.floor((Date.now() - window._cpUpCurtainT0)/1000);
+        el.textContent = Math.floor(t/60) + ':' + String(t%60).padStart(2,'0');
+      }, 250);
+    }
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-875", type: "App", changes: ["A CLOCK ON THE PUBLISHING SCREEN (Rev-875, embedded validation REV-255) — Rich asked for a timer on the update curtain. A live elapsed clock now sits between the message and the sweep bar - gold, 30px, tabular digits so it does not wobble as it counts - reading 0:00 upward from the moment the curtain first went up, not from each message change. It answers the only question that screen raises, how long has this been going, and makes a stall visible: the publish wait gives up at 60 seconds, so the reader can see where they stand against that. The interval cleans itself up when the curtain leaves with the reload, and re-entering the curtain re-uses the same clock rather than stacking a second one. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-874", type: "App", changes: ["SAVING THE TRAVELLER NO LONGER OPENS THE VIEWER OVER YOUR SCREEN (Rev-874, embedded validation REV-255) — Rich saved a traveller from the new plan form and a full-screen read-only viewer of it appeared, and he asked why. It was deliberate once: when the studio was only reachable from the Control Plans list, popping the viewer after save was the proof that the sew landed. But you have JUST been looking at the stitched preview inside the studio, so being shown the same thing again - over the form you were in the middle of filling in - reads as a screen appearing for no reason. The save now finishes with the confirmation flash and the form thumbnail; the viewer opens only when asked for, from View Traveller on the Control Plans list. This applies wherever the traveller is saved from, since the launch-from-list case had the same double-show. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-873", type: "App", changes: ["THE ADD ANOTHER PAGE STRIP IS TWICE AS TALL (Rev-873, embedded validation REV-255) — Rich asked for the collapsed ADD ANOTHER PAGE strip in the traveller studio to be 100 percent taller. It collapses to a sliver on purpose - Rev-577 hands the height to the drawing once a page is loaded - but 7px of padding made it a hard target to tap and a harder one to drag a file onto. Its padding is doubled to 14px top and bottom and the label goes up from 11px to 13px, roughly doubling the strip. Still far shy of the full instruction box, so the drawing keeps the room the collapse won it. The pre-load state, where the box shows its full instructions, is unchanged. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-872", type: "App", changes: ["THE NEW-PLAN TRAVELLER BOX OPENS THE REAL TRAVELLER STUDIO (Rev-872, embedded validation REV-255) — Rich pasted a traveller on the new plan screen and asked where the stitching went. It was never on this box: it opened a bare file picker - one image, no pages, no sewing - while the traveller screen reached from the Control Plans list opens the full studio with load every page, sew pages into one, nudge, trim and background. A traveller is nearly always more than one page, so the bare picker was simply the wrong door. Tapping the box now opens that same studio, keyed to the Part Number typed on the form, and whatever it saves is pulled straight back onto the form thumbnail - so the plan is created with the sewn traveller, not a single page of it. With the Part Number still blank there is no key to file the traveller under, so the old picker stands in and says why; the pages can be sewn later from the Control Plans list. Ctrl+V still takes a single pasted page for speed and now says outright that tapping the box is how to add the rest. Verified live in both repos before this entry."] },
@@ -2879,7 +2895,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:35 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:38 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
