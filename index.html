@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-857</title>
+<title>CONTROL PLAN GENERATOR - Rev-858</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-857 · 2026-08-02 9:19 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-858 · 2026-08-02 9:21 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-857 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-02 9:19 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-858 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-02 9:21 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-857 · Built Aug 2, 2026</span>
+    <span id="revFooter">App Rev-858 · Built Aug 2, 2026</span>
   </div>
 </div>
 
@@ -1614,7 +1614,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-857";
+const APP_REV = "Rev-858";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2075,12 +2075,51 @@ function cpUpdateCurtain(msg){
     if(!c){
       c = document.createElement('div');
       c.id = 'cpUpdateCurtain';
-      c.style.cssText = 'position:fixed; inset:0; z-index:2147483000; background:#2b0f10;'
-        + ' display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;';
-      c.innerHTML = '<div style="width:52px; height:52px; border:5px solid rgba(255,255,255,.25);'
-        + ' border-top-color:#fff; border-radius:50%; animation:cpUpSpin 0.9s linear infinite;"></div>'
-        + '<div id="cpUpdateCurtainMsg" style="color:#fff; font:800 17px system-ui; letter-spacing:.04em;"></div>'
-        + '<style>@keyframes cpUpSpin{to{transform:rotate(360deg)}}</style>';
+      // Rev-858: the curtain was one flat maroon field and one white spinner - correct, but bleak
+      // for a screen you sit and watch. Now a slowly drifting red gradient, a warm glow behind
+      // three counter-rotating rings in the CAMCO red / gold / green, a pulsing CP core and a
+      // colour sweep bar. Still one self-contained element with inline CSS, so it paints in the
+      // single frame before the reload exactly as before.
+      c.style.cssText = 'position:fixed; inset:0; z-index:2147483000; overflow:hidden;'
+        + ' background:linear-gradient(135deg,#2b0f10 0%,#5d1c1f 32%,#3a1214 62%,#1d0b0c 100%);'
+        + ' background-size:400% 400%; animation:cpUpBg 9s ease-in-out infinite;'
+        + ' display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px;';
+      c.innerHTML = '<div class="cpUpGlow"></div>'
+        + '<div class="cpUpRings">'
+        +   '<div class="cpUpRing cpUpR1"></div>'
+        +   '<div class="cpUpRing cpUpR2"></div>'
+        +   '<div class="cpUpRing cpUpR3"></div>'
+        +   '<div class="cpUpCore">CP</div>'
+        + '</div>'
+        + '<div id="cpUpdateCurtainMsg" class="cpUpMsg"></div>'
+        + '<div class="cpUpBar"><i></i></div>'
+        + '<style>'
+        + '@keyframes cpUpSpin{to{transform:rotate(360deg)}}'
+        + '@keyframes cpUpSpinBack{to{transform:rotate(-360deg)}}'
+        + '@keyframes cpUpBg{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}'
+        + '@keyframes cpUpPulse{0%,100%{opacity:.6}50%{opacity:1}}'
+        + '@keyframes cpUpBeat{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.08);opacity:1}}'
+        + '@keyframes cpUpHalo{0%,100%{transform:scale(1);opacity:.22}50%{transform:scale(1.18);opacity:.48}}'
+        + '@keyframes cpUpSweep{0%{left:-45%}100%{left:100%}}'
+        + '.cpUpGlow{position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;'
+        +   'border-radius:50%;pointer-events:none;filter:blur(6px);animation:cpUpHalo 4.5s ease-in-out infinite;'
+        +   'background:radial-gradient(circle,rgba(255,213,74,.30) 0%,rgba(179,37,44,.26) 42%,rgba(0,0,0,0) 70%)}'
+        + '.cpUpRings{position:relative;width:132px;height:132px}'
+        + '.cpUpRing{position:absolute;border-radius:50%;border:5px solid transparent}'
+        + '.cpUpR1{inset:0;border-top-color:#e6483f;border-right-color:#e6483f;animation:cpUpSpin 1.15s linear infinite}'
+        + '.cpUpR2{inset:17px;border-bottom-color:#ffd54a;border-left-color:#ffd54a;animation:cpUpSpinBack 1.75s linear infinite}'
+        + '.cpUpR3{inset:34px;border-top-color:#4fb477;border-right-color:#4fb477;animation:cpUpSpin 2.5s linear infinite}'
+        + '.cpUpCore{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;'
+        +   'color:#fff;font:900 25px system-ui;letter-spacing:.10em;animation:cpUpBeat 2.1s ease-in-out infinite}'
+        + '.cpUpMsg{color:#fff;font:800 17px system-ui;letter-spacing:.05em;text-align:center;padding:0 18px;'
+        +   'text-shadow:0 2px 12px rgba(0,0,0,.55);animation:cpUpPulse 2.4s ease-in-out infinite}'
+        + '.cpUpBar{position:relative;width:340px;max-width:62vw;height:6px;border-radius:99px;'
+        +   'background:rgba(255,255,255,.13);overflow:hidden}'
+        + '.cpUpBar i{position:absolute;top:0;bottom:0;width:45%;border-radius:99px;'
+        +   'background:linear-gradient(90deg,rgba(0,0,0,0),#e6483f,#ffd54a,#4fb477,rgba(0,0,0,0));'
+        +   'animation:cpUpSweep 1.6s ease-in-out infinite}'
+        + '@media (prefers-reduced-motion:reduce){.cpUpRing,.cpUpCore,.cpUpMsg,.cpUpGlow,.cpUpBar i{animation-duration:6s}}'
+        + '</style>';
       document.body.appendChild(c);
     }
     const m = document.getElementById('cpUpdateCurtainMsg');
@@ -2088,6 +2127,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-02", rev: "App Rev-858", type: "App", changes: ["THE PUBLISHING SCREEN IS NOT BLEAK ANY MORE (Rev-858, embedded validation REV-246) — Rich sits and watches this screen while a new rev publishes, and it was one flat maroon field with one white spinner - two colours, one animation. It now carries a red gradient that drifts slowly across the whole screen, a warm gold-and-red halo breathing behind the centre, THREE counter-rotating rings in the CAMCO colours (red outer, gold middle turning the other way, green inner), a CP mark pulsing at the core, the message text breathing under it, and a colour sweep bar running red-gold-green underneath. It is still one self-contained element with its CSS inline, so it paints in the single frame before the reload exactly as it did - the update mechanism is untouched, only dressed. Motion is slowed right down for anyone whose system asks for reduced motion."] },
   { ts: "2026-08-02", rev: "App Rev-857", type: "App", changes: ["WHITE-OUT SIDES ARE GRABBABLE AGAIN (Rev-857, embedded validation REV-246) — Rich could not grab the sides of a selected white-out to resize it. Two causes, both fixed. The four edge grips were the last thing in the editor still measured in IMAGE units: they sit inside the element that carries the zoom, so a 14px grip rendered as 14 times the zoom on screen - hundreds of pixels at deep zoom, sticking far outside the visible box and overlapping each other, so the strip under the cursor was rarely the edge being aimed at. They are now a constant 14 SCREEN pixels straddling the edge, like every other editing mark. Second, on a white-out that was already selected a plain drag MOVED the box, so aiming near an edge and pulling shifted the whole thing instead of resizing it. Dragging anywhere on a selected white-out now pulls its NEAREST EDGE - exactly what a selected patch has done since REV-225 - so resizing no longer depends on hitting a grip at all. Hold SHIFT while dragging to move the whole box, which is what a plain drag used to do. Verified live in both repos before this entry."] },
   { ts: "2026-08-02", rev: "App Rev-856", type: "App", changes: ["WHOLE PIXELS ONLY - THE ZOOM SNAPS SO NO IMAGE PIXEL IS EVER SPLIT (Rev-856, embedded validation REV-245) — Rich asked that a pixel on the drawing stay one pixel and not break into partial pixels as he zooms. The cause was not the zoom number but the layout underneath it: the drawing is shown contain-fit, so at zoom 1 one IMAGE pixel already covers a fraction of a SCREEN pixel - 0.42 of one on a typical window. Free-running zoom multiplied that into figures like 6.37 screen pixels per image pixel, so some blocks rendered 6 wide and their neighbours 7, and every block edge left a part-pixel sliver. Now, once a block reaches 2 screen pixels, the zoom is nudged to the nearest value that makes one image pixel a WHOLE number of screen pixels, and the pan offset is rounded so the pixel grid lands on the screen grid instead of straddling it. Below 2 the nudge is skipped so zoom-to-crop still fits exactly. odsView.z itself is corrected rather than only the transform, so the editing marks, the arrow-key step and the pointer maths all stay in step with what is drawn. The no-smoothing hint is now keyed off the real block size instead of the zoom number. Verified live in both repos before this entry."] },
   { ts: "2026-08-02", rev: "App Rev-855", type: "App", changes: ["SELECTED WHITE-OUT GOES SEE-THROUGH; EDGE MARKS HALVED AGAIN (Rev-855, embedded validation REV-244) — Rich could not tell what was being covered. The marks were already one screen pixel wide and a browser cannot draw thinner, so the real culprit was the FILL: at 82% white the drawing underneath was gone before the white-out was ever saved. A SELECTED white-out now drops to 35% white, so the lines underneath read straight through it and you can place the edges against what you are actually covering; deselected it returns to 82% so the page still previews as it will look. The saved file is identical either way - the save paints solid white from the stored rectangle and never reads this styling. Alongside it the active-edge bar is halved from two screen pixels to one and sits flush on the edge instead of straddling it, and the grip dot goes from 10px to 7px with a 1px ring. Verified live in both repos before this entry."] },
@@ -2822,7 +2862,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-02";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:19 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:21 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
