@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-878</title>
+<title>CONTROL PLAN GENERATOR - Rev-879</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-878 · 2026-08-03 7:44 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-879 · 2026-08-03 7:54 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-878 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 7:44 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-879 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 7:54 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-878 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-879 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -589,6 +589,10 @@
   </div>
   <p class="sub" style="margin-bottom:16px;">Upload the ODS drawing. We'll generate a skeleton CP.</p>
 
+  <!-- Rev-879: two columns - the part fields on the left, the traveller on the right, per
+       Rich's sketch. On a narrow window the columns stack back to the old order. -->
+  <div id="cpNewTwoCol" style="display:flex; gap:22px; align-items:flex-start; flex-wrap:wrap;">
+  <div id="cpNewLeftCol" style="flex:1 1 560px; min-width:340px;">
   <div class="grid3">
     <div class="field tight">
       <label>Part Number</label>
@@ -619,6 +623,8 @@
     </div>
   </div>
 
+  </div><!-- /cpNewLeftCol (Rev-879) -->
+  <div id="cpNewRightCol" style="flex:1 1 480px; min-width:340px;">
   <div id="travSection">
   <div style="font-weight:800; letter-spacing:.06em; color:#7a1a1c; margin:14px 0 4px;">TRAVELLER <span style="font-weight:400; font-size:12px; color:#6b6257;">(required the first time a part is created — the routing that lists its operations)</span></div>
   <div id="travDrop" style="border:2px dashed #b8a; border-color:#b89; border-radius:10px; background:#fff; padding:14px; text-align:center; cursor:pointer;">
@@ -629,6 +635,8 @@
   <input id="travFile" type="file" accept="image/*,.pdf" style="display:none">
   <div style="text-align:right; margin-top:4px;"><button type="button" id="travRemove" class="btn-ghost" style="display:none; font-size:12px; padding:4px 10px;">✕ Remove traveller</button></div>
   </div>
+  </div><!-- /cpNewRightCol (Rev-879) -->
+  </div><!-- /cpNewTwoCol (Rev-879) -->
 
   <!-- Rev-877: the OPERATION heading and its four fields are off this screen - Step 1 (EDIT OP #)
        on the operation row is where the op number and description are entered. The inputs stay in
@@ -1621,7 +1629,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-878";
+const APP_REV = "Rev-879";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2149,6 +2157,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-879", type: "App", changes: ["THE TRAVELLER MOVED TO THE RIGHT-HAND SIDE (Rev-879, embedded validation REV-255) — per Rich's sketch the new plan screen is now two columns: the part fields (Part Number, Revision, Process Owner, Customer, Quality Level) on the left, the traveller upload-and-sew box on the right where the empty space was, with the Save Draft / Edit Existing / SAVE NEW PART CONTROL PLAN row running full width beneath both. Done with a flex row wrapped around the existing blocks - nothing inside either column was rebuilt, so every control keeps its id and wiring, including the tap-to-open-studio and Ctrl+V paste from Rev-871/872. The columns are allowed to wrap, so on a narrow window they stack back to the old top-to-bottom order instead of crushing each other. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-878", type: "App", changes: ["THE MANDATORY YELLOW ACTUALLY SHOWS NOW - AND REVISION JOINS IT (Rev-878, embedded validation REV-255) — Rich pointed out four fields still white after Rev-876 coloured them, and he was right - found the wipe. The Add-Operation lockdown from Rev-566 greys Part Number, Revision, Process Owner and Customer while an op is being added to an existing part, and its RESET path - run whenever the New Control Plan screen is prepared fresh - cleared those backgrounds to blank, silently erasing the inline yellow a moment after it was painted. That is exactly why Quality Level held its colour (it is not in the reset list) while the rest went white. The reset now restores the standards yellow, fafa96, instead of blank; the lockdown grey while adding an op to an existing part is unchanged, since those fields really are read-only there. Revision is also mandatory now per Rich's marking, same yellow. All five required fields - Part Number, Revision, Process Owner, Customer, Quality Level - now hold their colour. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-877", type: "App", changes: ["THE OPERATION FIELDS ARE OFF THE NEW PLAN SCREEN (Rev-877, embedded validation REV-255) — Rich: delete these four fields, they get entered in Step 1. The OPERATION heading and its fields - Op number, Op Description, Operation, Machine Type - no longer show on NEW CONTROL PLAN. Step 1 on the operation row is where the number and description belong, and Rev-582 already gave that step a proper window for both. As with the ODS section and Data Rows before it, the inputs stay in the page hidden rather than being ripped out, because the save path and other code read them by id; saving with them blank is the already-supported path where the plan lands as (no op number) and Step 1 names it. The screen is now exactly the part-level front door the renamed SAVE NEW PART CONTROL PLAN button says it is: part, revision, owner, customer, quality level, traveller. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-876", type: "App", changes: ["MANDATORY FIELDS IN THE STANDARDS YELLOW; THE SAVE BUTTON SAYS PART (Rev-876, embedded validation REV-255) — Rich marked Part Number, Process Owner, Customer and Quality Level as mandatory on the new plan screen. All four now carry the mandatory-field yellow specified in the Camco UI Standards - hex fafa96, Red 250 Green 250 Blue 150, the one finalized colour in the standards document, already used by the operation window and rename window - Quality Level included even though it fills itself from the customer, since a required value is a required value however it arrives. Revision keeps its white, already defaulted to REV-1. And the save button now reads SAVE NEW PART CONTROL PLAN rather than OPERATION: with the ODS gone from this screen the form is becoming the part-level front door, operations added from the Control Plans list. The rename is the visible label only - nothing that keys off the button changed. Verified live in both repos before this entry."] },
@@ -2904,7 +2913,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:44 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:54 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
