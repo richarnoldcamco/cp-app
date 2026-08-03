@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-872</title>
+<title>CONTROL PLAN GENERATOR - Rev-873</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-872 · 2026-08-03 7:31 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-873 · 2026-08-03 7:34 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-872 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 7:31 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-873 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 7:34 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-872 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-873 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -1615,7 +1615,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-872";
+const APP_REV = "Rev-873";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2128,6 +2128,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-873", type: "App", changes: ["THE ADD ANOTHER PAGE STRIP IS TWICE AS TALL (Rev-873, embedded validation REV-255) — Rich asked for the collapsed ADD ANOTHER PAGE strip in the traveller studio to be 100 percent taller. It collapses to a sliver on purpose - Rev-577 hands the height to the drawing once a page is loaded - but 7px of padding made it a hard target to tap and a harder one to drag a file onto. Its padding is doubled to 14px top and bottom and the label goes up from 11px to 13px, roughly doubling the strip. Still far shy of the full instruction box, so the drawing keeps the room the collapse won it. The pre-load state, where the box shows its full instructions, is unchanged. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-872", type: "App", changes: ["THE NEW-PLAN TRAVELLER BOX OPENS THE REAL TRAVELLER STUDIO (Rev-872, embedded validation REV-255) — Rich pasted a traveller on the new plan screen and asked where the stitching went. It was never on this box: it opened a bare file picker - one image, no pages, no sewing - while the traveller screen reached from the Control Plans list opens the full studio with load every page, sew pages into one, nudge, trim and background. A traveller is nearly always more than one page, so the bare picker was simply the wrong door. Tapping the box now opens that same studio, keyed to the Part Number typed on the form, and whatever it saves is pulled straight back onto the form thumbnail - so the plan is created with the sewn traveller, not a single page of it. With the Part Number still blank there is no key to file the traveller under, so the old picker stands in and says why; the pages can be sewn later from the Control Plans list. Ctrl+V still takes a single pasted page for speed and now says outright that tapping the box is how to add the rest. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-871", type: "App", changes: ["ODS SECTION OFF THE NEW PLAN SCREEN; THE TRAVELLER TAKES A PASTE (Rev-871, embedded validation REV-255) — two from Rich. The ODS Drawing section and its Input Files heading are gone from NEW CONTROL PLAN - the ODS belongs to Step 2 on the operation screen and asking for it twice only invited the two copies to disagree. It is hidden rather than deleted: its inner controls (the drop zone, the file input, enhance, add balloons, download ballooned, drawing revisions) are wired by name from other parts of the app, and ripping the nodes out would strand those references for no visible gain. Step 2 is unaffected - it opens its own image studio and never touched these controls. Second, the traveller drop zone now takes Ctrl+V like every other upload in the app, with the hint said on screen. The listener sits on the document, because a div cannot hold focus to receive a paste, and it acts only while the New Control Plan screen is the one on show and the traveller section is visible - pasting into a text field, or on any other screen, is untouched. Verified live in both repos before this entry."] },
   { ts: "2026-08-02", rev: "App Rev-870", type: "App", changes: ["STEP 6 NOW SAYS WHICH HALF OF IT IS LEFT (Rev-870, embedded validation REV-255) — Rich approved every row and the Step 6 tile still read DO THIS NEXT, which reads as nothing done. Step 6 is two acts - approve every feature, then mark the operation ready for production - and only the second writes the sign-off, so the tile was telling the truth in the least useful way. It now reports which half is outstanding, counted from the stored plan rather than assumed: ROWS DONE, MARK READY when every ballooned row carries an approval and the release is still outstanding, shown in green so it reads as finished work waiting on one action; APPROVING n of total while the walk is part way through; and the old DO THIS NEXT only when nothing has been approved at all. Its tooltip says the same thing in full - all rows approved, not yet released, releasing is what completes the step. Verified live in both repos before this entry."] },
@@ -2877,7 +2878,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:31 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:34 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6433,8 +6434,12 @@ function _cptvRender(){
   if(dz && dh && dt){
     const loaded = _cptvPages.length > 0;
     dh.style.display = loaded ? 'none' : 'block';
-    dz.style.padding = loaded ? '7px 10px' : '14px';
-    dt.style.fontSize = loaded ? '11px' : '13px';
+    /* Rev-873: the collapsed ADD ANOTHER PAGE strip was a 7px-padded sliver - a hard target
+       to hit with a mouse, harder as a drag target. Rich asked for 100% taller, so its
+       padding is doubled (7 -> 14) and the label a step up; still well shy of the full
+       instruction box, so the drawing keeps the room the Rev-577 collapse won it. */
+    dz.style.padding = loaded ? '14px 10px' : '14px';
+    dt.style.fontSize = loaded ? '13px' : '13px';
     dt.textContent = loaded ? '\u2b06 ADD ANOTHER PAGE \u2014 tap, drag, or Ctrl+V' : String(dz.dataset.label || dt.textContent);
     if(!dz.dataset.label && !loaded) dz.dataset.label = dt.textContent;
   }
