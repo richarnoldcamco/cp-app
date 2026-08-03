@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-875</title>
+<title>CONTROL PLAN GENERATOR - Rev-876</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-875 · 2026-08-03 7:38 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-876 · 2026-08-03 7:39 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-875 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 7:38 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-876 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 7:39 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-875 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-876 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -592,7 +592,8 @@
   <div class="grid3">
     <div class="field tight">
       <label>Part Number</label>
-      <input type="text" id="cpPartNum" placeholder="e.g., 912478-M-P (blank = auto TestN)">
+      <!-- Rev-876: mandatory fields carry the UI-standards yellow, fafa96 -->
+      <input type="text" id="cpPartNum" style="background:#fafa96;" placeholder="e.g., 912478-M-P (blank = auto TestN)">
     </div>
     <div class="field tight">
       <label>Revision</label>
@@ -604,17 +605,17 @@
   <div class="grid3">
     <div class="field tight">
       <label>Process Owner</label>
-      <input type="text" id="cpOwner" placeholder="e.g., R. Arnold">
+      <input type="text" id="cpOwner" style="background:#fafa96;" placeholder="e.g., R. Arnold">
     </div>
     <div class="field tight">
       <label>Customer</label>
-      <select id="cpCustomer">
+      <select id="cpCustomer" style="background:#fafa96;">
         <option value="">— Select customer —</option>
       </select>
     </div>
     <div class="field tight">
       <label>Quality Level</label>
-      <input type="text" id="cpQualityLevel" placeholder="(from customer)" readonly="" style="background: var(--panel-2);">
+      <input type="text" id="cpQualityLevel" placeholder="(from customer)" readonly="" style="background:#fafa96;">
     </div>
   </div>
 
@@ -730,7 +731,7 @@
   <div style="display:grid; grid-template-columns:1fr 1fr 1.4fr; gap:12px;">
     <button class="btn-ghost" id="cpSaveDraftBtn" style="min-height:52px; font-weight:600; background:#5a6c7d; border:1px solid #4a5a68; color:#fff;">💾 Save Draft</button>
     <button class="btn-ghost" id="cpEditExistingBtn" onclick="cpEditExisting()" disabled="" style="min-height:52px; font-weight:700; background:#9aa4ad; border:1px solid #8a949d; color:#eef2f5; opacity:0.65; cursor:not-allowed;" title="No saved Control Plan matches this Part # + Operation ID# yet">📂 EDIT EXISTING CONTROL PLAN</button>
-    <button class="btn-primary" id="cpGenerateBtn" style="min-height:52px;">SAVE NEW OPERATION CONTROL PLAN</button>
+    <button class="btn-primary" id="cpGenerateBtn" style="min-height:52px;">SAVE NEW PART CONTROL PLAN</button>
   </div>
 </div>
 
@@ -1615,7 +1616,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-875";
+const APP_REV = "Rev-876";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2143,6 +2144,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-876", type: "App", changes: ["MANDATORY FIELDS IN THE STANDARDS YELLOW; THE SAVE BUTTON SAYS PART (Rev-876, embedded validation REV-255) — Rich marked Part Number, Process Owner, Customer and Quality Level as mandatory on the new plan screen. All four now carry the mandatory-field yellow specified in the Camco UI Standards - hex fafa96, Red 250 Green 250 Blue 150, the one finalized colour in the standards document, already used by the operation window and rename window - Quality Level included even though it fills itself from the customer, since a required value is a required value however it arrives. Revision keeps its white, already defaulted to REV-1. And the save button now reads SAVE NEW PART CONTROL PLAN rather than OPERATION: with the ODS gone from this screen the form is becoming the part-level front door, operations added from the Control Plans list. The rename is the visible label only - nothing that keys off the button changed. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-875", type: "App", changes: ["A CLOCK ON THE PUBLISHING SCREEN (Rev-875, embedded validation REV-255) — Rich asked for a timer on the update curtain. A live elapsed clock now sits between the message and the sweep bar - gold, 30px, tabular digits so it does not wobble as it counts - reading 0:00 upward from the moment the curtain first went up, not from each message change. It answers the only question that screen raises, how long has this been going, and makes a stall visible: the publish wait gives up at 60 seconds, so the reader can see where they stand against that. The interval cleans itself up when the curtain leaves with the reload, and re-entering the curtain re-uses the same clock rather than stacking a second one. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-874", type: "App", changes: ["SAVING THE TRAVELLER NO LONGER OPENS THE VIEWER OVER YOUR SCREEN (Rev-874, embedded validation REV-255) — Rich saved a traveller from the new plan form and a full-screen read-only viewer of it appeared, and he asked why. It was deliberate once: when the studio was only reachable from the Control Plans list, popping the viewer after save was the proof that the sew landed. But you have JUST been looking at the stitched preview inside the studio, so being shown the same thing again - over the form you were in the middle of filling in - reads as a screen appearing for no reason. The save now finishes with the confirmation flash and the form thumbnail; the viewer opens only when asked for, from View Traveller on the Control Plans list. This applies wherever the traveller is saved from, since the launch-from-list case had the same double-show. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-873", type: "App", changes: ["THE ADD ANOTHER PAGE STRIP IS TWICE AS TALL (Rev-873, embedded validation REV-255) — Rich asked for the collapsed ADD ANOTHER PAGE strip in the traveller studio to be 100 percent taller. It collapses to a sliver on purpose - Rev-577 hands the height to the drawing once a page is loaded - but 7px of padding made it a hard target to tap and a harder one to drag a file onto. Its padding is doubled to 14px top and bottom and the label goes up from 11px to 13px, roughly doubling the strip. Still far shy of the full instruction box, so the drawing keeps the room the collapse won it. The pre-load state, where the box shows its full instructions, is unchanged. Verified live in both repos before this entry."] },
@@ -2895,7 +2897,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:38 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:39 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
