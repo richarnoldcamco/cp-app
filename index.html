@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-892</title>
+<title>CONTROL PLAN GENERATOR - Rev-893</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-892 · 2026-08-03 8:45 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-893 · 2026-08-03 9:21 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-892 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 8:45 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-893 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 9:21 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-892 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-893 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -663,6 +663,7 @@
   <input id="travFile" type="file" accept="image/*,.pdf" style="display:none">
   <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; align-items:center;">   <!-- Rev-882: the traveller's own toolbar -->
     <button type="button" id="travInlineSaveBtn" onclick="cpTravInlineSave();" style="background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:9px 16px; font-size:13px; font-weight:800; cursor:pointer;">✓ Save traveller</button>   <!-- Rev-884 -->
+    <button type="button" id="travAiBtn" onclick="cpTravAiRead();" style="background:#5b2d8e; color:#fff; border:1px solid #46226e; border-radius:6px; padding:9px 14px; font-size:13px; font-weight:700; cursor:pointer;">🤖 AI-read the traveller</button>   <!-- Rev-893 -->
     <button type="button" id="travTableBtn" onclick="cpTravellerManual();" style="background:#1d6f42; color:#fff; border:1px solid #14512f; border-radius:6px; padding:9px 14px; font-size:13px; font-weight:700; cursor:pointer;">📋 View as editable table</button>   <!-- Rev-890: opens the fill-in CAMCO PART TRAVELER replica, seeded with the typed data; no Excel file, per Rich -->
     <span style="flex:1;"></span>
     <button type="button" id="travRemove" class="btn-ghost" style="display:none; font-size:12px; padding:6px 12px;">✕ Remove traveller</button>
@@ -1657,7 +1658,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-892";
+const APP_REV = "Rev-893";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2185,6 +2186,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-893", type: "App", changes: ["AI READS THE TRAVELLER INTO THE TABLE, SCAN AND TABLE SIDE BY SIDE (Rev-893, embedded validation REV-255) — the purple AI-READ THE TRAVELLER button sends the stored scan to Claude (claude-sonnet-4-6, straight from this device to the API) with instructions to return the sheet as strict JSON - the header fields, the eight usage buckets, and every printed operation row, skipping the handwriting blanks and inventing nothing. The result is stored as the part's typed data and the review opens as Rich asked: the SCAN ON THE LEFT, the EDITABLE TABLE ON THE RIGHT in one wide window, every field and row checkable against the paper and correctable before Save re-issues the sheet. The API key is asked for once and kept in this browser's storage under cpAnthropicKey, the same arrangement as the GitHub token; a wrong key reports itself as a 401 with the fix stated. AI reading is transcription, so the review is the point, not decoration - the row count is flashed and the instruction is to check them. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-892", type: "App", changes: ["THE DRAWN TRAVELLER'S LABELS SIT WHERE THEY BELONG (Rev-892, embedded validation REV-255) — Rich circled three faults on the rendered sheet and one leak caused all of them: the little box-drawing helper flipped the canvas to CENTRE alignment and never put it back, so the first label drawn after any box came out left-aligned and every later one drew CENTRED on its anchor point - which is exactly why MATERIAL COST slid half off the blue band while PART PRICE above it stayed put, why ORDER QUANTITY and DUE DATE drifted from their boxes, and why ECONOMIC ORDER QUANTITY planted itself over the 85-96 usage cell. The helper now saves and restores the canvas state, the right-column labels state their alignment on every pass and sit on their boxes' own centre lines, and the price pair is lifted fully inside the band instead of straddling its bottom edge. View before Save shows the corrected sheet, byte-for-byte what saves. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-891", type: "App", changes: ["SAVE DRAFT IS GREEN AND SAYS SAVE PART CONTROL PLAN (Rev-891, embedded validation REV-255) — per Rich: the grey Save Draft button is now GREEN (the app's standard green, matching Save traveller) and reads SAVE PART CONTROL PLAN. The wiring underneath is untouched - it still performs the draft save it always did. Worth noting for the next look at this screen: the stack now carries SAVE PART CONTROL PLAN and SAVE NEW PART CONTROL PLAN two buttons apart, and if those two ever read as the same action to a fresh eye, renaming or merging them is a one-line follow-up. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-890", type: "App", changes: ["THE THREE BUTTONS FINALLY SIT UNDER THE FIELDS; THE TABLE IS EDITABLE, NOT EXCEL (Rev-890, embedded validation REV-255) — found why the buttons kept vanishing however much height was shaved: the row was never IN the left column - it sat BELOW the whole two-column layout, so its top edge always equalled the tall right column's height, which is off the bottom of any screen. The block now physically lives inside the left column, directly under the part fields, where the sketch put it - visible no matter how tall the traveller side gets, and immune to future height changes on the right. And per Rich, no Excel: the toolbar button is now VIEW AS EDITABLE TABLE and opens the fill-in CAMCO PART TRAVELER replica - the same styled header block, usage grid and operations table, seeded with the typed data where it exists, with the scanned traveller viewable beside it, every field and row editable and Save re-issuing the sheet. The xlsx popup is retired from the toolbar. Verified live in both repos before this entry."] },
@@ -2954,7 +2956,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:45 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:21 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6924,6 +6926,68 @@ async function cpTravInlineSave(){
   };
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire); else wire();
 })();
+/* Rev-893: AI-READ. The stored traveller scan is sent to Claude (model claude-sonnet-4-6)
+   which returns the sheet as strict JSON - header fields, usage buckets, and one row per
+   operation. The result is stored as the part's typed data and the review opens with the
+   SCAN ON THE LEFT and the EDITABLE TABLE ON THE RIGHT, so every AI-read value can be
+   checked against the paper before Save. Runs straight from this device to the API with a
+   key kept in this browser's storage (asked for once); AI reading is transcription, so the
+   review step is not optional decoration - check the rows. */
+async function cpTravAiRead(){
+  const pn = ((document.getElementById('cpPartNum') || {}).value || '').trim().toUpperCase();
+  if(!pn){ flash('Enter the Part Number first', true); return; }
+  const d = _idbGetDrawing(pn + '::TRAVELLER');
+  if(!(d && d.odsImage)){ flash('No traveller image is loaded for ' + pn + ' \u2014 upload or paste one first', true); return; }
+  let key = '';
+  try{ key = localStorage.getItem('cpAnthropicKey') || ''; }catch(e){ }
+  if(!key){
+    key = prompt('Paste your Anthropic API key (starts sk-ant-). It is stored only in this browser, like the GitHub token.') || '';
+    key = key.trim();
+    if(!key) return;
+    try{ localStorage.setItem('cpAnthropicKey', key); }catch(e){ }
+  }
+  const m = /^data:(image\/[a-z+]+);base64,(.+)$/.exec(d.odsImage);
+  if(!m){ flash('The stored traveller is not a readable image', true); return; }
+  flash('\u{1F916} Reading the traveller\u2026 this takes ten seconds or so');
+  const btn = document.getElementById('travAiBtn'); if(btn){ btn.disabled = true; btn.style.opacity = '.55'; }
+  try{
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key,
+                 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 4096,
+        messages: [{ role: 'user', content: [
+          { type: 'image', source: { type: 'base64', media_type: m[1], data: m[2] } },
+          { type: 'text', text: 'This is a CAMCO PART TRAVELER routing sheet. Return ONLY strict JSON, no markdown fences, no commentary, exactly this shape: '
+            + '{"part":"","name":"","desc":"","price":"","mat":"","so":"","qty":"","due":"","eoq":"","usage":["","","","","","","",""],'
+            + '"rows":[["OP #","OP ID","WC #","WORKCENTER DESCRIPTION"]]}. '
+            + 'usage = the eight PAST ANNUAL USAGE cells left-to-right top row then bottom row. '
+            + 'rows = every printed operation line in order; QUANTITY/INITIALS/DATE are handwriting blanks - skip them. '
+            + 'Use "" for anything not readable. Do not invent rows.' } ] }] })
+    });
+    if(!resp.ok){
+      const t = await resp.text();
+      throw new Error('API ' + resp.status + ' \u2014 ' + t.slice(0, 300));
+    }
+    const j = await resp.json();
+    const txt = (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('\n');
+    const clean = txt.replace(/```json|```/g, '').trim();
+    const data = JSON.parse(clean);
+    if(!data || !Array.isArray(data.rows) || !data.rows.length) throw new Error('The reply held no operation rows');
+    data.part = (data.part || pn);
+    const info = cpPartInfoGet(pn) || {};
+    info.travData = data;
+    cpPartInfoSet(pn, info);
+    flash('\u2713 Read ' + data.rows.length + ' operation rows \u2014 CHECK THEM against the scan');
+    cpTravellerManual({ withScan: true });
+  }catch(e){
+    console.warn('AI read failed:', e);
+    alert('Could not AI-read the traveller.\n\n' + (e && e.message || e)
+      + '\n\nIf this says 401, the API key is wrong \u2014 it can be re-entered (it is under cpAnthropicKey in this browser\u2019s storage).');
+  }finally{
+    if(btn){ btn.disabled = false; btn.style.opacity = ''; }
+  }
+}
 /* Rev-880: MANUAL TRAVELLER. A fill-in replica of the CAMCO PART TRAVELER for when there is
    no scan to upload: the same header block (part number / name / description, prices, past
    annual usage, order block) and the same operations table, typed instead of photographed.
@@ -6931,7 +6995,8 @@ async function cpTravInlineSave(){
    form thumbnail, and the part's ::TRAVELLER file when a part number is on the form - so
    nothing downstream knows the difference. Rendering is done by hand-drawing the canvas, not
    by screenshotting the DOM, so it cannot be affected by zoom or window size. */
-function cpTravellerManual(){
+function cpTravellerManual(opts){
+  const _o = opts || {};
   const old = document.getElementById('travManBg'); if(old) old.remove();
   const pn0 = (document.getElementById('cpPartNum') ? document.getElementById('cpPartNum').value : '').trim().toUpperCase();
   const bg = document.createElement('div');
@@ -6940,11 +7005,13 @@ function cpTravellerManual(){
   const inp = 'box-sizing:border-box; border:1px solid #999; border-radius:3px; padding:4px 6px; font:700 13px Arial; width:100%;';
   const th = 'font:800 11px Arial; border-bottom:2px solid #000; padding:3px 4px; text-align:left; white-space:nowrap;';
   bg.innerHTML =
-    '<div style="background:#fff; border-radius:10px; max-width:1060px; width:100%; max-height:94vh; display:flex; flex-direction:column; overflow:hidden;">'
+    '<div style="background:#fff; border-radius:10px; max-width:' + (_o.withScan ? '96vw' : '1060px') + '; width:100%; max-height:94vh; display:flex; flex-direction:column; overflow:hidden;">'
     + '<div style="background:#7a1a1c; color:#fff; font:800 15px system-ui; letter-spacing:.05em; padding:10px 16px; display:flex; align-items:center;">'
     +   '<span style="flex:1;">MANUAL TRAVELLER' + (pn0 ? (' \u2014 ' + pn0) : '') + '</span>'
     +   '<button onclick="document.getElementById(\'travManBg\').remove()" style="background:#a5342a; color:#fff; border:0; border-radius:6px; padding:6px 12px; font-weight:800; cursor:pointer;">\u2715 Cancel</button></div>'
-    + '<div style="padding:14px 16px; overflow:auto;">'
+    + '<div style="display:flex; min-height:0; flex:1;">'   /* Rev-893: scan left, form right */
+    + (_o.withScan ? '<div id="tmScanPane" style="flex:0 0 44%; min-width:0; overflow:auto; background:#3a3a3a; padding:10px; text-align:center;"></div>' : '')
+    + '<div style="padding:14px 16px; overflow:auto; flex:1; min-width:0;">'
     + '<div style="display:grid; grid-template-columns:1.2fr 1.6fr 1.1fr; gap:14px; background:#dce3ee; border:1px solid #98a4b8; padding:12px; border-radius:4px;">'
     +   '<div>'
     +     '<div style="font:800 11px Arial; text-align:center;">PART NUMBER</div>'
@@ -6978,11 +7045,19 @@ function cpTravellerManual(){
     + '</table>'
     + '<button type="button" onclick="cpTmAddRow()" style="margin-top:8px; background:#2c6e49; color:#fff; border:0; border-radius:6px; padding:8px 14px; font-weight:800; cursor:pointer;">+ Add operation row</button>'
     + '</div>'
+    + '</div>'   /* /flex row (Rev-893) */
     + '<div style="padding:12px 16px; border-top:1px solid #ddd; text-align:right; background:#f6f2ec; display:flex; gap:10px; justify-content:flex-end;">'
     +   '<button type="button" onclick="cpTmView()" style="background:#1a5276; color:#fff; border:0; border-radius:8px; padding:12px 22px; font:800 15px system-ui; cursor:pointer;">\ud83d\udc41 View</button>'   /* Rev-881 */
     +   '<button type="button" onclick="cpTmSave()" style="background:#2c6e49; color:#fff; border:0; border-radius:8px; padding:12px 22px; font:800 15px system-ui; cursor:pointer;">\u2713 Save as traveller</button>'
     + '</div></div>';
   document.body.appendChild(bg);
+  /* Rev-893: the review pane - the scan itself, beside the fields it was read into */
+  if(_o.withScan && pn0){
+    try{ const dd = _idbGetDrawing(pn0 + '::TRAVELLER');
+      const pane = document.getElementById('tmScanPane');
+      if(pane && dd && dd.odsImage) pane.innerHTML = '<img src="' + dd.odsImage + '" style="max-width:100%; background:#fff;">';
+    }catch(e){ console.warn(e); }
+  }
   /* Rev-882: stored typed data for this part reloads into the form - adding an operation or
      changing a field carries on from what was saved, instead of starting blank every time. */
   let seeded = false;
