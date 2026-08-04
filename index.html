@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-911</title>
+<title>CONTROL PLAN GENERATOR - Rev-912</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-911 · 2026-08-04 7:23 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-912 · 2026-08-04 7:29 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-911 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 7:23 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-912 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 7:29 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-911 · Built Aug 4, 2026</span>
+    <span id="revFooter">App Rev-912 · Built Aug 4, 2026</span>
   </div>
 </div>
 
@@ -1658,7 +1658,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-911";
+const APP_REV = "Rev-912";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2186,6 +2186,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-04", rev: "App Rev-912", type: "App", changes: ["THE CHECK CONTROLS LIVE IN THE FOOTER NOW - AND FULL VIEW IS ONE CLICK (Rev-912, embedded validation REV-255) — Rich asked where the screen showing both documents went, and the answer exposed a trap: that screen is what Exit returns to, and Exit itself had vanished. The check bar was planted in whatever div a last-child query happened to find - the form pane - and check mode HIDES the form pane, so Prev, Next and Exit disappeared exactly when they were needed and the strip view had no way out but Cancel. The controls now mount in the real footer by name, beside View and Save, where nothing ever hides them. And the Exit button is renamed FULL VIEW for what it actually shows: the whole scan beside the whole editable table. So the two screens are one click apart in both directions - Full view from the strip, Check columns from the full view. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-911", type: "App", changes: ["THE AI READ OPENS STRAIGHT INTO THE SIDE-BY-SIDE VIEW, AND THE COLLAPSED WINDOW IS FIXED (Rev-911, embedded validation REV-255) — Rich sent two screenshots: the review window collapsed to a bare banner, and beside it the view he actually wants - printed OP numbers and the AI values standing together, row for row, which is the Rev-910 pin mode working. Two fixes deliver it. The collapse: the window's body fills by flex inside a box whose height was only a MAXIMUM, so while the scan image was still loading there was nothing to fill and the whole body folded to a strip - the box now has a real height and the body always has room. And the route: finishing an AI read now lands DIRECTLY in the checking view, image and pinned values side by side, instead of on the full form asking for two more clicks to reach the thing the read was for. Prev, Next, Exit and editing all work as before; Exit drops back to the full form. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-910", type: "App", changes: ["EVERY VALUE PINS ITSELF TO ITS PRINTED ROW - NO MORE DIALLING (Rev-910, embedded validation REV-255) — Rich has spent three revisions being asked to line rows up by hand, and the honest conclusion is that he never should have been: the AI reads the sheet anyway, so it now also reports WHERE each row sits - the vertical centre of every printed row as a fraction of the image height. With that on file, check mode stops using the table at all and pins each editable value at its own printed row's height, tracked live through every drag and wheel of the strip - wrapped rows and uneven pitch are irrelevant because nothing is estimated, each value sits where ITS row is, always. Values stay editable and write straight back to the table; the DESCRIPTION step gets a wider column. The pitch and offset dials remain only for reads made before this revision, with a note saying one re-run of AI-read makes the rows pin themselves. Run AI-read once more on 1000237498 to pick up the positions. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-909", type: "App", changes: ["REV-908 SHIPPED EMPTY; THE ROW ALIGNMENT IS TRULY IN THIS TIME (Rev-909, embedded validation REV-255) — the process failure first, again: Rev-908's patch missed its anchor, the guard fired - and the push was chained behind it and went out anyway, so Rev-908 carries the alignment story and none of the code, the second time this has happened (Rev-903 was the first). From this revision the workflow is patch, verify in the file, and only then embed and push as separate steps. The feature itself, genuinely present now: a single row pitch can never sit on the paper because the paper's rows are not one height - a wrapped two-line description makes its printed row taller and every row after it slides off a uniform grid, which was exactly the creep in Rich's screenshot. Each table row's height now scales with the lines its own description occupied on the print, estimated from its length against the sheet's roughly 45-character line, so tall printed rows get tall table rows and the two columns keep step all the way down. Dial the top row on, match the size once, and the rest follows; heights restore on exit. Payload verified in both repos before this entry."] },
@@ -2974,7 +2975,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-04";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:23 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:29 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7128,7 +7129,7 @@ function cpTravellerManual(opts){
     + '<button type="button" id="tmAddRowBtn" onclick="cpTmAddRow()" style="margin-top:8px; background:#2c6e49; color:#fff; border:0; border-radius:6px; padding:8px 14px; font-weight:800; cursor:pointer;">+ Add operation row</button>'
     + '</div>'
     + '</div>'   /* /flex row (Rev-893) */
-    + '<div style="padding:12px 16px; border-top:1px solid #ddd; text-align:right; background:#f6f2ec; display:flex; gap:10px; justify-content:flex-end;">'
+    + '<div id="tmFoot" style="padding:12px 16px; border-top:1px solid #ddd; text-align:right; background:#f6f2ec; display:flex; gap:10px; justify-content:flex-end; align-items:center; flex-wrap:wrap;">'
     +   '<button type="button" onclick="cpTmView()" style="background:#1a5276; color:#fff; border:0; border-radius:8px; padding:12px 22px; font:800 15px system-ui; cursor:pointer;">\ud83d\udc41 View</button>'   /* Rev-881 */
     +   '<button type="button" onclick="cpTmSave()" style="background:#2c6e49; color:#fff; border:0; border-radius:8px; padding:12px 22px; font:800 15px system-ui; cursor:pointer;">\u2713 Save as traveller</button>'
     + '</div></div>';
@@ -7137,7 +7138,11 @@ function cpTravellerManual(opts){
   if(_o.withScan){
     const stEl = document.createElement('style'); stEl.id = 'tmCheckStyle';
     bg.appendChild(stEl);
-    const foot = bg.querySelector('div > div:last-child');
+    /* Rev-912: the controls mount in the REAL footer, by name. They used to be planted in
+       whatever div a last-child query found - the form pane - and check mode HIDES the form
+       pane, so Prev, Next and Exit vanished the moment they were needed and the strip view
+       had no way out but Cancel. The footer never hides. */
+    const foot = document.getElementById('tmFoot');
     if(foot){
       const cb = document.createElement('button');
       cb.type = 'button'; cb.id = 'tmCheckStart';
@@ -7152,7 +7157,7 @@ function cpTravellerManual(opts){
         '<button type="button" id="tmCheckPrev" onclick="cpTmCheck(-1)" style="background:#efe9df; border:1px solid #c9c0b4; border-radius:8px; padding:12px 16px; font:800 14px system-ui; cursor:pointer;">\u25c0 Prev</button>'
         + '<span id="tmCheckLabel" style="font:800 15px system-ui; min-width:150px; text-align:center;"></span>'
         + '<button type="button" id="tmCheckNext" onclick="cpTmCheck(+1)" style="background:#2c6e49; color:#fff; border:0; border-radius:8px; padding:12px 16px; font:800 14px system-ui; cursor:pointer;">Next \u25b6</button>'
-        + '<button type="button" onclick="cpTmCheck(null)" style="background:#a5342a; color:#fff; border:0; border-radius:8px; padding:12px 14px; font:800 14px system-ui; cursor:pointer;">Exit</button>'
+        + '<button type="button" onclick="cpTmCheck(null)" style="background:#a5342a; color:#fff; border:0; border-radius:8px; padding:12px 14px; font:800 14px system-ui; cursor:pointer;">\ud83d\uddc2 Full view</button>'   /* Rev-912: Exit renamed for what it shows - both documents whole */
         + '<span style="font:800 12px system-ui; margin-left:14px;">ROWS:</span>'
         + '<button type="button" onclick="cpTmDial(\'p\',-1)" title="Rows closer together" style="border:1px solid #c9c0b4; border-radius:6px; padding:10px 12px; font:800 14px system-ui; cursor:pointer;">Pitch \u2212</button>'
         + '<button type="button" onclick="cpTmDial(\'p\',1)" title="Rows further apart" style="border:1px solid #c9c0b4; border-radius:6px; padding:10px 12px; font:800 14px system-ui; cursor:pointer;">Pitch +</button>'
