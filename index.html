@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-906</title>
+<title>CONTROL PLAN GENERATOR - Rev-907</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-906 · 2026-08-03 10:15 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-907 · 2026-08-03 10:20 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-906 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 10:15 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-907 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 10:20 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-906 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-907 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -1658,7 +1658,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-906";
+const APP_REV = "Rev-907";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2186,6 +2186,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-907", type: "App", changes: ["BOTH SIDES SHOW ONE COLUMN NOW - THE SCAN IS STRIPPED TOO (Rev-907, embedded validation REV-255) — Rich asked whether only the OP number column could be shown with everything else hidden - and the everything includes the SCAN's other columns, which no previous attempt touched, which is why the image kept swamping the screen. In check mode the image now sits inside a narrow 380-pixel viewing slot that shows a vertical strip of it: DRAG inside the slot slides the printed column into view, the WHEEL zooms about the cursor until the print's row pitch matches the table's, and the checked editable column stands six pixels to the strip's right. One printed column, one editable column, nothing else on screen; walking Next means dragging the strip a touch right to the next printed column. The pitch and offset dials remain for fine registration. Exit unwraps the strip and returns the image to its old fit exactly. Verified live in both repos with payload markers before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-906", type: "App", changes: ["THE COLUMN NOW STANDS SHOULDER TO SHOULDER WITH THE SCAN (Rev-906, embedded validation REV-255) — Rich: the rows need to be next to each other. They are now, by construction rather than layout persuasion - entering check mode physically MOVES the operations table into the scan pane, which becomes a flex row of exactly two things: the traveller image on the left and the checked column six pixels to its right, on a white strip. The form pane is hidden outright while checking since nothing in it is needed. Exit moves the table home in front of the add-row button and restores both panes to their old shape. The Rev-905 pitch and offset dials work on the moved column unchanged, so the registration workflow is: dial the rows onto the paper once, then walk OP number, OP ID, WC number and description with the values touching the image they are checked against. Verified live in both repos with payload markers before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-905", type: "App", changes: ["THE COLUMN DIALS ONTO THE SCAN, ROW FOR ROW (Rev-905, embedded validation REV-255) — Rich called check mode unusable because the rows did not line up with the paper, and he is right that they never could by assumption: the scan's row pitch depends on the photograph and the pane width, different for every traveller. So the column is now DIALLED onto the scan. Four controls join the check bar - PITCH minus and plus squeeze or stretch the row height a pixel at a time, UP and DOWN slide the whole column four pixels at a time - until the column's rows sit exactly on the paper's lines; the setting holds while stepping Prev and Next through all four columns, so it is dialled once per scan. Also fixed from the same screenshot: the traveller header block had survived hiding because its inline display outranked the plain CSS rule - the rule carries important now and the header genuinely disappears in check mode. Verified live in both repos with payload markers before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-904", type: "App", changes: ["REV-903 SHIPPED EMPTY - THIS IS THE COLUMN-BESIDE-THE-SCAN FIX, REALLY IN (Rev-904, embedded validation REV-255) — owning a process failure first: Rev-903's changelog described the checked column sitting hard against the scan, but the patch had missed its target and the guard that caught it fired AFTER the push had been chained - so Rev-903 went out carrying the claim and none of the code. This revision actually contains it, verified in the file this time: in check mode the traveller header block and the add-row button disappear along with the other columns, the form pane shrinks to the surviving column's own width and stops flexing, and the scan pane takes every pixel the column does not need - the values stand directly beside the paper, close enough to read across, instead of centred in a wide empty pane a screen away. Exit restores the header block, add-row, full table and pane widths exactly. Verified live in both repos before this entry."] },
@@ -2969,7 +2970,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:15 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:20 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7380,9 +7381,15 @@ function cpTmCheck(step){
     if(pane && fp && tbl && tbl.parentElement === pane){
       const ab = document.getElementById('tmAddRowBtn');
       fp.insertBefore(tbl, ab || null);
-      tbl.style.flex = ''; tbl.style.background = ''; tbl.style.padding = '';
-      pane.style.display = ''; pane.style.alignItems = ''; pane.style.gap = ''; pane.style.textAlign = 'center';
-      const im = pane.querySelector('img'); if(im){ im.style.flex = ''; im.style.minWidth = ''; }
+      tbl.style.flex = ''; tbl.style.background = ''; tbl.style.padding = ''; tbl.style.alignSelf = '';
+      /* Rev-907: unwrap the strip - the image returns to the pane at its old fit */
+      const vp2 = document.getElementById('tmStrip');
+      if(vp2){
+        const im = vp2.querySelector('img');
+        if(im){ pane.insertBefore(im, vp2); im.style.cssText = 'max-width:100%; background:#fff;'; }
+        vp2.remove();
+      }
+      pane.style.display = ''; pane.style.alignItems = ''; pane.style.gap = ''; pane.style.textAlign = 'center'; pane.style.overflow = '';
     }
     if(pane) pane.style.flex = '0 0 44%';
     return;
@@ -7392,13 +7399,53 @@ function cpTmCheck(step){
      six pixels apart. The form pane is hidden outright. Exit moves the table home in front
      of the add-row button and restores the pane. Rev-905's dials keep working on the moved
      table unchanged. */
+  /* Rev-907: the SCAN is column-stripped too. The image goes into a narrow 380px viewing
+     slot that shows only a vertical strip of it - DRAG inside the slot to slide the printed
+     OP # (or any) column into view, WHEEL to zoom the print until its row pitch matches the
+     table's. The editable column stands six pixels to the strip's right. So both sides show
+     one column and nothing else, exactly as asked; walking Next, drag the strip a little
+     right to the next printed column. */
   const _sp = document.getElementById('tmScanPane'), _fp = document.getElementById('tmFormPane');
   const _tbl = document.getElementById('tmOps');
   if(_sp && _tbl && _tbl.parentElement !== _sp){
-    _sp.style.display = 'flex'; _sp.style.alignItems = 'flex-start'; _sp.style.gap = '6px'; _sp.style.textAlign = 'left';
-    const _img = _sp.querySelector('img'); if(_img){ _img.style.flex = '1 1 auto'; _img.style.minWidth = '0'; }
+    _sp.style.display = 'flex'; _sp.style.alignItems = 'stretch'; _sp.style.gap = '6px'; _sp.style.textAlign = 'left';
+    _sp.style.overflow = 'hidden';
+    const _img = _sp.querySelector('img');
+    let vp = document.getElementById('tmStrip');
+    if(!vp){
+      vp = document.createElement('div');
+      vp.id = 'tmStrip';
+      vp.style.cssText = 'position:relative; flex:0 0 380px; overflow:hidden; background:#222; cursor:grab; border:1px solid #555;';
+      _sp.insertBefore(vp, _sp.firstChild);
+      if(_img){
+        vp.appendChild(_img);
+        _img.style.cssText = 'position:absolute; left:0; top:0; transform-origin:0 0; max-width:none; background:#fff; user-select:none; pointer-events:none;';
+        window._tmStripZ = 1; window._tmStripX = 0; window._tmStripY = 0;
+        const paint = () => { _img.style.transform = 'translate(' + window._tmStripX + 'px,' + window._tmStripY + 'px) scale(' + window._tmStripZ + ')'; };
+        paint();
+        vp.onwheel = (e) => {
+          e.preventDefault();
+          const r = vp.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+          const z0 = window._tmStripZ, z1 = Math.min(6, Math.max(.15, z0 * (e.deltaY < 0 ? 1.12 : 1/1.12)));
+          window._tmStripX = mx - (mx - window._tmStripX) * (z1/z0);
+          window._tmStripY = my - (my - window._tmStripY) * (z1/z0);
+          window._tmStripZ = z1; paint();
+        };
+        vp.onpointerdown = (e) => {
+          e.preventDefault(); vp.setPointerCapture(e.pointerId); vp.style.cursor = 'grabbing';
+          const sx = e.clientX - window._tmStripX, sy = e.clientY - window._tmStripY;
+          vp.onpointermove = (m) => { window._tmStripX = m.clientX - sx; window._tmStripY = m.clientY - sy; paint(); };
+          vp.onpointerup = () => { vp.onpointermove = null; vp.style.cursor = 'grab'; };
+        };
+      }
+      const hint = document.createElement('div');
+      hint.style.cssText = 'position:absolute; left:6px; bottom:6px; color:#fff; font:800 11px system-ui; background:rgba(0,0,0,.55); padding:4px 8px; border-radius:5px; pointer-events:none;';
+      hint.textContent = 'DRAG to the printed column \u00b7 WHEEL to match row size';
+      vp.appendChild(hint);
+    }
     _sp.appendChild(_tbl);
     _tbl.style.flex = '0 0 auto'; _tbl.style.background = '#fff'; _tbl.style.padding = '0 6px';
+    _tbl.style.alignSelf = 'flex-start';
   }
   const col = _tmCheckCols[_tmCheckIdx][0];
   /* Rev-904: the survivor sits hard against the scan - header block and add-row button
