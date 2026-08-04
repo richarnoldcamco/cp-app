@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-888</title>
+<title>CONTROL PLAN GENERATOR - Rev-889</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-888 · 2026-08-03 8:33 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-889 · 2026-08-03 8:36 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-888 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 8:33 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-889 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 8:36 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-888 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-889 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -644,7 +644,7 @@
        traveller / Enter-edit toolbar under it and the three buttons on the left are all on
        screen with no page scrolling. The 300px allowance covers the header, the field rows
        and the toolbar; the 420px floor keeps the studio usable on a short laptop screen. -->
-  <div id="travStudioHost" style="height:calc(100vh - 300px); min-height:420px; overflow:hidden; display:flex; flex-direction:column; border:1px solid #c9c0b4; border-radius:10px; background:#efe9df; padding:8px;"></div>
+  <div id="travStudioHost" style="height:calc(100vh - 390px); min-height:380px; overflow:hidden; display:flex; flex-direction:column; border:1px solid #c9c0b4; border-radius:10px; background:#efe9df; padding:8px;"></div>
   <div id="travDrop" style="display:none; border:2px dashed #b8a; border-color:#b89; border-radius:10px; background:#fff; padding:14px; text-align:center; cursor:pointer;">
     <span id="travDropLabel">📄 Tap to upload the traveller (image or PDF)</span>
     <div id="travPasteHint" style="font-size:12px; color:#6b6257; margin-top:6px;">Tap to load <b>every page</b> and sew them into one · or press <b>Ctrl+V</b> to paste a single copied page</div>   <!-- Rev-872 -->
@@ -1656,7 +1656,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-888";
+const APP_REV = "Rev-889";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2184,6 +2184,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-889", type: "App", changes: ["CONVERT SHOWS THE TABLE FIRST; THE PLAN BUTTONS ARE BACK ON SCREEN (Rev-889, embedded validation REV-255) — two fixes. The three plan buttons had slipped under the fold again - my Rev-887 mode tabs added about eighty pixels above the studio and the height allowance did not account for them; it now does (300 to 390), so Save Draft, Edit Existing and SAVE NEW PART CONTROL PLAN are back on screen without scrolling. And CONVERT TO TABLE FILE now opens a POP-UP first, showing the traveller as a table - the header fields at the top and one shaded row per operation under OP, OP ID, WC and DESCRIPTION - with Download .xlsx as a button inside the pop-up, so what is downloaded has been seen. The no-typed-data path still says plainly that a scan cannot be read without typing the rows once at tab 2. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-888", type: "App", changes: ["THE BLUE BUTTON IS GONE; CONVERT TO TABLE FILE TAKES ITS PLACE (Rev-888, embedded validation REV-255) — two from Rich. The blue Enter / edit data button under the panel is deleted - the manual door is tab 2 at the top now and one door is enough. In its slot: CONVERT TO TABLE FILE, which builds a real .xlsx of the traveller on this device using the same on-demand ExcelJS engine the Customer CP export uses - the header fields (part, name, description, prices, order block, usage) on top and one row per operation under an OP / OP ID / WC / DESCRIPTION heading, downloaded as TRAVELLER_<part>.xlsx. Said honestly on the button's own failure path: the table comes from the TYPED data, because a scanned photograph has no rows a program can read without OCR - with only a scan on file, the button says exactly that and points at tab 2: type the rows once, convert forever after. A part with typed data converts instantly. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-887", type: "App", changes: ["TWO DISTINCT DOORS INTO THE TRAVELLER (Rev-887, embedded validation REV-255) — Rich asked for the two ways in to be two distinct options rather than a small Enter-edit button under the box. Two full-width tabs now head the traveller panel: 1, UPLOAD AN IMAGE OF THE TRAVELLER, and 2, INPUT THE DATA MANUALLY. Upload is lit by default and shows the studio exactly as before. Manual lights its tab and opens the fill-in CAMCO PART TRAVELER form on the spot; when the form closes the tab hands back to Upload, because the studio is where the finished sheet lands either way - and a manual Save now re-seeds the inline studio immediately, so the drawn sheet appears on the panel the moment it is saved instead of on the next remount. The Save traveller and Enter-edit buttons under the panel are unchanged for anyone who reaches for them there. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-886", type: "App", changes: ["THE SAVED TRAVELLER COMES BACK NOW (Rev-886, embedded validation REV-255) — Rich saved a traveller, the app updated and reloaded, and the studio came up empty - the traveller looked lost. It was never lost: the 1000237498 traveller is confirmed sitting in storage, 447 KB. Two timing faults hid it. First, the drawing cache is filled from the browser's database asynchronously at boot, and the studio mounted before the cache was warm - found nothing, and never looked again. The mount now waits and retries every half second, up to six seconds, until the cache is ready. Second, RESUME LAST SESSION fills the Part Number programmatically, which fires no change event - so the remount hook never ran and the studio stayed mounted for the BLANK part number. Restore now tells the studio directly once the fields are back, and typing a part number is caught on input as well, debounced, not only on leaving the field. The mount also re-seeds when the stored traveller itself has changed since the last mount. Verified live in both repos before this entry."] },
@@ -2949,7 +2950,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:33 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:36 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6769,7 +6770,10 @@ async function cpImageStudio(opts){
    built on this device. The TABLE comes from the TYPED data (travData): a scanned photograph
    has no rows a program can read without OCR, so with a scan only, this says exactly that and
    offers tab 2 - type the rows once, convert forever after. */
-async function cpTravToXlsx(){
+/* Rev-889: the button shows the traveller AS A TABLE first - a pop-up with the header fields
+   and one row per operation - and the .xlsx download is a button inside that pop-up, so what
+   is downloaded has been seen. */
+function cpTravToXlsx(){
   const pn = ((document.getElementById('cpPartNum') || {}).value || '').trim().toUpperCase();
   if(!pn){ flash('Enter the Part Number first', true); return; }
   const info = cpPartInfoGet(pn) || {};
@@ -6780,6 +6784,40 @@ async function cpTravToXlsx(){
       + 'after that this button converts it any time.');
     return;
   }
+  const esc2 = t => String(t == null ? '' : t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const old = document.getElementById('travTblBg'); if(old) old.remove();
+  const bg = document.createElement('div');
+  bg.id = 'travTblBg';
+  bg.style.cssText = 'position:fixed; inset:0; z-index:100011; background:rgba(20,15,12,.9); display:flex; align-items:center; justify-content:center; padding:16px;';
+  const hdrPairs = [['PART NUMBER', d.part || pn], ['NAME', d.name], ['DESCRIPTION', d.desc], ['PART PRICE', d.price],
+    ['MATERIAL COST', d.mat], ['SHOP ORDER #', d.so], ['ORDER QTY', d.qty], ['DUE DATE', d.due],
+    ['ECON. ORDER QTY', d.eoq], ['PAST ANNUAL USAGE', (d.usage || []).join(' / ')]];
+  bg.innerHTML =
+    '<div style="background:#fff; border-radius:10px; max-width:1000px; width:100%; max-height:94vh; display:flex; flex-direction:column; overflow:hidden;">'
+    + '<div style="background:#7a1a1c; color:#fff; font:800 15px system-ui; letter-spacing:.05em; padding:10px 16px; display:flex; align-items:center;">'
+    +   '<span style="flex:1;">TRAVELLER AS A TABLE \u2014 ' + esc2(pn) + '</span>'
+    +   '<button onclick="document.getElementById(\'travTblBg\').remove()" style="background:#a5342a; color:#fff; border:0; border-radius:6px; padding:6px 12px; font-weight:800; cursor:pointer;">\u2715 Close</button></div>'
+    + '<div style="padding:14px 16px; overflow:auto;">'
+    +   '<table style="border-collapse:collapse; font:700 13px Arial; margin-bottom:14px;">'
+    +     hdrPairs.filter(p => p[1]).map(p => '<tr><td style="padding:3px 14px 3px 0; font-weight:800;">' + esc2(p[0]) + '</td><td style="padding:3px 0;">' + esc2(p[1]) + '</td></tr>').join('')
+    +   '</table>'
+    +   '<table style="width:100%; border-collapse:collapse; font:700 13px Arial;">'
+    +     '<thead><tr>' + ['OP #','OP ID','WC #','WORKCENTER DESCRIPTION'].map(h => '<th style="text-align:left; padding:5px 8px; border-bottom:2px solid #000; font-weight:800;">' + h + '</th>').join('') + '</tr></thead>'
+    +     '<tbody>' + (d.rows || []).map((r, i) => '<tr style="background:' + (i % 2 ? '#f2f2f2' : '#fff') + ';">'
+    +        r.slice(0,4).map(c => '<td style="padding:5px 8px;">' + esc2(c) + '</td>').join('') + '</tr>').join('') + '</tbody>'
+    +   '</table>'
+    + '</div>'
+    + '<div style="padding:12px 16px; border-top:1px solid #ddd; display:flex; gap:10px; justify-content:flex-end; background:#f6f2ec;">'
+    +   '<button onclick="cpTravXlsxDownload()" style="background:#1d6f42; color:#fff; border:0; border-radius:8px; padding:12px 22px; font:800 15px system-ui; cursor:pointer;">\u2B07 Download .xlsx</button>'
+    + '</div></div>';
+  bg.onclick = (e) => { if(e.target === bg) bg.remove(); };
+  document.body.appendChild(bg);
+}
+async function cpTravXlsxDownload(){
+  const pn = ((document.getElementById('cpPartNum') || {}).value || '').trim().toUpperCase();
+  const info = cpPartInfoGet(pn) || {};
+  const d = info.travData;
+  if(!d){ flash('No typed data', true); return; }
   flash('Building the .xlsx\u2026');
   if(typeof ExcelJS === 'undefined'){
     await new Promise((res, rej) => {
