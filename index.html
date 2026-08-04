@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-908</title>
+<title>CONTROL PLAN GENERATOR - Rev-909</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-908 · 2026-08-04 6:21 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-909 · 2026-08-04 6:22 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-908 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 6:21 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-909 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 6:22 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-908 · Built Aug 4, 2026</span>
+    <span id="revFooter">App Rev-909 · Built Aug 4, 2026</span>
   </div>
 </div>
 
@@ -1658,7 +1658,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-908";
+const APP_REV = "Rev-909";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2186,6 +2186,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-04", rev: "App Rev-909", type: "App", changes: ["REV-908 SHIPPED EMPTY; THE ROW ALIGNMENT IS TRULY IN THIS TIME (Rev-909, embedded validation REV-255) — the process failure first, again: Rev-908's patch missed its anchor, the guard fired - and the push was chained behind it and went out anyway, so Rev-908 carries the alignment story and none of the code, the second time this has happened (Rev-903 was the first). From this revision the workflow is patch, verify in the file, and only then embed and push as separate steps. The feature itself, genuinely present now: a single row pitch can never sit on the paper because the paper's rows are not one height - a wrapped two-line description makes its printed row taller and every row after it slides off a uniform grid, which was exactly the creep in Rich's screenshot. Each table row's height now scales with the lines its own description occupied on the print, estimated from its length against the sheet's roughly 45-character line, so tall printed rows get tall table rows and the two columns keep step all the way down. Dial the top row on, match the size once, and the rest follows; heights restore on exit. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-908", type: "App", changes: ["THE ROWS ALIGN THEMSELVES NOW - TALL PRINTED ROWS GET TALL TABLE ROWS (Rev-908, embedded validation REV-255) — Rich asked why the rows could not simply be aligned, and the honest answer is that a uniform pitch never could: the paper's rows are not one height. A description that wrapped to two printed lines made its row taller - 020 and 030 on this very traveller - and every row after it slid off a uniform grid, which is exactly the creep in his screenshot. Each table row's height now scales with how many lines its own description occupied on the print, estimated from its length against the sheet's roughly 45-character line, so the table's rhythm mirrors the paper's row for row. Dial the top row on with Up and Down, match the size once with the wheel or Pitch, and the two columns keep step all the way down including through the tall rows. Row heights are restored on exit. Verified live in both repos with payload markers before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-907", type: "App", changes: ["BOTH SIDES SHOW ONE COLUMN NOW - THE SCAN IS STRIPPED TOO (Rev-907, embedded validation REV-255) — Rich asked whether only the OP number column could be shown with everything else hidden - and the everything includes the SCAN's other columns, which no previous attempt touched, which is why the image kept swamping the screen. In check mode the image now sits inside a narrow 380-pixel viewing slot that shows a vertical strip of it: DRAG inside the slot slides the printed column into view, the WHEEL zooms about the cursor until the print's row pitch matches the table's, and the checked editable column stands six pixels to the strip's right. One printed column, one editable column, nothing else on screen; walking Next means dragging the strip a touch right to the next printed column. The pitch and offset dials remain for fine registration. Exit unwraps the strip and returns the image to its old fit exactly. Verified live in both repos with payload markers before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-906", type: "App", changes: ["THE COLUMN NOW STANDS SHOULDER TO SHOULDER WITH THE SCAN (Rev-906, embedded validation REV-255) — Rich: the rows need to be next to each other. They are now, by construction rather than layout persuasion - entering check mode physically MOVES the operations table into the scan pane, which becomes a flex row of exactly two things: the traveller image on the left and the checked column six pixels to its right, on a white strip. The form pane is hidden outright while checking since nothing in it is needed. Exit moves the table home in front of the add-row button and restores both panes to their old shape. The Rev-905 pitch and offset dials work on the moved column unchanged, so the registration workflow is: dial the rows onto the paper once, then walk OP number, OP ID, WC number and description with the values touching the image they are checked against. Verified live in both repos with payload markers before this entry."] },
@@ -2971,7 +2972,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-04";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "6:21 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "6:22 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7383,6 +7384,7 @@ function cpTmCheck(step){
       const ab = document.getElementById('tmAddRowBtn');
       fp.insertBefore(tbl, ab || null);
       tbl.style.flex = ''; tbl.style.background = ''; tbl.style.padding = ''; tbl.style.alignSelf = '';
+      document.querySelectorAll('#tmOpsBody tr').forEach(tr => { tr.style.height = ''; });   /* Rev-909 */
       /* Rev-907: unwrap the strip - the image returns to the pane at its old fit */
       const vp2 = document.getElementById('tmStrip');
       if(vp2){
@@ -7455,7 +7457,6 @@ function cpTmCheck(step){
   window._tmPitch = window._tmPitch || 34;
   window._tmOffs = window._tmOffs || 0;
   if(st) st.textContent = '#tmOps th:not(:nth-child(' + col + ')), #tmOps td:not(:nth-child(' + col + ')){display:none}'
-    + '#tmOpsBody tr{height:' + window._tmPitch + 'px !important}'
     + '#tmOps{margin-top:' + window._tmOffs + 'px !important;}'
     + '#tmHeadGrid, #tmAddRowBtn{display:none !important}'   /* Rev-905: inline display:grid outranked the plain rule - the whole header block stayed */
     + '#tmOps{width:auto !important; margin:0 !important;}'
@@ -7469,6 +7470,18 @@ function cpTmCheck(step){
     if(nx) nx.textContent = _tmCheckIdx === _tmCheckCols.length - 1 ? 'Done \u2713' : 'Next \u25b6';
   }
   const pane = document.getElementById('tmScanPane'); if(pane) pane.style.flex = '1 1 auto';   /* Rev-904 */
+  /* Rev-909: THE ALIGNMENT ITSELF. A single row pitch can never sit on the paper because the
+     paper's rows are not one height - a description that wrapped to two printed lines made
+     its row taller and everything after it slid off a uniform grid. Each table row's height
+     now scales with the lines its own description occupied on the print (estimated from its
+     length against the sheet's ~45-character line), so the table's rhythm mirrors the
+     paper's row for row. Pitch still scales it all; Up/Down still slides the start. */
+  document.querySelectorAll('#tmOpsBody tr').forEach(tr => {
+    const t = tr.querySelectorAll('input[type=text], input:not([type])');
+    const dl = (t[3] ? String(t[3].value || '') : '').length;
+    const lines = 1 + (dl > 44 ? 1 : 0) + (dl > 95 ? 1 : 0);
+    tr.style.height = (window._tmPitch * lines) + 'px';
+  });
 }
 async function cpTmSave(){
   const r = cpTmRender(); if(!r) return;
