@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-915</title>
+<title>CONTROL PLAN GENERATOR - Rev-916</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-915 · 2026-08-04 7:47 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-916 · 2026-08-04 7:51 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-915 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 7:47 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-916 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 7:51 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-915 · Built Aug 4, 2026</span>
+    <span id="revFooter">App Rev-916 · Built Aug 4, 2026</span>
   </div>
 </div>
 
@@ -1658,7 +1658,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-915";
+const APP_REV = "Rev-916";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2186,6 +2186,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-04", rev: "App Rev-916", type: "App", changes: ["BOTH TRAVELLERS IN THE VIEWER, WITH A PRIMARY - THE SCAN BY DEFAULT (Rev-916, embedded validation REV-255) — per Rich's spec. VIEW TRAVELLER now shows both documents side by side whenever a generated sheet exists - SCANNED TRAVELLER and AI-GENERATED TRAVELLER, each labelled, the primary framed green with a gold PRIMARY star and the other carrying a MAKE PRIMARY button that switches on the spot. The default primary is the scanned image, exactly as specified, and no part changes until he changes it. The mechanism makes the choice govern everything downstream without touching a single consumer: the TRAVELLER slot that validation, exports and the plan checks all read is simply loaded with whichever document is primary, the scan preserved losslessly in its own slot the first time the generated sheet takes over, so switching back restores it exactly. AI-read and the side-by-side panel are pointed at the true scan even while the generated sheet is primary, so the model never reads its own output. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-915", type: "App", changes: ["SAVE TRAVELLER ACTIVATES THE PLAN, AND LEAVING ASKS FIRST (Rev-915, embedded validation REV-255) — two from Rich. Pressing SAVE TRAVELLER now also runs the part control plan save - the same draft save the green button performs - so the plan is ACTIVE in Control Plans the moment its traveller is filed, with no second button to remember; the flash says so. And the screen guards its exit: typing in any part field or touching the traveller marks the screen dirty, both saves clear it, and pressing Back with unsaved work raises SAVE BEFORE EXITING with three honest choices - Save and exit, Exit without saving, or Stay - instead of silently dropping whatever was typed. Back with nothing unsaved leaves exactly as it always did. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-914", type: "App", changes: ["SCAN AND AI-GENERATED TRAVELLER LIVE SIDE BY SIDE ON THE PANEL - SAVED MEANS SAVED (Rev-914, embedded validation REV-255) — Rich: after AI-read and Save, both travellers should simply BE there, side by side, with nothing re-generated. Two changes deliver it. First, a quiet data hazard is closed: Save used to write the drawn sheet OVER the scan, destroying the photograph the AI reads from - one save and the original was gone. With a scan on file the sheet now saves to its own GEN slot beside it; only a traveller typed from scratch, with no scan to protect, takes the main slot as before. Second, the panel on NEW CONTROL PLAN now shows the two-up whenever the part carries a generated sheet: SCANNED TRAVELLER and AI-GENERATED TRAVELLER, labelled, side by side, built straight from storage every time the screen opens - no re-read, no re-generation, saved means saved. The studio returns automatically for parts without a generated sheet. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-913", type: "App", changes: ["THE AI READ LANDS ON THE FULL VIEW, AS RICH SHOWED (Rev-913, embedded validation REV-255) — Rich sent the screen that should follow the AI read: the whole scan on the left and the whole editable table on the right - the full view. Rev-911's automatic jump into the column strip is undone; the read now lands exactly on that screen, and CHECK COLUMNS in the footer takes him into the strip when he chooses, with FULL VIEW bringing him back. Nothing else changed. Payload verified in both repos before this entry."] },
@@ -2978,7 +2979,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-04";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:47 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:51 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
