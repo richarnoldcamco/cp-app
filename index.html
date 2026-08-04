@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-909</title>
+<title>CONTROL PLAN GENERATOR - Rev-910</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-909 · 2026-08-04 6:22 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-910 · 2026-08-04 6:31 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-909 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 6:22 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-910 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 6:31 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-909 · Built Aug 4, 2026</span>
+    <span id="revFooter">App Rev-910 · Built Aug 4, 2026</span>
   </div>
 </div>
 
@@ -1658,7 +1658,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-909";
+const APP_REV = "Rev-910";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2186,6 +2186,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-04", rev: "App Rev-910", type: "App", changes: ["EVERY VALUE PINS ITSELF TO ITS PRINTED ROW - NO MORE DIALLING (Rev-910, embedded validation REV-255) — Rich has spent three revisions being asked to line rows up by hand, and the honest conclusion is that he never should have been: the AI reads the sheet anyway, so it now also reports WHERE each row sits - the vertical centre of every printed row as a fraction of the image height. With that on file, check mode stops using the table at all and pins each editable value at its own printed row's height, tracked live through every drag and wheel of the strip - wrapped rows and uneven pitch are irrelevant because nothing is estimated, each value sits where ITS row is, always. Values stay editable and write straight back to the table; the DESCRIPTION step gets a wider column. The pitch and offset dials remain only for reads made before this revision, with a note saying one re-run of AI-read makes the rows pin themselves. Run AI-read once more on 1000237498 to pick up the positions. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-909", type: "App", changes: ["REV-908 SHIPPED EMPTY; THE ROW ALIGNMENT IS TRULY IN THIS TIME (Rev-909, embedded validation REV-255) — the process failure first, again: Rev-908's patch missed its anchor, the guard fired - and the push was chained behind it and went out anyway, so Rev-908 carries the alignment story and none of the code, the second time this has happened (Rev-903 was the first). From this revision the workflow is patch, verify in the file, and only then embed and push as separate steps. The feature itself, genuinely present now: a single row pitch can never sit on the paper because the paper's rows are not one height - a wrapped two-line description makes its printed row taller and every row after it slides off a uniform grid, which was exactly the creep in Rich's screenshot. Each table row's height now scales with the lines its own description occupied on the print, estimated from its length against the sheet's roughly 45-character line, so tall printed rows get tall table rows and the two columns keep step all the way down. Dial the top row on, match the size once, and the rest follows; heights restore on exit. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-908", type: "App", changes: ["THE ROWS ALIGN THEMSELVES NOW - TALL PRINTED ROWS GET TALL TABLE ROWS (Rev-908, embedded validation REV-255) — Rich asked why the rows could not simply be aligned, and the honest answer is that a uniform pitch never could: the paper's rows are not one height. A description that wrapped to two printed lines made its row taller - 020 and 030 on this very traveller - and every row after it slid off a uniform grid, which is exactly the creep in his screenshot. Each table row's height now scales with how many lines its own description occupied on the print, estimated from its length against the sheet's roughly 45-character line, so the table's rhythm mirrors the paper's row for row. Dial the top row on with Up and Down, match the size once with the wheel or Pitch, and the two columns keep step all the way down including through the tall rows. Row heights are restored on exit. Verified live in both repos with payload markers before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-907", type: "App", changes: ["BOTH SIDES SHOW ONE COLUMN NOW - THE SCAN IS STRIPPED TOO (Rev-907, embedded validation REV-255) — Rich asked whether only the OP number column could be shown with everything else hidden - and the everything includes the SCAN's other columns, which no previous attempt touched, which is why the image kept swamping the screen. In check mode the image now sits inside a narrow 380-pixel viewing slot that shows a vertical strip of it: DRAG inside the slot slides the printed column into view, the WHEEL zooms about the cursor until the print's row pitch matches the table's, and the checked editable column stands six pixels to the strip's right. One printed column, one editable column, nothing else on screen; walking Next means dragging the strip a touch right to the next printed column. The pitch and offset dials remain for fine registration. Exit unwraps the strip and returns the image to its old fit exactly. Verified live in both repos with payload markers before this entry."] },
@@ -2972,7 +2973,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-04";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "6:22 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "6:31 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7023,9 +7024,9 @@ async function cpTravAiRead(){
           { type: 'image', source: { type: 'base64', media_type: m[1], data: m[2] } },
           { type: 'text', text: 'This is a CAMCO PART TRAVELER routing sheet. Return ONLY strict JSON, no markdown fences, no commentary, exactly this shape: '
             + '{"part":"","name":"","desc":"","price":"","mat":"","so":"","qty":"","due":"","eoq":"","usage":["","","","","","","",""],'
-            + '"rows":[["OP #","OP ID","WC #","WORKCENTER DESCRIPTION","CHK","CYCLE","VALUE"]]}. '
+            + '"rows":[["OP #","OP ID","WC #","WORKCENTER DESCRIPTION","CHK","CYCLE","VALUE","Y"]]}. '
             + 'usage = the eight PAST ANNUAL USAGE cells left-to-right top row then bottom row. '
-            + 'rows = every printed operation line in order. CHK = \"Y\" if that row has its checkbox ticked, \"\" if not. CYCLE = the CYCLE TIME (Min) figure as printed, VALUE = the OPERATION VALUE as printed, \"\" where absent. QUANTITY/INITIALS/DATE are handwriting blanks - skip them. '
+            + 'rows = every printed operation line in order. CHK = \"Y\" if that row has its checkbox ticked, \"\" if not. CYCLE = the CYCLE TIME (Min) figure as printed, VALUE = the OPERATION VALUE as printed, \"\" where absent. Y = the vertical CENTER of the printed row as a fraction of the FULL image height, 4 decimals (e.g. 0.3125). QUANTITY/INITIALS/DATE are handwriting blanks - skip them. '
             + 'Use "" for anything not readable. Do not invent rows.' } ] }] })
     });
     if(!resp.ok){
@@ -7385,6 +7386,8 @@ function cpTmCheck(step){
       fp.insertBefore(tbl, ab || null);
       tbl.style.flex = ''; tbl.style.background = ''; tbl.style.padding = ''; tbl.style.alignSelf = '';
       document.querySelectorAll('#tmOpsBody tr').forEach(tr => { tr.style.height = ''; });   /* Rev-909 */
+      const yc2 = document.getElementById('tmYCol'); if(yc2) yc2.remove();   /* Rev-910 */
+      tbl.style.display = '';
       /* Rev-907: unwrap the strip - the image returns to the pane at its old fit */
       const vp2 = document.getElementById('tmStrip');
       if(vp2){
@@ -7450,6 +7453,19 @@ function cpTmCheck(step){
     _tbl.style.flex = '0 0 auto'; _tbl.style.background = '#fff'; _tbl.style.padding = '0 6px';
     _tbl.style.alignSelf = 'flex-start';
   }
+  /* Rev-910: AUTOMATIC ROW REGISTRATION. When the AI read carried each row's Y - its printed
+     position as a fraction of the image height - the dials become unnecessary: every value is
+     pinned at its own printed row's height, tracked live through every drag and wheel of the
+     strip. Wrapped rows, uneven pitch - irrelevant, since nothing is estimated: each value
+     sits where ITS row is. Values stay editable and write straight back to the table. Reads
+     from before Y existed fall back to the dial mode with a note. */
+  (function(){
+    const pnEl = document.getElementById('tmPart');
+    const pn2 = pnEl ? String(pnEl.value || '').trim().toUpperCase() : '';
+    const info2 = pn2 ? (cpPartInfoGet(pn2) || {}) : {};
+    const dr = (info2.travData && info2.travData.rows) || [];
+    window._tmYRows = (dr.length && dr[0].length >= 8 && dr.some(r => parseFloat(r[7]) > 0)) ? dr : null;
+  })();
   const col = _tmCheckCols[_tmCheckIdx][0];
   /* Rev-904: the survivor sits hard against the scan - header block and add-row button
      vanish too, the form pane shrinks to the column's own width and stops flexing, and the
@@ -7476,6 +7492,49 @@ function cpTmCheck(step){
      now scales with the lines its own description occupied on the print (estimated from its
      length against the sheet's ~45-character line), so the table's rhythm mirrors the
      paper's row for row. Pitch still scales it all; Up/Down still slides the start. */
+  if(window._tmYRows){
+    const tIdx = [0, 1, 2, 3][_tmCheckIdx];
+    const wide = _tmCheckIdx === 3;
+    const sp2 = document.getElementById('tmScanPane');
+    let yc = document.getElementById('tmYCol');
+    if(!yc && sp2){
+      yc = document.createElement('div'); yc.id = 'tmYCol';
+      sp2.insertBefore(yc, document.getElementById('tmOps'));
+    }
+    if(yc){
+      yc.style.cssText = 'position:relative; flex:0 0 ' + (wide ? 420 : 110) + 'px; background:#fff; border-left:2px solid #7a1a1c; overflow:hidden;';
+      yc.innerHTML = '';
+      const tbl2 = document.getElementById('tmOps'); if(tbl2) tbl2.style.display = 'none';
+      const trs = document.querySelectorAll('#tmOpsBody tr');
+      window._tmYRows.forEach((rr, i) => {
+        const y = parseFloat(rr[7]); if(!(y > 0)) return;
+        const tr = trs[i]; if(!tr) return;
+        const src = tr.querySelectorAll('input[type=text], input:not([type])')[tIdx]; if(!src) return;
+        const inp = document.createElement('input');
+        inp.value = src.value;
+        inp.dataset.y = y;
+        inp.style.cssText = 'position:absolute; left:4px; right:4px; height:26px; box-sizing:border-box;'
+          + 'border:1px solid #999; border-radius:3px; font:700 13px Arial; padding:2px 6px; background:#fffef4;';
+        inp.oninput = () => { src.value = inp.value; };
+        yc.appendChild(inp);
+      });
+      window._tmYSync = function(){
+        const img = document.querySelector('#tmStrip img'); if(!img || !img.naturalHeight) return;
+        const scale = (window._tmStripZ || 1);
+        document.querySelectorAll('#tmYCol input').forEach(el => {
+          const y = parseFloat(el.dataset.y || '0');
+          el.style.top = (y * img.naturalHeight * scale + (window._tmStripY || 0) - 13) + 'px';
+        });
+      };
+      window._tmYSync();
+      if(!window._tmYTick) window._tmYTick = setInterval(function(){
+        if(document.getElementById('tmYCol')){ try{ window._tmYSync(); }catch(e){ } }
+        else { clearInterval(window._tmYTick); window._tmYTick = null; }
+      }, 120);
+    }
+    return;
+  }
+  flash('This read predates auto-alignment \u2014 re-run \u{1F916} AI-read once and the rows will pin themselves', true);
   document.querySelectorAll('#tmOpsBody tr').forEach(tr => {
     const t = tr.querySelectorAll('input[type=text], input:not([type])');
     const dl = (t[3] ? String(t[3].value || '') : '').length;
