@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-891</title>
+<title>CONTROL PLAN GENERATOR - Rev-892</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-891 · 2026-08-03 8:44 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-892 · 2026-08-03 8:45 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-891 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 8:44 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-892 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 8:45 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-891 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-892 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -1657,7 +1657,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-891";
+const APP_REV = "Rev-892";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2185,6 +2185,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-892", type: "App", changes: ["THE DRAWN TRAVELLER'S LABELS SIT WHERE THEY BELONG (Rev-892, embedded validation REV-255) — Rich circled three faults on the rendered sheet and one leak caused all of them: the little box-drawing helper flipped the canvas to CENTRE alignment and never put it back, so the first label drawn after any box came out left-aligned and every later one drew CENTRED on its anchor point - which is exactly why MATERIAL COST slid half off the blue band while PART PRICE above it stayed put, why ORDER QUANTITY and DUE DATE drifted from their boxes, and why ECONOMIC ORDER QUANTITY planted itself over the 85-96 usage cell. The helper now saves and restores the canvas state, the right-column labels state their alignment on every pass and sit on their boxes' own centre lines, and the price pair is lifted fully inside the band instead of straddling its bottom edge. View before Save shows the corrected sheet, byte-for-byte what saves. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-891", type: "App", changes: ["SAVE DRAFT IS GREEN AND SAYS SAVE PART CONTROL PLAN (Rev-891, embedded validation REV-255) — per Rich: the grey Save Draft button is now GREEN (the app's standard green, matching Save traveller) and reads SAVE PART CONTROL PLAN. The wiring underneath is untouched - it still performs the draft save it always did. Worth noting for the next look at this screen: the stack now carries SAVE PART CONTROL PLAN and SAVE NEW PART CONTROL PLAN two buttons apart, and if those two ever read as the same action to a fresh eye, renaming or merging them is a one-line follow-up. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-890", type: "App", changes: ["THE THREE BUTTONS FINALLY SIT UNDER THE FIELDS; THE TABLE IS EDITABLE, NOT EXCEL (Rev-890, embedded validation REV-255) — found why the buttons kept vanishing however much height was shaved: the row was never IN the left column - it sat BELOW the whole two-column layout, so its top edge always equalled the tall right column's height, which is off the bottom of any screen. The block now physically lives inside the left column, directly under the part fields, where the sketch put it - visible no matter how tall the traveller side gets, and immune to future height changes on the right. And per Rich, no Excel: the toolbar button is now VIEW AS EDITABLE TABLE and opens the fill-in CAMCO PART TRAVELER replica - the same styled header block, usage grid and operations table, seeded with the typed data where it exists, with the scanned traveller viewable beside it, every field and row editable and Save re-issuing the sheet. The xlsx popup is retired from the toolbar. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-889", type: "App", changes: ["CONVERT SHOWS THE TABLE FIRST; THE PLAN BUTTONS ARE BACK ON SCREEN (Rev-889, embedded validation REV-255) — two fixes. The three plan buttons had slipped under the fold again - my Rev-887 mode tabs added about eighty pixels above the studio and the height allowance did not account for them; it now does (300 to 390), so Save Draft, Edit Existing and SAVE NEW PART CONTROL PLAN are back on screen without scrolling. And CONVERT TO TABLE FILE now opens a POP-UP first, showing the traveller as a table - the header fields at the top and one shaded row per operation under OP, OP ID, WC and DESCRIPTION - with Download .xlsx as a button inside the pop-up, so what is downloaded has been seen. The no-typed-data path still says plainly that a scan cannot be read without typing the rows once at tab 2. Verified live in both repos before this entry."] },
@@ -2953,7 +2954,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:44 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:45 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7062,21 +7063,26 @@ function cpTmRender(){
   x.fillStyle = '#dce3ee'; x.fillRect(30, 24, W - 60, headH - 40);
   x.strokeStyle = '#98a4b8'; x.strokeRect(30, 24, W - 60, headH - 40);
   const box = (bx, by, bw, bh, txt, fs, bold) => {
+    x.save();   /* Rev-892: box() used to leave the canvas centre-aligned, so every label
+                   drawn after a box inherited CENTRE and planted itself half-left of its x.
+                   That one leak was Rich's whole circle: MATERIAL COST off the band,
+                   ECONOMIC ORDER QUANTITY over the 85-96 cell. Saved and restored now. */
     x.fillStyle = '#fff'; x.fillRect(bx, by, bw, bh);
     x.strokeStyle = '#666'; x.strokeRect(bx, by, bw, bh);
     x.fillStyle = '#000'; x.font = (bold ? '800 ' : '700 ') + fs + 'px Arial';
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillText(txt, bx + bw/2, by + bh/2 + 1, bw - 14);
+    x.restore();
   };
   x.fillStyle = '#000'; x.font = '800 22px Arial'; x.textAlign = 'center'; x.textBaseline = 'alphabetic';
   x.fillText('PART NUMBER', 260, 62);
   box(80, 74, 360, 52, g('tmPart'), 30, true);
   box(80, 132, 360, 40, g('tmName'), 20, true);
   box(80, 178, 360, 40, g('tmDesc'), 20, true);
-  x.fillStyle = '#000'; x.font = '800 20px Arial'; x.textAlign = 'left';
-  x.fillText('PART PRICE', 80, 250); x.fillText('MATERIAL COST:', 80, 284);
-  box(280, 230, 150, 28, g('tmPrice'), 18, false);
-  box(280, 264, 150, 28, g('tmMat'), 18, false);
+  x.fillStyle = '#000'; x.font = '800 20px Arial'; x.textAlign = 'left'; x.textBaseline = 'middle';
+  x.fillText('PART PRICE', 80, 236); x.fillText('MATERIAL COST:', 80, 268);   /* Rev-892: inside the band */
+  box(280, 222, 150, 28, g('tmPrice'), 18, false);
+  box(280, 254, 150, 28, g('tmMat'), 18, false);
   x.fillStyle = '#000'; x.font = '800 38px Arial'; x.textAlign = 'center';
   x.fillText('CAMCO PART TRAVELER', W/2, 84);
   x.font = '800 20px Arial'; x.fillText('PAST ANNUAL USAGE', W/2, 130);
@@ -7089,10 +7095,11 @@ function cpTmRender(){
     x.fillText(['0-12','13-24','25-36','37-48','49-60','61-72','73-84','85-96'][i], bx + uW/2, by + 17);
     box(bx, by + 24, uW, 28, g('tmU' + i) || '0', 16, false);
   }
-  x.fillStyle = '#000'; x.font = '800 20px Arial'; x.textAlign = 'left';
   const rx = W - 560;
   ['SHOP ORDER NUMBER','ORDER QUANTITY','DUE DATE','ECONOMIC ORDER QUANTITY'].forEach((L, i) => {
-    x.fillStyle = '#000'; x.fillText(L, rx, 76 + i*54);
+    x.fillStyle = '#000'; x.font = '800 20px Arial';
+    x.textAlign = 'left'; x.textBaseline = 'middle';   /* Rev-892: stated every pass, on the box's own centre line */
+    x.fillText(L, rx, 71 + i*54);
     box(rx + 320, 56 + i*54, 200, 30, [g('tmSO'), g('tmQty'), g('tmDue'), g('tmEOQ')][i], 17, false);
   });
   let y = headH + 40;
