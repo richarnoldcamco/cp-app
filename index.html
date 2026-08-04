@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-882</title>
+<title>CONTROL PLAN GENERATOR - Rev-883</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-882 · 2026-08-03 8:07 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-883 · 2026-08-03 8:12 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-882 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 8:07 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-883 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 8:12 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-882 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-883 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -629,11 +629,11 @@
   <div style="font-weight:800; letter-spacing:.06em; color:#7a1a1c; margin:14px 0 4px;">TRAVELLER <span style="font-weight:400; font-size:12px; color:#6b6257;">(required the first time a part is created — the routing that lists its operations)</span></div>
   <!-- Rev-882: the traveller owns the whole right side now - the box runs the height of the
        column and the preview grows into it instead of sitting as a 120px stamp. -->
-  <div id="travDrop" style="border:2px dashed #b8a; border-color:#b89; border-radius:10px; background:#fff; padding:14px; text-align:center; cursor:pointer; min-height:56vh; display:flex; flex-direction:column; justify-content:center;">
+  <div id="travDrop" style="border:2px dashed #b8a; border-color:#b89; border-radius:10px; background:#fff; padding:14px; text-align:center; cursor:pointer; min-height:72vh; display:flex; flex-direction:column; justify-content:center;">
     <span id="travDropLabel">📄 Tap to upload the traveller (image or PDF)</span>
     <div id="travPasteHint" style="font-size:12px; color:#6b6257; margin-top:6px;">Tap to load <b>every page</b> and sew them into one · or press <b>Ctrl+V</b> to paste a single copied page</div>   <!-- Rev-872 -->
 
-    <img id="travThumb" style="display:none; max-height:46vh; max-width:96%; margin:10px auto 0; border:1px solid #ccc; border-radius:6px; object-fit:contain;">   <!-- Rev-882 -->
+    <img id="travThumb" style="display:none; max-height:60vh; max-width:96%; margin:10px auto 0; border:1px solid #ccc; border-radius:6px; object-fit:contain;">   <!-- Rev-882 -->
   </div>
   <input id="travFile" type="file" accept="image/*,.pdf" style="display:none">
   <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; align-items:center;">   <!-- Rev-882: the traveller's own toolbar -->
@@ -749,7 +749,10 @@
     </div>
   </div>
 
-  <div style="display:grid; grid-template-columns:1fr 1fr 1.4fr; gap:12px;">
+  <!-- Rev-883: the three buttons stack bottom-LEFT in a single 520px column, per Rich's
+       sketch, so the traveller keeps the whole right side. Save-new stays the loudest,
+       at the bottom of the stack where the eye lands last. -->
+  <div style="display:grid; grid-template-columns:1fr; gap:10px; max-width:520px; margin-top:14px;">
     <button class="btn-ghost" id="cpSaveDraftBtn" style="min-height:52px; font-weight:600; background:#5a6c7d; border:1px solid #4a5a68; color:#fff;">💾 Save Draft</button>
     <button class="btn-ghost" id="cpEditExistingBtn" onclick="cpEditExisting()" disabled="" style="min-height:52px; font-weight:700; background:#9aa4ad; border:1px solid #8a949d; color:#eef2f5; opacity:0.65; cursor:not-allowed;" title="No saved Control Plan matches this Part # + Operation ID# yet">📂 EDIT EXISTING CONTROL PLAN</button>
     <button class="btn-primary" id="cpGenerateBtn" style="min-height:52px;">SAVE NEW PART CONTROL PLAN</button>
@@ -1637,7 +1640,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-882";
+const APP_REV = "Rev-883";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2165,6 +2168,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-883", type: "App", changes: ["BUTTONS BOTTOM-LEFT; THE TRAVELLER FILLS THE RIGHT SIDE (Rev-883, embedded validation REV-255) — per Rich's sketch. The Save Draft, Edit Existing and SAVE NEW PART CONTROL PLAN buttons now stack in a single 520-pixel column at the bottom LEFT, under the part fields, instead of running across the page - the full-width row was what pinned the traveller into a box. With the width ceded, the traveller panel grows to fill the right side: the box floor rises from 56 to 72 percent of the window height and the preview from 46 to 60, so a long traveller like the 380-operation one on screen reads at size instead of in a letterbox. Save-new keeps the loudest styling and sits last in the stack where the eye lands. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-882", type: "App", changes: ["THE TRAVELLER OWNS THE RIGHT SIDE, AND ITS DATA IS EDITABLE NOW (Rev-882, embedded validation REV-255) — three pieces. The traveller box now runs the height of the right column (56vh minimum) with the preview growing to 46vh instead of a 120px stamp, and it carries its own toolbar underneath: SEW / ADD PAGES opens the stitching studio for the part on the form, ENTER / EDIT DATA opens the manual form, and Remove sits at the right of the same row. Second, the manual traveller is a DOCUMENT now, not a one-shot picture: Save stores the typed data - every field, every usage bucket, every operation row - keyed to the part, and Enter / edit data reloads all of it, so adding an operation or changing a field carries on from what was saved and Save re-issues the sheet. Third, when a SCANNED traveller is on file, the manual form offers View scanned traveller, opening the scan full screen beside the typing as a reference to copy from - said plainly: a scan cannot be read back into fields without OCR and this does not pretend to, the scan is shown so the data can be transcribed once and edited forever after. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-881", type: "App", changes: ["A VIEW BUTTON ON THE MANUAL TRAVELLER (Rev-881, embedded validation REV-255) — Rich asked for a View button next to Save. The sheet-drawing was split into its own function that both buttons call, so the preview is byte-for-byte the image the save will store - not a second rendering that could drift. View opens the drawn sheet full screen on a dark backdrop, scrollable at natural size, with Close (or a click on the backdrop) returning to the form with everything still typed in. Save is unchanged in behaviour. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-880", type: "App", changes: ["THE TRAVELLER IS ON THE RIGHT NOW - AND CAN BE TYPED IN BY HAND (Rev-880, embedded validation REV-255) — two things. First, Rev-879's columns never showed side by side: the NEW CONTROL PLAN screen is capped at 1100 pixels wide and the two columns needed 1062 inside 1052 of usable width, so the flex row wrapped and everything stayed stacked. The screen is widened to 1560 for real room and the column bases trimmed, so the part fields sit left and the traveller genuinely sits right. Second, ENTER TRAVELLER DATA MANUALLY: a button under the traveller box opens a fill-in replica of the CAMCO PART TRAVELER - part number (pre-filled from the form), nickname, description, part price, material cost, the eight-bucket PAST ANNUAL USAGE grid, shop order block, and an operations table of OP number, OP ID, workcenter and description with add and delete rows. Save draws the sheet onto a canvas by hand - white header band, blue usage headers, alternating row shading, the familiar layout - and hands the PNG down the SAME path an uploaded scan takes: the form thumbnail, and the part's TRAVELLER file when a part number is present. Nothing downstream can tell it from a scan. Verified live in both repos before this entry."] },
@@ -2924,7 +2928,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:07 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:12 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
