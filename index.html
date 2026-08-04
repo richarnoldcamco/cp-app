@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-890</title>
+<title>CONTROL PLAN GENERATOR - Rev-891</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-890 · 2026-08-03 8:41 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-891 · 2026-08-03 8:44 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-890 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 8:41 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-891 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 8:44 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-890 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-891 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -627,7 +627,8 @@
        the tall right column's height - off the bottom of the screen. It now lives INSIDE
        the left column, directly under the part fields, where the sketch put it. -->
   <div style="display:grid; grid-template-columns:1fr; gap:10px; max-width:520px; margin-top:14px;">
-    <button class="btn-ghost" id="cpSaveDraftBtn" style="min-height:52px; font-weight:600; background:#5a6c7d; border:1px solid #4a5a68; color:#fff;">💾 Save Draft</button>
+    <!-- Rev-891: green, and named for what it saves. Same draft-save wiring underneath. -->
+    <button class="btn-ghost" id="cpSaveDraftBtn" style="min-height:52px; font-weight:700; background:#2c6e49; border:1px solid #215236; color:#fff;">💾 SAVE PART CONTROL PLAN</button>
     <button class="btn-ghost" id="cpEditExistingBtn" onclick="cpEditExisting()" disabled="" style="min-height:52px; font-weight:700; background:#9aa4ad; border:1px solid #8a949d; color:#eef2f5; opacity:0.65; cursor:not-allowed;" title="No saved Control Plan matches this Part # + Operation ID# yet">📂 EDIT EXISTING CONTROL PLAN</button>
     <button class="btn-primary" id="cpGenerateBtn" style="min-height:52px;">SAVE NEW PART CONTROL PLAN</button>
   </div>
@@ -1656,7 +1657,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-890";
+const APP_REV = "Rev-891";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2184,6 +2185,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-891", type: "App", changes: ["SAVE DRAFT IS GREEN AND SAYS SAVE PART CONTROL PLAN (Rev-891, embedded validation REV-255) — per Rich: the grey Save Draft button is now GREEN (the app's standard green, matching Save traveller) and reads SAVE PART CONTROL PLAN. The wiring underneath is untouched - it still performs the draft save it always did. Worth noting for the next look at this screen: the stack now carries SAVE PART CONTROL PLAN and SAVE NEW PART CONTROL PLAN two buttons apart, and if those two ever read as the same action to a fresh eye, renaming or merging them is a one-line follow-up. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-890", type: "App", changes: ["THE THREE BUTTONS FINALLY SIT UNDER THE FIELDS; THE TABLE IS EDITABLE, NOT EXCEL (Rev-890, embedded validation REV-255) — found why the buttons kept vanishing however much height was shaved: the row was never IN the left column - it sat BELOW the whole two-column layout, so its top edge always equalled the tall right column's height, which is off the bottom of any screen. The block now physically lives inside the left column, directly under the part fields, where the sketch put it - visible no matter how tall the traveller side gets, and immune to future height changes on the right. And per Rich, no Excel: the toolbar button is now VIEW AS EDITABLE TABLE and opens the fill-in CAMCO PART TRAVELER replica - the same styled header block, usage grid and operations table, seeded with the typed data where it exists, with the scanned traveller viewable beside it, every field and row editable and Save re-issuing the sheet. The xlsx popup is retired from the toolbar. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-889", type: "App", changes: ["CONVERT SHOWS THE TABLE FIRST; THE PLAN BUTTONS ARE BACK ON SCREEN (Rev-889, embedded validation REV-255) — two fixes. The three plan buttons had slipped under the fold again - my Rev-887 mode tabs added about eighty pixels above the studio and the height allowance did not account for them; it now does (300 to 390), so Save Draft, Edit Existing and SAVE NEW PART CONTROL PLAN are back on screen without scrolling. And CONVERT TO TABLE FILE now opens a POP-UP first, showing the traveller as a table - the header fields at the top and one shaded row per operation under OP, OP ID, WC and DESCRIPTION - with Download .xlsx as a button inside the pop-up, so what is downloaded has been seen. The no-typed-data path still says plainly that a scan cannot be read without typing the rows once at tab 2. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-888", type: "App", changes: ["THE BLUE BUTTON IS GONE; CONVERT TO TABLE FILE TAKES ITS PLACE (Rev-888, embedded validation REV-255) — two from Rich. The blue Enter / edit data button under the panel is deleted - the manual door is tab 2 at the top now and one door is enough. In its slot: CONVERT TO TABLE FILE, which builds a real .xlsx of the traveller on this device using the same on-demand ExcelJS engine the Customer CP export uses - the header fields (part, name, description, prices, order block, usage) on top and one row per operation under an OP / OP ID / WC / DESCRIPTION heading, downloaded as TRAVELLER_<part>.xlsx. Said honestly on the button's own failure path: the table comes from the TYPED data, because a scanned photograph has no rows a program can read without OCR - with only a scan on file, the button says exactly that and points at tab 2: type the rows once, convert forever after. A part with typed data converts instantly. Verified live in both repos before this entry."] },
@@ -2951,7 +2953,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:41 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
