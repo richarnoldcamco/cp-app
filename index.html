@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-899</title>
+<title>CONTROL PLAN GENERATOR - Rev-900</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-899 · 2026-08-03 9:52 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-900 · 2026-08-03 9:53 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-899 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 9:52 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-900 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 9:53 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-899 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-900 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -1658,7 +1658,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-899";
+const APP_REV = "Rev-900";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2186,6 +2186,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-900", type: "App", changes: ["THE BRAIN IS TRUE GREY NOW (Rev-900, embedded validation REV-255) — Rich saw a purple tint on the brain and he was right, from two directions at once: the grayscale filter was only at 85 percent, leaving 15 percent of the emoji's own pink alive, and the glyph sits inside the purple thinking overlay whose rings and glow lend it a violet cast besides. The filter is now full grayscale with a small neutral contrast and brightness lift, so the glyph itself carries no colour at all and reads slate-grey against the purple rather than lilac. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-899", type: "App", changes: ["THE EDITABLE TABLE SHADES AND PACES LIKE THE PAPER (Rev-899, embedded validation REV-255) — the editable table's rows now alternate white and grey exactly as the printed traveller does, at a fixed 34-pixel row height with the cell padding tightened to match - so in the side-by-side review the form's rows run in step with the scan's and the eye can walk straight across from a printed line to its editable twin. One honest caveat stated rather than hidden: the scan's absolute row positions depend on how the photograph was taken and what zoom the pane is at, so the rhythm matches but pixel-for-pixel registration against any given scan cannot be promised. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-898", type: "App", changes: ["THE AI SPINNER IS THREE TIMES THE SIZE AND THE BRAIN IS GREY (Rev-898, embedded validation REV-255) — per Rich: the thinking overlay's ring stack grows from 150 to 450 pixels with the ring strokes tripled (4 to 12) and the inner ring's offset scaled to match, and the brain at the centre goes from 52 to 156 pixels. The emoji's pink is drained with a grayscale filter (85 percent, brightened slightly) so it reads as a grey brain rather than a pink one - an emoji's colours are baked into the glyph, so a filter is the honest way to recolour it. Message, clock and dots ride below unchanged. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-897", type: "App", changes: ["THE STRAY FORMAT TEXT WAS A BROKEN HEADER - FIXED, AND THE CHECKBOXES ARE BLACK (Rev-897, embedded validation REV-255) — the block of raw style text Rich circled was not a format section to remove but the operations table's own HEADER, broken by Rev-895: the splice left a doubled plus on four lines, and a unary plus on a string is NaN - so the opening thead tags became the literal text NaN, the tags never opened, the style text printed on the page as prose, and every column heading shifted one place, which is also why the checkboxes looked out of place. The concatenation is plain single pluses now, so the header reads OP #, OP ID, QUANTITY, INITIALS, DATE, WC #, WORKCENTER DESCRIPTION, checkbox, CYCLE (MIN), VALUE over their own columns. The checkboxes are BLACK (accent-color) and 20 pixels, the same size the drawn sheet gives them, instead of the browser-red 16. Verified live in both repos before this entry."] },
@@ -2962,7 +2963,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:53 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6977,7 +6978,7 @@ async function cpTravAiRead(){
       '<div style="position:relative; width:450px; height:450px;">'   /* Rev-898: 3x */
       + '<div style="position:absolute; inset:0; border-radius:50%; border:12px solid transparent; border-top-color:#b18cd9; border-right-color:#b18cd9; animation:cpAiSpin 1.1s linear infinite;"></div>'
       + '<div style="position:absolute; inset:48px; border-radius:50%; border:12px solid transparent; border-bottom-color:#8a5fc0; border-left-color:#8a5fc0; animation:cpAiSpinBack 1.7s linear infinite;"></div>'
-      + '<div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:156px; filter:grayscale(.85) brightness(1.15); animation:cpAiPulse 1.6s ease-in-out infinite;">\u{1F9E0}</div>'
+      + '<div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:156px; filter:grayscale(1) contrast(1.05) brightness(1.1); animation:cpAiPulse 1.6s ease-in-out infinite;">\u{1F9E0}</div>'
       + '</div>'
       + '<div id="cpAiThinkMsg" style="color:#e9defc; font:800 17px system-ui; letter-spacing:.05em; animation:cpAiPulse 2.2s ease-in-out infinite;">AI is reading the traveller\u2026</div>'
       + '<div id="cpAiThinkClock" style="color:#b18cd9; font:800 26px system-ui; font-variant-numeric:tabular-nums;">0:00</div>'
