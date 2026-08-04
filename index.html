@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-886</title>
+<title>CONTROL PLAN GENERATOR - Rev-887</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-886 · 2026-08-03 8:27 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-887 · 2026-08-03 8:29 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-886 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 8:27 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-887 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 8:29 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-886 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-887 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -629,6 +629,13 @@
   <div style="font-weight:800; letter-spacing:.06em; color:#7a1a1c; margin:14px 0 4px;">TRAVELLER <span style="font-weight:400; font-size:12px; color:#6b6257;">(required the first time a part is created — the routing that lists its operations)</span></div>
   <!-- Rev-882: the traveller owns the whole right side now - the box runs the height of the
        column and the preview grows into it instead of sitting as a 120px stamp. -->
+  <!-- Rev-887: TWO DISTINCT WAYS IN, said up front instead of a small button under the box:
+       upload an image of the traveller, or type the data in. Upload is the lit tab and shows
+       the studio; Manual opens the fill-in CAMCO PART TRAVELER form. -->
+  <div style="display:flex; gap:10px; margin-bottom:10px;">
+    <button type="button" id="travModeUpload" onclick="cpTravMode('upload')" style="flex:1; padding:14px 10px; font:800 14px system-ui; letter-spacing:.04em; border-radius:8px; cursor:pointer; background:#7a1a1c; color:#fff; border:2px solid #5d1416;">📄 1 · UPLOAD AN IMAGE OF THE TRAVELLER</button>
+    <button type="button" id="travModeManual" onclick="cpTravMode('manual')" style="flex:1; padding:14px 10px; font:800 14px system-ui; letter-spacing:.04em; border-radius:8px; cursor:pointer; background:#efe9df; color:#5c4a3a; border:2px solid #c9c0b4;">✏ 2 · INPUT THE DATA MANUALLY</button>
+  </div>
   <!-- Rev-884: the SAME studio the full-screen traveller window uses now mounts INLINE here -
        add-page strip, page thumbnails, zoom, layout / trim / background, Sew pages into one,
        nudge bar, live preview. One codebase, two mounts; nothing re-implemented. -->
@@ -1649,7 +1656,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-886";
+const APP_REV = "Rev-887";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2177,6 +2184,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-887", type: "App", changes: ["TWO DISTINCT DOORS INTO THE TRAVELLER (Rev-887, embedded validation REV-255) — Rich asked for the two ways in to be two distinct options rather than a small Enter-edit button under the box. Two full-width tabs now head the traveller panel: 1, UPLOAD AN IMAGE OF THE TRAVELLER, and 2, INPUT THE DATA MANUALLY. Upload is lit by default and shows the studio exactly as before. Manual lights its tab and opens the fill-in CAMCO PART TRAVELER form on the spot; when the form closes the tab hands back to Upload, because the studio is where the finished sheet lands either way - and a manual Save now re-seeds the inline studio immediately, so the drawn sheet appears on the panel the moment it is saved instead of on the next remount. The Save traveller and Enter-edit buttons under the panel are unchanged for anyone who reaches for them there. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-886", type: "App", changes: ["THE SAVED TRAVELLER COMES BACK NOW (Rev-886, embedded validation REV-255) — Rich saved a traveller, the app updated and reloaded, and the studio came up empty - the traveller looked lost. It was never lost: the 1000237498 traveller is confirmed sitting in storage, 447 KB. Two timing faults hid it. First, the drawing cache is filled from the browser's database asynchronously at boot, and the studio mounted before the cache was warm - found nothing, and never looked again. The mount now waits and retries every half second, up to six seconds, until the cache is ready. Second, RESUME LAST SESSION fills the Part Number programmatically, which fires no change event - so the remount hook never ran and the studio stayed mounted for the BLANK part number. Restore now tells the studio directly once the fields are back, and typing a part number is caught on input as well, debounced, not only on leaving the field. The mount also re-seeds when the stored traveller itself has changed since the last mount. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-885", type: "App", changes: ["EVERY BUTTON ON SCREEN WITHOUT SCROLLING (Rev-885, embedded validation REV-255) — the inline traveller studio was sized by its content, so a long traveller pushed its own Save traveller / Enter-edit toolbar and the three plan buttons below the fold. The studio is now height-capped to what the window can actually show - full height minus a 300 pixel allowance for the header, the field rows and the toolbars, with a 420 pixel floor for short laptop screens - and the long preview scrolls INSIDE the studio, which it already knew how to do in its full-screen shell. Result: Save Draft, Edit Existing, SAVE NEW PART CONTROL PLAN, Save traveller and Enter / edit data are all on screen at once, and the traveller scrolls within its panel. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-884", type: "App", changes: ["THE TRAVELLER BOX ON THE FORM IS THE REAL STUDIO NOW (Rev-884, embedded validation REV-255) — Rich asked for the traveller box to look and function like the full traveller screen. It does, because it IS it: the studio was already split into a mountable body (cpImageStudioInline) and a full-screen shell, so the body now mounts straight into the right-hand panel - the ADD ANOTHER PAGE strip, the page thumbnails with reorder and delete, the zoom row, LAYOUT / TRIM OVERLAP / BACKGROUND, Sew pages into one with Undo last sew, the nudge bar and the live preview. One codebase, two mounts; nothing was re-implemented, so every future studio fix lands in both places. It mounts when the New Control Plan screen is prepared, seeds from the part's stored traveller, and re-seeds when the Part Number changes. A green Save traveller in the toolbar under it runs the same storage path as the full-screen Save but stays on the form; Enter / edit data and Remove ride alongside. The old drop box stays in the page hidden because the plan-save checks and paste wiring read its elements, and the document-level Ctrl+V from Rev-871 stands down while the studio is mounted since the studio takes its own pastes. Verified live in both repos before this entry."] },
@@ -2940,7 +2948,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:27 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:29 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6755,6 +6763,23 @@ async function cpImageStudio(opts){
    is prepared, seeded from the part's stored traveller, re-seeded when the Part Number
    changes. Save runs the same storage path the full-screen studio's Save runs, but stays on
    the form. */
+/* Rev-887: the chooser. Upload lights its tab and shows the studio; Manual opens the
+   fill-in form immediately - the tab lights while the form is up and hands back to Upload
+   when it closes, since the studio is where the finished sheet lands either way. */
+function cpTravMode(m){
+  const up = document.getElementById('travModeUpload'), mn = document.getElementById('travModeManual');
+  const lit = 'background:#7a1a1c; color:#fff; border:2px solid #5d1416;';
+  const dim = 'background:#efe9df; color:#5c4a3a; border:2px solid #c9c0b4;';
+  const base = 'flex:1; padding:14px 10px; font:800 14px system-ui; letter-spacing:.04em; border-radius:8px; cursor:pointer; ';
+  if(up) up.style.cssText = base + (m === 'upload' ? lit : dim);
+  if(mn) mn.style.cssText = base + (m === 'manual' ? lit : dim);
+  if(m === 'manual'){
+    cpTravellerManual();
+    const watch = setInterval(function(){
+      if(!document.getElementById('travManBg')){ clearInterval(watch); cpTravMode('upload'); }
+    }, 400);
+  }
+}
 function cpTravInlineMount(){
   const host = document.getElementById('travStudioHost'); if(!host) return;
   const pn = ((document.getElementById('cpPartNum') || {}).value || '').trim().toUpperCase();
@@ -7043,6 +7068,7 @@ async function cpTmSave(){
     if(typeof window._cpTravShow === 'function') window._cpTravShow(url);
     const bgEl = document.getElementById('travManBg'); if(bgEl) bgEl.remove();
     flash('\u2713 Manual traveller saved' + (P ? (' for ' + P) : ''));
+    try{ if(typeof cpTravInlineMount === 'function') setTimeout(cpTravInlineMount, 150); }catch(e){ }   /* Rev-887 */
     try{ if(typeof renderProjects === 'function') renderProjects(); }catch(e){ }
   }catch(e){ alert('Could not save the traveller: ' + (e && e.message || e)); }
 }
