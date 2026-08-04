@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-904</title>
+<title>CONTROL PLAN GENERATOR - Rev-905</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-904 · 2026-08-03 10:05 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-905 · 2026-08-03 10:07 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-904 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 10:05 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-905 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 10:07 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-904 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-905 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -1658,7 +1658,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-904";
+const APP_REV = "Rev-905";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2186,6 +2186,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-905", type: "App", changes: ["THE COLUMN DIALS ONTO THE SCAN, ROW FOR ROW (Rev-905, embedded validation REV-255) — Rich called check mode unusable because the rows did not line up with the paper, and he is right that they never could by assumption: the scan's row pitch depends on the photograph and the pane width, different for every traveller. So the column is now DIALLED onto the scan. Four controls join the check bar - PITCH minus and plus squeeze or stretch the row height a pixel at a time, UP and DOWN slide the whole column four pixels at a time - until the column's rows sit exactly on the paper's lines; the setting holds while stepping Prev and Next through all four columns, so it is dialled once per scan. Also fixed from the same screenshot: the traveller header block had survived hiding because its inline display outranked the plain CSS rule - the rule carries important now and the header genuinely disappears in check mode. Verified live in both repos with payload markers before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-904", type: "App", changes: ["REV-903 SHIPPED EMPTY - THIS IS THE COLUMN-BESIDE-THE-SCAN FIX, REALLY IN (Rev-904, embedded validation REV-255) — owning a process failure first: Rev-903's changelog described the checked column sitting hard against the scan, but the patch had missed its target and the guard that caught it fired AFTER the push had been chained - so Rev-903 went out carrying the claim and none of the code. This revision actually contains it, verified in the file this time: in check mode the traveller header block and the add-row button disappear along with the other columns, the form pane shrinks to the surviving column's own width and stops flexing, and the scan pane takes every pixel the column does not need - the values stand directly beside the paper, close enough to read across, instead of centred in a wide empty pane a screen away. Exit restores the header block, add-row, full table and pane widths exactly. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-903", type: "App", changes: ["THE CHECKED COLUMN NOW SITS HARD AGAINST THE SCAN (Rev-903, embedded validation REV-255) — Rich was right - in check mode the surviving column floated centred in a wide pane with the traveller header block still above it, a screen-width away from the scan it was meant to be compared with. In check mode now: the header block and the add-row button disappear along with the other columns, the form pane shrinks to the column's own width and stops flexing, and the scan pane takes every pixel the column does not need - so the values stand DIRECTLY beside the paper, close enough to read across. Exit restores the header block, the add-row button, the full table and the pane widths exactly as before. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-902", type: "App", changes: ["COLUMN-BY-COLUMN CHECKING AGAINST THE SCAN (Rev-902, embedded validation REV-255) — Rich wants to verify the AI-read data one column at a time against the paper. A CHECK COLUMNS button now sits in the review window's footer: it hides every column but one and widens the scan pane to 62 percent, so a single slim column of values stands directly beside the image, row-for-row on the shared 34-pixel rhythm and shading from Rev-899. The walk is Rich's order - OP #, then OP ID, WC #, DESCRIPTION - with Prev and Next stepping through, the last Next reading Done, and Exit restoring the full table at any point. The mode is pure show and hide: no value is touched, edits made mid-check stick, and Save behaves exactly as before. Verified live in both repos before this entry."] },
@@ -2967,7 +2968,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:05 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:07 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7141,7 +7142,12 @@ function cpTravellerManual(opts){
         '<button type="button" id="tmCheckPrev" onclick="cpTmCheck(-1)" style="background:#efe9df; border:1px solid #c9c0b4; border-radius:8px; padding:12px 16px; font:800 14px system-ui; cursor:pointer;">\u25c0 Prev</button>'
         + '<span id="tmCheckLabel" style="font:800 15px system-ui; min-width:150px; text-align:center;"></span>'
         + '<button type="button" id="tmCheckNext" onclick="cpTmCheck(+1)" style="background:#2c6e49; color:#fff; border:0; border-radius:8px; padding:12px 16px; font:800 14px system-ui; cursor:pointer;">Next \u25b6</button>'
-        + '<button type="button" onclick="cpTmCheck(null)" style="background:#a5342a; color:#fff; border:0; border-radius:8px; padding:12px 14px; font:800 14px system-ui; cursor:pointer;">Exit</button>';
+        + '<button type="button" onclick="cpTmCheck(null)" style="background:#a5342a; color:#fff; border:0; border-radius:8px; padding:12px 14px; font:800 14px system-ui; cursor:pointer;">Exit</button>'
+        + '<span style="font:800 12px system-ui; margin-left:14px;">ROWS:</span>'
+        + '<button type="button" onclick="cpTmDial(\'p\',-1)" title="Rows closer together" style="border:1px solid #c9c0b4; border-radius:6px; padding:10px 12px; font:800 14px system-ui; cursor:pointer;">Pitch \u2212</button>'
+        + '<button type="button" onclick="cpTmDial(\'p\',1)" title="Rows further apart" style="border:1px solid #c9c0b4; border-radius:6px; padding:10px 12px; font:800 14px system-ui; cursor:pointer;">Pitch +</button>'
+        + '<button type="button" onclick="cpTmDial(\'o\',-4)" title="Whole column up" style="border:1px solid #c9c0b4; border-radius:6px; padding:10px 12px; font:800 14px system-ui; cursor:pointer;">\u25b2 Up</button>'
+        + '<button type="button" onclick="cpTmDial(\'o\',4)" title="Whole column down" style="border:1px solid #c9c0b4; border-radius:6px; padding:10px 12px; font:800 14px system-ui; cursor:pointer;">\u25bc Down</button>';
       foot.insertBefore(bar, cb.nextSibling);
     }
   }
@@ -7349,6 +7355,16 @@ function cpTmView(){
    full table. Pure show/hide - no value is touched. */
 const _tmCheckCols = [ [1, 'OP #'], [2, 'OP ID'], [6, 'WC #'], [7, 'DESCRIPTION'] ];
 let _tmCheckIdx = -1;
+/* Rev-905: registration. The scan's row pitch depends on the photograph and the pane width,
+   so it can never be assumed - instead the COLUMN is dialled onto the scan: PITCH grows or
+   shrinks the row height a pixel at a time, OFFSET slides the whole column up or down two
+   pixels at a time, until the rows sit exactly on the paper's. The setting holds while
+   stepping Prev/Next through the four columns, so it is dialled once per scan. */
+function cpTmDial(which, d){
+  if(which === 'p') window._tmPitch = Math.min(80, Math.max(14, (window._tmPitch || 34) + d));
+  else window._tmOffs = Math.min(400, Math.max(-200, (window._tmOffs || 0) + d));
+  cpTmCheck(0);
+}
 function cpTmCheck(step){
   if(step === null){ _tmCheckIdx = -1; } else { _tmCheckIdx += step; }
   const st = document.getElementById('tmCheckStyle');
@@ -7364,8 +7380,12 @@ function cpTmCheck(step){
   /* Rev-904: the survivor sits hard against the scan - header block and add-row button
      vanish too, the form pane shrinks to the column's own width and stops flexing, and the
      scan takes every pixel the column does not need. */
+  window._tmPitch = window._tmPitch || 34;
+  window._tmOffs = window._tmOffs || 0;
   if(st) st.textContent = '#tmOps th:not(:nth-child(' + col + ')), #tmOps td:not(:nth-child(' + col + ')){display:none}'
-    + '#tmHeadGrid, #tmAddRowBtn{display:none}'
+    + '#tmOpsBody tr{height:' + window._tmPitch + 'px !important}'
+    + '#tmOps{margin-top:' + window._tmOffs + 'px !important;}'
+    + '#tmHeadGrid, #tmAddRowBtn{display:none !important}'   /* Rev-905: inline display:grid outranked the plain rule - the whole header block stayed */
     + '#tmOps{width:auto !important; margin:0 !important;}'
     + '#tmFormPane{flex:0 0 auto !important; padding:14px 10px !important;}';
   if(bar){
