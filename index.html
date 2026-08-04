@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-903</title>
+<title>CONTROL PLAN GENERATOR - Rev-904</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-903 · 2026-08-03 10:04 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-904 · 2026-08-03 10:05 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-903 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 10:04 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-904 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-03 10:05 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-903 · Built Aug 3, 2026</span>
+    <span id="revFooter">App Rev-904 · Built Aug 3, 2026</span>
   </div>
 </div>
 
@@ -1658,7 +1658,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-903";
+const APP_REV = "Rev-904";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2186,6 +2186,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-03", rev: "App Rev-904", type: "App", changes: ["REV-903 SHIPPED EMPTY - THIS IS THE COLUMN-BESIDE-THE-SCAN FIX, REALLY IN (Rev-904, embedded validation REV-255) — owning a process failure first: Rev-903's changelog described the checked column sitting hard against the scan, but the patch had missed its target and the guard that caught it fired AFTER the push had been chained - so Rev-903 went out carrying the claim and none of the code. This revision actually contains it, verified in the file this time: in check mode the traveller header block and the add-row button disappear along with the other columns, the form pane shrinks to the surviving column's own width and stops flexing, and the scan pane takes every pixel the column does not need - the values stand directly beside the paper, close enough to read across, instead of centred in a wide empty pane a screen away. Exit restores the header block, add-row, full table and pane widths exactly. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-903", type: "App", changes: ["THE CHECKED COLUMN NOW SITS HARD AGAINST THE SCAN (Rev-903, embedded validation REV-255) — Rich was right - in check mode the surviving column floated centred in a wide pane with the traveller header block still above it, a screen-width away from the scan it was meant to be compared with. In check mode now: the header block and the add-row button disappear along with the other columns, the form pane shrinks to the column's own width and stops flexing, and the scan pane takes every pixel the column does not need - so the values stand DIRECTLY beside the paper, close enough to read across. Exit restores the header block, the add-row button, the full table and the pane widths exactly as before. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-902", type: "App", changes: ["COLUMN-BY-COLUMN CHECKING AGAINST THE SCAN (Rev-902, embedded validation REV-255) — Rich wants to verify the AI-read data one column at a time against the paper. A CHECK COLUMNS button now sits in the review window's footer: it hides every column but one and widens the scan pane to 62 percent, so a single slim column of values stands directly beside the image, row-for-row on the shared 34-pixel rhythm and shading from Rev-899. The walk is Rich's order - OP #, then OP ID, WC #, DESCRIPTION - with Prev and Next stepping through, the last Next reading Done, and Exit restoring the full table at any point. The mode is pure show and hide: no value is touched, edits made mid-check stick, and Save behaves exactly as before. Verified live in both repos before this entry."] },
   { ts: "2026-08-03", rev: "App Rev-901", type: "App", changes: ["SPINNER TEXT WHITE, CLOCK DOUBLE AND BRIGHT YELLOW (Rev-901, embedded validation REV-255) — per Rich: the thinking overlay's status line is pure white now instead of pale lavender, and the elapsed clock is doubled from 26 to 52 pixels, weight 900, in bright yellow (ffe93b) with a soft dark shadow so it holds against the purple. Tabular digits kept so it does not wobble as it counts. Verified live in both repos before this entry."] },
@@ -2966,7 +2967,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-03";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:04 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:05 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7070,8 +7071,8 @@ function cpTravellerManual(opts){
     +   '<button onclick="document.getElementById(\'travManBg\').remove()" style="background:#a5342a; color:#fff; border:0; border-radius:6px; padding:6px 12px; font-weight:800; cursor:pointer;">\u2715 Cancel</button></div>'
     + '<div style="display:flex; min-height:0; flex:1;">'   /* Rev-893: scan left, form right */
     + (_o.withScan ? '<div id="tmScanPane" style="flex:0 0 44%; min-width:0; overflow:auto; background:#3a3a3a; padding:10px; text-align:center;"></div>' : '')
-    + '<div style="padding:14px 16px; overflow:auto; flex:1; min-width:0;">'
-    + '<div style="display:grid; grid-template-columns:1.2fr 1.6fr 1.1fr; gap:14px; background:#dce3ee; border:1px solid #98a4b8; padding:12px; border-radius:4px;">'
+    + '<div id="tmFormPane" style="padding:14px 16px; overflow:auto; flex:1; min-width:0;">'
+    + '<div id="tmHeadGrid" style="display:grid; grid-template-columns:1.2fr 1.6fr 1.1fr; gap:14px; background:#dce3ee; border:1px solid #98a4b8; padding:12px; border-radius:4px;">'
     +   '<div>'
     +     '<div style="font:800 11px Arial; text-align:center;">PART NUMBER</div>'
     +     '<input id="tmPart" style="' + inp + ' font-size:16px; text-align:center;" value="' + pn0.replace(/"/g,'&quot;') + '">'
@@ -7113,7 +7114,7 @@ function cpTravellerManual(opts){
     +   '<th style="' + th + ' width:34px;"></th></tr></thead>'
     +   '<tbody id="tmOpsBody"></tbody>'
     + '</table>'
-    + '<button type="button" onclick="cpTmAddRow()" style="margin-top:8px; background:#2c6e49; color:#fff; border:0; border-radius:6px; padding:8px 14px; font-weight:800; cursor:pointer;">+ Add operation row</button>'
+    + '<button type="button" id="tmAddRowBtn" onclick="cpTmAddRow()" style="margin-top:8px; background:#2c6e49; color:#fff; border:0; border-radius:6px; padding:8px 14px; font-weight:800; cursor:pointer;">+ Add operation row</button>'
     + '</div>'
     + '</div>'   /* /flex row (Rev-893) */
     + '<div style="padding:12px 16px; border-top:1px solid #ddd; text-align:right; background:#f6f2ec; display:flex; gap:10px; justify-content:flex-end;">'
@@ -7360,8 +7361,13 @@ function cpTmCheck(step){
     return;
   }
   const col = _tmCheckCols[_tmCheckIdx][0];
+  /* Rev-904: the survivor sits hard against the scan - header block and add-row button
+     vanish too, the form pane shrinks to the column's own width and stops flexing, and the
+     scan takes every pixel the column does not need. */
   if(st) st.textContent = '#tmOps th:not(:nth-child(' + col + ')), #tmOps td:not(:nth-child(' + col + ')){display:none}'
-    + '#tmOps{width:auto !important; margin-left:auto; margin-right:auto;}';
+    + '#tmHeadGrid, #tmAddRowBtn{display:none}'
+    + '#tmOps{width:auto !important; margin:0 !important;}'
+    + '#tmFormPane{flex:0 0 auto !important; padding:14px 10px !important;}';
   if(bar){
     bar.style.display = 'flex';
     const lb = document.getElementById('tmCheckLabel');
@@ -7370,7 +7376,7 @@ function cpTmCheck(step){
     const nx = document.getElementById('tmCheckNext');
     if(nx) nx.textContent = _tmCheckIdx === _tmCheckCols.length - 1 ? 'Done \u2713' : 'Next \u25b6';
   }
-  const pane = document.getElementById('tmScanPane'); if(pane) pane.style.flex = '0 0 62%';
+  const pane = document.getElementById('tmScanPane'); if(pane) pane.style.flex = '1 1 auto';   /* Rev-904 */
 }
 async function cpTmSave(){
   const r = cpTmRender(); if(!r) return;
