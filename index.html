@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-920</title>
+<title>CONTROL PLAN GENERATOR - Rev-921</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-920 · 2026-08-04 8:07 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-921 · 2026-08-04 8:11 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-920 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 8:07 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-921 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 8:11 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-920 · Built Aug 4, 2026</span>
+    <span id="revFooter">App Rev-921 · Built Aug 4, 2026</span>
   </div>
 </div>
 
@@ -1658,7 +1658,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-920";
+const APP_REV = "Rev-921";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2186,6 +2186,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-04", rev: "App Rev-921", type: "App", changes: ["MARK READY FOR PRODUCTION WORKS - ITS CONFIRMATION WAS OPENING UNDERNEATH THE PROMPT (Rev-921, embedded validation REV-255) — Rich pressed MARK READY FOR PRODUCTION and the background only got progressively darker. The button was never dead: it opens a READY FOR PRODUCTION confirmation - but the confirmation dialog was built at z-index 10500 while the Step 6 release prompt sits at 10550, so the confirmation rendered UNDERNEATH the prompt: invisible, unanswerable, and every press stacked another sixty-percent-black backdrop behind the prompt, darkening the screen press by press while nothing seemed to happen. The confirmation and prompt boxes now sit above everything that can raise them, so pressing the button shows CONFIRM YOU HAVE WALKED THE INSPECTION PROGRAM with Mark ready, and confirming writes the sign-off, turns Step 6 green at 100 percent, and syncs. The stacked invisible dialogs from tonight vanish on reload; nothing was recorded by them, and the same trap is closed for Withdraw release and Fix a balloon's pin, which used the same buried dialogs. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-920", type: "App", changes: ["THE REAL SCAN IS BACK - RECOVERED FROM HISTORY, WITH A SELF-HEAL (Rev-920, embedded validation REV-255) — Rich circled the scanned pane showing the generated sheet, and he was right: the true scan was overwritten by a Save made before Rev-914's protection existed - on his device it was gone. It was not gone from GitHub. The repo's history held three versions of the traveller file; the Aug-3 one at 1019 by 1492 pixels with the blue-grey header band is the genuine photograph (tonight's 1700-wide pure-white one is the canvas sheet), and it has been restored server-side into both the primary slot and the protected _SCAN slot. The app self-heals to match: when the viewer finds the local scan byte-identical to the generated sheet - the overwrite signature - it pulls the recovered _SCAN from the repo, restores it to the primary slot, and announces the recovery; one network try, and failure just shows what exists. Reload the app and open View Traveller - the left pane is the real photograph again. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-919", type: "App", changes: ["ACTIVATION CREATES THE REAL PLAN - STEPS AND ALL (Rev-919, embedded validation REV-255) — Rich asked where his new plan's construction steps were, and the answer is that Rev-915 never made a real plan: it 'activated' with the DRAFT save, and a draft is a working copy with no operation row and no step tiles - exactly the bare Resume/Delete row he found. Saving the traveller now runs the genuine plan creation (generateCPBuild - its fields have been optional since Rev-206 and the ODS belongs to Step 2), so the part lands in Control Plans with its operation row and all six construction step tiles, EDIT OP number reading DO THIS NEXT. Creation runs only when the part has no plan yet; later traveller saves leave existing plans untouched rather than raising the overwrite gate every time. The stray no-op-number DRAFT from tonight is harmless - Delete clears it. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-918", type: "App", changes: ["PAN-ZOOM ON THE TRAVELLER VIEWER, AND A COMPARE BUTTON INTO THE COLUMN CHECK (Rev-918, embedded validation REV-255) — two from Rich on the viewer. Both panes of the two-up now PAN and ZOOM: drag anywhere on a traveller to slide it, wheel to zoom about the cursor, each side independent, so any region of either document reads at size. And a COMPARE COLUMNS button joins Replace and Close whenever both documents exist: it closes the viewer and opens the column-by-column check - the scan strip beside the AI values, pinned row for row - carrying the part number with it, because from the Control Plans list the New Plan screen's part field is empty; the manual window accepts a part override for exactly that reason. A botched command structure on the first attempt ran nothing and shipped nothing; this revision went out through the gated patch-verify-ship path. Payload verified in both repos before this entry."] },
@@ -2983,7 +2984,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-04";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:07 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:11 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4174,7 +4175,12 @@ function cpPlanPercent(p){
 function cpConfirmBox(title, bodyHtml, okLabel, opts){
   return new Promise(resolve => {
     const ov = document.createElement('div');
-    ov.style.cssText = 'position:fixed; inset:0; z-index:10500; background:rgba(0,0,0,0.6);'
+    /* Rev-921: this dialog sat at z-index 10500 while the Step 6 release prompt sits at
+       10550 - so MARK READY FOR PRODUCTION opened its confirmation UNDERNEATH the prompt:
+       invisible, unanswerable, and each press stacked another 60-percent-black backdrop
+       behind the prompt, which is exactly the background getting progressively darker
+       that Rich reported. Confirmations now sit above everything that can raise them. */
+    ov.style.cssText = 'position:fixed; inset:0; z-index:100030; background:rgba(0,0,0,0.6);'
       + ' display:flex; align-items:center; justify-content:center; padding:20px;';
     const c = document.createElement('div');
     c.style.cssText = 'background:#fff; border-radius:10px; max-width:560px; width:100%;'
@@ -9643,7 +9649,7 @@ function cpHowtoSetTitle(screenName, title){
 function cpPromptBox(heading, label, value){
   return new Promise(resolve => {
     const ov = document.createElement('div');
-    ov.style.cssText = 'position:fixed; inset:0; z-index:11900; background:rgba(0,0,0,.6);'
+    ov.style.cssText = 'position:fixed; inset:0; z-index:100031; background:rgba(0,0,0,.6);'
       + ' display:flex; align-items:center; justify-content:center; padding:20px;';
     const c = document.createElement('div');
     c.style.cssText = 'background:#fff; border-radius:10px; max-width:520px; width:100%;'
