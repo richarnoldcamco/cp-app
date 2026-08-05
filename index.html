@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-927</title>
+<title>CONTROL PLAN GENERATOR - Rev-928</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-927 · 2026-08-04 9:15 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-928 · 2026-08-04 9:22 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-927 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 9:15 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-928 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 9:22 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-927 · Built Aug 4, 2026</span>
+    <span id="revFooter">App Rev-928 · Built Aug 4, 2026</span>
   </div>
 </div>
 
@@ -1658,7 +1658,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-927";
+const APP_REV = "Rev-928";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2186,6 +2186,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-04", rev: "App Rev-928", type: "App", changes: ["ADD OPERATION IS A TWO-FIELD POP-UP NOW (Rev-928, embedded validation REV-255) — per Rich: pressing Add Operation no longer carries him to the New Plan screen. A pop-up asks for exactly what a new operation needs - OP number and OP DESCRIPTION, both mandatory in the standards yellow - while the part-level fields (revision, owner, customer) fill themselves silently from the part's stored info and any sibling plan. Create runs the real generateCP path, keeping the same-part-same-op clash gate, and the new operation lands on the Control Plans list with its six construction steps, announced by name. Cancel or a click outside closes with nothing changed. The old full-screen route is preserved unused as cpAddOpToPartScreen in case a full-form path is ever wanted back. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-927", type: "App", changes: ["PRIMARY ALONE BY DEFAULT; EDIT ROWS ON THE AI SHEET; COMPARE ON DEMAND (Rev-927, embedded validation REV-255) — three to Rich's spec, and the answer to his question is YES: the AI-generated routing is fully editable whether or not it is primary - the fill-in table has always been the editor - and an EDIT ROWS button now sits on the AI pane itself so the door is visible: add rows, change any field, Save re-issues the sheet and the pairing follows. Second, the viewer shows the PRIMARY document ALONE by default, full width with pan-zoom, its own actions on its header (EDIT ROWS on the AI sheet, UPLOAD NEW SCAN on the scan); the non-primary stays hidden. Third, a COMPARE UPLOADED IMAGE VS AI TRAVELLER button in the header opens the side-by-side pair - with MAKE PRIMARY, both panes pan-zooming, and the column-by-column Compare - exactly when wanted and not before. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-926", type: "App", changes: ["ADD OPERATION ACTS ON THE PLACEHOLDER LINE ITSELF; NO DELETE ON AN EMPTY LINE (Rev-926, embedded validation REV-255) — per Rich's markup. On a placeholder line with NO op number, Add Operation now acts on the line it sits on: pressing it consumes the placeholder draft and opens the add-operation flow, so the operation being named replaces the empty row rather than joining it. And since an empty line holds nothing worth discarding, the Delete button is not rendered there - a draft that does carry an op number keeps both buttons exactly as before. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-925", type: "App", changes: ["THE PART-HEADER ADD OPERATION IS GONE (Rev-925, embedded validation REV-255) — per Rich's cross. The part header carried Add Operation from Rev-604, but since Rev-923 every operation row carries its own Add Operation in the old Resume spot, so the header copy was a duplicate doing nothing the row button does not. Deleted; the header keeps View Traveller and the Stitch-together action. The row-level Add Operation, wired to the real cpAddOpToPart flow at Rev-924, is the one way in now. Payload verified in both repos before this entry."] },
@@ -2990,7 +2991,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-04";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:15 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:22 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6386,7 +6387,62 @@ function cpSetOpDesc(p){
     if(e.key === 'Enter'){ e.preventDefault(); document.getElementById('cpOpInfoSave').click(); }
   });
 }
+/* Rev-928: ADD OPERATION IS A POP-UP now, per Rich - not a trip to the New Plan screen. It
+   asks for the two things a new operation actually needs, OP # and OP DESCRIPTION (both
+   mandatory, in the standards yellow), fills the part-level fields silently from the part's
+   stored info, and creates the plan on the spot. The old screen route remains below as
+   cpAddOpToPartScreen, unused, in case a full-form path is ever wanted back. */
 function cpAddOpToPart(partNum){
+  const P = String(partNum || '').trim().toUpperCase();
+  const old = document.getElementById('cpAddOpBg'); if(old) old.remove();
+  const bg = document.createElement('div');
+  bg.id = 'cpAddOpBg';
+  bg.style.cssText = 'position:fixed; inset:0; z-index:100025; background:rgba(20,15,12,.82); display:flex; align-items:center; justify-content:center; padding:16px;';
+  bg.innerHTML =
+    '<div style="background:#fff; border-radius:12px; max-width:460px; width:100%; overflow:hidden;">'
+    + '<div style="background:#7a1a1c; color:#fff; font:800 15px system-ui; letter-spacing:.05em; padding:10px 16px;">ADD OPERATION \u2014 ' + P + '</div>'
+    + '<div style="padding:16px;">'
+    +   '<label style="font:800 11px system-ui; letter-spacing:.06em; color:#6b6257;">OP # (ROUTING)</label>'
+    +   '<input id="aoNum" style="width:100%; box-sizing:border-box; background:#fafa96; border:1px solid #c9c0b4; border-radius:6px; padding:10px 12px; font:700 15px system-ui; margin:4px 0 12px;" placeholder="E.G., 030">'
+    +   '<label style="font:800 11px system-ui; letter-spacing:.06em; color:#6b6257;">OP DESCRIPTION</label>'
+    +   '<input id="aoDesc" style="width:100%; box-sizing:border-box; background:#fafa96; border:1px solid #c9c0b4; border-radius:6px; padding:10px 12px; font:700 15px system-ui; margin:4px 0 4px;" placeholder="E.G., TURN COMPLETE">'
+    + '</div>'
+    + '<div style="padding:12px 16px; border-top:1px solid #ddd; display:flex; gap:10px; justify-content:flex-end; background:#f6f2ec;">'
+    +   '<button id="aoCancel" style="background:#efe9df; color:#5c4a3a; border:1px solid #c9c0b4; border-radius:8px; padding:11px 18px; font:800 14px system-ui; cursor:pointer;">Cancel</button>'
+    +   '<button id="aoGo" style="background:#2c6e49; color:#fff; border:0; border-radius:8px; padding:11px 20px; font:800 14px system-ui; cursor:pointer;">\u2713 Create operation</button>'
+    + '</div></div>';
+  document.body.appendChild(bg);
+  document.getElementById('aoCancel').onclick = () => bg.remove();
+  bg.onclick = (e) => { if(e.target === bg) bg.remove(); };
+  const num = document.getElementById('aoNum');
+  setTimeout(() => num.focus(), 60);
+  document.getElementById('aoGo').onclick = async () => {
+    const vNum = num.value.trim(), vDesc = document.getElementById('aoDesc').value.trim();
+    if(!vNum || !vDesc){ flash('OP # and OP DESCRIPTION are both required', true); return; }
+    window._cpTravWaive = P;
+    const info = cpPartInfoGet(P) || {};
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    const sib = projects.find(x => String(x.partNum).toUpperCase() === P);
+    if($('cpPartNum')) $('cpPartNum').value = P;
+    if($('cpRev')) $('cpRev').value = info.rev || (sib && sib.rev) || 'Rev-1';
+    if($('cpOwner')) $('cpOwner').value = info.owner || (sib && sib.owner) || $('cpOwner').value || '';
+    if($('cpCustomer')){
+      const want = info.customerName || (sib && sib.customer) || '';
+      if(want) Array.from($('cpCustomer').options).forEach((o, oi) => { if(o.text === want) $('cpCustomer').selectedIndex = oi; });
+      try{ if(typeof $('cpCustomer').onchange === 'function') $('cpCustomer').onchange(); }catch(e){ }
+    }
+    if($('cpOpNum')) $('cpOpNum').value = vNum;
+    if($('cpOpDesc')) $('cpOpDesc').value = vDesc;
+    ['cpOperation','cpMachine'].forEach(id => { if($(id)) $(id).value = ''; });
+    bg.remove();
+    try{
+      await generateCP();   // keeps the same-op clash gate
+      flash('\u2713 OP-' + vNum + ' created for ' + P + ' \u2014 its steps are on the Control Plans list');
+      try{ renderProjects(); }catch(e){ }
+    }catch(e){ alert('Could not create the operation: ' + (e && e.message || e)); }
+  };
+}
+function cpAddOpToPartScreen(partNum){
   window._cpTravWaive = String(partNum || '');   // the part exists — never re-ask for its traveller
   // Rev-563: prefill the New CP form from the part's stored info — only the op fields are blank
   showNewCP(true);
