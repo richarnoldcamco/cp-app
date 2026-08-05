@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-925</title>
+<title>CONTROL PLAN GENERATOR - Rev-926</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-925 · 2026-08-04 8:22 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-926 · 2026-08-04 8:47 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-925 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 8:22 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-926 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-04 8:47 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-925 · Built Aug 4, 2026</span>
+    <span id="revFooter">App Rev-926 · Built Aug 4, 2026</span>
   </div>
 </div>
 
@@ -1658,7 +1658,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-925";
+const APP_REV = "Rev-926";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2186,6 +2186,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-04", rev: "App Rev-926", type: "App", changes: ["ADD OPERATION ACTS ON THE PLACEHOLDER LINE ITSELF; NO DELETE ON AN EMPTY LINE (Rev-926, embedded validation REV-255) — per Rich's markup. On a placeholder line with NO op number, Add Operation now acts on the line it sits on: pressing it consumes the placeholder draft and opens the add-operation flow, so the operation being named replaces the empty row rather than joining it. And since an empty line holds nothing worth discarding, the Delete button is not rendered there - a draft that does carry an op number keeps both buttons exactly as before. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-925", type: "App", changes: ["THE PART-HEADER ADD OPERATION IS GONE (Rev-925, embedded validation REV-255) — per Rich's cross. The part header carried Add Operation from Rev-604, but since Rev-923 every operation row carries its own Add Operation in the old Resume spot, so the header copy was a duplicate doing nothing the row button does not. Deleted; the header keeps View Traveller and the Stitch-together action. The row-level Add Operation, wired to the real cpAddOpToPart flow at Rev-924, is the one way in now. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-924", type: "App", changes: ["THE DRAFT ROW'S ADD OPERATION USES THE REAL FLOW (Rev-924, embedded validation REV-255) — correcting Rev-923 before it bit: its Add Operation called a function that does not exist, so every press would have fallen through to the bare New Plan screen instead of the add-operation flow. It now calls cpAddOpToPart - the same handler the part header's own Add Operation button uses - with the New Plan screen kept only as the genuine fallback. Caught by reading the shipped code back, not by a user report. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-923", type: "App", changes: ["RESUME IS GONE; ADD OPERATION STANDS IN ITS SPOT (Rev-923, embedded validation REV-255) — per Rich. The draft row's Resume button is deleted - since Rev-919 the traveller save creates the real plan directly, so a draft is a leftover rather than a working state anyone resumes into. ADD OPERATION now stands in Resume's exact spot as the row's forward action, opening the add-operation flow for the part (falling back to the New Plan screen if that flow is unavailable), and Delete stays for clearing the leftover. Payload verified in both repos before this entry."] },
@@ -2988,7 +2989,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-04";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:22 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:47 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4613,13 +4614,16 @@ function renderProjects(){
       /* Rev-923: Resume is gone at Rich's request - since Rev-919 the traveller save creates
          the REAL plan, so a draft is a leftover, not a working state to resume into. Add
          Operation stands in Resume's spot: the forward action from here. Delete stays. */
-      mkBtn('Add Operation', 'primary', 128, 'Add an operation to this part', () => {
-        /* Rev-924: wired to the REAL add-operation flow (cpAddOpToPart) - the same one the
-           part header's Add Operation uses. Rev-923 called a function that does not exist
-           and always fell through to the bare New Plan screen. */
+      /* Rev-926: on a placeholder line with NO op number, Add Operation acts on THE LINE -
+         it consumes the placeholder and opens the add-operation flow, so the row it names
+         replaces the row it was pressed on. And with nothing on the line worth discarding,
+         Delete is not shown; a draft that DOES carry an op number keeps both buttons. */
+      const _noOp = !String(p.opNum || '').trim();
+      mkBtn('Add Operation', 'primary', 128, _noOp ? 'Name this operation \u2014 replaces this placeholder line' : 'Add an operation to this part', () => {
+        if(_noOp){ try{ deleteDraft(p.partNum); }catch(e){ console.warn(e); } }
         try{ cpAddOpToPart(p.partNum); }catch(e){ console.warn(e); showNewCP(); }
       });
-      mkBtn('Delete', 'danger', 82, 'Discard this draft', () => { deleteDraft(p.partNum); renderProjects(); updateHomeScreen(); });
+      if(!_noOp) mkBtn('Delete', 'danger', 82, 'Discard this draft', () => { deleteDraft(p.partNum); renderProjects(); updateHomeScreen(); });
     } else {
       const i = item.idx;
       const has = !!p.builderState;
