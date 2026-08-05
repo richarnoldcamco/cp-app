@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-934</title>
+<title>CONTROL PLAN GENERATOR - Rev-935</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-934 · 2026-08-05 7:37 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-935 · 2026-08-05 7:41 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-934 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 7:37 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-935 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 7:41 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-934 · Built Aug 5, 2026</span>
+    <span id="revFooter">App Rev-935 · Built Aug 5, 2026</span>
   </div>
 </div>
 
@@ -1662,7 +1662,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-934";
+const APP_REV = "Rev-935";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2190,6 +2190,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-05", rev: "App Rev-935", type: "App", changes: ["STARTED ON THE STEP TILE, AND A SAVE THAT SAYS IT SAVED (Rev-935, embedded validation REV-255) — two from Rich. First, a build step that has been ENTERED but has no rows done read DO THIS NEXT as if untouched - each plan now remembers which build steps it has been opened on, and the tile says STARTED for an entered step with zero progress, moving to IN PROGRESS n of total the moment the first row lands, exactly as before. Second, his question - is the Save button saving the data - is answered YES and made visible: Save to Project runs the same save-only path it always did, writing rows, pins and the drawing to the stored plan (auto-save also runs in the background throughout), and the button itself now turns green with a SAVED tick for a moment while a flash names the part and operation saved, so the press stops feeling like a shot in the dark. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-934", type: "App", changes: ["AN ANIMATED NUDGE SAYS CLICK THE BALLOON (Rev-934, embedded validation REV-255) — Rich asked for an animation telling the user to click the balloon. The balloon's position on the drawing is the very thing not yet known - pinning it is the task - so nothing can point at balloon n itself; instead a floating nudge rides over the top of the drawing pane: a tapping hand inside two pulsing gold rings and CLICK BALLOON n ON THE DRAWING in the app's red, bobbing gently. It ignores the mouse entirely so it can never block the click it is asking for, takes its number live from the focused row, appears only while that row has no pin, and disappears the moment the pin lands or a pinned row is focused. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-933", type: "App", changes: ["BALLOONING GREETS ON ROW 1 - AND STOPS INHERITING ANOTHER DRAWING'S PINS (Rev-933, embedded validation REV-255) — Rich started assigning balloons and the builder greeted him focused on row 14. Two faults, one of them the same disease Rev-929 cured on Step 2: the builder's drawing-recovery path adopted the bare PART-level drawing AND ITS PINS into an op-numbered plan, so thirteen foreign pins made rows 1-13 read as already pinned and the first genuinely unpinned row was 14. That recovery now serves op-less plans only, exactly like the ODS fallback. And independently: opening a plan on which NOTHING is pinned yet now greets on the FIRST row with the panel already asking for balloon 1, instead of Rev-608's open-with-no-row - the first act of ballooning is balloon 1, and the screen should say so. Plans with pins keep the no-row opening unchanged. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-932", type: "App", changes: ["THE PART DESCRIPTION SHOWS ON THE ALL PARTS LIST (Rev-932, embedded validation REV-255) — the optional Part Description now shows exactly where Rich circled - in grey after the part number and its pencil on the All Parts list, read straight from the part's stored info, invisible when blank. On the percentage question raised alongside: verified against the formula rather than guessed - the stages weigh 5 for the op number, 5 for the ODS, 25 each for bubbles, control types and measurement types, 15 for the review. The 10 percent he saw BEFORE uploading was inflated by the phantom ODS that Rev-929 exposed, and the 10 percent AFTER uploading is the same figure earned honestly - the lie and the truth happened to score the same, so the number looked stuck while actually going from wrong to right. The next movement comes from Step 3: each of the fifteen rows given a bubble adds about 1.7 points. Payload verified in both repos before this entry."] },
@@ -3001,7 +3002,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-05";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:37 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:41 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4718,6 +4719,10 @@ function renderProjects(){
         else if(n === 6 && _s6.all) tag = '  \u2013 ROWS DONE \u00b7 MARK READY';   /* Rev-870 */
         else if(n === 6 && _s6.total && _s6.approved > 0)
           tag = '  \u2013 APPROVING  ' + _s6.approved + '/' + _s6.total;   /* Rev-870 */
+        else if(n >= 3 && n <= 5 && (function(){
+            try{ const seen = (p.builderState && p.builderState.stepSeen) || {};
+                 return !!seen[String(n - 2)]; }catch(e){ return false; } })())
+          tag = '  \u2013 STARTED';   /* Rev-935: entered, nothing done yet */
         else tag = '  \u2013 DO THIS NEXT';
         const l2 = document.createElement('span');
         l2.className = 'cp-step-t';
@@ -8286,6 +8291,15 @@ function cpSetStep(s){
   if(!CP_STEPS[s]) s = '1';
   try{ logAct('step', s + ' \u00b7 ' + ((CP_STEPS[s]||{}).label || '')); }catch(e){}   // Rev-633
   localStorage.setItem('cpBuildStep', s);
+  /* Rev-935: the plan remembers each build step it has been OPENED on, so the tile can say
+     STARTED for a step that was entered but has no rows done yet - which used to read
+     DO THIS NEXT as if it were untouched. */
+  try{
+    if(cpBuildState){
+      cpBuildState.stepSeen = cpBuildState.stepSeen || {};
+      if(!cpBuildState.stepSeen[s]){ cpBuildState.stepSeen[s] = 1; try{ cpAutoSaveProject(); }catch(e){ } }
+    }
+  }catch(e){ }
   // Rev-608: arriving at a step should show the whole list, not drop you into whichever
   // row happened to be open last time. Click a row when you want to work on it.
   // Rev-689: ALWAYS redraw the rows on a step change, not only when a row was open.
@@ -20320,7 +20334,19 @@ if($('cpBuildXlsxBtn')) $('cpBuildXlsxBtn').onclick = () => {
   }catch(e){}
   buildCPxlsx();
 };
-if($('cpBuilderSaveBtn')) $('cpBuilderSaveBtn').onclick = () => buildCPxlsx(true);
+if($('cpBuilderSaveBtn')) $('cpBuilderSaveBtn').onclick = async () => {
+  /* Rev-935: the save says it saved. Same save as always (buildCPxlsx in save-only mode,
+     rows, pins and drawing written to the stored plan); the button now shows a green
+     SAVED tick for a moment and a flash names the operation, so pressing it stops
+     feeling like a shot in the dark. */
+  const b = $('cpBuilderSaveBtn');
+  try{
+    await buildCPxlsx(true);
+    if(b){ const t0 = b.textContent; b.textContent = '\u2713 SAVED'; b.style.background = '#2c6e49';
+      setTimeout(() => { b.textContent = t0; b.style.background = '#5a6c7d'; }, 1600); }
+    try{ flash('\u2713 Saved to project \u2014 ' + ((cpBuildState && cpBuildState.partNum) || '') + ((cpBuildState && cpBuildState.opNum) ? ' OP-' + cpBuildState.opNum : '')); }catch(e){ }
+  }catch(e){ alert('Save failed: ' + (e && e.message || e)); }
+};
 if($('cpFocusPrev')) $('cpFocusPrev').onclick = () => focusStep(-1);
 if($('cpFocusNext')) $('cpFocusNext').onclick = () => focusStep(1);
 
