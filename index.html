@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-930</title>
+<title>CONTROL PLAN GENERATOR - Rev-931</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-930 · 2026-08-05 7:02 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-931 · 2026-08-05 7:12 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-930 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 7:02 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-931 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 7:12 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-930 · Built Aug 5, 2026</span>
+    <span id="revFooter">App Rev-931 · Built Aug 5, 2026</span>
   </div>
 </div>
 
@@ -1662,7 +1662,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-930";
+const APP_REV = "Rev-931";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2190,6 +2190,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-05", rev: "App Rev-931", type: "App", changes: ["THE PENCIL EDITS THE PART DESCRIPTION TOO (Rev-931, embedded validation REV-255) — Rich asked how to add the description to an existing plan, and the answer is now the pencil he already knows: the edit window beside every part name carries a PART DESCRIPTION field - optional, prefilled from the part's stored info, saved by the same Save button, and saved even when the part number and revision are untouched, which used to close the window as a no-op. The parts list re-renders on save so the description shows beside the part name immediately. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-930", type: "App", changes: ["AN OPTIONAL PART DESCRIPTION FIELD ON THE NEW PLAN SCREEN (Rev-930, embedded validation REV-255) — per Rich: a PART DESCRIPTION field joins the New Control Plan form, on the row under Part Number and Revision. Deliberately white, not the mandatory yellow - the label itself says optional - so the required set stays exactly the five fields Rich marked mandatory. A filled description is stored with the part's info when the traveller save activates the plan, and prefills itself whenever the screen opens on that part again; blank costs nothing anywhere. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-929", type: "App", changes: ["STEP 2 STOPS CLAIMING AN ODS THAT WAS NEVER UPLOADED (Rev-929, embedded validation REV-255) — Rich completed Step 1 on a fresh operation and Step 2 announced COMPLETED though he had uploaded nothing - and he had not. The Rev-600 migration fallback was the liar: an operation with no drawing under its own PART::OPnnn key fell back to the bare PART key, and 1000237498 carries a stale part-level drawing from June, so the brand-new OP-040 silently inherited it. That fallback existed to bridge pre-Rev-600 data, and the store confirms every genuinely op-numbered plan migrated to OP-keyed drawings long ago - so the bare key is now honoured only by plans that themselves carry no op number, exactly as Rev-600's own note promised. A numbered operation with no drawing of its own reads DO THIS NEXT and Step 2 opens its studio to upload the real ODS. Payload verified in both repos before this entry."] },
   { ts: "2026-08-04", rev: "App Rev-928", type: "App", changes: ["ADD OPERATION IS A TWO-FIELD POP-UP NOW (Rev-928, embedded validation REV-255) — per Rich: pressing Add Operation no longer carries him to the New Plan screen. A pop-up asks for exactly what a new operation needs - OP number and OP DESCRIPTION, both mandatory in the standards yellow - while the part-level fields (revision, owner, customer) fill themselves silently from the part's stored info and any sibling plan. Create runs the real generateCP path, keeping the same-part-same-op clash gate, and the new operation lands on the Control Plans list with its six construction steps, announced by name. Cancel or a click outside closes with nothing changed. The old full-screen route is preserved unused as cpAddOpToPartScreen in case a full-form path is ever wanted back. Payload verified in both repos before this entry."] },
@@ -2997,7 +2998,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-05";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:02 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:12 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3971,6 +3972,10 @@ function cpRenamePart(part){
           '<input id="cpRenRev" style="width:100%; box-sizing:border-box; font-size:16px; font-weight:800; padding:10px; border:2px solid #c9c0b4; border-radius:6px; background:#fafa96;">' +
         '</div>' +
       '</div>' +
+      '<div style="margin-top:12px;">' +
+        '<label style="display:block; font-size:11px; font-weight:800; letter-spacing:.05em; margin-bottom:4px;">PART DESCRIPTION <span style="font-weight:400; color:#8a7f70;">(optional)</span></label>' +
+        '<input id="cpRenDesc" style="width:100%; box-sizing:border-box; font-size:15px; font-weight:700; padding:10px; border:2px solid #c9c0b4; border-radius:6px;" placeholder="E.G., COMPRESSOR HOUSING">' +
+      '</div>' +   /* Rev-931 */
       '<div id="cpRenWarn" style="display:none; font-size:12px; font-weight:700; color:#a11; margin-top:10px;"></div>' +
     '</div>' +
     '<div style="background:#f1ede6; padding:11px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid #ddd6cc;">' +
@@ -3981,6 +3986,10 @@ function cpRenamePart(part){
   document.body.appendChild(bg);
   const inP = document.getElementById('cpRenPart'), inR = document.getElementById('cpRenRev');
   inP.value = mine[0].partNum || P; inR.value = curRev;
+  /* Rev-931: the pencil is THE editor for the optional Part Description too - prefilled
+     from the part's stored info, saved back with the same Save. */
+  const inD = document.getElementById('cpRenDesc');
+  try{ const inf0 = cpPartInfoGet(P) || {}; if(inD && inf0.partDesc) inD.value = inf0.partDesc; }catch(e){ }
   setTimeout(() => { inP.focus(); inP.select(); }, 60);
   const close = () => bg.remove();
   document.getElementById('cpRenCancel').onclick = close;
@@ -3992,7 +4001,18 @@ function cpRenamePart(part){
     const newPart = inP.value.trim().toUpperCase();
     const newRev = inR.value.trim();
     if(!newPart){ warn('A part number is required.'); return; }
-    if(newPart === P && newRev === curRev){ close(); return; }
+    /* Rev-931: the description saves on its own, even when nothing else changed */
+    try{
+      const dv = (document.getElementById('cpRenDesc') || {}).value || '';
+      const infS = cpPartInfoGet(newPart === P ? P : newPart) || cpPartInfoGet(P) || {};
+      if(dv.trim() !== String(infS.partDesc || '')){
+        const infT = cpPartInfoGet(P) || {};
+        infT.partDesc = dv.trim();
+        cpPartInfoSet(P, infT);
+        try{ renderProjects(); }catch(e){ }
+      }
+    }catch(e){ console.warn(e); }
+    if(newPart === P && newRev === curRev){ close(); flash('\u2713 Saved'); return; }
     if(newPart !== P && projects.some(p => String(p.partNum || '').toUpperCase() === newPart)){
       warn(newPart + ' already has Control Plans. Rename or delete those first.'); return;
     }
