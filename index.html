@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-937</title>
+<title>CONTROL PLAN GENERATOR - Rev-938</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-937 · 2026-08-05 7:48 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-938 · 2026-08-05 7:50 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-937 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 7:48 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-938 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 7:50 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-937 · Built Aug 5, 2026</span>
+    <span id="revFooter">App Rev-938 · Built Aug 5, 2026</span>
   </div>
 </div>
 
@@ -847,7 +847,7 @@
       </table>
     </div>
 
-    <div id="cpOdsPanel" style="flex:0 0 38%; min-width:400px; height: calc(100vh - 94px); max-height: calc(100vh - 94px); position:sticky; top:54px; border:1px solid var(--line); border-radius:var(--r); background:var(--panel); padding:6px; display:flex; flex-direction:column;">
+    <div id="cpOdsPanel" style="flex:0 0 52%; min-width:520px; height: calc(100vh - 94px); max-height: calc(100vh - 94px); position:sticky; top:54px; border:1px solid var(--line); border-radius:var(--r); background:var(--panel); padding:6px; display:flex; flex-direction:column;">
       <div style="font-size:12px; font-weight:700; color:var(--signal); margin-bottom:6px; display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
         <span>ODS Drawing — Balloon <span id="cpFocusBubble">1</span></span>
         <button type="button" id="cpPanelZoomBtn" onclick="cpPanelZoomToggle(event)" style="display:none; background:#1a5276; color:#fff; border:none; border-radius:5px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer;">🔍 Full view</button>
@@ -1662,7 +1662,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-937";
+const APP_REV = "Rev-938";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2190,6 +2190,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-05", rev: "App Rev-938", type: "App", changes: ["THE DRAWING PANE GROWS TO HALF THE SCREEN AND MORE (Rev-938, embedded validation REV-255) — per Rich's circle: the ODS drawing pane in the builder held 38 percent of the width while the rows table kept 62 - proportions set when every column showed. On the bubble step the table is three narrow columns and a sheet of white space, and the drawing - the thing being clicked on - was the cramped one. The pane now takes 52 percent with a 520-pixel floor, so the drawing is a third larger at every zoom, dimension text readable at fit width. The table keeps ample room for its widest steps, wheel zoom and pan are unchanged, and MINIMIZE DRAWING still collapses to the full-width grid with the Show drawing chip to bring it back. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-937", type: "App", changes: ["THE BUILDER OPENS ON THE LOWEST UNCHECKED ROW (Rev-937, embedded validation REV-255) — Rich saved, left, came back, and the builder greeted him on row 1 though rows 1-8 carried green checks. Rev-933's greet rule keyed on PINS, and the pin features are not yet loaded at the instant the plan opens - so a well-worked plan read as pinless and fell to row 1. His general rule is now the rule, on data that is available at that instant: the builder opens focused on the LOWEST non-ghost row WITHOUT a green check for the step being worked (the approval flags live inside the rows themselves, no load-order dependence). Fresh plan, none checked: row 1, as Rev-933 intended. Rows 1-8 checked: opens on row 9. Every row checked: opens with no row, exactly as before. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-936", type: "App", changes: ["SAVING A PIN TICKS THE ROW'S CHECKMARK (Rev-936, embedded validation REV-255) — Rich pinned a balloon in the fine-tune editor, hit Save, and the row's checkmark stayed empty. The check column is the APPROVAL record - who and when, per Rev-701 - and only a hand-click on the box ever wrote it, so a pinned-and-saved balloon left its row looking unassigned. A saved pin IS the bubble step's test passed, so the editor's Save now approves the row for the bubble step automatically: the same stepDone flag, the same name-and-timestamp stamp a hand mark gets, logged in the action log as auto so hand judgements and auto marks stay distinguishable on read-back. It never un-sets an existing mark, ghost rows are exempt as everywhere, and the rows re-render on the spot so the tick appears the moment Save is pressed rather than on the next screen change. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-935", type: "App", changes: ["STARTED ON THE STEP TILE, AND A SAVE THAT SAYS IT SAVED (Rev-935, embedded validation REV-255) — two from Rich. First, a build step that has been ENTERED but has no rows done read DO THIS NEXT as if untouched - each plan now remembers which build steps it has been opened on, and the tile says STARTED for an entered step with zero progress, moving to IN PROGRESS n of total the moment the first row lands, exactly as before. Second, his question - is the Save button saving the data - is answered YES and made visible: Save to Project runs the same save-only path it always did, writing rows, pins and the drawing to the stored plan (auto-save also runs in the background throughout), and the button itself now turns green with a SAVED tick for a moment while a flash names the part and operation saved, so the press stops feeling like a shot in the dark. Payload verified in both repos before this entry."] },
@@ -3004,7 +3005,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-05";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:48 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:50 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
