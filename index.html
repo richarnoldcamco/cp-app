@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-944</title>
+<title>CONTROL PLAN GENERATOR - Rev-945</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-944 · 2026-08-05 8:08 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-945 · 2026-08-05 8:10 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-944 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 8:08 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-945 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 8:10 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-944 · Built Aug 5, 2026</span>
+    <span id="revFooter">App Rev-945 · Built Aug 5, 2026</span>
   </div>
 </div>
 
@@ -832,8 +832,8 @@
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:153px;">Feature / Process Description</th>
             <!-- Rev-207: Process Step / Operation ID# / Machine / Process columns hidden on-screen; values still fill the xlsx per CP-2 -->
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:102px;">Product / Process Spec / Tol</th>
-            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:80px;">Upper Limit</th>
-            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:80px;">Lower Limit</th>
+            <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:84px;">Upper Limit<br><span style="font-weight:600; opacity:.8;">Lower Limit</span></th>   <!-- Rev-945: stacked -->
+            <th rowspan="2" style="padding:0; border:0; width:0; font-size:0;"></th>
             <th rowspan="2" style="padding:6px; border:1px solid #5a8bb5; width:55px;">Class</th>
             <th colspan="5" style="padding:6px; border:1px solid #5a8bb5;">METHODS BAND (auto-filled from Master List)</th>
             <!-- Rev-571: does this feature need a special gage or fixture MADE? -->
@@ -1667,7 +1667,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-944";
+const APP_REV = "Rev-945";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2195,6 +2195,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-05", rev: "App Rev-945", type: "App", changes: ["UPPER AND LOWER LIMIT STACK IN ONE CELL - UPPER ON TOP (Rev-945, embedded validation REV-255) — per Rich: the two limit columns are now one. Every row shows its Upper Limit input ON TOP and its Lower Limit input DIRECTLY BENEATH in a single cell, matching how the printed spec reads, with the header stacked to say so. Both fields keep their own storage, editing, and everything downstream - the xlsx export's separate Upper and Lower columns are untouched - only the on-screen geometry changed. The old Lower column's td remains in the DOM at zero width because every step view's column indices count it; removing it would have renumbered every view. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-944", type: "App", changes: ["PAGES OPEN ON THE WHOLE DRAWING, NOT ZOOMED (Rev-944, embedded validation REV-255) — per Rich: arriving at a page no longer lands zoomed into a balloon. Opening the builder and switching between any of the step pages both reset the drawing to fit - whole sheet visible, scroll returned to the corner, the button offering ZOOM TO BALLOON for when it is wanted. Clicking a row still zooms to that row's pin exactly as before, and the wheel still zooms freely; only the ARRIVAL state changed, from wherever-you-last-were to the whole drawing. Applied at both doors: builder open and every step change. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-943", type: "App", changes: ["THE BUILDER'S STEP BANNER AT HALF SIZE (Rev-943, embedded validation REV-255) — per Rich: the builder's construction banner - the seven step tiles and the hazard-striped percent bar - is drawn at half its former height. Tile padding, fonts and borders halved, the stripe bar down from a tall band to a slim ribbon, the green progress track from seven pixels to four. Same tiles, same live states, same doors - the header just stops spending vertical space the rows and the drawing need. The main page's banner is untouched; this sizing is the builder's own. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-942", type: "App", changes: ["ASSIGN TOLERANCES - A SEVENTH STEP BETWEEN BUBBLES AND CONTROL TYPES (Rev-942, embedded validation REV-255) — per Rich's arrow. A new construction step, ASSIGN TOLERANCES, now sits between ASSIGN BUBBLES and ASSIGN CONTROL TYPES, everywhere the steps appear: the Control Plans list tiles (now seven, REVIEW INSPECTION at step 7), the builder's construction banner, and the builder itself as tab 4 - Tolerances showing the description, spec/tol, limits and class columns. The job of the step is the NUMBERS: confirm each row's spec or limits and approve the row, with the same per-row checkmark, name-and-time stamp and action-log entry as every other row step. Its data test asks for a spec/tol or at least one limit per row. The stage weights re-balance to seven (5+5+20+15+20+20+15 = 100), so expect percentages to shift slightly on existing plans - the same figure honestly re-based, not lost work. Internally the step is keyed T rather than renumbering 1-2-3, so every approval already recorded on any plan stays exactly where it is, per the Rev-738 rule. Control types stay gated on the bubble data as before and additionally list tolerance data as their READY test. Payload verified in both repos before this entry."] },
@@ -3016,7 +3017,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-05";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:08 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:10 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -8959,8 +8960,24 @@ tr.appendChild(tdCT);
       tr.appendChild(tdSpec);
 
       // Rev-398: manual Lower Limit / Upper Limit tolerance columns (blank cells to type in).
-      tr.appendChild(editableCell(idx, 'upperLimit', row.upperLimit, 'center', true));
-      tr.appendChild(editableCell(idx, 'lowerLimit', row.lowerLimit, 'center', true));
+      /* Rev-945: STACKED, per Rich - upper ON TOP, lower BENEATH, one cell. Both fields
+         keep their own storage and editing; only the geometry changed. The old Lower td
+         remains in the DOM at zero width because every column index in the step views
+         counts it. */
+      const tdUp = editableCell(idx, 'upperLimit', row.upperLimit, 'center', true);
+      const tdLo = editableCell(idx, 'lowerLimit', row.lowerLimit, 'center', true);
+      const _loIn = tdLo.querySelector('input, [contenteditable]');
+      if(_loIn){
+        tdUp.style.verticalAlign = 'middle';
+        const stack = document.createElement('div');
+        stack.style.cssText = 'display:flex; flex-direction:column; gap:2px; align-items:stretch;';
+        while(tdUp.firstChild) stack.appendChild(tdUp.firstChild);
+        stack.appendChild(_loIn);
+        tdUp.appendChild(stack);
+        tdLo.style.cssText = 'padding:0; border:0; width:0; max-width:0; overflow:hidden;';
+      }
+      tr.appendChild(tdUp);
+      tr.appendChild(tdLo);
 
       const tdClass = document.createElement('td');
       const isSpecial = ['KC','CC','CI'].includes((row.classification||'').toUpperCase());
