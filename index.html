@@ -1667,7 +1667,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-956";
+const APP_REV = "Rev-957";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2195,6 +2195,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-06", rev: "App Rev-957", type: "App", changes: ["REPLACING AN ODS DRAWING SENDS EVERY STEP ABOVE IT BACK TO ZERO (Rev-957, embedded validation REV-255) \u2014 per Rich, who swapped the OP-050 print and found STEP 3 ASSIGN BUBBLES still reading COMPLETED against a drawing that was no longer there. He is right and it is a quality problem, not a cosmetic one: a balloon pinned to the old print, a tolerance read off it and a row signed off against it are all claims about a document that has been withdrawn. Saving a REPLACE now clears, for that operation only: every balloon pin (Step 3 data), every row approval on Steps 3, 4, 5 and 6, the Step 7 inspection review sign-off, and the reference crops the validation app cut from the old drawing. Steps 3 through 7 read 0 of N and the percentage falls accordingly. WHAT IS DELIBERATELY KEPT: the rows themselves and their typed values - bubble numbers, tolerances, control types, measurement methods, reaction plans - exactly as Rev-720 keeps them on a DELETE. They survive as UNAPPROVED data for the QE to re-check against the new print, which is far better than retyping fifteen rows because a scan was swapped. A plain save (after a rotate, say) resets nothing - only a save that came through \u21c4 REPLACE DRAWING does, and the pop-up says exactly what it cleared. WHAT TO TEST (rule 8): on OP-050 press \u21c4 REPLACE DRAWING, pick a file, Save, and confirm Steps 3-7 all read 0 of N with the bar dropped; then confirm the typed tolerances and control types are still in the grid. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-956", type: "App", changes: ["REPLACE DRAWING - SWAP THE PRINT INSTEAD OF ADDING A PAGE TO IT (Rev-956, embedded validation REV-255) \u2014 per Rich. The drawing screen could ADD a page (the strip along the top) and DELETE the drawing outright, but there was no way to say \u2018this one is wrong, here is the right one\u2019: picking a file appended it, leaving two pages where one was wanted. \u21c4 REPLACE DRAWING now sits in the footer beside \ud83d\uddd1 DELETE DRAWING, left of Cancel and Save. It opens the file picker, and ONLY WHEN A FILE IS ACTUALLY CHOSEN does it clear what was loaded - back out of the picker and nothing has changed, so there is no confirmation box to read and nothing to undo. Deliberately NOT destructive: it works on the pages loaded in this window, and the stored drawing is not touched until Save is pressed, so Cancel still walks away from the whole thing. Arming is cancelled if ADD ANOTHER PAGE is used instead, so a replace started and abandoned can never eat a later add. Being in the shared studio, the button reads REPLACE DRAWING on the ODS screen and REPLACE on the traveller and special-gage mounts. WHAT TO TEST (rule 8): open the OP-050 ODS, press \u21c4 REPLACE DRAWING and back out of the picker - the existing page must still be there; press it again and choose a file - it must REPLACE, leaving 1 page and not 2. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-955", type: "App", changes: ["ROTATE LEFT AND ROTATE RIGHT ON THE DRAWING SCREEN (Rev-955, embedded validation REV-255) \u2014 per Rich, whose OP-050 ODS came in sideways with every dimension running up the page. Two buttons now sit in the zoom row beside FIT and 100%: \u21ba ROTATE LEFT and \u21bb ROTATE RIGHT, each turning the page a quarter turn. They rotate the PAGE ITSELF, not just the view, so the thumbnail, the preview, the sewn result and the saved drawing all come out upright - a rotate is not undone by saving. WITH ONE OR MORE PAGES LOADED they act on the SELECTED page (the one outlined in maroon in the thumbnail strip), so a multi-page traveller can have one crooked page straightened without touching the rest. QUALITY IS PROTECTED: the original page is kept untouched and every rotation is re-cut FROM THAT ORIGINAL, so turning a page four times is one re-encode, not four stacked ones, and coming back to square costs nothing at all - the original is handed straight back. A PNG stays a PNG (Rich\u2019s rule: JPEG smears readable text, and a hand-inked ODS is nothing but readable text). Any per-page nudge is cleared on rotate, since a nudge measured against the old orientation means nothing in the new one. Because the studio is one codebase mounted in three places, this lands on the ODS drawing screen, the traveller studio and the special-gage capture at once. WHAT TO TEST (rule 8): open the OP-050 ODS, press \u21bb ROTATE RIGHT once, confirm the drawing stands upright in the preview AND the thumbnail, save it, reopen it and confirm it is still upright. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-954", type: "App", changes: ["A NEW OPERATION APPEARS THE INSTANT IT IS CREATED (Rev-954, embedded validation REV-255) \u2014 Rich asked why a new operation took a moment to show up in the list, and the cause was measured in the shipped code rather than guessed. Every save went through ONE door: a 1,200-millisecond delay timer that exists so fast typing in the grid does not write on every keystroke. Creating an operation queued behind that same timer, while the app immediately jumped to the Control Plans list and drew it FROM STORAGE - where the new operation had not been written yet. So the list drew the old set, and the operation only turned up on the next redraw after the timer fired. There are now TWO doors onto the same save: cpAutoSaveProject keeps the 1.2s debounce for typing, and cpSaveProjectNow writes immediately and returns whether it worked. Creating an operation uses the immediate door, so the write completes BEFORE the list is drawn. AND THE SAVE NOW SPEAKS: its error trap discarded failures silently - one of the 321 - which meant a genuinely failed save looked exactly like this same delay and then the operation was simply gone. A failure now logs to the Action Log and says SAVE FAILED on screen with the reason. WHAT TO TEST (rule 8): press ADD NEW OPERATION, name it, and confirm it is in the list the moment the pop-up closes with no pause; then edit a few grid cells and confirm typing is still smooth. Payload verified in both repos before this entry."] },
@@ -3028,7 +3029,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:44 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:58 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4357,6 +4358,38 @@ function cpRemoveOpOds(p){
   try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
   })();
 }
+/* Rev-957: send every step ABOVE the drawing back to zero for one operation.
+   WHAT GOES - all of it a claim made about the OLD print:
+     · builderState.features  - the balloon pins located on that drawing (Step 3 data)
+     · row.stepDone           - the QE's row approvals on Steps 3, 4, 5 and 6
+     · inspReviewed           - the Step 7 inspection review sign-off
+     · valRefImages/valRefEdits - reference crops cut out of that drawing
+   WHAT STAYS - engineering data that is still worth checking rather than retyping:
+     the rows, bubble numbers, specs and limits, control types, measurement methods and
+     reaction plans. They survive UNAPPROVED, which is the honest state after a print swap.
+   Returns a count of what it cleared so the message can say so. */
+function cpOdsResetDownstream(x){
+  const out = { pins: 0, approvals: 0, review: 0, crops: 0 };
+  try{
+    if(!x) return out;
+    const bs = x.builderState;
+    if(bs){
+      if(Array.isArray(bs.features)){ out.pins = bs.features.length; bs.features = []; }
+      else bs.features = [];
+      (Array.isArray(bs.rows) ? bs.rows : []).forEach(r => {
+        if(!r) return;
+        if(r.stepDone && Object.keys(r.stepDone).length){ out.approvals += Object.keys(r.stepDone).length; }
+        r.stepDone = {};
+      });
+      if(bs.stepSeen) bs.stepSeen = {};
+    }
+    if(x.inspReviewed){ out.review = 1; delete x.inspReviewed; }
+    if(x.valRefImages){ try{ out.crops = Object.keys(x.valRefImages).length; }catch(_){ } delete x.valRefImages; }
+    if(x.valRefEdits) delete x.valRefEdits;
+    x.updated = new Date().toISOString();
+  }catch(e){ console.error('Rev-957 cpOdsResetDownstream failed', e); }
+  return out;
+}
 // Load (or replace) the ODS drawing for one operation, from the Control Plans list
 function cpUploadOpOds(p){
   const part = p.partNum || '', op = String(p.opNum || '');
@@ -4368,20 +4401,42 @@ function cpUploadOpOds(p){
     saveLabel: 'Save ODS drawing',
     replaceLabel: '\u21c4 REPLACE DRAWING',   // Rev-956
     extraBtn: { label: '\ud83d\uddd1 DELETE DRAWING', onClick: () => { cpRemoveOpOds(p); } },
-    onSave: (url) => {
+    onSave: (url, meta) => {
+      const replaced = !!(meta && meta.replaced);   // Rev-957
       _idbPutOds(part, op, url, null);
       try{ cpOdsSetDeleted(part, op, false); }catch(e){}   // Rev-721: a new drawing lifts the tombstone
+      let _cleared = null;
       try{
         const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
         let hit = false;
         projects.forEach(x => {
           if(String(x.partNum || '') !== String(part) || String(x.opNum || '') !== op) return;
           if(x.builderState){ x.builderState.odsImage = url; x.updated = new Date().toISOString(); hit = true; }
+          /* Rev-957: a REPLACED print withdraws every claim made against the old one. Pins,
+             row approvals and the inspection review all go; the typed values stay (Rev-720
+             keeps them on a delete too) so nobody retypes fifteen rows over a swapped scan. */
+          if(replaced){ _cleared = cpOdsResetDownstream(x); hit = true; }
         });
         if(hit) localStorage.setItem('cpProjects', JSON.stringify(projects));
-      }catch(e){}
-      try{ if(cpBuildState && String(cpBuildState.partNum||'') === String(part) && String(cpBuildState.opNum||'') === op) cpBuildState.odsImage = url; }catch(e){}
-      flash('\u2713 ODS drawing saved for ' + part + (op ? ' OP-' + op : '') + '.');
+      }catch(e){ console.error('Rev-957 ODS save/reset failed', e); }
+      try{
+        if(cpBuildState && String(cpBuildState.partNum||'') === String(part) && String(cpBuildState.opNum||'') === op){
+          cpBuildState.odsImage = url;
+          if(replaced){
+            cpBuildState.features = [];
+            (cpBuildState.rows || []).forEach(r => { if(r) r.stepDone = {}; });
+          }
+        }
+      }catch(e){ console.error('Rev-957 builder mirror failed', e); }
+      if(replaced){
+        try{ logAct('drawing', 'ODS REPLACED \u00b7 downstream steps reset'); }catch(e){}
+        flash('\u2713 ODS drawing REPLACED for ' + part + (op ? ' OP-' + op : '') + '. Steps 3\u20137 are back to '
+            + 'zero \u2014 ' + ((_cleared && _cleared.pins) || 0) + ' pin(s) and '
+            + ((_cleared && _cleared.approvals) || 0) + ' row approval(s) cleared against the old print. '
+            + 'Your typed tolerances, control types and methods are kept.');
+      } else {
+        flash('\u2713 ODS drawing saved for ' + part + (op ? ' OP-' + op : '') + '.');
+      }
       renderProjects();
       try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
     }
@@ -6607,6 +6662,9 @@ let _cptvPart = '', _cptvPages = [], _cptvSel = 0, _cptvBackup = null, _cptvTime
 /* Rev-956: armed by REPLACE DRAWING. The pages already loaded are cleared only when a file is
    actually CHOSEN, so backing out of the picker changes nothing and needs no confirmation box. */
 let _cptvReplaceArmed = false;
+/* Rev-957: set once a replace actually swaps the pages, and read by the SAVE so the caller
+   can be told this drawing REPLACED another one rather than simply being saved. */
+let _cptvDidReplace = false;
 
 function _cptvLoad(url){
   return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('could not decode a page')); im.src = url; });
@@ -6880,6 +6938,7 @@ function _cptvPaste(e){
 }
 function _cptvClose(){
   _cptvReplaceArmed = false;   // Rev-956: never leave a replace armed across windows
+  _cptvDidReplace = false;     // Rev-957
   const v = document.getElementById('cptvBg'); if(v) v.remove();
   document.removeEventListener('keydown', _cptvKeys, true);
   document.removeEventListener('paste', _cptvPaste, true);
@@ -6955,6 +7014,7 @@ function _cptvWire(root, o){
     if(!picked.length) return;   // Rev-956: backed out of the picker — nothing changes
     if(_cptvReplaceArmed){
       _cptvReplaceArmed = false;
+      _cptvDidReplace = true;                // Rev-957: the save that follows is a REPLACE
       _cptvPages.length = 0; _cptvSel = 0;   // Rev-956: REPLACE, not add
       try{ logAct('drawing', 'Drawing replaced \u00b7 pages cleared'); }catch(e){}
     }
@@ -7024,6 +7084,7 @@ function cpImageStudioInline(container, o){
 async function cpImageStudio(opts){
   const o = opts || {};
   _cptvClose();
+  _cptvDidReplace = false;   // Rev-957: a fresh window has not replaced anything yet
   _cptvPart = String(o.title || '');
   const bg = document.createElement('div');
   bg.id = 'cptvBg';
@@ -7076,7 +7137,9 @@ async function cpImageStudio(opts){
   document.getElementById('cptvSave').onclick = async () => {
     const url = await cpStudioResult();
     if(!url){ alert('Load at least one page first.'); return; }
-    try{ _cptvClose(); if(typeof o.onSave === 'function') await o.onSave(url); }
+    /* Rev-957: read the replace flag BEFORE closing - the close clears it. */
+    const _wasReplace = !!_cptvDidReplace;
+    try{ _cptvClose(); if(typeof o.onSave === 'function') await o.onSave(url, { replaced: _wasReplace }); }
     catch(e){ alert('Could not save: ' + (e && e.message || e)); }
   };
   if(!_cptvPages.length && o.autoPick !== false && file) setTimeout(() => file.click(), 150);
