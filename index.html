@@ -1678,7 +1678,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-962";
+const APP_REV = "Rev-963";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2206,6 +2206,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-06", rev: "App Rev-963", type: "App", changes: ["FEATURE / PROCESS DESCRIPTION IS OFF THE TOLERANCES SCREEN (Rev-963, embedded validation REV-255) \u2014 per Rich. Step 4 is about the NUMBERS: read the limits off the balloon, check them, approve the row. The description column sat in the middle of that, empty on every row, pushing the limit boxes rightward for no return. It is hidden on Step 4 only. It is untouched on Step 3 (bubbles), Step 5 (control types), Step 6 (measurement methods) and the All-columns view, and NO DATA IS AFFECTED - a step view decides only which columns are on screen, so anything typed in a description stays exactly where it was and reappears the moment another step is opened. DONE BY HIDING, NOT BY DELETING: the column keeps its index, because every step view addresses columns by NUMBER and removing one would silently renumber all four other views (the same trap the zero-width limit columns exist to avoid). WHAT TO TEST (rule 8): open Step 4 and confirm the columns read Doc # \u00b7 Bubble # \u00b7 \u2714 \u00b7 Product/Process Spec/Tol \u00b7 Class; then open Step 5 and confirm Feature / Process Description is back. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-962", type: "App", changes: ["THE READ DIMENSIONS (AI) BUTTON MOVES TO THE GRID (Rev-962, embedded validation REV-255) \u2014 per Rich\u2019s arrow. The purple \ud83d\udd0e Read dimensions (AI) button sat at the far right of the DRAWING pane\u2019s toolbar, the opposite end of a wide screen from the Spec/Tol cells it actually fills - and buried among four drawing controls it has nothing to do with. It now sits on its own strip directly above the Control Plan grid, over the columns it writes into. The strip is part of the grid pane and stays put while the grid scrolls under it, so the button is reachable from any row. NOTHING ELSE CHANGED: same id, same handler, same ITAR confirm gate before anything is sent, same rule that it fills only EMPTY Spec/Tol cells and never touches pins, and the same visibility rule - hidden until an ODS drawing is loaded. The drawing toolbar keeps Zoom to balloon, Back a balloon, Upload / Replace drawing and Minimize drawing. WHAT TO TEST (rule 8): on OP-040 Step 4, the purple button is above the grid on the left, the drawing toolbar no longer carries it, and pressing it still raises the ITAR confirm before reading. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-961", type: "App", changes: ["\ud83d\udd12 A STEP IS LOCKED UNTIL EVERY STEP BEFORE IT IS COMPLETED (Rev-961, embedded validation REV-255) \u2014 per Rich, and this REVERSES Rev-683, which removed locking entirely. That removal had a real reason and it has been fixed rather than ignored: Rev-683 was thrown by a contradiction where Step 4 read COMPLETED while Step 5 sat LOCKED, because readiness was computed from a DIFFERENT test than doneness - a step said done when its rows were APPROVED, but unlocked the next step only when its rows held DATA, and a row can be approved by hand with a cell still empty. The two tests are now one: a step is ready when every step before it is DONE, full stop, so LOCKED and COMPLETED can never contradict each other again. Locked tiles are greyed with a dashed edge, carry a \ud83d\udd12 in front of the name, read NEEDS EARLIER STEP, and do not respond to a click; their tooltip names the exact step that is holding them. The percentage calculation is untouched - this changes what can be OPENED, not what has been earned. WHAT TO TEST (rule 8): on 1000237498, OP-100 has only Step 1 done, so Steps 3 through 7 must show the lock and refuse to open, while Step 2 stays live; on OP-040, Steps 1-3 are done so Step 4 must be open and Steps 5-7 locked. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-960", type: "App", changes: ["THE HAZARD STRIPES NOW RUN AT THE SPEED OF THE WORK (Rev-960, embedded validation REV-255) \u2014 per Rich. Every UNDER CONSTRUCTION ribbon crawled at the same 1.35 seconds a cycle whether the plan was at 5 percent or 95, so six operations on one screen all looked equally busy and the ribbon carried no information beyond \u2018not finished\u2019. The stripe speed is now tied to the percentage: a plan barely started BARELY MOVES (about 5.3 seconds a cycle at 5 percent, nearly still), and one near the finish RACES (about half a second at 95 percent). Deliberately not a straight line - the speed rises on a curve, so the difference between 5 and 30 percent is as readable at a glance as the difference between 70 and 95, which a linear ramp buries in the middle. Ten times the range end to end. Nothing else about the ribbon changed: same height, same colours, same wording, same solid chip. STILL STOPS DEAD under prefers-reduced-motion - the inline speed sets only the duration, so the media rule that switches the animation off still wins. The tooltip now says what the speed means, so a fast ribbon is not mistaken for an alarm. WHAT TO TEST (rule 8): on 1000237498, OP-040 and OP-050 sit at 30 percent and the four grinds and bores at 5 - the two 30s must visibly outrun the 5s on the same screen. Payload verified in both repos before this entry."] },
@@ -3045,7 +3046,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:07 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:19 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -8591,9 +8592,14 @@ const CP_STEPS = {
      Rich. Same columns as the bubble view (description, spec/tol, limits, class): the job
      here is the NUMBERS, checked and approved row by row before a control type is chosen
      against them. Internal key 'T' so no existing stepDone approval is renumbered. */
+  /* Rev-963: column 8 (Feature / Process Description) dropped from THIS VIEW ONLY, per Rich -
+     Step 4 is the numbers, and the description sat between the bubble and the limits doing
+     nothing. HIDDEN, not deleted: the four other views address columns by index, so removing
+     the column itself would renumber every one of them. Columns 10 and 11 stay listed - they
+     are the zero-width limit cells the layout still counts. */
   'T': { label: '4 \u00b7 Tolerances',
          hint: 'Confirm each row\u2019s spec / tolerance and limits \u2014 approve the row when its numbers are right.',
-         cols: [0,1,2,8,9,10,11,12] },
+         cols: [0,1,2,9,10,11,12] },
   '2': { label: '5 \u00b7 Control Type',
          hint: 'Narrow it down with Workcenter \u2192 Feature Type \u2192 2nd / 3rd Level. The Control Type ID resolves itself, and the methods fill from the Master List.',
          cols: [0,1,2,3,4,5,6,7,8,9,12] },
