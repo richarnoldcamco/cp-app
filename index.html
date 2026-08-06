@@ -1667,7 +1667,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-955";
+const APP_REV = "Rev-956";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2195,6 +2195,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-06", rev: "App Rev-956", type: "App", changes: ["REPLACE DRAWING - SWAP THE PRINT INSTEAD OF ADDING A PAGE TO IT (Rev-956, embedded validation REV-255) \u2014 per Rich. The drawing screen could ADD a page (the strip along the top) and DELETE the drawing outright, but there was no way to say \u2018this one is wrong, here is the right one\u2019: picking a file appended it, leaving two pages where one was wanted. \u21c4 REPLACE DRAWING now sits in the footer beside \ud83d\uddd1 DELETE DRAWING, left of Cancel and Save. It opens the file picker, and ONLY WHEN A FILE IS ACTUALLY CHOSEN does it clear what was loaded - back out of the picker and nothing has changed, so there is no confirmation box to read and nothing to undo. Deliberately NOT destructive: it works on the pages loaded in this window, and the stored drawing is not touched until Save is pressed, so Cancel still walks away from the whole thing. Arming is cancelled if ADD ANOTHER PAGE is used instead, so a replace started and abandoned can never eat a later add. Being in the shared studio, the button reads REPLACE DRAWING on the ODS screen and REPLACE on the traveller and special-gage mounts. WHAT TO TEST (rule 8): open the OP-050 ODS, press \u21c4 REPLACE DRAWING and back out of the picker - the existing page must still be there; press it again and choose a file - it must REPLACE, leaving 1 page and not 2. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-955", type: "App", changes: ["ROTATE LEFT AND ROTATE RIGHT ON THE DRAWING SCREEN (Rev-955, embedded validation REV-255) \u2014 per Rich, whose OP-050 ODS came in sideways with every dimension running up the page. Two buttons now sit in the zoom row beside FIT and 100%: \u21ba ROTATE LEFT and \u21bb ROTATE RIGHT, each turning the page a quarter turn. They rotate the PAGE ITSELF, not just the view, so the thumbnail, the preview, the sewn result and the saved drawing all come out upright - a rotate is not undone by saving. WITH ONE OR MORE PAGES LOADED they act on the SELECTED page (the one outlined in maroon in the thumbnail strip), so a multi-page traveller can have one crooked page straightened without touching the rest. QUALITY IS PROTECTED: the original page is kept untouched and every rotation is re-cut FROM THAT ORIGINAL, so turning a page four times is one re-encode, not four stacked ones, and coming back to square costs nothing at all - the original is handed straight back. A PNG stays a PNG (Rich\u2019s rule: JPEG smears readable text, and a hand-inked ODS is nothing but readable text). Any per-page nudge is cleared on rotate, since a nudge measured against the old orientation means nothing in the new one. Because the studio is one codebase mounted in three places, this lands on the ODS drawing screen, the traveller studio and the special-gage capture at once. WHAT TO TEST (rule 8): open the OP-050 ODS, press \u21bb ROTATE RIGHT once, confirm the drawing stands upright in the preview AND the thumbnail, save it, reopen it and confirm it is still upright. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-954", type: "App", changes: ["A NEW OPERATION APPEARS THE INSTANT IT IS CREATED (Rev-954, embedded validation REV-255) \u2014 Rich asked why a new operation took a moment to show up in the list, and the cause was measured in the shipped code rather than guessed. Every save went through ONE door: a 1,200-millisecond delay timer that exists so fast typing in the grid does not write on every keystroke. Creating an operation queued behind that same timer, while the app immediately jumped to the Control Plans list and drew it FROM STORAGE - where the new operation had not been written yet. So the list drew the old set, and the operation only turned up on the next redraw after the timer fired. There are now TWO doors onto the same save: cpAutoSaveProject keeps the 1.2s debounce for typing, and cpSaveProjectNow writes immediately and returns whether it worked. Creating an operation uses the immediate door, so the write completes BEFORE the list is drawn. AND THE SAVE NOW SPEAKS: its error trap discarded failures silently - one of the 321 - which meant a genuinely failed save looked exactly like this same delay and then the operation was simply gone. A failure now logs to the Action Log and says SAVE FAILED on screen with the reason. WHAT TO TEST (rule 8): press ADD NEW OPERATION, name it, and confirm it is in the list the moment the pop-up closes with no pause; then edit a few grid cells and confirm typing is still smooth. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-953", type: "App", changes: ["THE CRUMB LINE IS GONE - THE PART HEADER SAYS IT ALREADY (Rev-953, embedded validation REV-255) \u2014 per Rich\u2019s two crossings. Inside a part, the line above the table repeated the part number and operation count that the big beige header row already carries, and sat beside a \u2190 All Parts button; both are deleted and the operations table now starts directly under the page heading. THE WAY OUT IS PRESERVED: with All Parts gone, \u2190 Back is the only exit, so it now steps OUT OF THE PART to the parts list when a part\u2019s operations are open, and only leaves the Control Plans screen on the second press - previously it jumped straight off the screen. Nothing else on the list changed. WHAT TO TEST (rule 8): open a part, confirm the line above the table is gone and the part number still reads on the beige header; press \u2190 Back once and land on All Parts; press it again and leave the screen. Payload verified in both repos before this entry."] },
@@ -3027,7 +3028,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:31 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4365,6 +4366,7 @@ function cpUploadOpOds(p){
     dropHint: 'The ballooned operation drawing. Image or PDF \u2014 any PDF, including a Chrome PDF Document. Ctrl+V pastes a screenshot.',
     seedKey: cpOdsKey(part, op),
     saveLabel: 'Save ODS drawing',
+    replaceLabel: '\u21c4 REPLACE DRAWING',   // Rev-956
     extraBtn: { label: '\ud83d\uddd1 DELETE DRAWING', onClick: () => { cpRemoveOpOds(p); } },
     onSave: (url) => {
       _idbPutOds(part, op, url, null);
@@ -6602,6 +6604,9 @@ function cpAddOpToPartScreen(partNum){
 // of a multi-page router, reorder them, push individual pages around with the nudge bar,
 // sew them edge-to-edge into ONE image, and save it as the part's traveller.
 let _cptvPart = '', _cptvPages = [], _cptvSel = 0, _cptvBackup = null, _cptvTimer = null, _cptvZoom = 0;
+/* Rev-956: armed by REPLACE DRAWING. The pages already loaded are cleared only when a file is
+   actually CHOSEN, so backing out of the picker changes nothing and needs no confirmation box. */
+let _cptvReplaceArmed = false;
 
 function _cptvLoad(url){
   return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('could not decode a page')); im.src = url; });
@@ -6874,6 +6879,7 @@ function _cptvPaste(e){
   if(txt) flash('That paste was text, not a picture. Copy the page as an image or drop the PDF file in.', true);
 }
 function _cptvClose(){
+  _cptvReplaceArmed = false;   // Rev-956: never leave a replace armed across windows
   const v = document.getElementById('cptvBg'); if(v) v.remove();
   document.removeEventListener('keydown', _cptvKeys, true);
   document.removeEventListener('paste', _cptvPaste, true);
@@ -6946,10 +6952,17 @@ function _cptvWire(root, o){
     // Rev-574 FIX: file.files is a LIVE list — resetting the input empties it, so copy first
     const picked = Array.from(file.files || []);
     file.value = '';
-    if(picked.length) _cptvAddFiles(picked);
+    if(!picked.length) return;   // Rev-956: backed out of the picker — nothing changes
+    if(_cptvReplaceArmed){
+      _cptvReplaceArmed = false;
+      _cptvPages.length = 0; _cptvSel = 0;   // Rev-956: REPLACE, not add
+      try{ logAct('drawing', 'Drawing replaced \u00b7 pages cleared'); }catch(e){}
+    }
+    _cptvAddFiles(picked);
   };
   const drop = root.querySelector('#cptvDrop');
-  drop.onclick = () => file.click();
+  /* Rev-956: an abandoned replace must never eat a later ADD, so this path disarms it. */
+  drop.onclick = () => { _cptvReplaceArmed = false; file.click(); };
   drop.ondragover = (e) => { e.preventDefault(); drop.style.background = '#e8dfcd'; };
   drop.ondragleave = () => { drop.style.background = '#f6f2ea'; };
   drop.ondrop = (e) => { e.preventDefault(); drop.style.background = '#f6f2ea'; if(e.dataTransfer && e.dataTransfer.files.length) _cptvAddFiles(e.dataTransfer.files); };
@@ -7023,9 +7036,16 @@ async function cpImageStudio(opts){
     '<div style="background:#e5ddd1; padding:8px 14px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; border-top:1px solid #c9c0b4; flex:0 0 auto;">' +
       // Rev-719: optional destructive action, pushed to the LEFT away from Save so it is not
       // hit by muscle memory reaching for the green button.
+      // Rev-956: the left group now holds DELETE and REPLACE together; the group carries the
+      // margin-right:auto that used to sit on the delete button alone.
+      '<div style="display:flex; gap:8px; margin-right:auto;">' +
       (o.extraBtn ? ('<button id="cptvExtra" style="padding:8px 16px; font-weight:700; cursor:pointer;'
-        + ' background:#fff; color:#a5342a; border:1px solid #d9b3ad; border-radius:6px; margin-right:auto;">'
+        + ' background:#fff; color:#a5342a; border:1px solid #d9b3ad; border-radius:6px;">'
         + String(o.extraBtn.label || 'Remove') + '</button>') : '') +
+      '<button id="cptvReplace" title="Pick a different file — this drawing is swapped for it, not added to"'
+        + ' style="padding:8px 16px; font-weight:700; cursor:pointer; background:#fff; color:#5c4a3a;'
+        + ' border:1px solid #c9c0b4; border-radius:6px;">' + String(o.replaceLabel || '\u21c4 REPLACE') + '</button>' +
+      '</div>' +
       '<button id="cptvCancel" style="padding:8px 18px; font-weight:700; cursor:pointer;">Cancel</button>' +
       '<button id="cptvSave" style="padding:8px 22px; font-weight:800; cursor:pointer; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px;">\u2713 ' + String(o.saveLabel || 'Save') + '</button>' +
     '</div>' +
@@ -7034,6 +7054,21 @@ async function cpImageStudio(opts){
   o.fill = true;                              // Rev-579: preview takes every spare pixel
   const file = cpImageStudioInline(document.getElementById('cptvBody'), o);
   document.getElementById('cptvCancel').onclick = _cptvClose;
+  /* Rev-956: REPLACE arms the swap and opens the picker. Nothing is cleared until a file is
+     actually chosen, so backing out of the picker leaves the loaded pages exactly as they were. */
+  const _rb = document.getElementById('cptvReplace');
+  if(_rb) _rb.onclick = () => {
+    try{
+      _cptvReplaceArmed = true;
+      try{ logAct('drawing', 'Replace pressed \u00b7 picker opened'); }catch(e){}
+      if(file) file.click();
+      else { _cptvReplaceArmed = false; flash('Could not open the file picker.', true); }
+    }catch(e){
+      _cptvReplaceArmed = false;
+      console.error('Rev-956 replace failed', e);
+      try{ flash('Could not start the replace: ' + (e && e.message || e), true); }catch(_){ }
+    }
+  };
   if(o.extraBtn){
     const xb = document.getElementById('cptvExtra');
     if(xb) xb.onclick = () => { _cptvClose(); try{ o.extraBtn.onClick(); }catch(e){} };
