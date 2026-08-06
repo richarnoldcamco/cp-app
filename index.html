@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-950</title>
+<title>CONTROL PLAN GENERATOR - Rev-951</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-950 · 2026-08-05 9:04 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-951 · 2026-08-05 9:06 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-950 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 9:04 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-951 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 9:06 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-950 · Built Aug 5, 2026</span>
+    <span id="revFooter">App Rev-951 · Built Aug 5, 2026</span>
   </div>
 </div>
 
@@ -1667,7 +1667,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-950";
+const APP_REV = "Rev-951";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2195,6 +2195,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-05", rev: "App Rev-951", type: "App", changes: ["THE NEW CHAT PROMPT CARRIES TONIGHT'S SESSION STATE (Rev-951, embedded validation REV-255) — Rich asked exactly the right question: the handoff belongs INSIDE the New Chat Prompt button, not pasted by hand. The baked CP_OPEN_WORK block still told Rev-752-era truth, so a dated AUG 5 SESSION STATE section now rides at its end: the seven-step structure with the never-renumber rule for the internal keys, the one-column tolerance cell and its spec write-back, the banner header with its hidden-but-required tab buttons, the zero-width td rule, the traveller primary system and protected scan, the op-less-only fallbacks and why, the Instructions Rev-92 mismatch awaiting explicit go-ahead, the consumed first-visit popup on OP-040, and the gated ship discipline with the literal-UTF-8 anchor lesson. The pre-existing outstanding items stay - all still true. Press the button and the fresh chat starts knowing tonight. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-950", type: "App", changes: ["THE DUPLICATED TOLERANCE IS GONE - THE PAIR IS THE ONE PLACE TO TYPE (Rev-950, embedded validation REV-255) — per Rich, strongly preferred and delivered: the open row's spec text box repeated the very numbers the UPPER and LOWER inputs hold, so that box is hidden and the pair is now the single place tolerances are typed. The spec FIELD lives on underneath doing its jobs invisibly: a two-number printed spec seeds the pair automatically on first open, and every edit to the pair writes the spec back - upper and lower joined with a slash, or the single limit in 1-DIM mode - so the compact closed-row summary, the xlsx export and the machinist validation all read exactly what they always did. One number, typed once, shown once. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-949", type: "App", changes: ["A PER-ROW TOGGLE BETWEEN ONE AND TWO DIMENSIONS (Rev-949, embedded validation REV-255) — per Rich: features that carry a single limit - a radius callout, a MAX note - no longer show a meaningless second box. Each row's spec cell carries a small toggle: 1 DIM shows a single LIMIT input, 2 DIMS shows the UPPER and LOWER pair, and the row remembers its choice (tolMode, saved with the plan and synced like everything else). Toggling to one dimension HIDES the lower value rather than erasing it, so switching back loses nothing. Default is two dimensions, matching how the printed pairs read. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-948", type: "App", changes: ["SPEC AND LIMITS CONSOLIDATED INTO ONE COLUMN (Rev-948, embedded validation REV-255) — Rich asked whether the Spec/Tol column and the Upper/Lower column are redundant, and the honest answer is MOSTLY: for a plain dimension the limits repeat the spec, but the machinist validation does its pass/fail arithmetic on the numeric limit fields, and a text spec like R.005 MAX 2X cannot be parsed into bounds automatically - so the FIELDS stay while the COLUMNS merge. On screen there is now one column: the printed spec with the UPPER and LOWER inputs stacked directly beneath it in the same cell, placeholders naming which is which. The old tds remain at zero width because every step view's column indices count them; storage, the xlsx export and validation are untouched. Payload verified in both repos before this entry."] },
@@ -3022,7 +3023,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-05";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:04 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:06 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -20069,6 +20070,34 @@ STILL OUTSTANDING:
     a post of the current feature index in renderStage(). ~30 lines. The baked copy IS the
     source of truth; the standalone machinist app is no longer used.
   · AUDIT should count declared machinist exceptions so plans carrying many are visible.
+
+AUG 5 SESSION STATE (Rev-871 → Rev-950) — read before touching anything:
+  · SEVEN construction steps now: 1 Edit Op# · 2 Upload ODS · 3 Assign Bubbles · 4 ASSIGN
+    TOLERANCES (new) · 5 Control Types · 6 Measurement Types · 7 Review Inspection.
+    Internal builder keys are '1','T','2','3' — NEVER renumber them (Rev-738 rule; every
+    recorded approval is keyed on them). Weights: 5/5/20/15/20/20/15.
+  · Tolerances UI is ONE column: the spec input is HIDDEN on the open row; the UPPER/LOWER
+    pair (or single LIMIT via the per-row tolMode toggle) is the only typing place. The pair
+    seeds from a two-number spec and writes row.spec back on every edit — export and
+    validation read spec exactly as before. Do not resurrect the spec input.
+  · Builder header is the construction BANNER (tiles + hazard ribbon), half-height, tiles
+    sized to labels. Old tab buttons remain hidden in the DOM — cpSetStep highlights them
+    by id; removing them breaks the step switch.
+  · Zero-width td rule: the old Upper/Lower tds still render at width:0 because every step
+    view's column indices count them. Removing a td renumbers every view.
+  · Traveller: primary system live (::TRAVELLER holds the primary; true scan preserved in
+    ::TRAVELLER_SCAN, 446,872 bytes, 1019x1492). GEN is primary for 1000237498 by choice.
+    AI-read + compares always read the true scan.
+  · Bare-part-key fallbacks (ODS image AND drawing-recovery-with-pins) now serve OP-LESS
+    plans only — they leaked June data into new operations twice (Rev-929, Rev-933).
+  · Instructions Rev-92 baked in still describes the OLD six-step flow and two-column
+    tolerances — needs a rev for Rev-942–950; NEVER edit without explicit go-ahead.
+  · First-visit AI-tolerance-fill popup asks once per plan (stepSeen.T); already consumed
+    on 1000237498 OP-040 — the purple Read dimensions button is the door there.
+  · SHIP DISCIPLINE (three empty-ship postmortems: 903/908/916): patch script standalone,
+    assert FEATURE MARKERS in the file, node --check, then embed && push && verify chained;
+    post-push verify markers in BOTH repos via blob API. File anchors contain literal UTF-8
+    → ← — ✔ characters, not backslash-u escapes.
 `;
 // ===== NEW CHAT PROMPT =====
 // The COMMON block is shared across all CAMCO apps and lives on GitHub so it can be
