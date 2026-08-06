@@ -1667,7 +1667,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-953";
+const APP_REV = "Rev-954";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2195,6 +2195,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-06", rev: "App Rev-954", type: "App", changes: ["A NEW OPERATION APPEARS THE INSTANT IT IS CREATED (Rev-954, embedded validation REV-255) \u2014 Rich asked why a new operation took a moment to show up in the list, and the cause was measured in the shipped code rather than guessed. Every save went through ONE door: a 1,200-millisecond delay timer that exists so fast typing in the grid does not write on every keystroke. Creating an operation queued behind that same timer, while the app immediately jumped to the Control Plans list and drew it FROM STORAGE - where the new operation had not been written yet. So the list drew the old set, and the operation only turned up on the next redraw after the timer fired. There are now TWO doors onto the same save: cpAutoSaveProject keeps the 1.2s debounce for typing, and cpSaveProjectNow writes immediately and returns whether it worked. Creating an operation uses the immediate door, so the write completes BEFORE the list is drawn. AND THE SAVE NOW SPEAKS: its error trap discarded failures silently - one of the 321 - which meant a genuinely failed save looked exactly like this same delay and then the operation was simply gone. A failure now logs to the Action Log and says SAVE FAILED on screen with the reason. WHAT TO TEST (rule 8): press ADD NEW OPERATION, name it, and confirm it is in the list the moment the pop-up closes with no pause; then edit a few grid cells and confirm typing is still smooth. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-953", type: "App", changes: ["THE CRUMB LINE IS GONE - THE PART HEADER SAYS IT ALREADY (Rev-953, embedded validation REV-255) \u2014 per Rich\u2019s two crossings. Inside a part, the line above the table repeated the part number and operation count that the big beige header row already carries, and sat beside a \u2190 All Parts button; both are deleted and the operations table now starts directly under the page heading. THE WAY OUT IS PRESERVED: with All Parts gone, \u2190 Back is the only exit, so it now steps OUT OF THE PART to the parts list when a part\u2019s operations are open, and only leaves the Control Plans screen on the second press - previously it jumped straight off the screen. Nothing else on the list changed. WHAT TO TEST (rule 8): open a part, confirm the line above the table is gone and the part number still reads on the beige header; press \u2190 Back once and land on All Parts; press it again and leave the screen. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-952", type: "App", changes: ["ADD NEW OPERATION IS BACK \u2014 A BUTTON UNDER THE LAST OPERATION (Rev-952, embedded validation REV-255) \u2014 per Rich\u2019s red box, drawn exactly where he expected the button to be. Rev-925 deleted the part-header Add Operation on the stated grounds that every operation row carries its own; that was WRONG. Reading the shipped code shows the row-level Add Operation renders ONLY on a DRAFT line - a part whose operations are all real saved plans had NO way in at all, which is exactly the state 1000237498 was in. A full-width footer line now closes every part\u2019s operation list carrying \u2795 ADD NEW OPERATION, indented to sit under the operation names, opening the same Rev-928 two-field pop-up (cpAddOpToPart) that asks for OP number and OP description and fills the part-level fields silently. The draft-row button is untouched. WHAT TO TEST (rule 8): open part 1000237498, see the button below the OP-040 line, press it, name an operation and confirm it lands as a second row with its seven construction steps. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-951", type: "App", changes: ["THE NEW CHAT PROMPT CARRIES TONIGHT'S SESSION STATE (Rev-951, embedded validation REV-255) — Rich asked exactly the right question: the handoff belongs INSIDE the New Chat Prompt button, not pasted by hand. The baked CP_OPEN_WORK block still told Rev-752-era truth, so a dated AUG 5 SESSION STATE section now rides at its end: the seven-step structure with the never-renumber rule for the internal keys, the one-column tolerance cell and its spec write-back, the banner header with its hidden-but-required tab buttons, the zero-width td rule, the traveller primary system and protected scan, the op-less-only fallbacks and why, the Instructions Rev-92 mismatch awaiting explicit go-ahead, the consumed first-visit popup on OP-040, and the gated ship discipline with the literal-UTF-8 anchor lesson. The pre-existing outstanding items stay - all still true. Press the button and the fresh chat starts knowing tonight. Payload verified in both repos before this entry."] },
@@ -3025,7 +3026,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:11 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:19 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -8144,7 +8145,12 @@ async function generateCPBuild(){
   // jobs — the five construction steps are the map, and landing on Step 3 with the
   // skeleton already open skipped past steps 1 and 2 and hid the rest of the part.
   cpBuildState.focusIdx = -1;
-  try{ cpAutoSaveProject(); }catch(e){}
+  /* Rev-954: IMMEDIATE save. The next lines draw the Control Plans list from storage, so the
+     write has to have landed first - on the 1.2s debounce it had not, and the new operation
+     was missing from the list it had just been created on. */
+  try{
+    if(cpSaveProjectNow() === false) flash('\u26a0 The operation may not have saved \u2014 check the Action Log', true);
+  }catch(e){ console.error('Rev-954 immediate save on create failed', e); }
   try{ logAct('new-op', (partNum || '') + (opNum ? ' OP-' + opNum : '') + ' \u00b7 ' + numRows + ' rows'); }catch(e){}
   const _newPart = String(partNum || '').toUpperCase();
   if(_newPart && typeof showProjects === 'function' && typeof cpOpenPart === 'function'){
@@ -8226,10 +8232,25 @@ function getControlTypeOptions(){
 }
 
 let _cpAutoT = null;
+/* Rev-954: TWO DOORS ONTO ONE SAVE.
+   cpAutoSaveProject  - the original 1,200ms debounce. Typing in the grid calls this on every
+                        keystroke and only the last one writes. Unchanged behaviour.
+   cpSaveProjectNow   - writes IMMEDIATELY and returns true/false. For finished, deliberate
+                        actions (creating an operation) where the very next thing the app does
+                        is redraw the list FROM STORAGE - queuing those behind the typing timer
+                        meant the list drew before the write landed, which is exactly the delay
+                        Rich reported. Cancels any pending debounce so the same write can't run twice. */
+function cpSaveProjectNow(){
+  if(!cpBuildState || !cpBuildState.partNum) return false;
+  clearTimeout(_cpAutoT); _cpAutoT = null;
+  return _cpSaveProjectBody();
+}
 function cpAutoSaveProject(){
   if(!cpBuildState || !cpBuildState.partNum) return;
   clearTimeout(_cpAutoT);
-  _cpAutoT = setTimeout(() => {
+  _cpAutoT = setTimeout(_cpSaveProjectBody, 1200);
+}
+function _cpSaveProjectBody(){
     try {
       const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
       // Rev-583: include the op, or two operations on one part overwrite each other
@@ -8282,8 +8303,15 @@ function cpAutoSaveProject(){
       if(_cpRevPushWanted){
         try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
       }
-    } catch(e){}
-  }, 1200);
+      return true;
+    } catch(e){
+      /* Rev-954: this trap used to discard the error. A failed save then looked exactly like a
+         slow one, and the work was simply gone. It speaks now. */
+      console.error('Rev-954 SAVE FAILED', e);
+      try{ logAct('save-fail', 'Control Plan save failed: ' + (e && e.message || e)); }catch(_){ }
+      try{ flash('\u26a0 SAVE FAILED \u2014 ' + (e && e.message || e), true); }catch(_){ }
+      return false;
+    }
 }
 
 // Rev-319: "Under Construction" status — a manual per-plan flag (2 states: on/off). Shows a banner
