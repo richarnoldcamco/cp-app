@@ -1667,7 +1667,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-960";
+const APP_REV = "Rev-961";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2195,6 +2195,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-06", rev: "App Rev-961", type: "App", changes: ["\ud83d\udd12 A STEP IS LOCKED UNTIL EVERY STEP BEFORE IT IS COMPLETED (Rev-961, embedded validation REV-255) \u2014 per Rich, and this REVERSES Rev-683, which removed locking entirely. That removal had a real reason and it has been fixed rather than ignored: Rev-683 was thrown by a contradiction where Step 4 read COMPLETED while Step 5 sat LOCKED, because readiness was computed from a DIFFERENT test than doneness - a step said done when its rows were APPROVED, but unlocked the next step only when its rows held DATA, and a row can be approved by hand with a cell still empty. The two tests are now one: a step is ready when every step before it is DONE, full stop, so LOCKED and COMPLETED can never contradict each other again. Locked tiles are greyed with a dashed edge, carry a \ud83d\udd12 in front of the name, read NEEDS EARLIER STEP, and do not respond to a click; their tooltip names the exact step that is holding them. The percentage calculation is untouched - this changes what can be OPENED, not what has been earned. WHAT TO TEST (rule 8): on 1000237498, OP-100 has only Step 1 done, so Steps 3 through 7 must show the lock and refuse to open, while Step 2 stays live; on OP-040, Steps 1-3 are done so Step 4 must be open and Steps 5-7 locked. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-960", type: "App", changes: ["THE HAZARD STRIPES NOW RUN AT THE SPEED OF THE WORK (Rev-960, embedded validation REV-255) \u2014 per Rich. Every UNDER CONSTRUCTION ribbon crawled at the same 1.35 seconds a cycle whether the plan was at 5 percent or 95, so six operations on one screen all looked equally busy and the ribbon carried no information beyond \u2018not finished\u2019. The stripe speed is now tied to the percentage: a plan barely started BARELY MOVES (about 5.3 seconds a cycle at 5 percent, nearly still), and one near the finish RACES (about half a second at 95 percent). Deliberately not a straight line - the speed rises on a curve, so the difference between 5 and 30 percent is as readable at a glance as the difference between 70 and 95, which a linear ramp buries in the middle. Ten times the range end to end. Nothing else about the ribbon changed: same height, same colours, same wording, same solid chip. STILL STOPS DEAD under prefers-reduced-motion - the inline speed sets only the duration, so the media rule that switches the animation off still wins. The tooltip now says what the speed means, so a fast ribbon is not mistaken for an alarm. WHAT TO TEST (rule 8): on 1000237498, OP-040 and OP-050 sit at 30 percent and the four grinds and bores at 5 - the two 30s must visibly outrun the 5s on the same screen. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-959", type: "App", changes: ["PART DESCRIPTION IS A REAL COLUMN NOW, NOT TEXT TRAILING THE PART NUMBER (Rev-959, embedded validation REV-255) \u2014 Rich asked whether he had added a part-description column, and the honest answer was half. Rev-932 added the description to the All Parts list but as grey text tucked in after the part number and its pencil, not as a column of its own - and since none of the six parts on this device has a description saved yet, there was nothing on screen at all, which is why it looked like it had never been built. It is now its own PART DESCRIPTION column between PART NUMBER and OPEN, with its own heading, so an empty one is visibly empty rather than absent. Blank rows read a faint \u2014 rather than nothing, so it is clear the field exists and is simply unfilled. The description is still edited exactly where Rev-931 put it: the \u270f\ufe0f pencil beside the part number. Nothing about storage changed - same cpPartInfo partDesc field, same pencil, same New Plan field. WHAT TO TEST (rule 8): the All Parts list shows six columns with PART DESCRIPTION third-from-left; press the pencil beside 1000237498, type COMPRESSOR HOUSING, Save, and confirm it lands in that column. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-958", type: "App", changes: ["ASSIGN BUBBLES REALLY DOES START OVER NOW - AND THE BUILDER\u2019S OWN REPLACE BUTTON OBEYS IT (Rev-958, embedded validation REV-255) \u2014 Rev-957 was half a fix and Rich caught both halves. FIRST: it cleared the pins and the approvals but KEPT the bubble numbers, so Step 3 still showed rows numbered against a print that had been withdrawn. The bubble numbers now go too - Step 3 starts from nothing, which is what he asked for. SECOND, and the reason he saw no reset at all: he replaced the drawing from the BUILDER, using the blue \ud83d\udcc4 Upload / Replace drawing button in the ODS pane, and that is a completely separate path from the Control Plans list - it dates to Rev-510 and its confirm box literally promised \u2018Balloon pin positions are KEPT\u2019. It now runs the same reset and says so before it does anything. THIRD, found while fixing the second: that builder path stored the drawing under the PART NUMBER ALONE rather than the operation, which is the exact shape that leaked one operation\u2019s drawing into another at Rev-748 and Rev-929. It now stores per-operation like every other path, falling back to the bare part key only for plans that genuinely have no operation number. WHAT IS STILL KEPT: tolerances, control types, measurement methods and reaction plans, as unapproved data. WHAT TO TEST (rule 8): from the builder press \ud83d\udcc4 Upload / Replace drawing, accept the warning, pick a file - the Bubble # column must come back EMPTY, every green tick gone, and Steps 3-7 at 0 of N. Payload verified in both repos before this entry."] },
@@ -3032,7 +3033,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:36 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4189,17 +4190,21 @@ function cpOpStages(p){
   const numbered = !!String(p.opNum || '').trim();
   let hasOds = false;
   try{ hasOds = !!cpOpOdsImage(p); }catch(e){}
-  // Rev-683: NOTHING IS LOCKED. Every step is always openable. The gate was telling the
-  // QE two contradictory things at once — Step 4 COMPLETED (approved) while Step 5 sat
-  // LOCKED (some rows had no control type) — and a lock cannot be argued with, so the
-  // only way forward was to guess. `ready` keeps the old test, but it now only WARNS.
+  /* Rev-961: A STEP IS READY WHEN EVERY STEP BEFORE IT IS DONE. Nothing else.
+     This reverses Rev-683, which removed locking because it produced a contradiction:
+     Step 4 read COMPLETED while Step 5 read LOCKED. That happened because doneness and
+     readiness were measured DIFFERENTLY - a step was done when its rows were APPROVED,
+     but it unlocked the next step only when its rows held DATA, and a row can be approved
+     by hand with a cell still empty. One test now serves both, so the two labels cannot
+     disagree. `open` is left TRUE on purpose: it feeds the percentage, and locking is a
+     statement about what may be opened, not about what has been earned. */
   const s1 = { done: numbered, open: true, ready: true, left: numbered ? 0 : 1, total: 1 };
-  const s2 = { done: hasOds, open: true, ready: numbered, left: hasOds ? 0 : 1, total: 1 };
-  const s3 = { done: pr.s1Done, open: true, ready: numbered && hasOds, left: pr.s1Left, total: pr.total };
+  const s2 = { done: hasOds, open: true, ready: true, left: hasOds ? 0 : 1, total: 1 };
+  const s3 = { done: pr.s1Done, open: true, ready: true, left: pr.s1Left, total: pr.total };
   /* Rev-942: ASSIGN TOLERANCES sits between bubbles and control types */
-  const sT = { done: pr.sTDone, open: true, ready: numbered && hasOds && pr.s1DataDone, left: pr.sTLeft, total: pr.total };
-  const s4 = { done: pr.s2Done, open: true, ready: numbered && hasOds && pr.dTDataDone, left: pr.s2Left, total: pr.total };
-  const s5 = { done: pr.s3Done, open: true, ready: numbered && hasOds && pr.s2DataDone, left: pr.s3Left, total: pr.total };
+  const sT = { done: pr.sTDone, open: true, ready: true, left: pr.sTLeft, total: pr.total };
+  const s4 = { done: pr.s2Done, open: true, ready: true, left: pr.s2Left, total: pr.total };
+  const s5 = { done: pr.s3Done, open: true, ready: true, left: pr.s3Left, total: pr.total };
   // Rev-750: STEP 6 — review the inspection program before it reaches production. Everything
   // up to Step 5 describes what SHOULD be measured; this is the last look at what the machinist
   // will actually be handed. Done only when a person says so — nothing about the plan data can
@@ -4213,6 +4218,22 @@ function cpOpStages(p){
     hasOds ? 'ODS loaded' : 'no ODS drawing',
     pr.s1Note, pr.s2Note, pr.s3Note
   ].join(' \u00b7 ');
+  /* Rev-961: walk the seven in order and lock everything after the first unfinished one.
+     Each locked stage also learns WHICH step is holding it, so the tooltip can say so. */
+  const _seq = [
+    { s: s1, n: 1, name: 'EDIT OP #' },
+    { s: s2, n: 2, name: 'UPLOAD ODS' },
+    { s: s3, n: 3, name: 'ASSIGN BUBBLES' },
+    { s: sT, n: 4, name: 'ASSIGN TOLERANCES' },
+    { s: s4, n: 5, name: 'ASSIGN CONTROL TYPES' },
+    { s: s5, n: 6, name: 'ASSIGN MEASUREMENT TYPES' },
+    { s: s6, n: 7, name: 'REVIEW INSPECTION' }
+  ];
+  let _blocker = null;
+  _seq.forEach(e => {
+    if(_blocker){ e.s.ready = false; e.s.blockedBy = _blocker; }
+    else { e.s.ready = true; e.s.blockedBy = null; if(!e.s.done) _blocker = 'STEP ' + e.n + ' \u2014 ' + e.name; }
+  });
   return { s1, s2, s3, sT, s4, s5, s6, labelSummary };
 }
 // Rev-634: percentage that reflects the WORK, not the step count. Two faults in the
@@ -4803,6 +4824,13 @@ function renderProjects(){
         // rows were done, which read as 'not begun' beside a 98% bar. It now shows how far in.
         const _S = { 1: st.s1, 2: st.s2, 3: st.s3, 4: st.s4, 5: st.s5 }[n];
         const _R = { 1: st.s1, 2: st.s2, 3: st.s3, 4: st.sT, 5: st.s4, 6: st.s5 }[n];   /* Rev-942 */
+        /* Rev-961: a lock the QE cannot argue with must at least say WHAT is holding it.
+           Set here, below the stage lookups, not up beside the other title. */
+        if(state === 'lock'){
+          const _by = (_R && _R.blockedBy) || (_S && _S.blockedBy) || (st.s6 && st.s6.blockedBy) || '';
+          b.title = '\ud83d\udd12 LOCKED \u2014 finish ' + (_by || 'the step before this one') + ' first.'
+            + '\n\nEvery step has to be completed in order.';
+        }
         if(state === 'done') tag = '\u2713 COMPLETED';
         else if(_R && _R.ready === false) tag = 'NEEDS EARLIER STEP';
         else if(_S && _S.total > 1 && _S.left < _S.total)
@@ -4819,7 +4847,8 @@ function renderProjects(){
         l2.className = 'cp-step-t';
         l2.style.fontSize = '11px';
         l2.style.whiteSpace = 'nowrap';
-        l2.textContent = title;
+        /* Rev-961: the lock rides in FRONT OF THE NAME so it is read before the words. */
+        l2.textContent = (state === 'lock' ? '\ud83d\udd12 ' : '') + title;
         const l3 = document.createElement('span');
         l3.className = 'cp-step-s';
         l3.textContent = tag.replace(/^\s*[\u2013\u2014]\s*/, '').replace(/^\s*\u2713\s*/, '').trim();
@@ -4840,7 +4869,9 @@ function renderProjects(){
       // Rev-620: a step only reads DONE if everything before it is done too. Step 5 was
       // announcing DONE while Step 4 still said DO THIS NEXT, because the methods band
       // fills itself from the master — true of the cells, but nonsense as a sequence.
-      const stateOf = (s) => s.done ? 'done' : 'todo';   // Rev-683: no 'lock' state any more
+      /* Rev-961: the 'lock' state is BACK, and it means one thing only - a step before this
+         one is not finished. Rev-683 removed it over a contradiction that no longer exists. */
+      const stateOf = (s) => s.done ? 'done' : (s.ready === false ? 'lock' : 'todo');
       const frac = (s) => (s.total ? ('  ' + (s.total - s.left) + '/' + s.total) : '');
       /* Rev-870: Step 6 is two acts, not one - approve every feature, THEN mark the operation
          ready for production. Only the second writes the sign-off. With every row approved and
