@@ -1667,7 +1667,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-954";
+const APP_REV = "Rev-955";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2195,6 +2195,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-06", rev: "App Rev-955", type: "App", changes: ["ROTATE LEFT AND ROTATE RIGHT ON THE DRAWING SCREEN (Rev-955, embedded validation REV-255) \u2014 per Rich, whose OP-050 ODS came in sideways with every dimension running up the page. Two buttons now sit in the zoom row beside FIT and 100%: \u21ba ROTATE LEFT and \u21bb ROTATE RIGHT, each turning the page a quarter turn. They rotate the PAGE ITSELF, not just the view, so the thumbnail, the preview, the sewn result and the saved drawing all come out upright - a rotate is not undone by saving. WITH ONE OR MORE PAGES LOADED they act on the SELECTED page (the one outlined in maroon in the thumbnail strip), so a multi-page traveller can have one crooked page straightened without touching the rest. QUALITY IS PROTECTED: the original page is kept untouched and every rotation is re-cut FROM THAT ORIGINAL, so turning a page four times is one re-encode, not four stacked ones, and coming back to square costs nothing at all - the original is handed straight back. A PNG stays a PNG (Rich\u2019s rule: JPEG smears readable text, and a hand-inked ODS is nothing but readable text). Any per-page nudge is cleared on rotate, since a nudge measured against the old orientation means nothing in the new one. Because the studio is one codebase mounted in three places, this lands on the ODS drawing screen, the traveller studio and the special-gage capture at once. WHAT TO TEST (rule 8): open the OP-050 ODS, press \u21bb ROTATE RIGHT once, confirm the drawing stands upright in the preview AND the thumbnail, save it, reopen it and confirm it is still upright. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-954", type: "App", changes: ["A NEW OPERATION APPEARS THE INSTANT IT IS CREATED (Rev-954, embedded validation REV-255) \u2014 Rich asked why a new operation took a moment to show up in the list, and the cause was measured in the shipped code rather than guessed. Every save went through ONE door: a 1,200-millisecond delay timer that exists so fast typing in the grid does not write on every keystroke. Creating an operation queued behind that same timer, while the app immediately jumped to the Control Plans list and drew it FROM STORAGE - where the new operation had not been written yet. So the list drew the old set, and the operation only turned up on the next redraw after the timer fired. There are now TWO doors onto the same save: cpAutoSaveProject keeps the 1.2s debounce for typing, and cpSaveProjectNow writes immediately and returns whether it worked. Creating an operation uses the immediate door, so the write completes BEFORE the list is drawn. AND THE SAVE NOW SPEAKS: its error trap discarded failures silently - one of the 321 - which meant a genuinely failed save looked exactly like this same delay and then the operation was simply gone. A failure now logs to the Action Log and says SAVE FAILED on screen with the reason. WHAT TO TEST (rule 8): press ADD NEW OPERATION, name it, and confirm it is in the list the moment the pop-up closes with no pause; then edit a few grid cells and confirm typing is still smooth. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-953", type: "App", changes: ["THE CRUMB LINE IS GONE - THE PART HEADER SAYS IT ALREADY (Rev-953, embedded validation REV-255) \u2014 per Rich\u2019s two crossings. Inside a part, the line above the table repeated the part number and operation count that the big beige header row already carries, and sat beside a \u2190 All Parts button; both are deleted and the operations table now starts directly under the page heading. THE WAY OUT IS PRESERVED: with All Parts gone, \u2190 Back is the only exit, so it now steps OUT OF THE PART to the parts list when a part\u2019s operations are open, and only leaves the Control Plans screen on the second press - previously it jumped straight off the screen. Nothing else on the list changed. WHAT TO TEST (rule 8): open a part, confirm the line above the table is gone and the part number still reads on the beige header; press \u2190 Back once and land on All Parts; press it again and leave the screen. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-952", type: "App", changes: ["ADD NEW OPERATION IS BACK \u2014 A BUTTON UNDER THE LAST OPERATION (Rev-952, embedded validation REV-255) \u2014 per Rich\u2019s red box, drawn exactly where he expected the button to be. Rev-925 deleted the part-header Add Operation on the stated grounds that every operation row carries its own; that was WRONG. Reading the shipped code shows the row-level Add Operation renders ONLY on a DRAFT line - a part whose operations are all real saved plans had NO way in at all, which is exactly the state 1000237498 was in. A full-width footer line now closes every part\u2019s operation list carrying \u2795 ADD NEW OPERATION, indented to sit under the operation names, opening the same Rev-928 two-field pop-up (cpAddOpToPart) that asks for OP number and OP description and fills the part-level fields silently. The draft-row button is untouched. WHAT TO TEST (rule 8): open part 1000237498, see the button below the OP-040 line, press it, name an operation and confirm it lands as a second row with its seven construction steps. Payload verified in both repos before this entry."] },
@@ -3026,7 +3027,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "7:19 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:31 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6791,6 +6792,50 @@ async function _cptvPreview(){
       '<div style="font-size:11px; color:#6b6257; margin-top:4px;">' + c.width + ' \u00d7 ' + c.height + ' px</div>';
   }catch(e){ pv.innerHTML = '<p style="color:#a11; font-size:12px;">Could not build a preview: ' + (e && e.message || e) + '</p>'; }
 }
+/* Rev-955: ROTATE THE SELECTED PAGE.
+   Turns the page itself rather than the view, so the thumbnail, the preview, the sewn output
+   and the SAVED drawing are all upright - a rotate survives Save.
+   QUALITY: the untouched original is kept on the page as url0 and every rotation is re-cut
+   FROM THAT ORIGINAL, so four presses cost ONE re-encode instead of four stacked ones, and
+   returning to square hands the original straight back with no re-encode at all. A PNG stays
+   a PNG - a hand-inked ODS is readable text, and JPEG smears text (operator rule, 2026-07-28). */
+async function _cptvRotate(dir){
+  try{
+    const p = _cptvPages[_cptvSel];
+    if(!p){ try{ flash('Load a page first, then rotate it.', true); }catch(_){ } return; }
+    if(!p.url0) p.url0 = p.url;
+    p.rot = ((((p.rot || 0) + (dir > 0 ? 90 : -90)) % 360) + 360) % 360;
+    if(!p.rot){ p.url = p.url0; }
+    else {
+      const img = await new Promise((res, rej) => {
+        const im = new Image();
+        im.onload = () => res(im);
+        im.onerror = () => rej(new Error('the page image would not load'));
+        im.src = p.url0;
+      });
+      const w = img.naturalWidth, h = img.naturalHeight;
+      const swap = (p.rot === 90 || p.rot === 270);
+      const c = document.createElement('canvas');
+      c.width = swap ? h : w;
+      c.height = swap ? w : h;
+      const x = c.getContext('2d');
+      x.fillStyle = '#ffffff'; x.fillRect(0, 0, c.width, c.height);
+      x.translate(c.width / 2, c.height / 2);
+      x.rotate(p.rot * Math.PI / 180);
+      x.drawImage(img, -w / 2, -h / 2);
+      const isPng = /^data:image\/png/i.test(String(p.url0));
+      p.url = isPng ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', 0.94);
+    }
+    /* a nudge was measured against the old orientation - it means nothing in the new one */
+    p.ox = 0; p.oy = 0; p.ow = 0;
+    _cptvRender();
+    _cptvPreview();
+    try{ logAct('drawing', 'Rotated page ' + (_cptvSel + 1) + ' ' + (dir > 0 ? 'right' : 'left') + ' \u00b7 now ' + p.rot + '\u00b0'); }catch(_){ }
+  }catch(e){
+    console.error('Rev-955 rotate failed', e);
+    try{ flash('Could not rotate the page: ' + (e && e.message || e), true); }catch(_){ }
+  }
+}
 // Nudge: push the SELECTED page around, or stretch/squeeze its width
 function _cptvNudge(dx, dy, dw){
   const p = _cptvPages[_cptvSel]; if(!p) return;
@@ -6858,6 +6903,11 @@ function _cptvPanelHtml(o){
         '<button type="button" id="cptvZFit" style="font-size:12px; padding:3px 10px; cursor:pointer;">FIT</button>' +
         '<button type="button" id="cptvZ100" style="font-size:12px; padding:3px 10px; cursor:pointer;">100%</button>' +
         '<button type="button" id="cptvZIn" style="font-size:12px; padding:3px 10px; cursor:pointer;">+</button>' +
+        /* Rev-955: rotate the PAGE, not the view - a sideways scan is straightened here and
+           saved straight. Worded, not icon-only, per the UI standards. */
+        '<span style="width:1px; height:18px; background:#c9c0b4; margin:0 4px;"></span>' +
+        '<button type="button" id="cptvRotL" title="Turn this page a quarter turn anticlockwise" style="font-size:12px; font-weight:700; padding:3px 10px; cursor:pointer;">\u21ba ROTATE LEFT</button>' +
+        '<button type="button" id="cptvRotR" title="Turn this page a quarter turn clockwise" style="font-size:12px; font-weight:700; padding:3px 10px; cursor:pointer;">\u21bb ROTATE RIGHT</button>' +
       '</div>' +
       '<div id="cptvStrip" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; flex:0 0 auto;"></div>' +
       // Rev-576: joining controls only appear once there are two or more pages to join
@@ -6909,6 +6959,8 @@ function _cptvWire(root, o){
   on('cptvZIn', () => { _cptvZoom = (_cptvZoom || 0.85) + 0.15; _cptvPreview(); });
   on('cptvZFit', () => { _cptvZoom = 0; _cptvPreview(); });
   on('cptvZ100', () => { _cptvZoom = 1; _cptvPreview(); });
+  on('cptvRotL', () => { _cptvRotate(-1); });
+  on('cptvRotR', () => { _cptvRotate(1); });
   on('cptvRefresh', _cptvPreview);
   ['cptvLayout','cptvOverlap','cptvBgCol'].forEach(id => { const el = root.querySelector('#' + id); if(el) el.onchange = _cptvPreview; });
   on('cptvNUp', () => _cptvNudge(0, -1));
