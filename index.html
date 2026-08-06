@@ -1667,7 +1667,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-958";
+const APP_REV = "Rev-959";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2195,6 +2195,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-06", rev: "App Rev-959", type: "App", changes: ["PART DESCRIPTION IS A REAL COLUMN NOW, NOT TEXT TRAILING THE PART NUMBER (Rev-959, embedded validation REV-255) \u2014 Rich asked whether he had added a part-description column, and the honest answer was half. Rev-932 added the description to the All Parts list but as grey text tucked in after the part number and its pencil, not as a column of its own - and since none of the six parts on this device has a description saved yet, there was nothing on screen at all, which is why it looked like it had never been built. It is now its own PART DESCRIPTION column between PART NUMBER and OPEN, with its own heading, so an empty one is visibly empty rather than absent. Blank rows read a faint \u2014 rather than nothing, so it is clear the field exists and is simply unfilled. The description is still edited exactly where Rev-931 put it: the \u270f\ufe0f pencil beside the part number. Nothing about storage changed - same cpPartInfo partDesc field, same pencil, same New Plan field. WHAT TO TEST (rule 8): the All Parts list shows six columns with PART DESCRIPTION third-from-left; press the pencil beside 1000237498, type COMPRESSOR HOUSING, Save, and confirm it lands in that column. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-958", type: "App", changes: ["ASSIGN BUBBLES REALLY DOES START OVER NOW - AND THE BUILDER\u2019S OWN REPLACE BUTTON OBEYS IT (Rev-958, embedded validation REV-255) \u2014 Rev-957 was half a fix and Rich caught both halves. FIRST: it cleared the pins and the approvals but KEPT the bubble numbers, so Step 3 still showed rows numbered against a print that had been withdrawn. The bubble numbers now go too - Step 3 starts from nothing, which is what he asked for. SECOND, and the reason he saw no reset at all: he replaced the drawing from the BUILDER, using the blue \ud83d\udcc4 Upload / Replace drawing button in the ODS pane, and that is a completely separate path from the Control Plans list - it dates to Rev-510 and its confirm box literally promised \u2018Balloon pin positions are KEPT\u2019. It now runs the same reset and says so before it does anything. THIRD, found while fixing the second: that builder path stored the drawing under the PART NUMBER ALONE rather than the operation, which is the exact shape that leaked one operation\u2019s drawing into another at Rev-748 and Rev-929. It now stores per-operation like every other path, falling back to the bare part key only for plans that genuinely have no operation number. WHAT IS STILL KEPT: tolerances, control types, measurement methods and reaction plans, as unapproved data. WHAT TO TEST (rule 8): from the builder press \ud83d\udcc4 Upload / Replace drawing, accept the warning, pick a file - the Bubble # column must come back EMPTY, every green tick gone, and Steps 3-7 at 0 of N. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-957", type: "App", changes: ["REPLACING AN ODS DRAWING SENDS EVERY STEP ABOVE IT BACK TO ZERO (Rev-957, embedded validation REV-255) \u2014 per Rich, who swapped the OP-050 print and found STEP 3 ASSIGN BUBBLES still reading COMPLETED against a drawing that was no longer there. He is right and it is a quality problem, not a cosmetic one: a balloon pinned to the old print, a tolerance read off it and a row signed off against it are all claims about a document that has been withdrawn. Saving a REPLACE now clears, for that operation only: every balloon pin (Step 3 data), every row approval on Steps 3, 4, 5 and 6, the Step 7 inspection review sign-off, and the reference crops the validation app cut from the old drawing. Steps 3 through 7 read 0 of N and the percentage falls accordingly. WHAT IS DELIBERATELY KEPT: the rows themselves and their typed values - bubble numbers, tolerances, control types, measurement methods, reaction plans - exactly as Rev-720 keeps them on a DELETE. They survive as UNAPPROVED data for the QE to re-check against the new print, which is far better than retyping fifteen rows because a scan was swapped. A plain save (after a rotate, say) resets nothing - only a save that came through \u21c4 REPLACE DRAWING does, and the pop-up says exactly what it cleared. WHAT TO TEST (rule 8): on OP-050 press \u21c4 REPLACE DRAWING, pick a file, Save, and confirm Steps 3-7 all read 0 of N with the bar dropped; then confirm the typed tolerances and control types are still in the grid. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-956", type: "App", changes: ["REPLACE DRAWING - SWAP THE PRINT INSTEAD OF ADDING A PAGE TO IT (Rev-956, embedded validation REV-255) \u2014 per Rich. The drawing screen could ADD a page (the strip along the top) and DELETE the drawing outright, but there was no way to say \u2018this one is wrong, here is the right one\u2019: picking a file appended it, leaving two pages where one was wanted. \u21c4 REPLACE DRAWING now sits in the footer beside \ud83d\uddd1 DELETE DRAWING, left of Cancel and Save. It opens the file picker, and ONLY WHEN A FILE IS ACTUALLY CHOSEN does it clear what was loaded - back out of the picker and nothing has changed, so there is no confirmation box to read and nothing to undo. Deliberately NOT destructive: it works on the pages loaded in this window, and the stored drawing is not touched until Save is pressed, so Cancel still walks away from the whole thing. Arming is cancelled if ADD ANOTHER PAGE is used instead, so a replace started and abandoned can never eat a later add. Being in the shared studio, the button reads REPLACE DRAWING on the ODS screen and REPLACE on the traveller and special-gage mounts. WHAT TO TEST (rule 8): open the OP-050 ODS, press \u21c4 REPLACE DRAWING and back out of the picker - the existing page must still be there; press it again and choose a file - it must REPLACE, leaving 1 page and not 2. Payload verified in both repos before this entry."] },
@@ -3030,7 +3031,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:12 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:24 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3608,6 +3609,7 @@ function renderPartsIndex(tbody, combined){
   const head = document.getElementById('cpPlanHeadRow');
   if(head) head.innerHTML =
       '<th>Part Number</th>'
+    + '<th>Part Description</th>'   /* Rev-959 */
     + '<th>Open</th>'
     + '<th>Operations</th>'
     + '<th>Progress</th>'
@@ -3636,18 +3638,20 @@ function renderPartsIndex(tbody, combined){
       pen.style.cssText = 'margin-left:10px; border:none; background:none; cursor:pointer; font-size:13px; opacity:.55;';
       pen.onclick = (e) => { e.stopPropagation(); cpRenamePart(g.part); };
       tdName.appendChild(pen);
-      /* Rev-932: the part's optional description shows right where Rich circled - grey,
-         after the pencil, straight from the part's stored info. Blank costs nothing. */
-      try{
-        const _inf = cpPartInfoGet(g.part) || {};
-        if(_inf.partDesc){
-          const dsp = document.createElement('span');
-          dsp.textContent = _inf.partDesc;
-          dsp.style.cssText = 'margin-left:10px; font-size:13px; font-weight:600; color:#6b6257;';
-          tdName.appendChild(dsp);
-        }
-      }catch(e){ }
       tr.appendChild(tdName);
+
+      /* Rev-959: the description is its OWN COLUMN now. Rev-932 hung it off the end of the
+         part number, so an unfilled one was indistinguishable from a feature that had never
+         been built - which is exactly how it read to Rich. A column with a heading is honest
+         about being empty; the em dash says the field exists and is waiting. Edited by the
+         same pencil (Rev-931); storage unchanged. */
+      let _pdTxt = '';
+      try{ _pdTxt = String((cpPartInfoGet(g.part) || {}).partDesc || '').trim(); }
+      catch(e){ console.warn('Rev-959 part description read failed', e); }
+      const tdDesc = cell(_pdTxt
+        ? ('<span style="font-size:14px; font-weight:600; color:#5a5148;">' + _pdTxt + '</span>')
+        : '<span style="font-size:14px; color:#b3aa9c;" title="No part description yet \u2014 add one with the \u270f\ufe0f pencil beside the part number">\u2014</span>');
+      tr.appendChild(tdDesc);
 
       // Rev-747: OPEN sits right after the part number — it is the thing you came to press,
       // and it was parked at the far right edge, the longest reach on the row.
