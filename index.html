@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-941</title>
+<title>CONTROL PLAN GENERATOR - Rev-942</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-941 · 2026-08-05 8:03 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-942 · 2026-08-05 8:06 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-941 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 8:03 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-942 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 8:06 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-941 · Built Aug 5, 2026</span>
+    <span id="revFooter">App Rev-942 · Built Aug 5, 2026</span>
   </div>
 </div>
 
@@ -804,6 +804,7 @@
   <div id="cpStepBar" style="margin:0 0 8px;">
     <span style="display:none;">
       <button id="cpStepBtn1" onclick="cpSetStep('1')" class="cp-btn">3 · Bubble Numbers</button>
+      <button id="cpStepBtnT" onclick="cpSetStep('T')" class="cp-btn">4 · Tolerances</button>
       <button id="cpStepBtn2" onclick="cpSetStep('2')" class="cp-btn">4 · Control Type</button>
       <button id="cpStepBtn3" onclick="cpSetStep('3')" class="cp-btn">5 · Measurement Methods</button>
       <span id="cpStepHint"></span>
@@ -1666,7 +1667,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-941";
+const APP_REV = "Rev-942";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2194,6 +2195,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-05", rev: "App Rev-942", type: "App", changes: ["ASSIGN TOLERANCES - A SEVENTH STEP BETWEEN BUBBLES AND CONTROL TYPES (Rev-942, embedded validation REV-255) — per Rich's arrow. A new construction step, ASSIGN TOLERANCES, now sits between ASSIGN BUBBLES and ASSIGN CONTROL TYPES, everywhere the steps appear: the Control Plans list tiles (now seven, REVIEW INSPECTION at step 7), the builder's construction banner, and the builder itself as tab 4 - Tolerances showing the description, spec/tol, limits and class columns. The job of the step is the NUMBERS: confirm each row's spec or limits and approve the row, with the same per-row checkmark, name-and-time stamp and action-log entry as every other row step. Its data test asks for a spec/tol or at least one limit per row. The stage weights re-balance to seven (5+5+20+15+20+20+15 = 100), so expect percentages to shift slightly on existing plans - the same figure honestly re-based, not lost work. Internally the step is keyed T rather than renumbering 1-2-3, so every approval already recorded on any plan stays exactly where it is, per the Rev-738 rule. Control types stay gated on the bubble data as before and additionally list tolerance data as their READY test. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-941", type: "App", changes: ["THE BUILDER'S TAB STRIP IS SWAPPED FOR THE CONSTRUCTION BANNER (Rev-941, embedded validation REV-255) — per Rich's circle: the small step tabs in the builder are replaced by the SAME six-step construction banner the main Control Plans page shows - six live tiles (EDIT OP number, UPLOAD ODS, ASSIGN BUBBLES, ASSIGN CONTROL TYPES, ASSIGN MEASUREMENT TYPES, REVIEW INSPECTION) with COMPLETED, IN PROGRESS n of total and YOU ARE HERE states from the same stage engine, and beneath them the hazard-striped UNDER CONSTRUCTION percent bar with the green progress track. The tiles are doors, not decoration: 3 to 5 switch the builder step, UPLOAD ODS opens the drawing studio for this operation, REVIEW INSPECTION opens the release walk, and EDIT OP number points honestly at the pencil on the list where that edit lives. The banner redraws on every step change and on a slow tick, so approvals move the tiles without leaving the screen. The old tab buttons remain hidden in the DOM because the step-switch code highlights them by id. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-940", type: "App", changes: ["BUILD .XLSX AND ALL COLUMNS DELETED FROM THE BUILDER; SAVE TO PROJECT GOES GREEN (Rev-940, embedded validation REV-255) — per Rich's marks. The builder toolbar's BUILD .XLSX button is deleted - the export door remains EXCEL CONTROL PLAN on the Control Plans list, which runs the same code including Rev-666's revision-issuing, so nothing about document control changes, there is simply one door instead of two. The ALL COLUMNS step tab is deleted with it. SAVE TO PROJECT turns green, including after the Rev-935 saved-tick animation, which used to reset it to the old grey. One deliberate judgement call, stated openly: the green stroke also passed through the 5 - MEASUREMENT METHODS step tab, but deleting a construction step's only tab would make that step unreachable, so it stays - say the word if it was truly meant to go and it will be handled properly. The orphaned button binding is null-guarded and inert. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-939", type: "App", changes: ["THE FROSTED STRIP OVER THE TOOLBAR IS GONE (Rev-939, embedded validation REV-255) — Rich asked why the builder's toolbar was blurry and could not be chosen, and the answer was an element sitting on it: the how-to video button rides in a full-width fixed strip carrying backdrop-filter blur and a translucent film, laid over Back, Save to Project and Build .xlsx - and the strip itself caught the clicks across the whole top edge. The film and the blur are deleted, the strip now ignores the mouse entirely with only the red button inside accepting clicks, and it hugs the top-right so the button stops sitting on the toolbar's centre. The body padding that reserves the strip's height is unchanged, so nothing shifts underneath. Payload verified in both repos before this entry."] },
@@ -3012,7 +3014,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-05";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:03 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:06 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4173,7 +4175,9 @@ function cpOpStages(p){
   const s1 = { done: numbered, open: true, ready: true, left: numbered ? 0 : 1, total: 1 };
   const s2 = { done: hasOds, open: true, ready: numbered, left: hasOds ? 0 : 1, total: 1 };
   const s3 = { done: pr.s1Done, open: true, ready: numbered && hasOds, left: pr.s1Left, total: pr.total };
-  const s4 = { done: pr.s2Done, open: true, ready: numbered && hasOds && pr.s1DataDone, left: pr.s2Left, total: pr.total };
+  /* Rev-942: ASSIGN TOLERANCES sits between bubbles and control types */
+  const sT = { done: pr.sTDone, open: true, ready: numbered && hasOds && pr.s1DataDone, left: pr.sTLeft, total: pr.total };
+  const s4 = { done: pr.s2Done, open: true, ready: numbered && hasOds && pr.dTDataDone, left: pr.s2Left, total: pr.total };
   const s5 = { done: pr.s3Done, open: true, ready: numbered && hasOds && pr.s2DataDone, left: pr.s3Left, total: pr.total };
   // Rev-750: STEP 6 — review the inspection program before it reaches production. Everything
   // up to Step 5 describes what SHOULD be measured; this is the last look at what the machinist
@@ -4188,7 +4192,7 @@ function cpOpStages(p){
     hasOds ? 'ODS loaded' : 'no ODS drawing',
     pr.s1Note, pr.s2Note, pr.s3Note
   ].join(' \u00b7 ');
-  return { s1, s2, s3, s4, s5, s6, labelSummary };
+  return { s1, s2, s3, sT, s4, s5, s6, labelSummary };
 }
 // Rev-634: percentage that reflects the WORK, not the step count. Two faults in the
 // old sum, both of which flattered the figure:
@@ -4207,7 +4211,7 @@ function cpPercentBreakdown(p){
   const names = { s1: 'Edit op #', s2: 'Upload ODS', s3: 'Assign bubbles', s4: 'Control types', s5: 'Measurement methods', s6: 'Review inspection' };
   const lines = [];
   let total = 0;
-  ['s1','s2','s3','s4','s5'].forEach(k => {
+  ['s1','s2','s3','sT','s4','s5'].forEach(k => {   /* Rev-942 */
     const s = st[k], w = CP_STAGE_WEIGHTS[k];
     let got = 0, note;
     if(!s.open){ note = 'locked — not counted'; }
@@ -4221,11 +4225,11 @@ function cpPercentBreakdown(p){
 }
 // Rev-750: re-weighted for six stages — the three row-by-row stages give up 5 points each
 // to fund the review, which is a single decision but the one that releases the plan.
-const CP_STAGE_WEIGHTS = { s1: 5, s2: 5, s3: 25, s4: 25, s5: 25, s6: 15 };   // sums to 100
+const CP_STAGE_WEIGHTS = { s1: 5, s2: 5, s3: 20, sT: 15, s4: 20, s5: 20, s6: 15 };   // Rev-942: seven stages, sums to 100
 function cpPlanPercent(p){
   const st = cpOpStages(p);
   let pct = 0;
-  ['s1','s2','s3','s4','s5'].forEach(k => {
+  ['s1','s2','s3','sT','s4','s5'].forEach(k => {   /* Rev-942 */
     const s = st[k], w = CP_STAGE_WEIGHTS[k];
     if(!s || !s.open) return;                 // locked: earns nothing
     if(s.done){ pct += w; return; }
@@ -4416,6 +4420,10 @@ function cpStepProgress(p){
     if(!String(r.bubble || '').trim()) return true;
     return !isPinned(r.bubble);
   }).length;
+  /* Rev-942: T's data is there when the row carries a spec/tol or at least one limit */
+  const dTLeft = rows.filter(r => !r.ghost && !String(r.spec || '').trim()
+    && !String(r.upperLimit || '').trim() && !String(r.lowerLimit || '').trim()).length;
+  const sTLeft = rows.filter(r => !r.ghost && !marked(r, 'T')).length;
   const d2Left = rows.filter(r => !String(r.controlTypeId || '').trim()).length;
   // Rev-597: step 3's data is there when every row carries a machinist method and a reaction plan
   const d3Left = rows.filter(r => !String(r.measMethod || '').trim() || !String(r.reactionPlan || '').trim()).length;
@@ -4426,6 +4434,7 @@ function cpStepProgress(p){
   return {
     total,
     s1Done: total > 0 && s1Left === 0,
+    sTDone: total > 0 && sTLeft === 0, sTLeft, dTLeft, dTDataDone: total > 0 && dTLeft === 0,   /* Rev-942 */
     s2Done: total > 0 && s2Left === 0,
     s3Done: total > 0 && s3Left === 0,
     s1DataDone: total > 0 && d1Left === 0,
@@ -4721,17 +4730,17 @@ function renderProjects(){
         // Rev-677: a started-but-unfinished step said DO THIS NEXT whether 0 or 13 of 14
         // rows were done, which read as 'not begun' beside a 98% bar. It now shows how far in.
         const _S = { 1: st.s1, 2: st.s2, 3: st.s3, 4: st.s4, 5: st.s5 }[n];
-        const _R = { 1: st.s1, 2: st.s2, 3: st.s3, 4: st.s4, 5: st.s5 }[n];
+        const _R = { 1: st.s1, 2: st.s2, 3: st.s3, 4: st.sT, 5: st.s4, 6: st.s5 }[n];   /* Rev-942 */
         if(state === 'done') tag = '\u2713 COMPLETED';
         else if(_R && _R.ready === false) tag = 'NEEDS EARLIER STEP';
         else if(_S && _S.total > 1 && _S.left < _S.total)
           tag = '  \u2013 IN PROGRESS  ' + (_S.total - _S.left) + '/' + _S.total;
-        else if(n === 6 && _s6.all) tag = '  \u2013 ROWS DONE \u00b7 MARK READY';   /* Rev-870 */
-        else if(n === 6 && _s6.total && _s6.approved > 0)
+        else if(n === 7 && _s6.all) tag = '  \u2013 ROWS DONE \u00b7 MARK READY';   /* Rev-870 */
+        else if(n === 7 && _s6.total && _s6.approved > 0)
           tag = '  \u2013 APPROVING  ' + _s6.approved + '/' + _s6.total;   /* Rev-870 */
-        else if(n >= 3 && n <= 5 && (function(){
+        else if(n >= 3 && n <= 6 && (function(){
             try{ const seen = (p.builderState && p.builderState.stepSeen) || {};
-                 return !!seen[String(n - 2)]; }catch(e){ return false; } })())
+                 return !!seen[{3:'1',4:'T',5:'2',6:'3'}[n]]; }catch(e){ return false; } })())
           tag = '  \u2013 STARTED';   /* Rev-935: entered, nothing done yet */
         else tag = '  \u2013 DO THIS NEXT';
         const l2 = document.createElement('span');
@@ -4790,24 +4799,30 @@ function renderProjects(){
                    : 'LOCKED \u2014 load the ODS drawing first.',
         () => openAt('1'));
 
-      mkStep(4, 'ASSIGN CONTROL TYPES', stateOf(st.s4),
-        st.s4.open ? ('STEP 4 \u2014 pick the Control Type for each balloon; the methods fill themselves from the Master List.\n' + prog.s2Note + '.' + stepNote)
+      /* Rev-942: the new step, in its place */
+      mkStep(4, 'ASSIGN TOLERANCES', stateOf(st.sT),
+        st.sT.open ? 'STEP 4 \u2014 confirm each row\u2019s spec / tolerance and limits, and approve the numbers row by row.'
+                   : 'LOCKED \u2014 finish the bubble numbers first.',
+        () => openAt('T'));
+
+      mkStep(5, 'ASSIGN CONTROL TYPES', stateOf(st.s4),
+        st.s4.open ? ('STEP 5 \u2014 pick the Control Type for each balloon; the methods fill themselves from the Master List.\n' + prog.s2Note + '.' + stepNote)
                    : 'LOCKED \u2014 finish the bubble numbers first. A control type cannot be chosen for a balloon that does not exist yet.',
         () => openAt('2'));
 
-      mkStep(5, 'ASSIGN MEASUREMENT TYPES', stateOf(st.s5),
-        st.s5.open ? ('STEP 5 \u2014 review the measurement methods, set any special gage, confirm the reaction plan.\n' + prog.s3Note + '.' + stepNote)
+      mkStep(6, 'ASSIGN MEASUREMENT TYPES', stateOf(st.s5),
+        st.s5.open ? ('STEP 6 \u2014 review the measurement methods, set any special gage, confirm the reaction plan.\n' + prog.s3Note + '.' + stepNote)
                    : 'LOCKED \u2014 finish the control types first. The methods band is filled BY the control type.',
         () => openAt('3'));
 
-      mkStep(6, 'REVIEW INSPECTION', stateOf(st.s6),
+      mkStep(7, 'REVIEW INSPECTION', stateOf(st.s6),
         (st.s6.done
-          ? ('STEP 6 \u2014 reviewed by ' + ((p.inspReviewed && p.inspReviewed.who) || 'someone') + '.\n'
+          ? ('STEP 7 \u2014 reviewed by ' + ((p.inspReviewed && p.inspReviewed.who) || 'someone') + '.\n'
              + 'Open it again to re-check, or to withdraw the release.')
           : (_s6.all
-              ? ('STEP 6 \u2014 all ' + _s6.total + ' rows are approved. The operation has NOT been released yet, '
+              ? ('STEP 7 \u2014 all ' + _s6.total + ' rows are approved. The operation has NOT been released yet, '
                  + 'and releasing is what completes this step. Click to mark it ready for production.')
-              : ('STEP 6 \u2014 walk the inspection program the machinist will actually run, tweak what needs '
+              : ('STEP 7 \u2014 walk the inspection program the machinist will actually run, tweak what needs '
                 + 'tweaking, and approve each feature as you go. Once every feature is approved, this button '
                 + 'asks whether to release the operation to production.'))),   /* Rev-870 */
         () => cpReviewInspection(i));
@@ -8287,10 +8302,17 @@ const CP_STEPS = {
   '1': { label: '3 \u00b7 Bubble Numbers',
          hint: 'Give every ODS balloon its row, then pin each one on the drawing \u2014 the step is done when every row shows a green dot.',
          cols: [0,1,2,8,9,10,11,12] },
-  '2': { label: '4 \u00b7 Control Type',
+  /* Rev-942: ASSIGN TOLERANCES - a step of its own between bubbles and control types, per
+     Rich. Same columns as the bubble view (description, spec/tol, limits, class): the job
+     here is the NUMBERS, checked and approved row by row before a control type is chosen
+     against them. Internal key 'T' so no existing stepDone approval is renumbered. */
+  'T': { label: '4 \u00b7 Tolerances',
+         hint: 'Confirm each row\u2019s spec / tolerance and limits \u2014 approve the row when its numbers are right.',
+         cols: [0,1,2,8,9,10,11,12] },
+  '2': { label: '5 \u00b7 Control Type',
          hint: 'Narrow it down with Workcenter \u2192 Feature Type \u2192 2nd / 3rd Level. The Control Type ID resolves itself, and the methods fill from the Master List.',
          cols: [0,1,2,3,4,5,6,7,8,9,12] },
-  '3': { label: '5 \u00b7 Measurement Methods',
+  '3': { label: '6 \u00b7 Measurement Methods',
          hint: 'Review what the master filled in, set any special gage, and confirm the reaction plan.',
          cols: [0,1,2,8,9,12,13,14,15,16,17,18,19] },
   'A': { label: 'All columns',
@@ -8318,11 +8340,11 @@ function cpBuilderStepsBar(){
     const p = { partNum: cpBuildState.partNum, opNum: cpBuildState.opNum, builderState: cpBuildState };
     const st = cpOpStages(p);
     const pct = cpPlanPercent(p);
-    const cur = { '1': 3, '2': 4, '3': 5 }[localStorage.getItem('cpBuildStep') || '1'];
-    const L = [[1,'EDIT OP #'],[2,'UPLOAD ODS'],[3,'ASSIGN BUBBLES'],[4,'ASSIGN CONTROL TYPES'],[5,'ASSIGN MEASUREMENT TYPES'],[6,'REVIEW INSPECTION']];
+    const cur = { '1': 3, 'T': 4, '2': 5, '3': 6 }[localStorage.getItem('cpBuildStep') || '1'];   /* Rev-942 */
+    const L = [[1,'EDIT OP #'],[2,'UPLOAD ODS'],[3,'ASSIGN BUBBLES'],[4,'ASSIGN TOLERANCES'],[5,'ASSIGN CONTROL TYPES'],[6,'ASSIGN MEASUREMENT TYPES'],[7,'REVIEW INSPECTION']];   /* Rev-942 */
     host.innerHTML = '<div style="display:flex; gap:8px; flex-wrap:wrap; align-items:stretch; margin-bottom:6px;">'
       + L.map(([n, lab]) => {
-          const S = st['s' + n] || {};
+          const S = ({1:st.s1,2:st.s2,3:st.s3,4:st.sT,5:st.s4,6:st.s5,7:st.s6})[n] || {};   /* Rev-942 */
           const done = !!S.done;
           const curHere = n === cur;
           const status = done ? 'COMPLETED' : (S.total > 1 && S.left < S.total ? ('IN PROGRESS ' + (S.total - S.left) + '/' + S.total) : (curHere ? 'YOU ARE HERE' : ''));
@@ -8344,9 +8366,9 @@ function cpBuilderStepsBar(){
     host.querySelectorAll('button[data-sb]').forEach(b => {
       b.onclick = () => {
         const n = +b.dataset.sb;
-        if(n >= 3 && n <= 5){ cpSetStep(String(n - 2)); return; }
+        if(n >= 3 && n <= 6){ cpSetStep({3:'1',4:'T',5:'2',6:'3'}[n]); return; }   /* Rev-942 */
         if(n === 2){ try{ cpUploadOpOds({ partNum: cpBuildState.partNum, opNum: cpBuildState.opNum }); }catch(e){ console.warn(e); } return; }
-        if(n === 6){
+        if(n === 7){
           try{
             const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
             const idx = projects.findIndex(x => String(x.partNum).toUpperCase() === String(cpBuildState.partNum).toUpperCase()
