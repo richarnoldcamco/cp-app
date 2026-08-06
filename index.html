@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-948</title>
+<title>CONTROL PLAN GENERATOR - Rev-949</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-948 · 2026-08-05 8:14 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-949 · 2026-08-05 8:17 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-948 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 8:14 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-949 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 8:17 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-948 · Built Aug 5, 2026</span>
+    <span id="revFooter">App Rev-949 · Built Aug 5, 2026</span>
   </div>
 </div>
 
@@ -1667,7 +1667,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-948";
+const APP_REV = "Rev-949";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2195,6 +2195,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-05", rev: "App Rev-949", type: "App", changes: ["A PER-ROW TOGGLE BETWEEN ONE AND TWO DIMENSIONS (Rev-949, embedded validation REV-255) — per Rich: features that carry a single limit - a radius callout, a MAX note - no longer show a meaningless second box. Each row's spec cell carries a small toggle: 1 DIM shows a single LIMIT input, 2 DIMS shows the UPPER and LOWER pair, and the row remembers its choice (tolMode, saved with the plan and synced like everything else). Toggling to one dimension HIDES the lower value rather than erasing it, so switching back loses nothing. Default is two dimensions, matching how the printed pairs read. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-948", type: "App", changes: ["SPEC AND LIMITS CONSOLIDATED INTO ONE COLUMN (Rev-948, embedded validation REV-255) — Rich asked whether the Spec/Tol column and the Upper/Lower column are redundant, and the honest answer is MOSTLY: for a plain dimension the limits repeat the spec, but the machinist validation does its pass/fail arithmetic on the numeric limit fields, and a text spec like R.005 MAX 2X cannot be parsed into bounds automatically - so the FIELDS stay while the COLUMNS merge. On screen there is now one column: the printed spec with the UPPER and LOWER inputs stacked directly beneath it in the same cell, placeholders naming which is which. The old tds remain at zero width because every step view's column indices count them; storage, the xlsx export and validation are untouched. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-947", type: "App", changes: ["THE STEP TILES STOP STRETCHING - HALF THE WIDTH, SIZED TO THEIR LABELS (Rev-947, embedded validation REV-255) — per Rich: the builder's seven step tiles no longer stretch to fill the whole row - each is sized to its own label, roughly half the width they were claiming, packed left with the spare space simply left empty. Heights, states, colours and clicks unchanged; the hazard ribbon and progress track still run the full width beneath them. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-946", type: "App", changes: ["FIRST VISIT TO ASSIGN TOLERANCES OFFERS THE AI FILL (Rev-946, embedded validation REV-255) — per Rich: the first time a plan lands on ASSIGN TOLERANCES, a themed pop-up asks whether the AI should read the dimensions off the drawing and fill in the empty tolerance cells. YES runs the same Read-dimensions flow as the purple button - each balloon's printed dimension into its row's empty spec cell, pins untouched, filled cells left alone, with the flow's own send-to-Anthropic confirmation still in force. NO closes and the step proceeds by hand. Asked ONCE per plan, on the genuine first arrival (the stepSeen record drives it), and skipped entirely when every row already carries tolerance data, so it never nags a finished plan. Payload verified in both repos before this entry."] },
@@ -3020,7 +3021,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-05";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:17 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -8999,10 +9000,29 @@ tr.appendChild(tdCT);
       const _upIn = tdUp.querySelector('input, [contenteditable]');
       const _loIn = tdLo.querySelector('input, [contenteditable]');
       if(_upIn && _loIn){
-        try{ _upIn.placeholder = 'UPPER'; _loIn.placeholder = 'LOWER'; }catch(_){ }
+        /* Rev-949: a per-row TOGGLE between one and two dimensions. A radius callout or a
+           MAX note has a single limit; a diameter has two. The row remembers its choice
+           (tolMode, saved with the plan). In 1-DIM mode only one input shows, placeholder
+           LIMIT; the hidden lower value is kept, not erased, so toggling back loses
+           nothing. Default is two, matching the printed pairs. */
+        const _mode = (row.tolMode === '1') ? '1' : '2';
+        try{ _upIn.placeholder = _mode === '1' ? 'LIMIT' : 'UPPER'; _loIn.placeholder = 'LOWER'; }catch(_){ }
+        if(_mode === '1') _loIn.style.display = 'none';
         const stack = document.createElement('div');
         stack.style.cssText = 'display:flex; flex-direction:column; gap:2px; align-items:stretch; margin-top:3px;';
         stack.appendChild(_upIn); stack.appendChild(_loIn);
+        const tg = document.createElement('button');
+        tg.type = 'button';
+        tg.textContent = _mode === '1' ? '\u21c5 2 dims' : '\u21c5 1 dim';
+        tg.title = _mode === '1' ? 'This feature has ONE limit \u2014 click for upper and lower' : 'Two limits shown \u2014 click if this feature has only ONE (radius, MAX, note)';
+        tg.style.cssText = 'align-self:flex-end; border:1px solid #c9c0b4; background:#f6f2ec; color:#5c4a3a; border-radius:4px; font:700 8px system-ui; padding:1px 5px; cursor:pointer; margin-top:1px;';
+        tg.onclick = (e) => {
+          e.stopPropagation();
+          row.tolMode = (_mode === '1') ? '2' : '1';
+          try{ cpAutoSaveProject(); }catch(_){ }
+          renderCPBuilder();
+        };
+        stack.appendChild(tg);
         tdSpec.appendChild(stack);
         tdUp.style.cssText = 'padding:0; border:0; width:0; max-width:0; overflow:hidden;';
         tdLo.style.cssText = 'padding:0; border:0; width:0; max-width:0; overflow:hidden;';
