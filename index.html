@@ -1667,7 +1667,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-951";
+const APP_REV = "Rev-952";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2195,6 +2195,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-05", rev: "App Rev-952", type: "App", changes: ["ADD NEW OPERATION IS BACK \u2014 A BUTTON UNDER THE LAST OPERATION (Rev-952, embedded validation REV-255) \u2014 per Rich\u2019s red box, drawn exactly where he expected the button to be. Rev-925 deleted the part-header Add Operation on the stated grounds that every operation row carries its own; that was WRONG. Reading the shipped code shows the row-level Add Operation renders ONLY on a DRAFT line - a part whose operations are all real saved plans had NO way in at all, which is exactly the state 1000237498 was in. A full-width footer line now closes every part\u2019s operation list carrying \u2795 ADD NEW OPERATION, indented to sit under the operation names, opening the same Rev-928 two-field pop-up (cpAddOpToPart) that asks for OP number and OP description and fills the part-level fields silently. The draft-row button is untouched. WHAT TO TEST (rule 8): open part 1000237498, see the button below the OP-040 line, press it, name an operation and confirm it lands as a second row with its seven construction steps. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-951", type: "App", changes: ["THE NEW CHAT PROMPT CARRIES TONIGHT'S SESSION STATE (Rev-951, embedded validation REV-255) — Rich asked exactly the right question: the handoff belongs INSIDE the New Chat Prompt button, not pasted by hand. The baked CP_OPEN_WORK block still told Rev-752-era truth, so a dated AUG 5 SESSION STATE section now rides at its end: the seven-step structure with the never-renumber rule for the internal keys, the one-column tolerance cell and its spec write-back, the banner header with its hidden-but-required tab buttons, the zero-width td rule, the traveller primary system and protected scan, the op-less-only fallbacks and why, the Instructions Rev-92 mismatch awaiting explicit go-ahead, the consumed first-visit popup on OP-040, and the gated ship discipline with the literal-UTF-8 anchor lesson. The pre-existing outstanding items stay - all still true. Press the button and the fresh chat starts knowing tonight. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-950", type: "App", changes: ["THE DUPLICATED TOLERANCE IS GONE - THE PAIR IS THE ONE PLACE TO TYPE (Rev-950, embedded validation REV-255) — per Rich, strongly preferred and delivered: the open row's spec text box repeated the very numbers the UPPER and LOWER inputs hold, so that box is hidden and the pair is now the single place tolerances are typed. The spec FIELD lives on underneath doing its jobs invisibly: a two-number printed spec seeds the pair automatically on first open, and every edit to the pair writes the spec back - upper and lower joined with a slash, or the single limit in 1-DIM mode - so the compact closed-row summary, the xlsx export and the machinist validation all read exactly what they always did. One number, typed once, shown once. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-949", type: "App", changes: ["A PER-ROW TOGGLE BETWEEN ONE AND TWO DIMENSIONS (Rev-949, embedded validation REV-255) — per Rich: features that carry a single limit - a radius callout, a MAX note - no longer show a meaningless second box. Each row's spec cell carries a small toggle: 1 DIM shows a single LIMIT input, 2 DIMS shows the UPPER and LOWER pair, and the row remembers its choice (tolMode, saved with the plan and synced like everything else). Toggling to one dimension HIDES the lower value rather than erasing it, so switching back loses nothing. Default is two dimensions, matching how the printed pairs read. Payload verified in both repos before this entry."] },
@@ -3023,7 +3024,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-05";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:06 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:33 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4936,6 +4937,32 @@ function renderProjects(){
       tbody.appendChild(btr);
     }
   });
+  /* Rev-952: ADD NEW OPERATION, at the foot of this part's operation list - where Rich
+     drew the box. Rev-925 removed the part-header copy believing every operation row had
+     its own; only DRAFT rows do, so a part of real saved plans had no way in. This view is
+     already filtered to ONE part, so one footer line serves it. */
+  try{
+    const _fpn = (filtered[0] && filtered[0].data && filtered[0].data.partNum) || '';
+    if(_fpn){
+      const aotr = document.createElement('tr');
+      const aotd = document.createElement('td');
+      aotd.colSpan = 5;
+      aotd.style.cssText = 'padding:16px 10px 18px 68px; background:#faf7f2; border-bottom:1px solid #e2ddd4;';
+      const aob = document.createElement('button');
+      aob.className = 'cp-btn cp-btn-primary';
+      aob.textContent = '\u2795 ADD NEW OPERATION';
+      aob.title = 'Add another routing operation to ' + _fpn;
+      aob.style.cssText = 'width:auto; padding:12px 24px; font-size:16px; font-weight:800; letter-spacing:.03em;';
+      aob.onclick = () => {
+        try{ logAct('nav', 'Add New Operation (part footer)'); }catch(e){}
+        try{ cpAddOpToPart(_fpn); }
+        catch(e){ console.warn('cpAddOpToPart failed', e); try{ flash('Could not open Add Operation: ' + (e && e.message || e), true); }catch(_){ } showNewCP(); }
+      };
+      aotd.appendChild(aob);
+      aotr.appendChild(aotd);
+      tbody.appendChild(aotr);
+    }
+  }catch(e){ console.warn('Rev-952 add-op footer failed', e); }
 }
 
 // Rev-389: build a full Machinist Validation APP (the live REV-93 inspection app)
