@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-942</title>
+<title>CONTROL PLAN GENERATOR - Rev-943</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-942 · 2026-08-05 8:06 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-943 · 2026-08-05 8:07 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-942 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 8:06 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-943 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 8:07 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-942 · Built Aug 5, 2026</span>
+    <span id="revFooter">App Rev-943 · Built Aug 5, 2026</span>
   </div>
 </div>
 
@@ -1667,7 +1667,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-942";
+const APP_REV = "Rev-943";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2195,6 +2195,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-05", rev: "App Rev-943", type: "App", changes: ["THE BUILDER'S STEP BANNER AT HALF SIZE (Rev-943, embedded validation REV-255) — per Rich: the builder's construction banner - the seven step tiles and the hazard-striped percent bar - is drawn at half its former height. Tile padding, fonts and borders halved, the stripe bar down from a tall band to a slim ribbon, the green progress track from seven pixels to four. Same tiles, same live states, same doors - the header just stops spending vertical space the rows and the drawing need. The main page's banner is untouched; this sizing is the builder's own. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-942", type: "App", changes: ["ASSIGN TOLERANCES - A SEVENTH STEP BETWEEN BUBBLES AND CONTROL TYPES (Rev-942, embedded validation REV-255) — per Rich's arrow. A new construction step, ASSIGN TOLERANCES, now sits between ASSIGN BUBBLES and ASSIGN CONTROL TYPES, everywhere the steps appear: the Control Plans list tiles (now seven, REVIEW INSPECTION at step 7), the builder's construction banner, and the builder itself as tab 4 - Tolerances showing the description, spec/tol, limits and class columns. The job of the step is the NUMBERS: confirm each row's spec or limits and approve the row, with the same per-row checkmark, name-and-time stamp and action-log entry as every other row step. Its data test asks for a spec/tol or at least one limit per row. The stage weights re-balance to seven (5+5+20+15+20+20+15 = 100), so expect percentages to shift slightly on existing plans - the same figure honestly re-based, not lost work. Internally the step is keyed T rather than renumbering 1-2-3, so every approval already recorded on any plan stays exactly where it is, per the Rev-738 rule. Control types stay gated on the bubble data as before and additionally list tolerance data as their READY test. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-941", type: "App", changes: ["THE BUILDER'S TAB STRIP IS SWAPPED FOR THE CONSTRUCTION BANNER (Rev-941, embedded validation REV-255) — per Rich's circle: the small step tabs in the builder are replaced by the SAME six-step construction banner the main Control Plans page shows - six live tiles (EDIT OP number, UPLOAD ODS, ASSIGN BUBBLES, ASSIGN CONTROL TYPES, ASSIGN MEASUREMENT TYPES, REVIEW INSPECTION) with COMPLETED, IN PROGRESS n of total and YOU ARE HERE states from the same stage engine, and beneath them the hazard-striped UNDER CONSTRUCTION percent bar with the green progress track. The tiles are doors, not decoration: 3 to 5 switch the builder step, UPLOAD ODS opens the drawing studio for this operation, REVIEW INSPECTION opens the release walk, and EDIT OP number points honestly at the pencil on the list where that edit lives. The banner redraws on every step change and on a slow tick, so approvals move the tiles without leaving the screen. The old tab buttons remain hidden in the DOM because the step-switch code highlights them by id. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-940", type: "App", changes: ["BUILD .XLSX AND ALL COLUMNS DELETED FROM THE BUILDER; SAVE TO PROJECT GOES GREEN (Rev-940, embedded validation REV-255) — per Rich's marks. The builder toolbar's BUILD .XLSX button is deleted - the export door remains EXCEL CONTROL PLAN on the Control Plans list, which runs the same code including Rev-666's revision-issuing, so nothing about document control changes, there is simply one door instead of two. The ALL COLUMNS step tab is deleted with it. SAVE TO PROJECT turns green, including after the Rev-935 saved-tick animation, which used to reset it to the old grey. One deliberate judgement call, stated openly: the green stroke also passed through the 5 - MEASUREMENT METHODS step tab, but deleting a construction step's only tab would make that step unreachable, so it stays - say the word if it was truly meant to go and it will be handled properly. The orphaned button binding is null-guarded and inert. Payload verified in both repos before this entry."] },
@@ -3014,7 +3015,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-05";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:06 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:07 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -8342,7 +8343,7 @@ function cpBuilderStepsBar(){
     const pct = cpPlanPercent(p);
     const cur = { '1': 3, 'T': 4, '2': 5, '3': 6 }[localStorage.getItem('cpBuildStep') || '1'];   /* Rev-942 */
     const L = [[1,'EDIT OP #'],[2,'UPLOAD ODS'],[3,'ASSIGN BUBBLES'],[4,'ASSIGN TOLERANCES'],[5,'ASSIGN CONTROL TYPES'],[6,'ASSIGN MEASUREMENT TYPES'],[7,'REVIEW INSPECTION']];   /* Rev-942 */
-    host.innerHTML = '<div style="display:flex; gap:8px; flex-wrap:wrap; align-items:stretch; margin-bottom:6px;">'
+    host.innerHTML = '<div style="display:flex; gap:5px; flex-wrap:wrap; align-items:stretch; margin-bottom:4px;">'   /* Rev-943: half-size */
       + L.map(([n, lab]) => {
           const S = ({1:st.s1,2:st.s2,3:st.s3,4:st.sT,5:st.s4,6:st.s5,7:st.s6})[n] || {};   /* Rev-942 */
           const done = !!S.done;
@@ -8351,18 +8352,18 @@ function cpBuilderStepsBar(){
           const bg = done ? '#dcecdf' : (curHere ? '#fdf3d5' : '#fff');
           const bd = done ? '#a9cdb5' : (curHere ? '#d9b64a' : '#d8d0c4');
           const fg = done ? '#1f5133' : (curHere ? '#5c4708' : '#5c5349');
-          return '<button data-sb="' + n + '" style="flex:1 1 120px; min-width:118px; border:2px solid ' + bd + '; background:' + bg + '; color:' + fg + ';'
-            + ' border-radius:8px; padding:6px 8px; cursor:pointer; text-align:center;">'
-            + '<div style="font-size:9px; font-weight:800; letter-spacing:.08em; opacity:.75;">STEP ' + n + '</div>'
-            + '<div style="font-size:11px; font-weight:800; letter-spacing:.03em;">' + lab + '</div>'
-            + '<div style="font-size:9px; font-weight:700; margin-top:2px; min-height:11px;">' + status + '</div>'
+          return '<button data-sb="' + n + '" style="flex:1 1 84px; min-width:82px; border:1px solid ' + bd + '; background:' + bg + '; color:' + fg + ';'
+            + ' border-radius:5px; padding:2px 4px; cursor:pointer; text-align:center;">'
+            + '<div style="font-size:7px; font-weight:800; letter-spacing:.07em; opacity:.75;">STEP ' + n + '</div>'
+            + '<div style="font-size:8.5px; font-weight:800; letter-spacing:.02em;">' + lab + '</div>'
+            + '<div style="font-size:7px; font-weight:700; margin-top:1px; min-height:8px;">' + status + '</div>'
             + '</button>';
         }).join('')
       + '</div>'
-      + '<div style="position:relative; border-radius:6px; overflow:hidden; background:repeating-linear-gradient(45deg,#e6a817 0 16px,#231d10 16px 32px); text-align:center;">'
-      +   '<div style="font-weight:800; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.8); padding:5px 10px; font-size:12px; letter-spacing:.04em;">UNDER CONSTRUCTION \u2014 ' + pct + '% COMPLETE</div>'
+      + '<div style="position:relative; border-radius:4px; overflow:hidden; background:repeating-linear-gradient(45deg,#e6a817 0 10px,#231d10 10px 20px); text-align:center;">'
+      +   '<div style="font-weight:800; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.8); padding:1px 8px; font-size:9px; letter-spacing:.04em;">UNDER CONSTRUCTION \u2014 ' + pct + '% COMPLETE</div>'
       + '</div>'
-      + '<div style="height:7px; border-radius:4px; background:#e3ddd2; margin-top:3px; overflow:hidden;"><div style="height:100%; width:' + pct + '%; background:linear-gradient(90deg,#1f5133,#5cae82);"></div></div>';
+      + '<div style="height:4px; border-radius:2px; background:#e3ddd2; margin-top:2px; overflow:hidden;"><div style="height:100%; width:' + pct + '%; background:linear-gradient(90deg,#1f5133,#5cae82);"></div></div>';   /* Rev-943: half-size */
     host.querySelectorAll('button[data-sb]').forEach(b => {
       b.onclick = () => {
         const n = +b.dataset.sb;
