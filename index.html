@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-946</title>
+<title>CONTROL PLAN GENERATOR - Rev-947</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,7 +487,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-946 · 2026-08-05 8:11 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-947 · 2026-08-05 8:12 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -513,7 +513,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-946 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 8:11 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-947 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-05 8:12 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -576,7 +576,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-946 · Built Aug 5, 2026</span>
+    <span id="revFooter">App Rev-947 · Built Aug 5, 2026</span>
   </div>
 </div>
 
@@ -1667,7 +1667,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-946";
+const APP_REV = "Rev-947";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2195,6 +2195,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-05", rev: "App Rev-947", type: "App", changes: ["THE STEP TILES STOP STRETCHING - HALF THE WIDTH, SIZED TO THEIR LABELS (Rev-947, embedded validation REV-255) — per Rich: the builder's seven step tiles no longer stretch to fill the whole row - each is sized to its own label, roughly half the width they were claiming, packed left with the spare space simply left empty. Heights, states, colours and clicks unchanged; the hazard ribbon and progress track still run the full width beneath them. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-946", type: "App", changes: ["FIRST VISIT TO ASSIGN TOLERANCES OFFERS THE AI FILL (Rev-946, embedded validation REV-255) — per Rich: the first time a plan lands on ASSIGN TOLERANCES, a themed pop-up asks whether the AI should read the dimensions off the drawing and fill in the empty tolerance cells. YES runs the same Read-dimensions flow as the purple button - each balloon's printed dimension into its row's empty spec cell, pins untouched, filled cells left alone, with the flow's own send-to-Anthropic confirmation still in force. NO closes and the step proceeds by hand. Asked ONCE per plan, on the genuine first arrival (the stepSeen record drives it), and skipped entirely when every row already carries tolerance data, so it never nags a finished plan. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-945", type: "App", changes: ["UPPER AND LOWER LIMIT STACK IN ONE CELL - UPPER ON TOP (Rev-945, embedded validation REV-255) — per Rich: the two limit columns are now one. Every row shows its Upper Limit input ON TOP and its Lower Limit input DIRECTLY BENEATH in a single cell, matching how the printed spec reads, with the header stacked to say so. Both fields keep their own storage, editing, and everything downstream - the xlsx export's separate Upper and Lower columns are untouched - only the on-screen geometry changed. The old Lower column's td remains in the DOM at zero width because every step view's column indices count it; removing it would have renumbered every view. Payload verified in both repos before this entry."] },
   { ts: "2026-08-05", rev: "App Rev-944", type: "App", changes: ["PAGES OPEN ON THE WHOLE DRAWING, NOT ZOOMED (Rev-944, embedded validation REV-255) — per Rich: arriving at a page no longer lands zoomed into a balloon. Opening the builder and switching between any of the step pages both reset the drawing to fit - whole sheet visible, scroll returned to the corner, the button offering ZOOM TO BALLOON for when it is wanted. Clicking a row still zooms to that row's pin exactly as before, and the wheel still zooms freely; only the ARRIVAL state changed, from wherever-you-last-were to the whole drawing. Applied at both doors: builder open and every step change. Payload verified in both repos before this entry."] },
@@ -3018,7 +3019,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-05";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:11 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:12 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -8356,7 +8357,7 @@ function cpBuilderStepsBar(){
     const pct = cpPlanPercent(p);
     const cur = { '1': 3, 'T': 4, '2': 5, '3': 6 }[localStorage.getItem('cpBuildStep') || '1'];   /* Rev-942 */
     const L = [[1,'EDIT OP #'],[2,'UPLOAD ODS'],[3,'ASSIGN BUBBLES'],[4,'ASSIGN TOLERANCES'],[5,'ASSIGN CONTROL TYPES'],[6,'ASSIGN MEASUREMENT TYPES'],[7,'REVIEW INSPECTION']];   /* Rev-942 */
-    host.innerHTML = '<div style="display:flex; gap:5px; flex-wrap:wrap; align-items:stretch; margin-bottom:4px;">'   /* Rev-943: half-size */
+    host.innerHTML = '<div style="display:flex; gap:5px; flex-wrap:wrap; align-items:stretch; justify-content:flex-start; margin-bottom:4px;">'   /* Rev-947: tiles hug their labels */
       + L.map(([n, lab]) => {
           const S = ({1:st.s1,2:st.s2,3:st.s3,4:st.sT,5:st.s4,6:st.s5,7:st.s6})[n] || {};   /* Rev-942 */
           const done = !!S.done;
@@ -8365,7 +8366,7 @@ function cpBuilderStepsBar(){
           const bg = done ? '#dcecdf' : (curHere ? '#fdf3d5' : '#fff');
           const bd = done ? '#a9cdb5' : (curHere ? '#d9b64a' : '#d8d0c4');
           const fg = done ? '#1f5133' : (curHere ? '#5c4708' : '#5c5349');
-          return '<button data-sb="' + n + '" style="flex:1 1 84px; min-width:82px; border:1px solid ' + bd + '; background:' + bg + '; color:' + fg + ';'
+          return '<button data-sb="' + n + '" style="flex:0 1 auto; min-width:0; border:1px solid ' + bd + '; background:' + bg + '; color:' + fg + ';'   /* Rev-947: 50% narrower - sized to the label, no stretch */
             + ' border-radius:5px; padding:2px 4px; cursor:pointer; text-align:center;">'
             + '<div style="font-size:7px; font-weight:800; letter-spacing:.07em; opacity:.75;">STEP ' + n + '</div>'
             + '<div style="font-size:8.5px; font-weight:800; letter-spacing:.02em;">' + lab + '</div>'
