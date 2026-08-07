@@ -1683,7 +1683,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-979";
+const APP_REV = "Rev-980";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2211,6 +2211,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-07", rev: "App Rev-980", type: "App", changes: ["THE RELEASE DIALOG IS TWICE THE SIZE (Rev-980, embedded validation REV-257) \u2014 per Rich. This is the box that asks whether an inspection program is right and carries the button that RELEASES AN OPERATION TO PRODUCTION - the most consequential press in the app - and it was a 560px card in 12.5px type. Everything about it is now doubled: the card goes 560 to 1120px wide, the header 13 to 26px, the body 12.5 to 25px, the approval count 11 to 22px, and the buttons 12 to 24px with the padding and gaps raised to match. It still fits a phone - the card is width:100% up to that limit and the buttons wrap - so the only thing that changed on a narrow screen is that the words are readable at arm\u2019s length. Wording, buttons and behaviour are untouched. ON THE FIX A BALLOON\u2019S PIN BUTTON: it was already removed at Rev-979; the screenshot showing it was taken on Rev-978, before the reload. Nothing to do twice. WHAT TO TEST (rule 8): open Step 7 on OP-030 and confirm the box is about double and reads Close \u00b7 Open it again \u00b7 Withdraw release, with no orange button. Payload verified in both repos before this entry."] },
   { ts: "2026-08-07", rev: "App Rev-979", type: "App", changes: ["FIX A BALLOON\u2019S PIN IS OFF THE RELEASE DIALOG (Rev-979, embedded validation REV-257) \u2014 per Rich. The dialog that closes the inspection walk asks ONE question - is the program right - and offered four answers, one of which was a whole side errand: type a balloon number, get sent to Step 3, re-pin it, come back. It sat between Open it again and Mark ready for production, the two answers actually being asked for, and it was the wrong shape of thing to put beside them. Removed, along with the return-address machinery it needed. NOTHING IS LOST: a pin is fixed where pins are fixed - Step 3 ASSIGN BUBBLES, click the balloon on the drawing - which was always the real route; this was a shortcut into it, not the only way. The dialog now reads Not yet \u00b7 Open it again \u00b7 Mark ready for production, plus Withdraw release when it is already released. WHAT TO TEST (rule 8): finish a walk on OP-030 and confirm three buttons and no orange one. Payload verified in both repos before this entry."] },
   { ts: "2026-08-07", rev: "App Rev-978", type: "App", changes: ["THE BALLOON HIGHLIGHT IS A RED CIRCLE, NOT A GLOW (Rev-978, embedded validation REV-257) \u2014 per Rich, who pointed at the crisp red ring round balloon 4 and said that is the one he wants everywhere. The balloon marker had been a pulsing red HALO - a 34px blur breathing in and out twice a second - which smears across a busy print, hides the very number it is pointing at, and on a dense drawing reads as damage rather than as a pointer. It is now the same crisp double ring as the reference-image marker: a solid red circle with a white ring outside it so it holds on both ink and white paper, no blur, no pulse. Slightly larger and thicker to stay findable now that it is not flashing. WHAT IT DOES NOT CHANGE: it is still draggable onto the right bubble, same size, same purpose, same tooltip. ON THE RECORD, so nobody claims more than was done: this is the marker in the Control Plan builder\u2019s drawing panel. If a glow turns up on any other screen, point at it and it gets the same treatment - Rich should not have to hunt for them. WHAT TO TEST (rule 8): open a plan, pin a balloon, and confirm the marker is a hard red circle with a white outline and no pulsing. Payload verified in both repos before this entry."] },
   { ts: "2026-08-07", rev: "App Rev-977", type: "App", changes: ["STEP 8 - CNC PROGRAM, OPTIONAL (Rev-977, embedded validation REV-257) \u2014 per Rich: an eighth tile that takes the CNC program for the operation. OPTIONAL IN THE REAL SENSE, not just in name: it is never locked, it is worth ZERO toward the percentage, and it can never hold COMPLETE back - an operation with no program still finishes at 100%. It sits after Step 7 and out of the sequential lock chain entirely, so it can be filled at any point, before or after the rest. THE FILE GOES TO GITHUB, per Rich\u2019s decision: stored in the PRIVATE cp-generator-data repository under programs/PART/OPnnn/, the same repository the drawings already use, so it reaches every device and survives a wiped machine. Any file type is accepted - .nc, .min, .eia, .txt, .h - because controls differ by machine. The panel shows the file name, size and when it landed, with Download, Replace and Remove; Remove takes it off GitHub as well as off the plan, and asks first. The plan records only the name, size, path and timestamp - the program itself is never copied into cp_data.json, so the data file stays small. If GitHub is not configured the tile says so plainly instead of accepting a file it cannot store. WHAT TO TEST (rule 8): press STEP 8 on any operation, upload a program, confirm the tile turns green and the percentage does NOT move; press Remove and confirm it goes. Payload verified in both repos before this entry."] },
@@ -3067,7 +3068,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-07";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:18 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:41 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5801,27 +5802,29 @@ function cpStep6Release(idx, already){
   ov.style.cssText = 'position:fixed; inset:0; z-index:10550; background:rgba(0,0,0,.6);'
     + ' display:flex; align-items:center; justify-content:center; padding:20px;';
   const c = document.createElement('div');
-  c.style.cssText = 'background:#fff; border-radius:10px; max-width:560px; width:100%;'
-    + ' box-shadow:0 12px 46px rgba(0,0,0,.45); font-family:inherit; overflow:hidden;';
+  /* Rev-980: DOUBLED, per Rich. This box carries the release-to-production press; it was a
+     560px card in 12.5px type. width:100% is kept so it still fits a phone. */
+  c.style.cssText = 'background:#fff; border-radius:14px; max-width:1120px; width:100%;'
+    + ' box-shadow:0 16px 60px rgba(0,0,0,.5); font-family:inherit; overflow:hidden;';
   const head = String(p.partNum || '') + (p.opNum ? ('  \u00b7  OP-' + p.opNum) : '');
   c.innerHTML = '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.04em;'
-    + ' padding:10px 16px; font-size:13px;">STEP 6 \u00b7 ' + head + '</div>'
-    + '<div style="padding:14px 16px; font-size:12.5px; line-height:1.6; color:#3a352e;">'
+    + ' padding:20px 32px; font-size:26px;">STEP 6 \u00b7 ' + head + '</div>'   /* Rev-980 */
+    + '<div style="padding:28px 32px; font-size:25px; line-height:1.6; color:#3a352e;">'   /* Rev-980 */
     + (done ? ('<b style="color:#1d6b3f;">Marked ready by ' + ((p.inspReviewed.who) || 'someone')
               + ' on ' + when + '.</b>')
             : (already ? 'Open the inspection program again, or release it.'
                        : 'Walked it. Is the inspection program right?'))
     + (function(){ try{ const f = p.step6Feat || {}, n = Object.keys(f).length;
         const tot = (((p.builderState||{}).rows)||[]).filter(r => String(r.bubble||'').trim()).length;
-        return n ? ('<div style="margin-top:8px; font-size:11px; color:#6b6257;">'
+        return n ? ('<div style="margin-top:16px; font-size:22px; color:#6b6257;">'   /* Rev-980 */
           + n + (tot ? (' of ' + tot) : '') + ' features approved during the walk.</div>') : '';
       }catch(e){ return ''; } })()
     + '</div>';
   const foot = document.createElement('div');
-  foot.style.cssText = 'display:flex; justify-content:flex-end; gap:8px; padding:0 16px 14px; flex-wrap:wrap;';
+  foot.style.cssText = 'display:flex; justify-content:flex-end; gap:16px; padding:0 32px 28px; flex-wrap:wrap;';   /* Rev-980 */
   const mk = (label, css, fn2) => {
     const b = document.createElement('button'); b.type = 'button'; b.textContent = label;
-    b.style.cssText = 'font-size:12px; font-weight:800; padding:8px 16px; border-radius:6px;'
+    b.style.cssText = 'font-size:24px; font-weight:800; padding:16px 32px; border-radius:10px;'   /* Rev-980 */
       + ' cursor:pointer; font-family:inherit; ' + css;
     b.onclick = fn2; foot.appendChild(b);
   };
