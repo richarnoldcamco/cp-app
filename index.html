@@ -605,7 +605,7 @@
     </div>
     <div class="field tight">
       <label>Part Description <span style="font-weight:400; color:#8a7f70;">(optional)</span></label>
-      <input type="text" id="cpPartDesc" placeholder="E.G., COMPRESSOR HOUSING">   <!-- Rev-930: optional, white - not part of the mandatory yellow set -->
+      <input type="text" id="cpPartDesc" placeholder="E.G., COMPRESSOR HOUSING" style="text-transform:uppercase;">   <!-- Rev-930: optional, white - not part of the mandatory yellow set -->
     </div>
 
   </div>
@@ -1680,7 +1680,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-973";
+const APP_REV = "Rev-974";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2208,6 +2208,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-07", rev: "App Rev-974", type: "App", changes: ["PART DESCRIPTION IS UPPER CASE, TYPED AND STORED (Rev-974, embedded validation REV-255) \u2014 per Rich, who found \u2018housing\u2019 and \u2018air coil\u2019 sitting in lower case on the All Parts list beside COMPRESSOR BORE. CAMCO documents are upper case throughout - Rev-92 says every cell, title block and header row - and a part description that comes out lower case on the list comes out lower case wherever else it is used. It is forced to upper case in three places so it cannot slip back in: as it is TYPED (both the \u270f\ufe0f pencil beside the part number and the New Control Plan form show capitals as you type), as it is SAVED, and as it is DRAWN on the list - the last of those covering the descriptions already stored in lower case, so housing and air coil read HOUSING and AIR COIL without anyone retyping them. This covers TYPED DATA. Button labels and headings elsewhere are untouched pending Rich\u2019s word on how far to take it. WHAT TO TEST (rule 8): the list reads HOUSING and AIR COIL; press the pencil on 912993, type a description in lower case and watch it capitalise as you type. Payload verified in both repos before this entry."] },
   { ts: "2026-08-07", rev: "App Rev-973", type: "App", changes: ["A BALLOON WITH NO ROW IS NOW COUNTED, AND OFFERED (Rev-973, embedded validation REV-255) \u2014 Rich asked why the AI only picked up three tolerances on 1000237498 OP-050. It had not: it found SIX balloons and read five dimensions, but the plan carried three rows, so balloons 4, 5 and 6 were read correctly and dropped on the floor - the fill only writes into a row whose Bubble # matches. Worse, Step 3 ASSIGN BUBBLES read COMPLETED, because it only ever asked whether the rows THAT EXIST are pinned. Convention #5 of Rev-92 is explicit - one row per ODS balloon, the row count shall equal the balloon count - and nothing in the app checked it. BOTH ENDS FIXED. (1) Step 3 no longer reads COMPLETED while the drawing carries a balloon with no row; the step note names the missing balloon numbers, and the percentage and the COMPLETE badge follow, since they all read the same engine. (2) Read dimensions now counts the balloons it found against the rows on the plan and, when any have no row, asks before filling whether to create them - numbered, in order, carrying the CP-7 reaction plan, existing rows untouched - then fills every row including the new ones in the same pass. Both work off the balloons the AI actually located, so a plan that has never been read is never accused of missing anything. WHAT TO TEST (rule 8): on OP-050 press Read dimensions, accept the offer, and confirm rows 4, 5 and 6 appear and fill with .440/.430 and R .040/.020; Step 3 must drop out of COMPLETED until they are pinned. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-972", type: "App", changes: ["DIA / RAD / CHAM BUTTONS - A TOLERANCE CAN BE GIVEN ITS SHAPE (Rev-972, embedded validation REV-255) \u2014 Rich asked how to make a row a radius or a diameter, and the honest answer was that he could not: the R on R.040/.020 and the DIA on 1.202/1.198 DIA only existed because the AI happened to read them off the print, and Rev-967 merely stopped them being thrown away. Nothing could ADD one. Three buttons now sit under the limit boxes on every tolerance row - \u00d8 DIA, R RAD, C CHAM - each writing its mark onto the callout and clearing it when pressed again, one at a time. They show in both one-limit and two-limit mode, because a radius and a diameter both come either way. TWO SPELLINGS, ONE ANSWER: a diameter reads either as a leading \u00d8 or as a trailing DIA, and the button lights for both - press it on 1.202/1.198 DIA and it clears the DIA rather than adding a second mark that says the same thing. Setting a shape writes the leading form the print uses (\u00d8, R, C) and removes the trailing word, so one row cannot end up saying it twice. Everything else on the callout survives - MAX, MIN, 2 PLACES, 2X - because the mark is swapped in place. WHAT TO TEST (rule 8): on row 11 the R button is already lit; press C and the row reads C.040/.020; press it again and it reads .040/.020. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-971", type: "App", changes: ["MAX AND MIN BUTTONS ON A SINGLE-LIMIT ROW (Rev-971, embedded validation REV-255) \u2014 per Rich. A row switched to 1 DIM holds one number, and one number on a print almost always carries a MAX or a MIN with it - .002 alone says nothing about which side of it is bad. Two buttons now sit under the LIMIT box on any 1-DIM row: MAX and MIN. Pressing one writes it into the spec (.002 becomes .002 MAX), pressing the active one again clears it, and only one can be on at a time. They appear ONLY in 1-DIM mode - a two-limit dimension already says which side is which. IT KEEPS THE REST OF THE CALLOUT: on R.005 MAX 2X, pressing MIN swaps only the MAX word and leaves R.005 ... 2X exactly as printed, because the token is replaced in place rather than the note being overwritten. A 1-DIM row also seeds itself now - .001 MAX opens with LIMIT reading .001 and MAX already lit, instead of an empty box. And a guard: with the LIMIT box empty the buttons say so rather than writing a bare MAX over the row and losing the callout. WHAT TO TEST (rule 8): on row 8 press 1 dim if needed, then MAX - the closed row must read .002 MAX; press MAX again and it goes back to .002. Payload verified in both repos before this entry."] },
@@ -3058,7 +3059,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-07";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:21 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:12 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3673,7 +3674,9 @@ function renderPartsIndex(tbody, combined){
          about being empty; the em dash says the field exists and is waiting. Edited by the
          same pencil (Rev-931); storage unchanged. */
       let _pdTxt = '';
-      try{ _pdTxt = String((cpPartInfoGet(g.part) || {}).partDesc || '').trim(); }
+      /* Rev-974: drawn UPPER CASE, which also lifts descriptions already stored in lower
+         case - nobody has to retype 'housing' to get HOUSING. */
+      try{ _pdTxt = String((cpPartInfoGet(g.part) || {}).partDesc || '').trim().toUpperCase(); }
       catch(e){ console.warn('Rev-959 part description read failed', e); }
       const tdDesc = cell(_pdTxt
         ? ('<span style="font-size:14px; font-weight:600; color:#5a5148;">' + _pdTxt + '</span>')
@@ -4048,7 +4051,7 @@ function cpRenamePart(part){
       '</div>' +
       '<div style="margin-top:12px;">' +
         '<label style="display:block; font-size:11px; font-weight:800; letter-spacing:.05em; margin-bottom:4px;">PART DESCRIPTION <span style="font-weight:400; color:#8a7f70;">(optional)</span></label>' +
-        '<input id="cpRenDesc" style="width:100%; box-sizing:border-box; font-size:15px; font-weight:700; padding:10px; border:2px solid #c9c0b4; border-radius:6px;" placeholder="E.G., COMPRESSOR HOUSING">' +
+        '<input id="cpRenDesc" style="width:100%; box-sizing:border-box; font-size:15px; font-weight:700; padding:10px; border:2px solid #c9c0b4; border-radius:6px; text-transform:uppercase;" placeholder="E.G., COMPRESSOR HOUSING">' +
       '</div>' +   /* Rev-931 */
       '<div id="cpRenWarn" style="display:none; font-size:12px; font-weight:700; color:#a11; margin-top:10px;"></div>' +
     '</div>' +
@@ -4079,9 +4082,9 @@ function cpRenamePart(part){
     try{
       const dv = (document.getElementById('cpRenDesc') || {}).value || '';
       const infS = cpPartInfoGet(newPart === P ? P : newPart) || cpPartInfoGet(P) || {};
-      if(dv.trim() !== String(infS.partDesc || '')){
+      if(dv.trim().toUpperCase() !== String(infS.partDesc || '').toUpperCase()){   /* Rev-974 */
         const infT = cpPartInfoGet(P) || {};
-        infT.partDesc = dv.trim();
+        infT.partDesc = dv.trim().toUpperCase();   /* Rev-974: stored upper case */
         cpPartInfoSet(P, infT);
         try{ renderProjects(); }catch(e){ }
       }
@@ -7531,7 +7534,7 @@ async function cpTravInlineSave(){
       /* Rev-930: the optional Part Description rides with the part's stored info */
       try{
         const _pd = (document.getElementById('cpPartDesc') || {}).value || '';
-        if(_pd.trim()){ const inf = cpPartInfoGet(pn) || {}; inf.partDesc = _pd.trim(); cpPartInfoSet(pn, inf); }
+        if(_pd.trim()){ const inf = cpPartInfoGet(pn) || {}; inf.partDesc = _pd.trim().toUpperCase(); cpPartInfoSet(pn, inf); }   /* Rev-974 */
       }catch(e){ }
       const _projs = JSON.parse(localStorage.getItem('cpProjects') || '[]');
       const _has = _projs.some(p => cpNorm(p.partNum) === cpNorm(pn));
