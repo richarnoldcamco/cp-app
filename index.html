@@ -791,7 +791,8 @@
     <!-- Rev-940: Build .xlsx removed from the toolbar at Rich's request; Excel Control Plan on the Control Plans list is the export door -->
     <button id="cpAddRowBtn" onclick="cpBuilderAddRow(event)" style="min-height:40px; width:auto; margin:0; padding:6px 16px; white-space:nowrap; background:#1e8449; color:#fff; border:1px solid #196f3d; border-radius:8px; font-weight:700; cursor:pointer;" title="Add a new row (new balloon) to this control plan">➕ New Row</button>
 <button id="cpTrimRowsBtn" onclick="cpTrimEmptyRows(event)" style="min-height:40px; width:auto; margin:0 0 0 8px; padding:6px 16px; white-space:nowrap; background:#8a5a00; color:#fff; border:1px solid #6b4600; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer;" title="Remove rows that have nothing in them and no balloon pinned — use when the plan was created with more rows than the drawing has balloons">🧹 Remove empty rows</button>
-    <button id="cpUnderConstructionBtn" onclick="toggleUnderConstruction()" style="min-height:40px; margin:0; padding:6px 16px; white-space:nowrap; font-weight:700; border-radius:6px; cursor:pointer; background:#e6a817; color:#3a2c00; border:1px solid #c98f00;">🚧 Under Construction</button>
+    <!-- Rev-969: the manual Under Construction switch is removed. Step 7 REVIEW INSPECTION
+         is the hold, and COMPLETE is earned from the seven steps (Rev-964). -->
     <button class="btn-ghost" id="cpAcceptAllBtn" onclick="cpAcceptAllProposed()" style="min-height:40px; font-weight:600; background:#1a5276; border:1px solid #154360; color:#fff; padding:6px 16px; white-space:nowrap;" title="Fill every unset row with the app's best-match control type from the Master List — review and change any that are off">🎯 Auto-fill Proposed</button>
     <button class="btn-ghost" id="cpAiProposeBtn" onclick="aiProposeControlTypes()" style="min-height:40px; font-weight:600; background:#6e1414; border:1px solid #581010; color:#fff; padding:6px 16px; white-space:nowrap;" title="Claude reads the drawing and proposes a control type for every balloon. Sends the drawing to the Anthropic API (ITAR confirm required). Populates the Proposed column — you still ✓ Use or override.">🤖 AI Propose Types</button>
     <span id="cpBuilderInfo" style="display:none;"></span><span id="cpAiBar" style="display:none;"></span>
@@ -812,7 +813,8 @@
     <div id="cpStepsBanner"></div>
   </div>
 
-  <div id="cpUnderConstructionBanner" style="display:none; background:#e6a817; color:#3a2c00; font-weight:800; text-align:center; padding:7px 12px; border-radius:6px; margin-bottom:6px; letter-spacing:0.5px;">🚧 UNDER CONSTRUCTION — THIS CONTROL PLAN IS STILL IN PROGRESS</div>
+  <!-- Rev-969: banner removed with its switch. The hazard ribbon above the grid already
+       reports progress, and it is computed rather than hand-set. -->
 
   <div style="display:flex; gap:12px; align-items:flex-start;">
     <!-- Rev-962: the grid pane is a column now — a fixed tool strip on top, the scrolling
@@ -1678,7 +1680,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-968";
+const APP_REV = "Rev-969";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2206,6 +2208,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-06", rev: "App Rev-969", type: "App", changes: ["THE UNDER CONSTRUCTION SWITCH IS GONE - STEP 7 IS THE HOLD (Rev-969, embedded validation REV-255) \u2014 per Rich, who asked whether the button was needed. It was not. Since Rev-964 COMPLETE is EARNED from the seven steps, and STEP 7 REVIEW INSPECTION is the deliberate hold - the sign-off that releases an operation to production. A hand switch saying \u2018not done yet\u2019 was a second, weaker answer to a question Step 7 already answers properly, and it could only ever push a plan away from complete, never toward it. It was also half broken, found by reading it: the immediate save looked the plan up as part::rev with no ::OPnnn, so on every per-operation plan the lookup found nothing, and its fallback called cpAutoSave - a function that does not exist in this app. Press it and walk away and the setting was lost. REMOVED: the toolbar button and the yellow banner. THE COMPLETE TEST NO LONGER HONOURS THE FLAG, which matters because 1000222892 was still flagged and would otherwise have been stuck incomplete with no button left to clear it. The stored field is left in the data untouched so nothing old breaks, and toggleUnderConstruction / reflectUnderConstruction stay defined as harmless no-ops for any caller. WHAT TO TEST (rule 8): the Build Control Plan toolbar reads Save to Project \u00b7 New Row \u00b7 Remove empty rows and nothing else; the yellow banner is gone; 1000222892 no longer lists \u2018marked under construction by hand\u2019 as a reason. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-968", type: "App", changes: ["APPROVING A ROW MOVES TO THE NEXT ONE (Rev-968, embedded validation REV-255) \u2014 per Rich. Ticking a row\u2019s approval box left the cursor sitting on the row just finished, so working down fifteen balloons meant a tick, a reach, a click on the next row, then the next tick - half the clicks were navigation. The tick now opens the next row by itself and the drawing panel follows to that balloon, so a step can be walked end to end from the tick column alone. ONLY ON APPROVE: un-ticking a row stays put, because clearing an approval is usually the start of fixing THAT row, not of leaving it. Ghost rows are skipped - a ghost is a balloon deliberately not on the drawing and has nothing to approve. On the last row it stays where it is and says so rather than wrapping round to the top, which would look like it had lost your place. The next row is FOCUSED BUT NOT SELECTED, so an accidental keystroke cannot wipe a value that is already there. WHAT TO TEST (rule 8): on Step 4 tick row 8 and confirm row 9 opens with the drawing moving to balloon 9; tick the last row and confirm it stays put. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-967", type: "App", changes: ["LIMITS NOW SEED THROUGH DIA, R, C AND 2 PLACES - AND THAT TEXT IS KEPT (Rev-967, embedded validation REV-255) \u2014 Rich asked why the AI could not pick up balloon 6 on 1000237498 OP-040. It did: the row holds 1.155/1.145 DIA, read straight off the print. The UPPER / LOWER boxes stayed empty because the parser demanded the two numbers and NOTHING ELSE, so the trailing DIA disqualified the whole string - the same reason six other rows on that plan sat empty: 1.202/1.198 DIA, R.040/.020, C.020/.010 twice, and .065/.055 2 PLACES. cpSplitLimits now allows a letter prefix (R, C, \u00d8) and a trailing note, and returns them alongside the numbers. THE POINT OF RETURNING THEM IS THAT THEY SURVIVE: the row remembers its prefix and suffix, and every edit to the limit boxes rebuilds the spec with them back in place, so editing 1.155/1.145 DIA can never silently leave 1.155/1.145. That risk is exactly why Rev-965 left these six rows alone; with the text preserved the risk is gone. Still refused, unchanged: .035 X 50\u00b0, // .002 A, .001 MAX, R.005 MAX 2X - a plain space is not a separator, so a note can never be mistaken for a limit. WHAT TO TEST (rule 8): open row 6 - UPPER 1.155, LOWER 1.145 - retype the lower as 1.144 and confirm the closed row still reads DIA after it. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-966", type: "App", changes: ["THE MENU COUNTS GET SOME AIR (Rev-966, embedded validation REV-255) \u2014 per Rich: the counts beside CONTROL PLANS and GAGES TO BE MADE were separated from their titles by a single space, so \u201cCONTROL PLANS 3 PROJECTS\u201d and \u201cGAGES TO BE MADE 2 OPEN / 2\u201d ran together and read as one crowded phrase rather than a heading and its count. Both counts move right by 18px and are held on one line so \u20182 OPEN / 2\u2019 can never break across two. Text, colours, sizes and the tiles themselves are untouched. WHAT TO TEST (rule 8): on the main menu both counts sit clear of their titles. Payload verified in both repos before this entry."] },
@@ -3051,7 +3054,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:41 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:56 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4561,7 +4564,8 @@ function cpPlanComplete(p){
     if(!st.s5.done) miss.push('Step 6 ASSIGN MEASUREMENT TYPES' + _rowNote(6, pr.s3Left));
     if(!st.s6.done) miss.push('Step 7 REVIEW INSPECTION \u2014 not reviewed / released yet');
   }
-  if(p.underConstruction) miss.push('marked under construction by hand');
+  /* Rev-969: the hand flag is no longer a reason. Its button is gone, so honouring it would
+     strand any plan still carrying it - 1000222892 was one - with no way to clear it. */
   return { done: miss.length === 0, missing: miss };
 }
 // ===== Rev-588: STEP GATING =====================================================
@@ -8595,7 +8599,11 @@ function _cpSaveProjectBody(){
 // Rev-319: "Under Construction" status — a manual per-plan flag (2 states: on/off). Shows a banner
 // on the Build screen and a badge in the Control Plans list. Toggled by the build-header button;
 // persisted on cpBuildState and mirrored to the saved project entry so the list badge stays in sync.
+/* Rev-969: kept as a no-op so any caller left anywhere cannot throw. The switch it drove is
+   gone; nothing calls this from the UI any more. */
 function toggleUnderConstruction(){
+  return;
+  /* eslint-disable no-unreachable */
   if(!cpBuildState) return;
   cpBuildState.underConstruction = !cpBuildState.underConstruction;
   reflectUnderConstruction();
