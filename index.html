@@ -1678,7 +1678,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-964";
+const APP_REV = "Rev-965";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2206,6 +2206,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-06", rev: "App Rev-965", type: "App", changes: ["A STACKED TOLERANCE NOW FILLS THE UPPER AND LOWER BOXES (Rev-965, embedded validation REV-255) \u2014 Rich asked why the AI could not read balloon 1 on 1000237620 OP-040. Reading the STORED DATA rather than guessing showed it read it perfectly: the row held .325 and .323. They arrived separated by a LINE BREAK, because that is how the print stacks them, and the code that seeds the UPPER / LOWER boxes split on a forward slash and nothing else - so it seeded nothing and both boxes sat empty. The \u0394 .0020 chip above them was right the whole time because it uses a different, more forgiving parser: two parsers, two answers, one value. There is now ONE parser, cpSplitLimits, used by both the AI fill and the boxes. It accepts a slash, a line break, a backslash or a comma between the two numbers. It deliberately does NOT accept a plain space, which would wrongly split a note like \u2018.500 2X\u2019, and it still refuses anything with other text in it, so .035 X 50\u00b0, // .002 A and .001 MAX stay single values exactly as before. The AI fill also normalises a stacked reading to upper/lower as it writes, so new reads are stored in one shape. Existing rows need no re-run - the row seeds itself the moment it is opened. WHAT TO TEST (rule 8): open 1000237620 OP-040 Step 4 and click row 1 - UPPER should read .325 and LOWER .323 with no AI re-run. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-964", type: "App", changes: ["COMPLETE NOW MEANS ALL SEVEN STEPS - IT WAS STILL COUNTING THREE (Rev-964, embedded validation REV-255) \u2014 Rich caught 1000237620 OP-030 wearing a green COMPLETE badge beside its own bar reading 85% and Step 7 reading DO THIS NEXT. The badge was right by its own out-of-date rule and wrong about the plan. cpPlanComplete was written at Rev-597 against the THREE row stages of the day - bubbles, control types, measurement methods - and was never extended when ASSIGN TOLERANCES arrived at Rev-942 or when REVIEW INSPECTION arrived at Rev-750. So a plan could be declared complete with its tolerances unapproved and its inspection program never reviewed or released, which on a Control Plan is the sign-off that matters most. The badge is now driven off the SAME stage engine the seven tiles and the percentage use, so it cannot drift away from them again: every one of the seven must be done, the part must have a traveller, the plan must have rows, and it must not be hand-marked under construction. The IN PROGRESS count and its hover list name the exact steps outstanding, by step number. WHAT TO TEST (rule 8): OP-030 must now read IN PROGRESS with Step 7 named as outstanding; hover it and the tooltip should say Step 7. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-963", type: "App", changes: ["FEATURE / PROCESS DESCRIPTION IS OFF THE TOLERANCES SCREEN (Rev-963, embedded validation REV-255) \u2014 per Rich. Step 4 is about the NUMBERS: read the limits off the balloon, check them, approve the row. The description column sat in the middle of that, empty on every row, pushing the limit boxes rightward for no return. It is hidden on Step 4 only. It is untouched on Step 3 (bubbles), Step 5 (control types), Step 6 (measurement methods) and the All-columns view, and NO DATA IS AFFECTED - a step view decides only which columns are on screen, so anything typed in a description stays exactly where it was and reappears the moment another step is opened. DONE BY HIDING, NOT BY DELETING: the column keeps its index, because every step view addresses columns by NUMBER and removing one would silently renumber all four other views (the same trap the zero-width limit columns exist to avoid). WHAT TO TEST (rule 8): open Step 4 and confirm the columns read Doc # \u00b7 Bubble # \u00b7 \u2714 \u00b7 Product/Process Spec/Tol \u00b7 Class; then open Step 5 and confirm Feature / Process Description is back. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-962", type: "App", changes: ["THE READ DIMENSIONS (AI) BUTTON MOVES TO THE GRID (Rev-962, embedded validation REV-255) \u2014 per Rich\u2019s arrow. The purple \ud83d\udd0e Read dimensions (AI) button sat at the far right of the DRAWING pane\u2019s toolbar, the opposite end of a wide screen from the Spec/Tol cells it actually fills - and buried among four drawing controls it has nothing to do with. It now sits on its own strip directly above the Control Plan grid, over the columns it writes into. The strip is part of the grid pane and stays put while the grid scrolls under it, so the button is reachable from any row. NOTHING ELSE CHANGED: same id, same handler, same ITAR confirm gate before anything is sent, same rule that it fills only EMPTY Spec/Tol cells and never touches pins, and the same visibility rule - hidden until an ODS drawing is loaded. The drawing toolbar keeps Zoom to balloon, Back a balloon, Upload / Replace drawing and Minimize drawing. WHAT TO TEST (rule 8): on OP-040 Step 4, the purple button is above the grid on the left, the drawing toolbar no longer carries it, and pressing it still raises the ITAR confirm before reading. Payload verified in both repos before this entry."] },
@@ -3047,7 +3048,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:34 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4506,6 +4507,21 @@ function cpUploadOpOds(p){
    It now runs off cpOpStages, the SAME engine that draws the seven tiles and computes the
    percentage, so the badge cannot drift away from them again: add a step to the flow and
    this follows automatically. */
+/* Rev-965: ONE parser for a two-limit spec, shared by the AI fill and the UPPER / LOWER
+   boxes. The boxes used to split on '/' alone, so a reading transcribed the way the print
+   stacks it - .325 on one line, .323 on the next - seeded nothing and both boxes sat empty
+   while the delta chip above them, using a different parser, correctly showed .0020.
+   ACCEPTED between the two numbers: / \ , or a line break.
+   NOT accepted: a plain space, which would wrongly split a note like '.500 2X'.
+   Anything with other text in it returns null, so '.035 X 50\u00b0', '// .002 A' and
+   '.001 MAX' stay single values, exactly as before. */
+function cpSplitLimits(s){
+  try{
+    const m = String(s == null ? '' : s)
+      .match(/^\s*(\d*\.?\d+)\s*(?:\/|\\|,|\r?\n)\s*(\d*\.?\d+)\s*$/);
+    return m ? { hi: m[1], lo: m[2] } : null;
+  }catch(e){ console.warn('Rev-965 cpSplitLimits failed', e); return null; }
+}
 function cpPlanComplete(p){
   const miss = [];
   const pr = cpStepProgress(p);
@@ -9306,8 +9322,9 @@ tr.appendChild(tdCT);
           const _specIn = tdSpec.querySelector('input, [contenteditable]');
           if(_specIn) _specIn.style.display = 'none';
           if(!String(row.upperLimit || '').trim() && !String(row.lowerLimit || '').trim()){
-            const m2 = String(row.spec || '').match(/^\s*(\.?\d[\d.]*)\s*\/\s*(\.?\d[\d.]*)\s*$/);
-            if(m2){ row.upperLimit = m2[1]; row.lowerLimit = m2[2]; _upIn.value = m2[1]; _loIn.value = m2[2]; }
+            /* Rev-965: through the shared parser, so a stacked reading seeds too. */
+            const m2 = cpSplitLimits(row.spec);
+            if(m2){ row.upperLimit = m2.hi; row.lowerLimit = m2.lo; _upIn.value = m2.hi; _loIn.value = m2.lo; }
           }
           const _syncSpec = () => {
             const u = String(_upIn.value || '').trim(), l = String(_loIn.value || '').trim();
@@ -12879,7 +12896,20 @@ async function aiLocateBubbles(ev){
       cpBuildState.rows.forEach(r => {
         if(r.spec) return;                              // never overwrite what you typed
         const f = beFeatures.find(ft => String(ft.n) === String(r.bubble));
-        if(f && f.description){ r.spec = f.description.toUpperCase(); cpAutoBands(r); filled++; }
+        if(f && f.description){
+          r.spec = f.description.toUpperCase();
+          /* Rev-965: a reading transcribed the way the print stacks it is stored in the same
+             shape as every other two-limit spec, and the limit pair is filled at the same
+             time so Step 4 shows the numbers without waiting to be opened. */
+          const _lim = cpSplitLimits(r.spec);
+          if(_lim){
+            r.spec = _lim.hi + '/' + _lim.lo;
+            if(!String(r.upperLimit || '').trim() && !String(r.lowerLimit || '').trim()){
+              r.upperLimit = _lim.hi; r.lowerLimit = _lim.lo;
+            }
+          }
+          cpAutoBands(r); filled++;
+        }
       });
       if(filled) renderCPBuilder();
     }
