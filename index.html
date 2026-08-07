@@ -1683,7 +1683,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-982";
+const APP_REV = "Rev-983";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2211,6 +2211,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-983", type: "App", changes: ["ONE TAB DRIVES - SEVERAL OPEN COPIES NO LONGER RELOAD EACH OTHER (Rev-983, embedded validation REV-258) \u2014 Rich reported the screen blinking, and the Action Log settled it rather than any guess. Between 23:09:07 and 23:09:47 there were TWENTY-ONE app-starts, one every two seconds - which the updater cannot do, being throttled to once a minute and capped at three tries per target. The giveaway was an OLDER rev appearing mid-burst: app-start Rev-977 inside a run of Rev-978, and Rev-961 inside runs of Rev-963 and Rev-964. One copy cannot start as two revisions in the same minute. SEVERAL COPIES WERE OPEN AT ONCE, each on its own revision, each self-updating on its own timer, all writing into the one shared log - and the curtain reading Rev-979 while the title bar read Rev-978 was simply a different tab. It also explains the GitHub refused the write (409) entries: two copies writing the same file in the same instant. FIXED BY ELECTION: every copy now claims a leader slot in shared storage with a heartbeat. Exactly one copy - the leader - runs the background update check and the periodic app push. The others do nothing in the background and say so in a small amber note at the top: another copy is driving. If the leader is closed its claim goes stale within eight seconds and the next copy takes over, so closing the driving tab does not strand the rest. WHAT IS DELIBERATELY NOT GATED: anything Rich actually presses. Saving, pushing data, pulling code and the manual update banner work in every copy - the guard covers only the machinery that runs by itself. WHAT TO TEST (rule 8): open the app in two tabs; the second should show the amber note, and neither should reload on its own. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-982", type: "App", changes: ["THE RELEASE DIALOG CALLED ITSELF STEP 6 (Rev-982, embedded validation REV-258) \u2014 the box that reviews and releases the inspection program is STEP 7 REVIEW INSPECTION, and had been since ASSIGN TOLERANCES was inserted as Step 4 at Rev-942 and pushed everything after it along by one. The dialog kept the old number in three places a person actually reads: its heading, the withdraw-release warning, and the confirmation shown when an operation is marked ready for production. On a released-part record that is a document saying the wrong step was signed off, which is worse than untidy. All three now read STEP 7. LEFT ALONE ON PURPOSE: the places that genuinely mean Step 6 ASSIGN MEASUREMENT TYPES - the outstanding-steps list and that tile\u2019s own tooltip - and the code comments, which are history and record what the numbering was at the time. WHAT TO TEST (rule 8): open Step 7 on OP-030 and confirm the blue heading reads STEP 7. Payload verified in both repos before this entry."] },
   { ts: "2026-08-07", rev: "App Rev-981", type: "App", changes: ["A GHOSTED PROMPT ON THE CROP SAYS WHAT ENTER DOES (Rev-981, embedded validation REV-258) \u2014 per Rich. Dragging a crop box and then pressing Enter to zoom into it was an unwritten rule: nothing on screen said so, and the only way to find out was to be told. A translucent prompt now sits centred on the crop the moment one is drawn, reading PRESS ENTER TO ZOOM INTO THIS AREA. It follows the box as it is dragged or resized, and it disappears with the crop. IT NAMES THE SECOND PRESS TOO: once zoomed it changes to PRESS ENTER AGAIN TO SAVE, because Enter has always done two different things in a row and a prompt that vanished halfway would be worse than none. Deliberately ghosted rather than solid so the drawing reads through it, and it takes no clicks at all - it can never swallow a press meant for the crop box underneath it. WHAT TO TEST (rule 8): open the drawing editor, drag a crop box, and the prompt should appear over it; press Enter and it should change to the save wording. Payload verified in both repos before this entry."] },
   { ts: "2026-08-07", rev: "App Rev-980", type: "App", changes: ["THE RELEASE DIALOG IS TWICE THE SIZE (Rev-980, embedded validation REV-257) \u2014 per Rich. This is the box that asks whether an inspection program is right and carries the button that RELEASES AN OPERATION TO PRODUCTION - the most consequential press in the app - and it was a 560px card in 12.5px type. Everything about it is now doubled: the card goes 560 to 1120px wide, the header 13 to 26px, the body 12.5 to 25px, the approval count 11 to 22px, and the buttons 12 to 24px with the padding and gaps raised to match. It still fits a phone - the card is width:100% up to that limit and the buttons wrap - so the only thing that changed on a narrow screen is that the words are readable at arm\u2019s length. Wording, buttons and behaviour are untouched. ON THE FIX A BALLOON\u2019S PIN BUTTON: it was already removed at Rev-979; the screenshot showing it was taken on Rev-978, before the reload. Nothing to do twice. WHAT TO TEST (rule 8): open Step 7 on OP-030 and confirm the box is about double and reads Close \u00b7 Open it again \u00b7 Withdraw release, with no orange button. Payload verified in both repos before this entry."] },
@@ -3070,7 +3071,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:14 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "7:34 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -18491,8 +18492,64 @@ async function headerSyncNow(){
   }
 }
 
+/* ===== Rev-983: ONE TAB DRIVES ==========================================
+   Several copies open at once each ran their own update check and their own app push. They
+   reloaded each other in bursts (21 app-starts in 40 seconds in Rich's log) and collided on
+   the same GitHub file (409). Now every copy claims a leader slot with a heartbeat; only the
+   leader runs the BACKGROUND machinery. Nothing a person presses is gated. */
+const CP_TAB_ID = 'TAB-' + Math.random().toString(36).slice(2, 9) + '-' + Date.now().toString(36);
+const CP_LEAD_KEY = 'cpTabLeader';
+const CP_LEAD_STALE = 8000;    // a claim older than this is treated as abandoned
+function _cpLeadRead(){
+  try{ return JSON.parse(localStorage.getItem(CP_LEAD_KEY) || 'null'); }catch(e){ return null; }
+}
+function cpTabIsLeader(){
+  try{
+    const now = Date.now();
+    const cur = _cpLeadRead();
+    if(!cur || !cur.id || (now - (cur.ts || 0)) > CP_LEAD_STALE){
+      localStorage.setItem(CP_LEAD_KEY, JSON.stringify({ id: CP_TAB_ID, ts: now }));
+      return true;   // vacant or abandoned - this copy takes it
+    }
+    if(cur.id === CP_TAB_ID){
+      localStorage.setItem(CP_LEAD_KEY, JSON.stringify({ id: CP_TAB_ID, ts: now }));   // heartbeat
+      return true;
+    }
+    return false;    // another copy holds it and is alive
+  }catch(e){ console.warn('Rev-983 leader check failed', e); return true; }   // storage broken: behave as before
+}
+/* The follower note. Deliberately small and amber, not an error - two copies open is a normal
+   thing to do, it just must not mean two copies reloading each other. */
+function cpTabGuardTick(){
+  try{
+    const lead = cpTabIsLeader();
+    let el = document.getElementById('cpTabFollowNote');
+    if(lead){ if(el) el.remove(); return; }
+    if(!el){
+      el = document.createElement('div');
+      el.id = 'cpTabFollowNote';
+      el.style.cssText = 'position:fixed; top:0; left:0; right:0; z-index:99998; background:#e6a817;'
+        + ' color:#3a2c00; font:800 12px system-ui; letter-spacing:.04em; text-align:center;'
+        + ' padding:6px 12px; box-shadow:0 2px 8px rgba(0,0,0,.25);';
+      el.textContent = '\u26a0 ANOTHER COPY OF THIS APP IS OPEN AND IS DRIVING \u2014 '
+        + 'THIS ONE WILL NOT UPDATE ITSELF. CLOSE THE OTHER TAB, OR WORK IN IT.';
+      document.body.appendChild(el);
+    }
+  }catch(e){ console.warn('Rev-983 guard tick failed', e); }
+}
+try{
+  setInterval(cpTabGuardTick, 3000);
+  window.addEventListener('load', cpTabGuardTick);
+  /* Release the claim on the way out so the next copy takes over in seconds, not eight. */
+  window.addEventListener('beforeunload', () => {
+    try{ const cur = _cpLeadRead(); if(cur && cur.id === CP_TAB_ID) localStorage.removeItem(CP_LEAD_KEY); }catch(e){}
+  });
+}catch(e){ console.warn('Rev-983 guard wiring failed', e); }
 async function ghAutoUpdateApp(){
   if(localStorage.getItem('ghAppSync') !== '1' || !ghConfigured()) return;
+  /* Rev-983: background updating is the LEADER's job. Without this, every open copy chased
+     its own target and they reloaded each other in bursts. */
+  if(typeof cpTabIsLeader === 'function' && !cpTabIsLeader()) return;
   if(_autoUpdBusy) return;
   if(Date.now() - _autoUpdLast < 60000) return;   // at most once a minute (this page-life)
   // Rev-671: the in-memory cooldown above is wiped by the very reload it triggers, so it
@@ -22394,7 +22451,10 @@ report can be read instead of guessed at.
   document.addEventListener('visibilitychange', () => {
     if(document.visibilityState === 'hidden' && typeof ghAutoSyncPush === 'function') ghAutoSyncPush();
   });   // Rev-314: auto-apply a newer app rev (only when safe; banner if mid-edit)
-  setInterval(() => { if(localStorage.getItem('ghAppSync') === '1') ghAutoPushAppOnBoot(); }, 90000);   // Rev-315: periodically re-verify this app is pushed up (self-heals a missed/failed push)
+  /* Rev-983: leader only - two copies pushing the same file in the same instant is what
+     produced the 'GitHub refused the write (409)' lines in the log. */
+  setInterval(() => { if(typeof cpTabIsLeader === 'function' && !cpTabIsLeader()) return;
+                      if(localStorage.getItem('ghAppSync') === '1') ghAutoPushAppOnBoot(); }, 90000);   // Rev-315: periodically re-verify this app is pushed up (self-heals a missed/failed push)
   // Rev-288: app-sync runs independently of the data auto-sync toggle. On (default) → auto-push this
   // app to GitHub whenever it's newer (no banner). Off → just check and offer the manual banner.
   if(localStorage.getItem('ghAppSync') === '1'){
