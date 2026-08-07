@@ -1680,7 +1680,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-970";
+const APP_REV = "Rev-971";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2208,6 +2208,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-06", rev: "App Rev-971", type: "App", changes: ["MAX AND MIN BUTTONS ON A SINGLE-LIMIT ROW (Rev-971, embedded validation REV-255) \u2014 per Rich. A row switched to 1 DIM holds one number, and one number on a print almost always carries a MAX or a MIN with it - .002 alone says nothing about which side of it is bad. Two buttons now sit under the LIMIT box on any 1-DIM row: MAX and MIN. Pressing one writes it into the spec (.002 becomes .002 MAX), pressing the active one again clears it, and only one can be on at a time. They appear ONLY in 1-DIM mode - a two-limit dimension already says which side is which. IT KEEPS THE REST OF THE CALLOUT: on R.005 MAX 2X, pressing MIN swaps only the MAX word and leaves R.005 ... 2X exactly as printed, because the token is replaced in place rather than the note being overwritten. A 1-DIM row also seeds itself now - .001 MAX opens with LIMIT reading .001 and MAX already lit, instead of an empty box. And a guard: with the LIMIT box empty the buttons say so rather than writing a bare MAX over the row and losing the callout. WHAT TO TEST (rule 8): on row 8 press 1 dim if needed, then MAX - the closed row must read .002 MAX; press MAX again and it goes back to .002. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-970", type: "App", changes: ["TWO DEAD COLUMNS OFF STEP 4, AND THE ROWS READ 30% LARGER ON STEPS 3-6 (Rev-970, embedded validation REV-255) \u2014 per Rich. (1) COLUMNS: Step 4 was still showing the two old separate Upper and Lower columns, clipped down to \u20181.\u2019 and \u2018.9\u2019 slivers - they have held nothing worth reading since Rev-945 put the pair inside the Spec/Tol cell - plus a Class column that is set on Step 5, not here. All three are off Step 4 now, leaving Doc # \u00b7 Bubble # \u00b7 \u2714 \u00b7 Product/Process Spec/Tol. HIDDEN, never deleted: the step views address columns by index, so deleting one would renumber every other view. (2) TEXT: the four builder steps - 3 ASSIGN BUBBLES, 4 ASSIGN TOLERANCES, 5 ASSIGN CONTROL TYPES, 6 ASSIGN MEASUREMENT TYPES - now render their rows about 30 percent larger: 11px to 14.3px for plain text and 13px to 16.9px for the wide typing cells, with padding raised to match so nothing crowds. The size hierarchy is kept rather than flattened. The All-columns view stays at the old size, where twenty columns need every pixel, and the small-screen rules still win on a phone. WHAT TO TEST (rule 8): Step 4 shows four columns and no slivers; Steps 3, 5 and 6 read noticeably bigger; the All-columns view is unchanged. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-969", type: "App", changes: ["THE UNDER CONSTRUCTION SWITCH IS GONE - STEP 7 IS THE HOLD (Rev-969, embedded validation REV-255) \u2014 per Rich, who asked whether the button was needed. It was not. Since Rev-964 COMPLETE is EARNED from the seven steps, and STEP 7 REVIEW INSPECTION is the deliberate hold - the sign-off that releases an operation to production. A hand switch saying \u2018not done yet\u2019 was a second, weaker answer to a question Step 7 already answers properly, and it could only ever push a plan away from complete, never toward it. It was also half broken, found by reading it: the immediate save looked the plan up as part::rev with no ::OPnnn, so on every per-operation plan the lookup found nothing, and its fallback called cpAutoSave - a function that does not exist in this app. Press it and walk away and the setting was lost. REMOVED: the toolbar button and the yellow banner. THE COMPLETE TEST NO LONGER HONOURS THE FLAG, which matters because 1000222892 was still flagged and would otherwise have been stuck incomplete with no button left to clear it. The stored field is left in the data untouched so nothing old breaks, and toggleUnderConstruction / reflectUnderConstruction stay defined as harmless no-ops for any caller. WHAT TO TEST (rule 8): the Build Control Plan toolbar reads Save to Project \u00b7 New Row \u00b7 Remove empty rows and nothing else; the yellow banner is gone; 1000222892 no longer lists \u2018marked under construction by hand\u2019 as a reason. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-968", type: "App", changes: ["APPROVING A ROW MOVES TO THE NEXT ONE (Rev-968, embedded validation REV-255) \u2014 per Rich. Ticking a row\u2019s approval box left the cursor sitting on the row just finished, so working down fifteen balloons meant a tick, a reach, a click on the next row, then the next tick - half the clicks were navigation. The tick now opens the next row by itself and the drawing panel follows to that balloon, so a step can be walked end to end from the tick column alone. ONLY ON APPROVE: un-ticking a row stays put, because clearing an approval is usually the start of fixing THAT row, not of leaving it. Ghost rows are skipped - a ghost is a balloon deliberately not on the drawing and has nothing to approve. On the last row it stays where it is and says so rather than wrapping round to the top, which would look like it had lost your place. The next row is FOCUSED BUT NOT SELECTED, so an accidental keystroke cannot wipe a value that is already there. WHAT TO TEST (rule 8): on Step 4 tick row 8 and confirm row 9 opens with the drawing moving to balloon 9; tick the last row and confirm it stays put. Payload verified in both repos before this entry."] },
@@ -3055,7 +3056,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:36 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4535,6 +4536,27 @@ function cpSplitLimits(s){
     if(!m) return null;
     return { pre: m[1] || '', hi: m[2], lo: m[3], suf: m[4] || '' };
   }catch(e){ console.warn('Rev-965 cpSplitLimits failed', e); return null; }
+}
+/* Rev-971: the ONE-number companion to cpSplitLimits, for rows set to 1 DIM. Same shape of
+   answer - prefix, value, trailing note - so a callout like 'R.005 MAX 2X' can be shown as a
+   LIMIT of .005 with MAX lit and '2X' kept. Only used when the row is in 1-DIM mode, so a
+   two-number callout is never mistaken for a single limit. */
+function cpSplitSingle(s){
+  try{
+    const m = String(s == null ? '' : s)
+      .match(/^\s*([A-Za-z\u00d8\u2300]*)\s*(\d*\.?\d+)\s*(.*?)\s*$/);
+    if(!m) return null;
+    return { pre: m[1] || '', v: m[2], suf: m[3] || '' };
+  }catch(e){ console.warn('Rev-971 cpSplitSingle failed', e); return null; }
+}
+/* Rev-971: put MAX or MIN into a trailing note IN PLACE, so the rest of the callout survives.
+   'MAX 2X' + MIN -> 'MIN 2X'.  '2X' + MAX -> '2X MAX'.  'MAX 2X' + '' -> '2X'. */
+function cpSetMaxMin(suf, want){
+  const s = String(suf || '').trim();
+  const has = /\b(MAX|MIN)\b/i.test(s);
+  if(!want) return s.replace(/\b(MAX|MIN)\b/i, '').replace(/\s+/g, ' ').trim();
+  if(has) return s.replace(/\b(MAX|MIN)\b/i, want).replace(/\s+/g, ' ').trim();
+  return (s ? (s + ' ' + want) : want);
 }
 /* Rev-967: rebuild a spec string from the limit pair, putting any prefix and trailing note
    back exactly where they were. Without this, editing a limit on '1.155/1.145 DIA' would
@@ -9420,9 +9442,58 @@ tr.appendChild(tdCT);
         const _mode = (row.tolMode === '1') ? '1' : '2';
         try{ _upIn.placeholder = _mode === '1' ? 'LIMIT' : 'UPPER'; _loIn.placeholder = 'LOWER'; }catch(_){ }
         if(_mode === '1') _loIn.style.display = 'none';
+        /* Rev-971: a 1-DIM row seeds itself from its own callout, so '.001 MAX' opens with
+           LIMIT reading .001 and MAX already lit instead of an empty box. */
+        if(_mode === '1' && !String(row.upperLimit || '').trim()){
+          try{
+            const _s1 = cpSplitSingle(row.spec);
+            if(_s1){
+              row.upperLimit = _s1.v;
+              row.specPre = _s1.pre || ''; row.specSuf = _s1.suf || '';
+              _upIn.value = _s1.v;
+            }
+          }catch(e){ console.warn('Rev-971 single seed failed', e); }
+        }
         const stack = document.createElement('div');
         stack.style.cssText = 'display:flex; flex-direction:column; gap:2px; align-items:stretch; margin-top:3px;';
         stack.appendChild(_upIn); stack.appendChild(_loIn);
+        /* Rev-971: MAX / MIN, per Rich. One number on a print almost always carries one of
+           them - .002 on its own says nothing about which side is bad. Only shown in 1-DIM
+           mode; a two-limit dimension already says which side is which. */
+        if(_mode === '1'){
+          const _cur = (String(row.specSuf || '').match(/\b(MAX|MIN)\b/i) || [''])[0].toUpperCase();
+          const mmBar = document.createElement('div');
+          mmBar.style.cssText = 'display:flex; gap:4px; margin-top:3px;';
+          ['MAX','MIN'].forEach(w => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.textContent = w;
+            const on = (_cur === w);
+            b.title = on ? ('This limit is a ' + w + ' \u2014 click again to remove it')
+                         : ('Mark this limit as a ' + w);
+            b.style.cssText = 'flex:1; border-radius:4px; font:800 10px system-ui; padding:3px 0; cursor:pointer;'
+              + (on ? ' background:#2c6e49; color:#fff; border:1px solid #215236;'
+                    : ' background:#f6f2ec; color:#5c4a3a; border:1px solid #c9c0b4;');
+            b.onclick = (e) => {
+              e.stopPropagation();
+              try{
+                const u = String(_upIn.value || row.upperLimit || '').trim();
+                if(!u){ flash('Type the limit first, then choose MAX or MIN.', true); return; }
+                row.upperLimit = u;
+                row.specSuf = cpSetMaxMin(row.specSuf, on ? '' : w);
+                row.spec = cpJoinLimits(row, u, String(_loIn.value || '').trim());
+                try{ logAct('row-edit', 'limit \u2192 ' + (on ? 'cleared' : w)); }catch(_){ }
+                cpAutoSaveProject();
+              }catch(err){
+                console.error('Rev-971 MAX/MIN failed', err);
+                try{ flash('Could not set ' + w + ': ' + (err && err.message || err), true); }catch(_){ }
+              }
+              renderCPBuilder();
+            };
+            mmBar.appendChild(b);
+          });
+          stack.appendChild(mmBar);
+        }
         const tg = document.createElement('button');
         tg.type = 'button';
         tg.textContent = _mode === '1' ? '\u21c5 2 dims' : '\u21c5 1 dim';
