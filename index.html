@@ -1680,7 +1680,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-969";
+const APP_REV = "Rev-970";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2208,6 +2208,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-06", rev: "App Rev-970", type: "App", changes: ["TWO DEAD COLUMNS OFF STEP 4, AND THE ROWS READ 30% LARGER ON STEPS 3-6 (Rev-970, embedded validation REV-255) \u2014 per Rich. (1) COLUMNS: Step 4 was still showing the two old separate Upper and Lower columns, clipped down to \u20181.\u2019 and \u2018.9\u2019 slivers - they have held nothing worth reading since Rev-945 put the pair inside the Spec/Tol cell - plus a Class column that is set on Step 5, not here. All three are off Step 4 now, leaving Doc # \u00b7 Bubble # \u00b7 \u2714 \u00b7 Product/Process Spec/Tol. HIDDEN, never deleted: the step views address columns by index, so deleting one would renumber every other view. (2) TEXT: the four builder steps - 3 ASSIGN BUBBLES, 4 ASSIGN TOLERANCES, 5 ASSIGN CONTROL TYPES, 6 ASSIGN MEASUREMENT TYPES - now render their rows about 30 percent larger: 11px to 14.3px for plain text and 13px to 16.9px for the wide typing cells, with padding raised to match so nothing crowds. The size hierarchy is kept rather than flattened. The All-columns view stays at the old size, where twenty columns need every pixel, and the small-screen rules still win on a phone. WHAT TO TEST (rule 8): Step 4 shows four columns and no slivers; Steps 3, 5 and 6 read noticeably bigger; the All-columns view is unchanged. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-969", type: "App", changes: ["THE UNDER CONSTRUCTION SWITCH IS GONE - STEP 7 IS THE HOLD (Rev-969, embedded validation REV-255) \u2014 per Rich, who asked whether the button was needed. It was not. Since Rev-964 COMPLETE is EARNED from the seven steps, and STEP 7 REVIEW INSPECTION is the deliberate hold - the sign-off that releases an operation to production. A hand switch saying \u2018not done yet\u2019 was a second, weaker answer to a question Step 7 already answers properly, and it could only ever push a plan away from complete, never toward it. It was also half broken, found by reading it: the immediate save looked the plan up as part::rev with no ::OPnnn, so on every per-operation plan the lookup found nothing, and its fallback called cpAutoSave - a function that does not exist in this app. Press it and walk away and the setting was lost. REMOVED: the toolbar button and the yellow banner. THE COMPLETE TEST NO LONGER HONOURS THE FLAG, which matters because 1000222892 was still flagged and would otherwise have been stuck incomplete with no button left to clear it. The stored field is left in the data untouched so nothing old breaks, and toggleUnderConstruction / reflectUnderConstruction stay defined as harmless no-ops for any caller. WHAT TO TEST (rule 8): the Build Control Plan toolbar reads Save to Project \u00b7 New Row \u00b7 Remove empty rows and nothing else; the yellow banner is gone; 1000222892 no longer lists \u2018marked under construction by hand\u2019 as a reason. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-968", type: "App", changes: ["APPROVING A ROW MOVES TO THE NEXT ONE (Rev-968, embedded validation REV-255) \u2014 per Rich. Ticking a row\u2019s approval box left the cursor sitting on the row just finished, so working down fifteen balloons meant a tick, a reach, a click on the next row, then the next tick - half the clicks were navigation. The tick now opens the next row by itself and the drawing panel follows to that balloon, so a step can be walked end to end from the tick column alone. ONLY ON APPROVE: un-ticking a row stays put, because clearing an approval is usually the start of fixing THAT row, not of leaving it. Ghost rows are skipped - a ghost is a balloon deliberately not on the drawing and has nothing to approve. On the last row it stays where it is and says so rather than wrapping round to the top, which would look like it had lost your place. The next row is FOCUSED BUT NOT SELECTED, so an accidental keystroke cannot wipe a value that is already there. WHAT TO TEST (rule 8): on Step 4 tick row 8 and confirm row 9 opens with the drawing moving to balloon 9; tick the last row and confirm it stays put. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-967", type: "App", changes: ["LIMITS NOW SEED THROUGH DIA, R, C AND 2 PLACES - AND THAT TEXT IS KEPT (Rev-967, embedded validation REV-255) \u2014 Rich asked why the AI could not pick up balloon 6 on 1000237498 OP-040. It did: the row holds 1.155/1.145 DIA, read straight off the print. The UPPER / LOWER boxes stayed empty because the parser demanded the two numbers and NOTHING ELSE, so the trailing DIA disqualified the whole string - the same reason six other rows on that plan sat empty: 1.202/1.198 DIA, R.040/.020, C.020/.010 twice, and .065/.055 2 PLACES. cpSplitLimits now allows a letter prefix (R, C, \u00d8) and a trailing note, and returns them alongside the numbers. THE POINT OF RETURNING THEM IS THAT THEY SURVIVE: the row remembers its prefix and suffix, and every edit to the limit boxes rebuilds the spec with them back in place, so editing 1.155/1.145 DIA can never silently leave 1.155/1.145. That risk is exactly why Rev-965 left these six rows alone; with the text preserved the risk is gone. Still refused, unchanged: .035 X 50\u00b0, // .002 A, .001 MAX, R.005 MAX 2X - a plain space is not a separator, so a note can never be mistaken for a limit. WHAT TO TEST (rule 8): open row 6 - UPPER 1.155, LOWER 1.145 - retype the lower as 1.144 and confirm the closed row still reads DIA after it. Payload verified in both repos before this entry."] },
@@ -3054,7 +3055,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:56 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:14 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -8662,9 +8663,13 @@ const CP_STEPS = {
      nothing. HIDDEN, not deleted: the four other views address columns by index, so removing
      the column itself would renumber every one of them. Columns 10 and 11 stay listed - they
      are the zero-width limit cells the layout still counts. */
+  /* Rev-970: 10 and 11 (the OLD separate Upper / Lower columns) and 12 (Class) dropped from
+     THIS VIEW, per Rich. Since Rev-945 the limit pair lives inside the Spec/Tol cell, so 10
+     and 11 were rendering as clipped '1.' and '.9' slivers holding nothing; Class is set on
+     Step 5. Hidden, never deleted - the other views address columns by index. */
   'T': { label: '4 \u00b7 Tolerances',
          hint: 'Confirm each row\u2019s spec / tolerance and limits \u2014 approve the row when its numbers are right.',
-         cols: [0,1,2,9,10,11,12] },
+         cols: [0,1,2,9] },
   '2': { label: '5 \u00b7 Control Type',
          hint: 'Narrow it down with Workcenter \u2192 Feature Type \u2192 2nd / 3rd Level. The Control Type ID resolves itself, and the methods fill from the Master List.',
          cols: [0,1,2,3,4,5,6,7,8,9,12] },
@@ -8681,6 +8686,14 @@ const CP_STEPS = {
 // recorded sits under stepDone['1'..'3'], and the how-to videos are keyed on them too, so
 // renumbering the keys would silently orphan both. Display and identity are separate here.
 function cpGetStep(){ const s = localStorage.getItem('cpBuildStep'); return CP_STEPS[s] ? s : '1'; }
+/* Rev-970: the four BUILDER steps - 3 bubbles, 4 tolerances, 5 control types, 6 measurement
+   methods - show few enough columns to afford bigger text, and they are the screens actually
+   worked in. The All-columns view ('A') keeps the small size, where twenty columns need every
+   pixel. Sizes are set INLINE rather than by a stylesheet rule so the small-screen media
+   queries, which carry !important, still win on a phone. */
+function cpStepIsBig(s){ const k = (s == null) ? cpGetStep() : s; return k === '1' || k === 'T' || k === '2' || k === '3'; }
+function cpGridFont(big){ const up = cpStepIsBig(); return (big ? (up ? 16.9 : 13) : (up ? 14.3 : 11)) + 'px'; }
+function cpGridPad(big){ const up = cpStepIsBig(); return (big ? (up ? 10 : 8) : (up ? 7 : 5)) + 'px'; }
 /* Rev-941: the builder's step header IS the construction banner now. Six tiles with live
    status from the same stage engine the main page uses, and the hazard-striped
    UNDER CONSTRUCTION percent bar beneath. Tiles 3-5 switch the builder step; UPLOAD ODS
@@ -8842,6 +8855,10 @@ function cpApplyStepView(){
 
   const table = document.getElementById('cpBuilderTable');
   if(!table) return;
+  /* Rev-970: everything that inherits its size - the stacked spec, the balloon numbers, the
+     plain cells - follows the table. Inline, so the small-screen rules still override it. */
+  try{ table.style.fontSize = cpStepIsBig(step) ? '14.3px' : '11px'; }
+  catch(e){ console.warn('Rev-970 grid size failed', e); }
 
   // --- header, top row. Its cells are not 1:1 with data columns: the METHODS band is
   // one cell spanning five, so it is hidden only when all five are hidden and its
@@ -13179,8 +13196,8 @@ function editableCell(idx, key, val, align, big){
   const inp = document.createElement('input');
   inp.type = 'text';
   inp.value = val || '';
-  const fs = big ? '13px' : '11px';
-  const pd = big ? '8px' : '5px';
+  const fs = cpGridFont(big);   /* Rev-970: 30% larger on the four builder steps */
+  const pd = cpGridPad(big);
   inp.style.cssText = 'width:100%; font-size:' + fs + '; padding:' + pd + '; text-transform:none; border:1px solid var(--line); border-radius:4px; text-align:' + align + ';';
   // Rev-358: an AI-suggested (unconfirmed) description shows amber so it's obvious it was auto-written and needs review.
   if(key === 'featureDesc' && cpBuildState && cpBuildState.rows[idx] && cpBuildState.rows[idx]._aiDesc){
