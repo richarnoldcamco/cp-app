@@ -1678,7 +1678,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-963";
+const APP_REV = "Rev-964";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2206,6 +2206,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-06", rev: "App Rev-964", type: "App", changes: ["COMPLETE NOW MEANS ALL SEVEN STEPS - IT WAS STILL COUNTING THREE (Rev-964, embedded validation REV-255) \u2014 Rich caught 1000237620 OP-030 wearing a green COMPLETE badge beside its own bar reading 85% and Step 7 reading DO THIS NEXT. The badge was right by its own out-of-date rule and wrong about the plan. cpPlanComplete was written at Rev-597 against the THREE row stages of the day - bubbles, control types, measurement methods - and was never extended when ASSIGN TOLERANCES arrived at Rev-942 or when REVIEW INSPECTION arrived at Rev-750. So a plan could be declared complete with its tolerances unapproved and its inspection program never reviewed or released, which on a Control Plan is the sign-off that matters most. The badge is now driven off the SAME stage engine the seven tiles and the percentage use, so it cannot drift away from them again: every one of the seven must be done, the part must have a traveller, the plan must have rows, and it must not be hand-marked under construction. The IN PROGRESS count and its hover list name the exact steps outstanding, by step number. WHAT TO TEST (rule 8): OP-030 must now read IN PROGRESS with Step 7 named as outstanding; hover it and the tooltip should say Step 7. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-963", type: "App", changes: ["FEATURE / PROCESS DESCRIPTION IS OFF THE TOLERANCES SCREEN (Rev-963, embedded validation REV-255) \u2014 per Rich. Step 4 is about the NUMBERS: read the limits off the balloon, check them, approve the row. The description column sat in the middle of that, empty on every row, pushing the limit boxes rightward for no return. It is hidden on Step 4 only. It is untouched on Step 3 (bubbles), Step 5 (control types), Step 6 (measurement methods) and the All-columns view, and NO DATA IS AFFECTED - a step view decides only which columns are on screen, so anything typed in a description stays exactly where it was and reappears the moment another step is opened. DONE BY HIDING, NOT BY DELETING: the column keeps its index, because every step view addresses columns by NUMBER and removing one would silently renumber all four other views (the same trap the zero-width limit columns exist to avoid). WHAT TO TEST (rule 8): open Step 4 and confirm the columns read Doc # \u00b7 Bubble # \u00b7 \u2714 \u00b7 Product/Process Spec/Tol \u00b7 Class; then open Step 5 and confirm Feature / Process Description is back. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-962", type: "App", changes: ["THE READ DIMENSIONS (AI) BUTTON MOVES TO THE GRID (Rev-962, embedded validation REV-255) \u2014 per Rich\u2019s arrow. The purple \ud83d\udd0e Read dimensions (AI) button sat at the far right of the DRAWING pane\u2019s toolbar, the opposite end of a wide screen from the Spec/Tol cells it actually fills - and buried among four drawing controls it has nothing to do with. It now sits on its own strip directly above the Control Plan grid, over the columns it writes into. The strip is part of the grid pane and stays put while the grid scrolls under it, so the button is reachable from any row. NOTHING ELSE CHANGED: same id, same handler, same ITAR confirm gate before anything is sent, same rule that it fills only EMPTY Spec/Tol cells and never touches pins, and the same visibility rule - hidden until an ODS drawing is loaded. The drawing toolbar keeps Zoom to balloon, Back a balloon, Upload / Replace drawing and Minimize drawing. WHAT TO TEST (rule 8): on OP-040 Step 4, the purple button is above the grid on the left, the drawing toolbar no longer carries it, and pressing it still raises the ITAR confirm before reading. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-961", type: "App", changes: ["\ud83d\udd12 A STEP IS LOCKED UNTIL EVERY STEP BEFORE IT IS COMPLETED (Rev-961, embedded validation REV-255) \u2014 per Rich, and this REVERSES Rev-683, which removed locking entirely. That removal had a real reason and it has been fixed rather than ignored: Rev-683 was thrown by a contradiction where Step 4 read COMPLETED while Step 5 sat LOCKED, because readiness was computed from a DIFFERENT test than doneness - a step said done when its rows were APPROVED, but unlocked the next step only when its rows held DATA, and a row can be approved by hand with a cell still empty. The two tests are now one: a step is ready when every step before it is DONE, full stop, so LOCKED and COMPLETED can never contradict each other again. Locked tiles are greyed with a dashed edge, carry a \ud83d\udd12 in front of the name, read NEEDS EARLIER STEP, and do not respond to a click; their tooltip names the exact step that is holding them. The percentage calculation is untouched - this changes what can be OPENED, not what has been earned. WHAT TO TEST (rule 8): on 1000237498, OP-100 has only Step 1 done, so Steps 3 through 7 must show the lock and refuse to open, while Step 2 stays live; on OP-040, Steps 1-3 are done so Step 4 must be open and Steps 5-7 locked. Payload verified in both repos before this entry."] },
@@ -3046,7 +3047,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:19 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:34 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4263,10 +4264,12 @@ function cpOpStages(p){
 // the points it contributed — the sum is checkable at a glance.
 function cpPercentBreakdown(p){
   const st = cpOpStages(p);
-  const names = { s1: 'Edit op #', s2: 'Upload ODS', s3: 'Assign bubbles', s4: 'Control types', s5: 'Measurement methods', s6: 'Review inspection' };
+  const names = { s1: 'Edit op #', s2: 'Upload ODS', s3: 'Assign bubbles', sT: 'Assign tolerances', s4: 'Control types', s5: 'Measurement methods', s6: 'Review inspection' };
   const lines = [];
   let total = 0;
-  ['s1','s2','s3','sT','s4','s5'].forEach(k => {   /* Rev-942 */
+  /* Rev-964: 's6' was missing from this list, so REVIEW INSPECTION's 15 points were never
+     counted and a fully finished plan could only ever reach 85%. */
+  ['s1','s2','s3','sT','s4','s5','s6'].forEach(k => {
     const s = st[k], w = CP_STAGE_WEIGHTS[k];
     let got = 0, note;
     if(!s.open){ note = 'locked — not counted'; }
@@ -4284,7 +4287,10 @@ const CP_STAGE_WEIGHTS = { s1: 5, s2: 5, s3: 20, sT: 15, s4: 20, s5: 20, s6: 15 
 function cpPlanPercent(p){
   const st = cpOpStages(p);
   let pct = 0;
-  ['s1','s2','s3','sT','s4','s5'].forEach(k => {   /* Rev-942 */
+  /* Rev-964: 's6' added - the seven weights sum to 100 but only six were being added up, so
+     100% was unreachable and the UNDER CONSTRUCTION ribbon (which hides at 100) could never
+     clear on a finished operation. */
+  ['s1','s2','s3','sT','s4','s5','s6'].forEach(k => {
     const s = st[k], w = CP_STAGE_WEIGHTS[k];
     if(!s || !s.open) return;                 // locked: earns nothing
     if(s.done){ pct += w; return; }
@@ -4491,18 +4497,33 @@ function cpUploadOpOds(p){
 // Rev-597: what COMPLETE actually means. The badge used to read straight off the
 // manual under-construction switch, so a plan with no operation number, no traveller
 // and no measurement methods still announced itself COMPLETE. It now has to earn it.
+/* Rev-964: COMPLETE MEANS ALL SEVEN STEPS.
+   This test was written at Rev-597 against the three row stages that existed then, and was
+   never extended when ASSIGN TOLERANCES arrived (Rev-942) or REVIEW INSPECTION arrived
+   (Rev-750). A plan could therefore wear a green COMPLETE badge with its tolerances
+   unapproved and its inspection program never reviewed - which is the sign-off that matters
+   most on a Control Plan - while its own progress bar beside it read 85%.
+   It now runs off cpOpStages, the SAME engine that draws the seven tiles and computes the
+   percentage, so the badge cannot drift away from them again: add a step to the flow and
+   this follows automatically. */
 function cpPlanComplete(p){
   const miss = [];
   const pr = cpStepProgress(p);
-  if(!String(p.opNum || '').trim()) miss.push('no operation number');
+  let st = null;
+  try{ st = cpOpStages(p); }catch(e){ console.error('Rev-964 cpPlanComplete stages failed', e); }
   let hasTrav = false;
   try{ const d = _idbGetDrawing(String(p.partNum || '').toUpperCase() + '::TRAVELLER'); hasTrav = !!(d && d.odsImage); }catch(e){}
   if(!hasTrav) miss.push('no traveller uploaded for this part');
   if(!pr.total) miss.push('no rows');
-  else {
-    if(!pr.s1Done) miss.push('Step 1: ' + pr.s1Note);
-    if(!pr.s2Done) miss.push('Step 2: ' + pr.s2Note);
-    if(!pr.s3Done) miss.push('Step 3: ' + pr.s3Note);
+  if(st){
+    const _rowNote = (n, left) => (pr.total ? (' \u2014 ' + (pr.total - left) + ' of ' + pr.total + ' approved') : '');
+    if(!st.s1.done) miss.push('Step 1 EDIT OP # \u2014 no operation number');
+    if(!st.s2.done) miss.push('Step 2 UPLOAD ODS \u2014 no ODS drawing loaded');
+    if(!st.s3.done) miss.push('Step 3 ASSIGN BUBBLES' + _rowNote(3, pr.s1Left));
+    if(!st.sT.done) miss.push('Step 4 ASSIGN TOLERANCES' + _rowNote(4, pr.sTLeft));
+    if(!st.s4.done) miss.push('Step 5 ASSIGN CONTROL TYPES' + _rowNote(5, pr.s2Left));
+    if(!st.s5.done) miss.push('Step 6 ASSIGN MEASUREMENT TYPES' + _rowNote(6, pr.s3Left));
+    if(!st.s6.done) miss.push('Step 7 REVIEW INSPECTION \u2014 not reviewed / released yet');
   }
   if(p.underConstruction) miss.push('marked under construction by hand');
   return { done: miss.length === 0, missing: miss };
