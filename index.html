@@ -533,7 +533,7 @@
         <small style="font-size:11px; color:var(--ink-dim);">UPLOAD AN ODS AND BUILD A NEW PLAN</small>
       </button>
       <button class="menu-btn" id="mProjects" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">📁 CONTROL PLANS <span id="badgeProjects" style="color:var(--signal); font-size:14px;">0</span></b><br>
+        <b style="font-size:15px;">📁 CONTROL PLANS <span id="badgeProjects" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">0</span></b><br>
         <small style="font-size:11px; color:var(--ink-dim);">OPEN, EDIT, INSPECT OR DOWNLOAD ANY SAVED PLAN</small>
       </button>
       <button class="menu-btn" id="mValidation" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block; background:#2c6e49; border-color:#215236; color:#fff;">
@@ -541,7 +541,7 @@
         <small style="font-size:11px; opacity:.9;">ALL PLANS, READY TO INSPECT</small>
       </button>
       <button class="menu-btn" id="mGages" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">🔧 GAGES TO BE MADE <span id="badgeGages" style="color:var(--signal); font-size:14px;">0</span></b><br>
+        <b style="font-size:15px;">🔧 GAGES TO BE MADE <span id="badgeGages" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">0</span></b><br>
         <small style="font-size:11px; color:var(--ink-dim);">SPECIAL GAGES AND FIXTURES CALLED OUT ON ANY CONTROL PLAN</small>
       </button>
       <button class="menu-btn" id="mReports" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -1678,7 +1678,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-965";
+const APP_REV = "Rev-966";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2206,6 +2206,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-06", rev: "App Rev-966", type: "App", changes: ["THE MENU COUNTS GET SOME AIR (Rev-966, embedded validation REV-255) \u2014 per Rich: the counts beside CONTROL PLANS and GAGES TO BE MADE were separated from their titles by a single space, so \u201cCONTROL PLANS 3 PROJECTS\u201d and \u201cGAGES TO BE MADE 2 OPEN / 2\u201d ran together and read as one crowded phrase rather than a heading and its count. Both counts move right by 18px and are held on one line so \u20182 OPEN / 2\u2019 can never break across two. Text, colours, sizes and the tiles themselves are untouched. WHAT TO TEST (rule 8): on the main menu both counts sit clear of their titles. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-965", type: "App", changes: ["A STACKED TOLERANCE NOW FILLS THE UPPER AND LOWER BOXES (Rev-965, embedded validation REV-255) \u2014 Rich asked why the AI could not read balloon 1 on 1000237620 OP-040. Reading the STORED DATA rather than guessing showed it read it perfectly: the row held .325 and .323. They arrived separated by a LINE BREAK, because that is how the print stacks them, and the code that seeds the UPPER / LOWER boxes split on a forward slash and nothing else - so it seeded nothing and both boxes sat empty. The \u0394 .0020 chip above them was right the whole time because it uses a different, more forgiving parser: two parsers, two answers, one value. There is now ONE parser, cpSplitLimits, used by both the AI fill and the boxes. It accepts a slash, a line break, a backslash or a comma between the two numbers. It deliberately does NOT accept a plain space, which would wrongly split a note like \u2018.500 2X\u2019, and it still refuses anything with other text in it, so .035 X 50\u00b0, // .002 A and .001 MAX stay single values exactly as before. The AI fill also normalises a stacked reading to upper/lower as it writes, so new reads are stored in one shape. Existing rows need no re-run - the row seeds itself the moment it is opened. WHAT TO TEST (rule 8): open 1000237620 OP-040 Step 4 and click row 1 - UPPER should read .325 and LOWER .323 with no AI re-run. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-964", type: "App", changes: ["COMPLETE NOW MEANS ALL SEVEN STEPS - IT WAS STILL COUNTING THREE (Rev-964, embedded validation REV-255) \u2014 Rich caught 1000237620 OP-030 wearing a green COMPLETE badge beside its own bar reading 85% and Step 7 reading DO THIS NEXT. The badge was right by its own out-of-date rule and wrong about the plan. cpPlanComplete was written at Rev-597 against the THREE row stages of the day - bubbles, control types, measurement methods - and was never extended when ASSIGN TOLERANCES arrived at Rev-942 or when REVIEW INSPECTION arrived at Rev-750. So a plan could be declared complete with its tolerances unapproved and its inspection program never reviewed or released, which on a Control Plan is the sign-off that matters most. The badge is now driven off the SAME stage engine the seven tiles and the percentage use, so it cannot drift away from them again: every one of the seven must be done, the part must have a traveller, the plan must have rows, and it must not be hand-marked under construction. The IN PROGRESS count and its hover list name the exact steps outstanding, by step number. WHAT TO TEST (rule 8): OP-030 must now read IN PROGRESS with Step 7 named as outstanding; hover it and the tooltip should say Step 7. Payload verified in both repos before this entry."] },
   { ts: "2026-08-06", rev: "App Rev-963", type: "App", changes: ["FEATURE / PROCESS DESCRIPTION IS OFF THE TOLERANCES SCREEN (Rev-963, embedded validation REV-255) \u2014 per Rich. Step 4 is about the NUMBERS: read the limits off the balloon, check them, approve the row. The description column sat in the middle of that, empty on every row, pushing the limit boxes rightward for no return. It is hidden on Step 4 only. It is untouched on Step 3 (bubbles), Step 5 (control types), Step 6 (measurement methods) and the All-columns view, and NO DATA IS AFFECTED - a step view decides only which columns are on screen, so anything typed in a description stays exactly where it was and reappears the moment another step is opened. DONE BY HIDING, NOT BY DELETING: the column keeps its index, because every step view addresses columns by NUMBER and removing one would silently renumber all four other views (the same trap the zero-width limit columns exist to avoid). WHAT TO TEST (rule 8): open Step 4 and confirm the columns read Doc # \u00b7 Bubble # \u00b7 \u2714 \u00b7 Product/Process Spec/Tol \u00b7 Class; then open Step 5 and confirm Feature / Process Description is back. Payload verified in both repos before this entry."] },
@@ -3048,7 +3049,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:04 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
