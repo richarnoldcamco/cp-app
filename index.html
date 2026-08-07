@@ -1683,7 +1683,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-978";
+const APP_REV = "Rev-979";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2211,6 +2211,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-07", rev: "App Rev-979", type: "App", changes: ["FIX A BALLOON\u2019S PIN IS OFF THE RELEASE DIALOG (Rev-979, embedded validation REV-257) \u2014 per Rich. The dialog that closes the inspection walk asks ONE question - is the program right - and offered four answers, one of which was a whole side errand: type a balloon number, get sent to Step 3, re-pin it, come back. It sat between Open it again and Mark ready for production, the two answers actually being asked for, and it was the wrong shape of thing to put beside them. Removed, along with the return-address machinery it needed. NOTHING IS LOST: a pin is fixed where pins are fixed - Step 3 ASSIGN BUBBLES, click the balloon on the drawing - which was always the real route; this was a shortcut into it, not the only way. The dialog now reads Not yet \u00b7 Open it again \u00b7 Mark ready for production, plus Withdraw release when it is already released. WHAT TO TEST (rule 8): finish a walk on OP-030 and confirm three buttons and no orange one. Payload verified in both repos before this entry."] },
   { ts: "2026-08-07", rev: "App Rev-978", type: "App", changes: ["THE BALLOON HIGHLIGHT IS A RED CIRCLE, NOT A GLOW (Rev-978, embedded validation REV-257) \u2014 per Rich, who pointed at the crisp red ring round balloon 4 and said that is the one he wants everywhere. The balloon marker had been a pulsing red HALO - a 34px blur breathing in and out twice a second - which smears across a busy print, hides the very number it is pointing at, and on a dense drawing reads as damage rather than as a pointer. It is now the same crisp double ring as the reference-image marker: a solid red circle with a white ring outside it so it holds on both ink and white paper, no blur, no pulse. Slightly larger and thicker to stay findable now that it is not flashing. WHAT IT DOES NOT CHANGE: it is still draggable onto the right bubble, same size, same purpose, same tooltip. ON THE RECORD, so nobody claims more than was done: this is the marker in the Control Plan builder\u2019s drawing panel. If a glow turns up on any other screen, point at it and it gets the same treatment - Rich should not have to hunt for them. WHAT TO TEST (rule 8): open a plan, pin a balloon, and confirm the marker is a hard red circle with a white outline and no pulsing. Payload verified in both repos before this entry."] },
   { ts: "2026-08-07", rev: "App Rev-977", type: "App", changes: ["STEP 8 - CNC PROGRAM, OPTIONAL (Rev-977, embedded validation REV-257) \u2014 per Rich: an eighth tile that takes the CNC program for the operation. OPTIONAL IN THE REAL SENSE, not just in name: it is never locked, it is worth ZERO toward the percentage, and it can never hold COMPLETE back - an operation with no program still finishes at 100%. It sits after Step 7 and out of the sequential lock chain entirely, so it can be filled at any point, before or after the rest. THE FILE GOES TO GITHUB, per Rich\u2019s decision: stored in the PRIVATE cp-generator-data repository under programs/PART/OPnnn/, the same repository the drawings already use, so it reaches every device and survives a wiped machine. Any file type is accepted - .nc, .min, .eia, .txt, .h - because controls differ by machine. The panel shows the file name, size and when it landed, with Download, Replace and Remove; Remove takes it off GitHub as well as off the plan, and asks first. The plan records only the name, size, path and timestamp - the program itself is never copied into cp_data.json, so the data file stays small. If GitHub is not configured the tile says so plainly instead of accepting a file it cannot store. WHAT TO TEST (rule 8): press STEP 8 on any operation, upload a program, confirm the tile turns green and the percentage does NOT move; press Remove and confirm it goes. Payload verified in both repos before this entry."] },
   { ts: "2026-08-07", rev: "App Rev-976", type: "App", changes: ["THE CP ROW PANEL NOW SHOWS THE MASTER ROW UNDERNEATH (Rev-976, embedded validation REV-257) \u2014 per Rich: the Control Plan row for a balloon was there, but the Control Types Master List row that GOVERNS it was not, so comparing meant leaving the inspection. CP-2C is explicit - the master list is the single source of truth for the methods band - and the two are now on screen together. The master row is drawn directly beneath the plan row against the same columns, marked MASTER H-number in the ID cell, and any of the five governed cells that DISAGREES with the plan row above is shown red with a tooltip naming the rule. Nothing is written and nothing is auto-corrected: it reports, the QE decides. SEVERAL ROWS WHEN THERE ARE SEVERAL: one Control Type ID can carry more than one master row split by tolerance band - H2 and H3 are both LATHE / CBORE / DIA - so every match is shown rather than picking one and implying it is the only answer. A Control Type ID with no master row at all says so in red rather than showing nothing. The embedded app has no copy of the master list, so the shell exposes a read-only lookup it calls up into; on an older shell the panel simply omits the comparison instead of breaking. WHAT TO TEST (rule 8): on 1000237620 OP-030 feature 11, press CP Row - the LATHE / SPECIAL / VISUAL master row H122 should sit under the plan row. Payload verified in both repos before this entry."] },
@@ -3066,7 +3067,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-07";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:02 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:18 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5827,30 +5828,10 @@ function cpStep6Release(idx, already){
   mk(done ? 'Close' : 'Not yet', 'background:#fff; color:#3a352e; border:1px solid #c9c0b4;', () => ov.remove());
   mk('\u270e Open it again', 'background:#1a5276; color:#fff; border:1px solid #154360;',
      () => { ov.remove(); window._cpStep6Walk = idx; createMachinistValidation(idx); });
-  // Rev-751 kept: a reference image can be framed on the wrong feature because the BALLOON PIN
-  // is in the wrong place, and that is fixed in the builder. Leaves a return address.
-  mk('\ud83d\udccd Fix a balloon\u2019s pin', 'background:#8a5a00; color:#fff; border:1px solid #6b4600;',
-     async () => {
-       const rows = ((p.builderState || {}).rows) || [];
-       const list = rows.filter(r => String(r.bubble || '').trim())
-         .map(r => String(r.bubble).trim() + (r.desc ? ('  \u2014  ' + r.desc) : '')).slice(0, 40);
-       const b = await cpPromptBox('WHICH BALLOON IS WRONG?',
-         'Type the balloon number whose pin sits in the wrong place. You will land on Step '
-         + '3 \u00b7 Bubble Numbers with that row open \u2014 click the correct spot on the drawing, '
-         + 'then press Back and you will return here.'
-         + (list.length ? ('<div style="margin-top:8px; font-size:10.5px; color:#6b6257;">On this '
-            + 'operation: ' + list.join('  \u00b7  ') + '</div>') : ''), '');
-       if(b === null) return;
-       const want = String(b).trim().toUpperCase();
-       const at = rows.findIndex(r => String(r.bubble || '').trim().toUpperCase() === want);
-       if(at < 0){ flash('Balloon ' + want + ' is not on this operation.', true); return; }
-       try{ localStorage.setItem('cpStep6Return', JSON.stringify({ id: p.id || '', bubble: want })); }catch(_){ }
-       ov.remove();
-       try{ cpSetStep('1'); }catch(_){ }
-       editProject(idx);
-       setTimeout(() => { try{ if(cpBuildState){ cpBuildState.focusIdx = at; renderCPBuilder();
-         cpScrollFocusIntoView(); } }catch(_){ } }, 350);
-     });
+  /* Rev-979: 'Fix a balloon\u2019s pin' removed per Rich. This dialog asks ONE question - is the
+     inspection program right - and a side errand that typed in a balloon number, jumped to Step 3
+     and jumped back did not belong beside the two answers to it. Pins are fixed where pins are
+     fixed: Step 3 ASSIGN BUBBLES. */
   if(done){
     mk('\u21ba Withdraw release', 'background:#a5342a; color:#fff; border:1px solid #7d2419;', async () => {
       const ok = await cpConfirmBox('WITHDRAW RELEASE',
@@ -21514,20 +21495,7 @@ if($('cpBuilderBack')) $('cpBuilderBack').onclick = () => {
   // you were working on and you had to find it again. Return to THAT PART's operations.
   $('cpBuilderScreen').classList.add('hidden');
   const nvb=$('newerVersionBanner'); if(nvb && window._nvbWasVisible) nvb.style.display='flex';
-  // Rev-751: came here from Step 6 to fix a pin — go straight back to Step 6.
-  try{
-    const ret = JSON.parse(localStorage.getItem('cpStep6Return') || 'null');
-    if(ret && ret.id){
-      localStorage.removeItem('cpStep6Return');
-      const pj = JSON.parse(localStorage.getItem('cpProjects') || '[]');
-      const j = pj.findIndex(x => x.id === ret.id);
-      showProjects();
-      const back = String((pj[j] && pj[j].partNum) || '').toUpperCase();
-      if(back && typeof cpOpenPart === 'function'){ try{ cpOpenPart(back); }catch(_){ } }
-      if(j >= 0) setTimeout(() => { try{ cpReviewInspection(j); }catch(_){ } }, 250);
-      return;
-    }
-  }catch(_){ }
+  /* Rev-979: the Step 6 return address is gone with the button that set it. */
   if(cpBuildState && cpBuildState.srcId && typeof showProjects === 'function'){
     const backTo = String((cpBuildState && cpBuildState.partNum) || '').toUpperCase();
     showProjects();
