@@ -1680,7 +1680,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-976";
+const APP_REV = "Rev-977";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2208,6 +2208,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-07", rev: "App Rev-977", type: "App", changes: ["STEP 8 - CNC PROGRAM, OPTIONAL (Rev-977, embedded validation REV-257) \u2014 per Rich: an eighth tile that takes the CNC program for the operation. OPTIONAL IN THE REAL SENSE, not just in name: it is never locked, it is worth ZERO toward the percentage, and it can never hold COMPLETE back - an operation with no program still finishes at 100%. It sits after Step 7 and out of the sequential lock chain entirely, so it can be filled at any point, before or after the rest. THE FILE GOES TO GITHUB, per Rich\u2019s decision: stored in the PRIVATE cp-generator-data repository under programs/PART/OPnnn/, the same repository the drawings already use, so it reaches every device and survives a wiped machine. Any file type is accepted - .nc, .min, .eia, .txt, .h - because controls differ by machine. The panel shows the file name, size and when it landed, with Download, Replace and Remove; Remove takes it off GitHub as well as off the plan, and asks first. The plan records only the name, size, path and timestamp - the program itself is never copied into cp_data.json, so the data file stays small. If GitHub is not configured the tile says so plainly instead of accepting a file it cannot store. WHAT TO TEST (rule 8): press STEP 8 on any operation, upload a program, confirm the tile turns green and the percentage does NOT move; press Remove and confirm it goes. Payload verified in both repos before this entry."] },
   { ts: "2026-08-07", rev: "App Rev-976", type: "App", changes: ["THE CP ROW PANEL NOW SHOWS THE MASTER ROW UNDERNEATH (Rev-976, embedded validation REV-257) \u2014 per Rich: the Control Plan row for a balloon was there, but the Control Types Master List row that GOVERNS it was not, so comparing meant leaving the inspection. CP-2C is explicit - the master list is the single source of truth for the methods band - and the two are now on screen together. The master row is drawn directly beneath the plan row against the same columns, marked MASTER H-number in the ID cell, and any of the five governed cells that DISAGREES with the plan row above is shown red with a tooltip naming the rule. Nothing is written and nothing is auto-corrected: it reports, the QE decides. SEVERAL ROWS WHEN THERE ARE SEVERAL: one Control Type ID can carry more than one master row split by tolerance band - H2 and H3 are both LATHE / CBORE / DIA - so every match is shown rather than picking one and implying it is the only answer. A Control Type ID with no master row at all says so in red rather than showing nothing. The embedded app has no copy of the master list, so the shell exposes a read-only lookup it calls up into; on an older shell the panel simply omits the comparison instead of breaking. WHAT TO TEST (rule 8): on 1000237620 OP-030 feature 11, press CP Row - the LATHE / SPECIAL / VISUAL master row H122 should sit under the plan row. Payload verified in both repos before this entry."] },
   { ts: "2026-08-07", rev: "App Rev-975", type: "App", changes: ["THE MACHINIST SCREEN SAID max IN LOWER CASE (Rev-975, embedded validation REV-256) \u2014 per Rich, who circled it on feature 7 of 1000237620, ID TO OD RUNOUT. A single-limit feature shows the number and the word beneath it, and that word was written lower case in the validation app - the one screen a machinist stands in front of all shift, where CAMCO documents are upper case throughout. It now reads MAX, in the live card and in the edit card, so it matches the .002 MAX on the print and the MAX button added to the Control Plan at Rev-971. THIS IS THE EMBEDDED MACHINIST VALIDATION APP, not the Control Plan shell: it is carried inside this file, so its own revision goes 255 to 256 and every device gets it with the next app update - nothing separate to install. STILL LOWER CASE ON THAT SCREEN, pending Rich\u2019s word on how far to take it: the unit under the reading (inch) and the one-line note under the decimal-places buttons. Everything else there was already capitals. WHAT TO TEST (rule 8): open the inspection on 1000237620 OP-030, walk to feature 7 and confirm the limit card reads .002 MAX. Payload verified in both repos before this entry."] },
   { ts: "2026-08-07", rev: "App Rev-974", type: "App", changes: ["PART DESCRIPTION IS UPPER CASE, TYPED AND STORED (Rev-974, embedded validation REV-255) \u2014 per Rich, who found \u2018housing\u2019 and \u2018air coil\u2019 sitting in lower case on the All Parts list beside COMPRESSOR BORE. CAMCO documents are upper case throughout - Rev-92 says every cell, title block and header row - and a part description that comes out lower case on the list comes out lower case wherever else it is used. It is forced to upper case in three places so it cannot slip back in: as it is TYPED (both the \u270f\ufe0f pencil beside the part number and the New Control Plan form show capitals as you type), as it is SAVED, and as it is DRAWN on the list - the last of those covering the descriptions already stored in lower case, so housing and air coil read HOUSING and AIR COIL without anyone retyping them. This covers TYPED DATA. Button labels and headings elsewhere are untouched pending Rich\u2019s word on how far to take it. WHAT TO TEST (rule 8): the list reads HOUSING and AIR COIL; press the pencil on 912993, type a description in lower case and watch it capitalise as you type. Payload verified in both repos before this entry."] },
@@ -3061,7 +3062,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-07";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:58 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:34 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4259,12 +4260,16 @@ function cpOpStages(p){
     { s: s5, n: 6, name: 'ASSIGN MEASUREMENT TYPES' },
     { s: s6, n: 7, name: 'REVIEW INSPECTION' }
   ];
+  /* Rev-977: STEP 8 CNC PROGRAM sits OUTSIDE the sequential chain below on purpose - it is
+     optional, so it is never locked, never blocks, and carries no weight in the percentage. */
+  const s8 = { done: !!(p && p.cncProgram && p.cncProgram.path), open: true, ready: true,
+               optional: true, left: 0, total: 1 };
   let _blocker = null;
   _seq.forEach(e => {
     if(_blocker){ e.s.ready = false; e.s.blockedBy = _blocker; }
     else { e.s.ready = true; e.s.blockedBy = null; if(!e.s.done) _blocker = 'STEP ' + e.n + ' \u2014 ' + e.name; }
   });
-  return { s1, s2, s3, sT, s4, s5, s6, labelSummary };
+  return { s1, s2, s3, sT, s4, s5, s6, s8, labelSummary };   /* Rev-977 */
 }
 // Rev-634: percentage that reflects the WORK, not the step count. Two faults in the
 // old sum, both of which flattered the figure:
@@ -5073,6 +5078,16 @@ function renderProjects(){
                 + 'tweaking, and approve each feature as you go. Once every feature is approved, this button '
                 + 'asks whether to release the operation to production.'))),   /* Rev-870 */
         () => cpReviewInspection(i));
+
+      /* Rev-977: STEP 8 - CNC PROGRAM. Optional, so stateOf is never asked for a lock. */
+      mkStep(8, 'CNC PROGRAM', (st.s8.done ? 'done' : 'todo'),
+        (st.s8.done
+          ? ('STEP 8 \u2014 ' + String((p.cncProgram && p.cncProgram.name) || 'a program')
+             + ' is stored for this operation.\nOpen to download, replace or remove it.')
+          : 'STEP 8 \u2014 OPTIONAL. Upload the CNC program for this operation.\n'
+            + 'It is stored in the private data repository, so every device gets it.\n'
+            + 'This step never holds the plan back and is worth nothing toward the percentage.'),
+        () => cpCncPanel(i));
 
       // Rev-620: built here, hung on its own row below
       _cpBarFor = (() => {
@@ -14386,6 +14401,185 @@ window.cpMvMasterRows = function(controlTypeId){
       String(m.controlTypeId || '').trim().toUpperCase().replace(/\s+/g, ' ') === want);
   }catch(e){ console.error('Rev-976 cpMvMasterRows failed', e); return []; }
 };
+/* ===== Rev-977: STEP 8 - CNC PROGRAM (OPTIONAL) ==========================
+   Rich's call: the program file itself goes to GitHub, in the PRIVATE data repo alongside
+   the drawings, so it reaches every device and survives a wiped machine. The PLAN records
+   only name / size / path / when - never the program text - so cp_data.json stays small.
+   Optional means optional: zero weight, never locked, never blocks COMPLETE. */
+function cpCncSafeName(n){
+  return String(n || 'program').trim().replace(/[^A-Za-z0-9._-]+/g, '_').slice(0, 120) || 'program';
+}
+function cpCncPath(part, op, name){
+  const P = String(part || '').trim().toUpperCase().replace(/[^A-Za-z0-9._-]+/g, '_');
+  const O = String(op || '').trim().toUpperCase().replace(/[^A-Za-z0-9._-]+/g, '_');
+  return 'programs/' + P + '/' + (O ? ('OP' + O) : 'NO-OP') + '/' + cpCncSafeName(name);
+}
+async function cpCncPut(path, b64, msg){
+  const c = ghConfig();
+  const url = 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/' + path;
+  const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+  let sha = null;
+  try{ const r = await fetch(url, { headers: hdrs }); if(r.ok){ const d = await r.json(); sha = d.sha; } }catch(e){}
+  const body = { message: msg || ('CNC program: ' + path), content: b64 };
+  if(sha) body.sha = sha;
+  const resp = await fetch(url, { method: 'PUT',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, hdrs), body: JSON.stringify(body) });
+  if(!resp.ok) throw new Error('GitHub refused the upload: ' + resp.status + ' ' + (await resp.text()).slice(0, 120));
+  return await resp.json();
+}
+async function cpCncGet(path){
+  const c = ghConfig();
+  const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+  const url = 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/' + path;
+  const r = await fetch(url, { headers: hdrs });
+  if(!r.ok) throw new Error('Not found on GitHub (' + r.status + ')');
+  const d = await r.json();
+  let b64 = (d.content || '').replace(/\n/g, '');
+  if(!b64 && d.sha){
+    const br = await fetch('https://api.github.com/repos/' + c.user + '/' + c.repo + '/git/blobs/' + d.sha, { headers: hdrs });
+    if(br.ok){ b64 = ((await br.json()).content || '').replace(/\n/g, ''); }
+  }
+  if(!b64) throw new Error('The file came back empty');
+  return b64;
+}
+async function cpCncDelete(path, sha){
+  const c = ghConfig();
+  const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+  const url = 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/' + path;
+  let s = sha;
+  if(!s){ const r = await fetch(url, { headers: hdrs }); if(r.ok) s = (await r.json()).sha; }
+  if(!s) return false;
+  const resp = await fetch(url, { method: 'DELETE',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, hdrs),
+    body: JSON.stringify({ message: 'CNC program removed: ' + path, sha: s }) });
+  return resp.ok;
+}
+function cpCncSaveMeta(part, op, meta){
+  const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+  let hit = false;
+  projects.forEach(x => {
+    if(String(x.partNum || '') !== String(part)) return;
+    if(String(x.opNum || '') !== String(op || '')) return;
+    if(meta) x.cncProgram = meta; else delete x.cncProgram;
+    x.updated = new Date().toISOString(); hit = true;
+  });
+  if(hit) localStorage.setItem('cpProjects', JSON.stringify(projects));
+  try{ if(cpBuildState && String(cpBuildState.partNum||'') === String(part)
+        && String(cpBuildState.opNum||'') === String(op||'')){
+    if(meta) cpBuildState.cncProgram = meta; else delete cpBuildState.cncProgram; } }catch(e){}
+  return hit;
+}
+function cpCncBytes(n){
+  const b = Number(n) || 0;
+  return b < 1024 ? (b + ' B') : (b < 1048576 ? ((b / 1024).toFixed(1) + ' KB') : ((b / 1048576).toFixed(2) + ' MB'));
+}
+/* The Step 8 panel. Shows what is stored and the three things that can be done with it. */
+function cpCncPanel(idx){
+  const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+  const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
+  const part = p.partNum, op = String(p.opNum || '');
+  const meta = p.cncProgram || null;
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed; inset:0; z-index:10600; background:rgba(0,0,0,.6);'
+    + ' display:flex; align-items:center; justify-content:center; padding:20px;';
+  const c = document.createElement('div');
+  c.style.cssText = 'background:#fff; border-radius:10px; max-width:560px; width:100%;'
+    + ' box-shadow:0 12px 46px rgba(0,0,0,.45); font-family:inherit; overflow:hidden;';
+  const head = String(part || '') + (op ? ('  \u00b7  OP-' + op) : '');
+  const ready = (typeof ghConfigured === 'function') && ghConfigured();
+  c.innerHTML =
+      '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.04em; padding:10px 16px; font-size:13px;">'
+    +   'STEP 8 \u00b7 CNC PROGRAM \u00b7 ' + head + '</div>'
+    + '<div style="padding:14px 16px; font-size:12.5px; line-height:1.6; color:#3a352e;">'
+    +   '<div style="font-size:11px; font-weight:800; letter-spacing:.05em; color:#6b6257;">OPTIONAL \u2014 THIS STEP NEVER HOLDS THE PLAN BACK</div>'
+    +   (meta
+          ? ('<div style="margin-top:10px; padding:10px 12px; background:#f2f6f2; border:1px solid #cfe0d2; border-radius:8px;">'
+             + '<div style="font-weight:800; font-size:13px; word-break:break-all;">\ud83d\udcc4 ' + String(meta.name || '') + '</div>'
+             + '<div style="font-size:11px; color:#5f5b56; margin-top:4px;">' + cpCncBytes(meta.size)
+             + ' \u00b7 uploaded ' + (meta.when ? new Date(meta.when).toLocaleString() : '\u2014') + '</div>'
+             + '<div style="font-size:10.5px; color:#8a8279; margin-top:4px; word-break:break-all;">' + String(meta.path || '') + '</div>'
+             + '</div>')
+          : '<div style="margin-top:10px; color:#6b6257;">No program uploaded for this operation yet.</div>')
+    +   (ready ? '' : '<div style="margin-top:10px; color:#a5342a; font-weight:700;">GitHub is not set up on this device, so a program cannot be stored. Admin \u2192 Settings.</div>')
+    + '</div>'
+    + '<div style="display:flex; gap:8px; flex-wrap:wrap; padding:12px 16px; border-top:1px solid #e2ddd4; background:#faf7f2;">'
+    +   (meta ? '<button id="cncDl" style="padding:9px 14px; border:1px solid #c9c0b4; background:#fff; border-radius:8px; font-weight:700; cursor:pointer;">\u2b07 Download</button>' : '')
+    +   (meta ? '<button id="cncRm" style="padding:9px 14px; border:1px solid #d9b3ad; background:#fff; color:#a5342a; border-radius:8px; font-weight:700; cursor:pointer;">\ud83d\uddd1 Remove</button>' : '')
+    +   '<button id="cncUp" ' + (ready ? '' : 'disabled ') + 'style="margin-left:auto; padding:9px 16px; border:none; background:' + (ready ? '#1e7a34' : '#b9b3aa') + '; color:#fff; border-radius:8px; font-weight:800; cursor:' + (ready ? 'pointer' : 'not-allowed') + ';">'
+    +     (meta ? '\u2b06 Replace program' : '\u2b06 Upload program') + '</button>'
+    +   '<button id="cncX" style="padding:9px 14px; border:1px solid #c9c0b4; background:#fff; border-radius:8px; font-weight:700; cursor:pointer;">Close</button>'
+    + '</div>';
+  ov.appendChild(c); document.body.appendChild(ov);
+  const close = () => ov.remove();
+  ov.addEventListener('click', e => { if(e.target === ov) close(); });
+  const $$ = id => document.getElementById(id);
+  if($$('cncX')) $$('cncX').onclick = close;
+
+  if($$('cncUp')) $$('cncUp').onclick = () => {
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.style.display = 'none';
+    document.body.appendChild(inp);
+    inp.onchange = async () => {
+      const f = (inp.files || [])[0];
+      inp.remove();
+      if(!f) return;
+      try{
+        flash('\u2b06 Uploading ' + f.name + ' \u2026');
+        const buf = await f.arrayBuffer();
+        let bin = ''; const bytes = new Uint8Array(buf);
+        for(let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+        const b64 = btoa(bin);
+        const path = cpCncPath(part, op, f.name);
+        const res = await cpCncPut(path, b64, 'CNC program for ' + head);
+        const meta2 = { name: f.name, size: f.size, path: path,
+                        sha: (res && res.content && res.content.sha) || '',
+                        when: new Date().toISOString() };
+        cpCncSaveMeta(part, op, meta2);
+        try{ logAct('cnc', 'program uploaded'); }catch(e){}
+        flash('\u2713 CNC program stored on GitHub \u2014 ' + f.name);
+        close(); renderProjects(); cpCncPanel(idx);
+      }catch(err){
+        console.error('Rev-977 CNC upload failed', err);
+        flash('Upload failed: ' + (err && err.message || err), true);
+      }
+    };
+    inp.click();
+  };
+
+  if($$('cncDl')) $$('cncDl').onclick = async () => {
+    try{
+      const b64 = await cpCncGet(meta.path);
+      const bin = atob(b64); const arr = new Uint8Array(bin.length);
+      for(let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([arr], { type: 'application/octet-stream' }));
+      const a = document.createElement('a'); a.href = url; a.download = meta.name || 'program';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      try{ logAct('cnc', 'program downloaded'); }catch(e){}
+    }catch(err){
+      console.error('Rev-977 CNC download failed', err);
+      flash('Could not download it: ' + (err && err.message || err), true);
+    }
+  };
+
+  if($$('cncRm')) $$('cncRm').onclick = async () => {
+    const ok = await cpConfirmBox('REMOVE THE CNC PROGRAM?',
+      'This deletes <b>' + String(meta.name || '') + '</b> from GitHub as well as from this plan.'
+      + '<br><br>Nothing else on the operation is touched.', '\ud83d\uddd1 Remove it');
+    if(!ok) return;
+    try{
+      await cpCncDelete(meta.path, meta.sha);
+      cpCncSaveMeta(part, op, null);
+      try{ logAct('cnc', 'program removed'); }catch(e){}
+      flash('\u2713 CNC program removed.');
+      close(); renderProjects();
+    }catch(err){
+      console.error('Rev-977 CNC remove failed', err);
+      flash('Could not remove it: ' + (err && err.message || err), true);
+    }
+  };
+}
 function getMasterRev(){
   return parseInt(localStorage.getItem('masterRev') || '11', 10);
 }
