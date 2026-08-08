@@ -1685,7 +1685,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-991";
+const APP_REV = "Rev-992";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2213,6 +2213,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-992", type: "App", changes: ["THE PART LINE UNDER THE HEADING IS GONE AGAIN (Rev-992, embedded validation REV-260) \u2014 Rich crossed out the 1000237620 \u00b7 AIR COIL line one revision after asking for it, and he is right: the beige header row directly beneath already says 1000237620 in large type, so the line said the part number twice and only added a word. That is the same reason Rev-953 emptied this bar in the first place; I put it back at Rev-991 without weighing it against the header sitting right under it. The bar is empty again. THE DRAWING FROM Rev-991 STAYS - that was the half that added something the screen did not already show. WHAT TO TEST (rule 8): open 1000237620 - no line between the subtitle and the table, and each operation still shows its own drawing in the STATUS column. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-991", type: "App", changes: ["THE PART DESCRIPTION AND THE ODS DRAWING BOTH SHOW ON THE OPERATIONS LIST (Rev-991, embedded validation REV-260) \u2014 per Rich, who circled two empty patches of screen. (1) THE PART DESCRIPTION now sits under the CONTROL PLANS heading whenever a part is open, in large type beside the part number - 1000237620 \u00b7 AIR COIL, upper case per Rev-974. With a part open there was nothing on that line saying WHICH part, since Rev-953 removed the crumb; the description brings the answer back in a more useful form than the number alone. It hides again on the All Parts view, where each row already carries its own. (2) THE ODS DRAWING now sits in the STATUS column, under the status pill, at 180px wide with the column widened to suit - click it and it opens full size. It is that operation\u2019s own drawing, so a part with six operations shows six different prints, which is the fastest way to see at a glance that the right print landed on the right operation. Operations with no drawing yet show a quiet NO ODS DRAWING box rather than a gap, so a missing print is visible instead of invisible. WHAT TO TEST (rule 8): open 1000237620 - the heading should read the part number and AIR COIL, and each operation row should show its own drawing under the status pill. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-990", type: "App", changes: ["INJECT AND REVIEW NOW SAY WHY THEY FAILED INSTEAD OF DOING NOTHING (Rev-990, embedded validation REV-260) \u2014 Rich pressed \ud83e\uddea INJECT and no pop-up appeared. The wiring was read and is correct - the button calls the panel with the right plan index - so something inside is throwing and dying quietly, which is the single most expensive shape of bug in this app and the one the standing rule exists for. Both panels are now wrapped so a failure SPEAKS: the message, and the file and line it came from, appear on screen and go into the Action Log rather than vanishing into the console. Two specific traps closed while looking: the panel now checks that its own card actually reached the page before wiring the buttons - if the browser refused the markup, getElementById comes back null and the old code threw on the very next line - and every getElementById is guarded, so one missing element can no longer take the whole panel down with it. It also reports plainly when a plan has no rows to generate against. NO BEHAVIOUR CHANGED: the same scenarios, the same pieces, the same refusal on a released operation. WHAT TO TEST (rule 8): press \ud83e\uddea INJECT again - either the pop-up opens, or a red message names the fault. Send me whichever appears. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-989", type: "App", changes: ["THE THIRD BACKGROUND TIMER IS GATED TOO, AND THE CHASE STOPS AFTER ONE TRY (Rev-989, embedded validation REV-260) \u2014 Rich reported the blinking again, and the curtain he photographed named it: Publishing Rev-988, the site is catching up. That is ghAutoPublishPages, a THIRD background timer - and Rev-983 gated only two of them. My miss, stated plainly: the leader guard covered the update check and the app push and left the website publisher running in every copy. It is gated now. TWO MORE CHANGES THAT ATTACK THE BLINK ITSELF. (1) The reload chase drops from three attempts to ONE: the API reports a new revision the instant it is pushed, but GitHub Pages serves the old file for a while afterwards, so reloading to chase it lands back on the old copy and tries again - three times per revision, and every new revision reset the counter. One try, then the quiet one-tap banner, which is what should have happened all along. (2) The cooldown between self-updates goes from 45 seconds to THREE MINUTES, so a burst of revisions arriving minutes apart can no longer turn into a burst of reloads. HONESTLY: while revisions are being pushed every few minutes some updating is unavoidable - the app is doing its job. These changes stop it happening several times per revision and in several copies at once. WHAT TO TEST (rule 8): with one tab open, the app should update at most once per revision and show a banner rather than reloading again. Payload verified in both repos before this entry."] },
@@ -3081,7 +3082,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:38 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:47 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4768,19 +4769,10 @@ function renderProjects(){
      repeated part number / operation count. The beige part-header row directly below already
      names the part, so this line said the same thing twice. The way back out of a part now
      lives on \u2190 Back (see the projectsBack handler). */
-  /* Rev-991: the crumb bar is reused to carry the PART DESCRIPTION. Rev-953 emptied it
-     because it repeated the part number the beige header already showed; a description is
-     new information, and with a part open nothing else on this line says which part. */
-  if(crumb){
-    let _pd = '';
-    try{ _pd = String((cpPartInfoGet(filtered[0].data.partNum) || {}).partDesc || '').trim().toUpperCase(); }
-    catch(e){ console.warn('Rev-991 part description read failed', e); }
-    if(_pd){
-      crumb.style.display = 'flex';
-      crumb.innerHTML = '<span style="font-size:21px; font-weight:800; letter-spacing:.02em; color:#5a5148;">'
-        + String(filtered[0].data.partNum || '') + ' \u00b7 ' + _pd + '</span>';
-    } else { crumb.style.display = 'none'; crumb.innerHTML = ''; }
-  }
+  /* Rev-992: EMPTY AGAIN, per Rich. Rev-991 put the part number and description here; the
+     beige header row directly beneath already carries the part number in large type, so the
+     line said it twice for the sake of one extra word. Same reason Rev-953 emptied it. */
+  if(crumb){ crumb.style.display = 'none'; crumb.innerHTML = ''; }
   const head = $('cpPlanHeadRow');
   if(head) head.innerHTML =
       '<th>Operation</th>'
