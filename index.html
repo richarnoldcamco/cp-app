@@ -1683,7 +1683,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-986";
+const APP_REV = "Rev-987";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2211,6 +2211,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-987", type: "App", changes: ["\ud83d\udcca REVIEW DATA - CAPABILITY PER FEATURE (Rev-987, embedded validation REV-260) \u2014 per Rich: a button beside Inspect that reads every run stored for the operation and reports what the process is actually doing. One line per ballooned feature: pieces measured, mean, min, max, CPK and how many fell out of tolerance, with the Cpk coloured - 1.33 and above green, 1.00 to 1.33 amber, below 1.00 red, and any feature with a piece out of tolerance flagged regardless of what its Cpk says. Click a line to see every individual reading behind it with the out-of-tolerance ones marked. THE MATHS IS STATED, NOT ASSUMED: Cpk is min(USL-mean, mean-LSL) / 3 sigma with sigma the SAMPLE standard deviation (n-1), and it is refused outright on fewer than 5 pieces - a Cpk off three parts is a number with no meaning, and printing one would be worse than printing nothing. Features with no numeric limits are listed with their pass count rather than an invented capability. SIMULATED RUNS ARE EXCLUDED unless the same tick used in Reports is on, and when they are included the panel says so in orange across the top - a capability number off fabricated data must never be mistaken for evidence. Runs are fetched in parallel batches with a progress line, because the store already holds over a thousand files. WHAT TO TEST (rule 8): press \ud83d\udcca Review Data on 1000237620 OP-030 - with simulated runs off it should say there is nothing to summarise; tick them on and the injected batch should appear with a Cpk near what was asked for. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-986", type: "App", changes: ["\ud83e\uddea INJECT DATA - SIMULATED RUNS AT A CHOSEN CPK (Rev-986, embedded validation REV-260) \u2014 per Rich: a button beside Inspect that fills an operation with believable measurement data so the reports, the capability maths and the whole inspection flow can be exercised without machining fifty parts. Eight scenarios - Cpk 2.00, 1.67, 1.33, 1.00, 0.67, SHIFTED (capable but off-centre), DRIFTING (walks across the run like tool wear) and ONE BAD PIECE - across 5, 10, 30 or 50 pieces. Readings are generated against EACH FEATURE\u2019S OWN limits read off the plan, rounded to the decimal places those limits imply, so a .0005 band gets four-place numbers and a .010 band gets three. Features with no numeric limits get a pass rather than an invented number. THE SAFETY, WHICH IS THE POINT: this writes fabricated readings into a quality-records system for ITAR parts, so a simulated run can never be mistaken for a real one. Every record carries simulated:true, the scenario that made it, and an appRev reading SIMULATED - NOT REAL MEASUREMENT DATA; the operator initials are SIM; the shop order is SIM-xxxx so the filename itself declares it; and Reports HIDES them unless \u2018include simulated runs\u2019 is ticked, saying how many it is hiding. Injection is REFUSED outright on any operation already marked ready for production - that is where the real damage would be - and the button is EXPERT USER only so it never sits in front of a machinist. WHAT TO TEST (rule 8): press \ud83e\uddea INJECT DATA on an unreleased operation, choose Cpk 1.33 and 30 pieces, then open Reports and confirm the batch is hidden until the tick is on. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-985", type: "App", changes: ["THE BUBBLE HIGHLIGHT IS A RED CIRCLE HERE TOO (Rev-985, embedded validation REV-260) \u2014 Rich asked whether we had not already moved off the yellow bubble highlight. Rev-978 changed a DIFFERENT one: the pin marker in the Control Plan builder\u2019s drawing panel, and the entry said so and asked him to point at any others. This is the second one, in the validation app, and it is not an overlay at all - a filled yellow ellipse is PAINTED INTO the reference image at the moment the crop is saved. A fill tints the very number it points at and washes out on a photographed print. It is now the same ring as Rev-978: no fill, a white ring laid down first so it holds on ink and on white paper, then the red ring over it. The live box that is dragged to place it is red now as well, so what is drawn is what gets saved, and the two size buttons no longer call it yellow. HONESTLY STATED: reference images CUT BEFORE THIS REV KEEP THEIR YELLOW - the colour is baked into those pictures and only a re-cut can change them. WHAT TO TEST (rule 8): open a feature, Grab this bubble from the ODS, place the circle and save - the saved reference image should carry a red ring, not a yellow blob. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-984", type: "App", changes: ["THE CROP PROMPT SAYS ONE THING (Rev-984, embedded validation REV-259) \u2014 per Rich, in his words: PRESS ENTER TO ZOOM INTO CROPPED AREA. Rev-981 had it swap to a save prompt after the first press, on the reasoning that Enter does two things in a row; Rich does not want that second wording and he is right that one prompt should say one thing. Once the zoom has happened the prompt simply GOES rather than changing - silence beats telling him to zoom into an area he is already zoomed into, and it leaves the zoomed view clean to work in. Everything else is unchanged: still ghosted, still centred on the crop, still takes no clicks. WHAT TO TEST (rule 8): drag a crop - the prompt reads PRESS ENTER TO ZOOM INTO CROPPED AREA; press Enter - it disappears rather than changing. Payload verified in both repos before this entry."] },
@@ -3074,7 +3075,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:48 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5127,6 +5128,12 @@ function renderProjects(){
           + 'Refused on an operation already released to production.',
           () => cpInjectPanel(i), has);
       }
+      /* Rev-987: capability from the runs actually stored for this operation. */
+      mkBtn('\ud83d\udcca Review Data', 'quiet', 112,
+        'Read every stored run for this operation and show mean, spread, Cpk and any\n'
+        + 'out-of-tolerance pieces, one line per feature. Simulated runs are excluded\n'
+        + 'unless they are switched on in Reports.',
+        () => cpReviewDataPanel(i), has);
       mkBtn('Inspect', 'go', 84, 'Machinist: start a real inspection run for this plan (readings are saved)'
         + (has ? '' : ' \u2014 no plan data to inspect'), () => inspectMachinistValidation(i), has);
       mkBtn('Validation', 'quiet', 94, (mvIsCreated(p)
@@ -14415,6 +14422,190 @@ window.cpMvMasterRows = function(controlTypeId){
    this writes FABRICATED READINGS into a quality-records system for ITAR parts, so every
    record says so in the record itself, the filename declares it, Reports hides them by
    default, and a released operation refuses the whole thing outright. */
+/* ===== Rev-987: REVIEW DATA - CAPABILITY PER FEATURE ====================
+   Reads every stored run for one operation and reports what the process is doing.
+   Cpk = min(USL-mean, mean-LSL) / 3 sigma, sigma = SAMPLE standard deviation (n-1).
+   Refused under 5 pieces: a Cpk off three parts is a number with no meaning, and printing
+   one anyway would be worse than printing nothing at all. */
+const CP_CAP_MIN_N = 5;
+function cpCapStats(vals, lo, hi){
+  const n = vals.length;
+  const out = { n: n, mean: null, min: null, max: null, sd: null, cpk: null, oot: 0, why: '' };
+  if(!n) return out;
+  out.mean = vals.reduce((a, b) => a + b, 0) / n;
+  out.min = Math.min.apply(null, vals);
+  out.max = Math.max.apply(null, vals);
+  out.oot = vals.filter(v => v < lo || v > hi).length;
+  if(n < CP_CAP_MIN_N){ out.why = 'needs ' + CP_CAP_MIN_N + '+ pieces'; return out; }
+  out.sd = Math.sqrt(vals.reduce((a, b) => a + Math.pow(b - out.mean, 2), 0) / (n - 1));
+  if(!(out.sd > 0)){ out.why = 'every reading identical'; return out; }
+  out.cpk = Math.min(hi - out.mean, out.mean - lo) / (3 * out.sd);
+  return out;
+}
+function _cpCapColour(s){
+  if(s.oot > 0) return { bg:'#fdecea', fg:'#a5342a', note:'OUT OF TOLERANCE' };
+  if(s.cpk == null) return { bg:'#f4f1ec', fg:'#6b6257', note:'' };
+  if(s.cpk >= 1.33) return { bg:'#e8f3ea', fg:'#1d6b3f', note:'' };
+  if(s.cpk >= 1.00) return { bg:'#fdf3d5', fg:'#7a5a00', note:'MARGINAL' };
+  return { bg:'#fdecea', fg:'#a5342a', note:'NOT CAPABLE' };
+}
+async function cpReviewDataPanel(idx){
+  const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+  const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
+  if(!ghConfigured()){ flash('GitHub is not set up on this device, so there are no stored runs to read.', true); return; }
+  const part = String(p.partNum || ''), op = 'OP-' + String(p.opNum || '');
+  const showSim = (function(){ try{ return localStorage.getItem('cpShowSimRuns') === '1'; }catch(e){ return false; } })();
+
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed; inset:0; z-index:10660; background:rgba(0,0,0,.65);'
+    + ' display:flex; align-items:flex-start; justify-content:center; padding:24px 16px; overflow:auto;';
+  const c = document.createElement('div');
+  c.style.cssText = 'background:#fff; border-radius:12px; max-width:1180px; width:100%;'
+    + ' box-shadow:0 16px 60px rgba(0,0,0,.5); font-family:inherit; overflow:hidden;';
+  c.innerHTML = '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.04em; padding:14px 20px; font-size:17px;">'
+    + '\ud83d\udcca REVIEW DATA \u00b7 ' + part + ' \u00b7 ' + op + '</div>'
+    + '<div id="capBody" style="padding:16px 20px; font-size:14px; color:#3a352e;">Reading stored runs\u2026</div>'
+    + '<div style="display:flex; gap:12px; padding:12px 20px; border-top:1px solid #e2ddd4; background:#faf7f2;">'
+    +   '<button id="capX" style="margin-left:auto; padding:10px 20px; border:1px solid #c9c0b4; background:#fff; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer;">Close</button>'
+    + '</div>';
+  ov.appendChild(c); document.body.appendChild(ov);
+  ov.addEventListener('click', e => { if(e.target === ov) ov.remove(); });
+  document.getElementById('capX').onclick = () => ov.remove();
+  const body = () => document.getElementById('capBody');
+  const say = h => { const b = body(); if(b) b.innerHTML = h; };
+
+  try{
+    const cfg = ghConfig();
+    const hdrs = { 'Authorization': 'Bearer ' + cfg.token, 'Accept': 'application/vnd.github+json' };
+    /* Trees, not the contents listing - the store is past a thousand files and /contents caps
+       at 1000 (the same trap Rev-456 hit). */
+    const tr = await fetch('https://api.github.com/repos/' + cfg.user + '/' + cfg.repo + '/git/trees/main?recursive=1',
+                           { headers: hdrs, cache: 'no-store' });
+    if(!tr.ok) throw new Error('Could not list runs (' + tr.status + ')');
+    const tj = await tr.json();
+    let names = (tj.tree || []).filter(e => e.type === 'blob' && e.path.startsWith('runs/') && e.path.endsWith('.json'))
+                               .map(e => e.path.slice(5));
+    const mine = names.filter(nm => {
+      const t = nm.replace(/\.json$/, '').split('_');
+      if(String(t[0] || '') !== part) return false;
+      if(String(t[1] || '') !== op) return false;
+      if(String(t[2] || '').toUpperCase().indexOf('SIM-') === 0 && !showSim) return false;
+      return true;
+    });
+    if(!mine.length){
+      const anySim = names.some(nm => { const t = nm.replace(/\.json$/,'').split('_');
+        return t[0] === part && t[1] === op && String(t[2]||'').toUpperCase().indexOf('SIM-') === 0; });
+      say('<div style="padding:20px 0; color:#6b6257;">No stored runs for this operation'
+        + (anySim ? '.<br><br><b>There ARE simulated runs for it.</b> Turn on \u2018include simulated runs\u2019 '
+                    + 'in Reports to summarise those \u2014 they are not measurement evidence.'
+                  : ' yet. Complete an inspection and it will appear here.') + '</div>');
+      return;
+    }
+    /* Parallel in small batches, with a progress line - a thousand serial fetches would look frozen. */
+    const runs = [];
+    for(let i = 0; i < mine.length; i += 8){
+      const chunk = mine.slice(i, i + 8);
+      say('Reading stored runs\u2026 ' + Math.min(i + chunk.length, mine.length) + ' of ' + mine.length);
+      const got = await Promise.all(chunk.map(async nm => {
+        try{
+          const r = await fetch('https://api.github.com/repos/' + cfg.user + '/' + cfg.repo + '/contents/runs/' + encodeURIComponent(nm),
+                                { headers: { 'Authorization': 'Bearer ' + cfg.token, 'Accept': 'application/vnd.github.raw' }, cache: 'no-store' });
+          return r.ok ? await r.json() : null;
+        }catch(e){ console.warn('Rev-987 run read failed', nm, e); return null; }
+      }));
+      got.forEach(g => { if(g) runs.push(g); });
+    }
+    if(!runs.length){ say('<div style="padding:20px 0; color:#a5342a;">Found ' + mine.length
+      + ' run file(s) but none could be read.</div>'); return; }
+
+    /* Group every reading by bubble. Limits come off the READING (what was actually in force
+       when the piece was measured), not off today's plan - the plan may have moved since. */
+    const byBubble = {};
+    let simCount = 0;
+    runs.forEach(rn => {
+      if(rn && (rn.simulated || (rn.run && rn.run.simulated))) simCount++;
+      (rn.readings || []).forEach(rd => {
+        const b = String(rd.bubble || '').trim(); if(!b) return;
+        const g = byBubble[b] = byBubble[b] || { bubble: b, desc: rd.characteristic || '', instr: rd.instrument || '',
+                                                lo: null, hi: null, vals: [], rows: [], attr: 0, attrPass: 0 };
+        if(!g.desc && rd.characteristic) g.desc = rd.characteristic;
+        if(rd.valueType === 'dim' && isFinite(rd.measuredValue) && isFinite(rd.tolLow) && isFinite(rd.tolHigh)){
+          if(g.lo === null){ g.lo = rd.tolLow; g.hi = rd.tolHigh; }
+          g.vals.push(+rd.measuredValue);
+          g.rows.push({ sn: (rn.run && rn.run.serialNumber) || '', v: +rd.measuredValue,
+                        ok: (rd.inTolerance !== false), sim: !!(rn.simulated || rd.simulated) });
+        } else {
+          g.attr++; if(rd.attributeResult !== 'FAIL' && rd.inTolerance !== false) g.attrPass++;
+        }
+      });
+    });
+    const groups = Object.values(byBubble).sort((a, b) => {
+      const x = parseFloat(a.bubble), y = parseFloat(b.bubble);
+      if(!isNaN(x) && !isNaN(y) && x !== y) return x - y;
+      return String(a.bubble) < String(b.bubble) ? -1 : 1;
+    });
+    const num = (v, dp) => (v == null ? '\u2014' : Number(v).toFixed(dp));
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+    let h = '';
+    if(simCount){
+      h += '<div style="background:#fdf3d5; border:1px solid #d9b64a; border-radius:8px; padding:10px 12px;'
+        +  ' font-weight:800; color:#7a5a00; margin-bottom:12px;">\u26a0 ' + simCount + ' OF THESE '
+        +  runs.length + ' RUNS ARE SIMULATED \u2014 THIS SUMMARY IS NOT MEASUREMENT EVIDENCE.</div>';
+    }
+    h += '<div style="font-size:12px; color:#6b6257; margin-bottom:10px;">'
+      +  runs.length + ' run(s) read \u00b7 Cpk = min(USL\u2212mean, mean\u2212LSL) \u00f7 3\u03c3, '
+      +  '\u03c3 = sample standard deviation \u00b7 not computed under ' + CP_CAP_MIN_N + ' pieces</div>';
+    h += '<div style="overflow:auto;"><table style="border-collapse:collapse; width:100%; font-size:13px;">'
+      +  '<tr style="background:#9DC3E6; color:#1c1c1c; font-weight:800; font-size:11px; letter-spacing:.03em;">'
+      +  ['BUBBLE','FEATURE','LOW','HIGH','n','MEAN','MIN','MAX','\u03c3','CPK','OUT OF TOL']
+           .map(t => '<th style="border:1px solid #7fa9cc; padding:7px 6px; text-align:center;">' + t + '</th>').join('')
+      +  '</tr>';
+    groups.forEach((g, gi) => {
+      if(g.lo === null){
+        h += '<tr><td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:800;">' + esc(g.bubble) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px;">' + esc(g.desc) + '</td>'
+          +  '<td colspan="9" style="border:1px solid #d8d3ca; padding:7px; text-align:center; color:#6b6257;">'
+          +  'no numeric limits \u2014 ' + g.attrPass + ' of ' + g.attr + ' recorded as a pass</td></tr>';
+        return;
+      }
+      const dp = Math.max(3, (String(g.lo).split('.')[1] || '').length, (String(g.hi).split('.')[1] || '').length);
+      const s = cpCapStats(g.vals, g.lo, g.hi);
+      const col = _cpCapColour(s);
+      h += '<tr style="cursor:pointer; background:' + col.bg + ';" onclick="cpCapToggle(' + gi + ')">'
+        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:800;">' + esc(g.bubble) + '</td>'
+        +  '<td style="border:1px solid #d8d3ca; padding:7px;">' + esc(g.desc)
+        +    (g.instr ? ('<div style="font-size:10.5px; color:#6b6257;">' + esc(g.instr) + '</div>') : '') + '</td>'
+        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(g.lo, dp) + '</td>'
+        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(g.hi, dp) + '</td>'
+        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:700;">' + s.n + '</td>'
+        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.mean, dp + 1) + '</td>'
+        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.min, dp) + '</td>'
+        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.max, dp) + '</td>'
+        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.sd, dp + 2) + '</td>'
+        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:900; font-size:15px; color:' + col.fg + ';">'
+        +    (s.cpk == null ? ('<span style="font-size:10.5px; font-weight:700;">' + esc(s.why || '\u2014') + '</span>') : s.cpk.toFixed(2)) + '</td>'
+        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:800; color:' + (s.oot ? '#a5342a' : '#1d6b3f') + ';">'
+        +    s.oot + (col.note ? ('<div style="font-size:9.5px;">' + col.note + '</div>') : '') + '</td></tr>';
+      h += '<tr id="capDet' + gi + '" style="display:none;"><td colspan="11" style="border:1px solid #d8d3ca; padding:8px 10px; background:#fbfaf8;">'
+        +  '<div style="display:flex; flex-wrap:wrap; gap:6px;">'
+        +  g.rows.map(r => '<span style="font:700 11px system-ui; padding:4px 8px; border-radius:5px; border:1px solid '
+             + (r.ok ? '#cfe0d2' : '#e6b3ad') + '; background:' + (r.ok ? '#f2f6f2' : '#fdecea') + '; color:'
+             + (r.ok ? '#1d6b3f' : '#a5342a') + ';">#' + esc(r.sn) + ' &nbsp;' + r.v.toFixed(dp)
+             + (r.sim ? ' <span style="opacity:.7;">SIM</span>' : '') + '</span>').join('')
+        +  '</div></td></tr>';
+    });
+    h += '</table></div>';
+    say(h);
+  }catch(e){
+    console.error('Rev-987 review data failed', e);
+    say('<div style="padding:18px 0; color:#a5342a; font-weight:700;">Could not build the summary: '
+      + String(e && e.message || e) + '</div>');
+  }
+}
+function cpCapToggle(i){
+  try{ const r = document.getElementById('capDet' + i); if(r) r.style.display = (r.style.display === 'none' ? '' : 'none'); }
+  catch(e){ console.warn('Rev-987 detail toggle failed', e); }
+}
 const CP_INJ_SCENARIOS = [
   { k:'cpk200', label:'Cpk 2.00 \u00b7 dead centre, very tight',      cpk:2.00, mode:'centred' },
   { k:'cpk167', label:'Cpk 1.67 \u00b7 comfortably capable',          cpk:1.67, mode:'centred' },
