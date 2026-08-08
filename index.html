@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1007</title>
+<title>CONTROL PLAN GENERATOR - Rev-1008</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1007 · 2026-08-08 11:34 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1008 · 2026-08-08 11:37 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1007 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:34 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1008 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:37 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1007 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1008 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1007";
+const APP_REV = "Rev-1008";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1008", type: "App", changes: ["CLOSE MOVES TO THE TOP OF REVIEW DATA (Rev-1008, embedded validation REV-260) — per Rich. The Close button sat in a footer strip under everything, so with a full-height drawing down one side and two tables down the other it was below the fold: leaving the panel meant scrolling to the bottom to find the way out. It now sits in the blue title bar at the top right, and it is RED with a ✕ like every other Close in the app rather than a quiet grey one. This is the same correction Rev-607 made to the full-screen drawing viewer, for the same reason. The footer strip is gone entirely — it held nothing else — which also gives the tables back a little height. Clicking the dark surround still closes the panel as it always did. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — Close should be top right in the blue bar, in red, reachable without scrolling, and there should be no button left at the bottom."] },
   { ts: "2026-08-08", rev: "App Rev-1007", type: "App", changes: ["TICKING A MACHINIST NARROWS THE SHOP ORDERS, AND GENERATED DATA GETS REAL NAMES (Rev-1007, embedded validation REV-260) — three things from Rich, all on the download screen. FIRST, the shop-order table now FOLLOWS the machinist tick: tick HICKEY and the table below drops to the shop orders he actually worked, with the caption saying so. It is rebuilt on every draw rather than once, and the (n in window) figure honours the machinist tick as well, so the two tables can never tell different stories. SECOND, a MACHINIST column sits between SHOP ORDER and RUNS, listing everyone who ran that job — a job number belongs to a run rather than a person, so two machinists can share one and both are named. A dash there means those runs are not in the summary table yet, NOT that nobody ran them. THIRD, generated data is now attributed to HICKEY, ISAIAH, ZAK, GRANT and STEVE instead of SIM-A to SIM-D, and HOW MANY MACHINISTS runs 1 to 5. BE CLEAR ABOUT WHAT THAT COSTS: the operator field no longer announces itself as fake. Every other declaration stands and must stay — simulated:true on the run AND on every single reading, the shop order still SIM-xxxx so the FILE NAME declares it, the red SIM tag beside the name in the machinist table, hidden from Reports and Review unless simulated runs are switched on, the banner across the top of any summary saying the runs are not measurement evidence, and a released operation still refuses the whole thing outright. Names already generated keep saying SIM-A to SIM-D until those runs are deleted and re-injected. WHAT TO TEST (rule 8): on 1000237620 OP-030 tick one machinist — the shop-order table under it should shrink to that person’s jobs and the MACHINIST column should name them; press Every machinist and it should come back. Then inject a fresh batch and the new machinist table should read HICKEY, ISAIAH, ZAK."] },
   { ts: "2026-08-08", rev: "App Rev-1006", type: "App", changes: ["A SMALL RUN INDEX NOW FEEDS THE FILTERS, SO MACHINISTS CAN BE PICKED BEFORE ANYTHING IS DOWNLOADED (Rev-1006, embedded validation REV-260) — Rich’s idea, and the right one. Rev-1004 could offer days and shop orders on the download screen because those are in the file NAME, but not machinists, because the operator is inside the file. The answer is a table beside the runs: one line per run holding the machinist, the day, the shop order, how many readings it carried and whether it is simulated. It lives at runs_index/PART_OP-nnn.json in the data repository and is KEYED BY FILE NAME, so two devices’ additions merge for free and a run can never be counted twice. Reading it is ONE small fetch. THE READER BUILDS IT, NOT THE WRITER. The machinist app pushes a run and knows nothing about this file; the review screen notices any run missing from the table and offers BUILD THE TABLE (n), reading just those runs once. That choice means no change to the validation app, it back-fills every run already in the repository, and it repairs itself if a run lands from a device that never opened the screen. A run is read once for this and never again for the purpose of drawing filters. The download screen gains a MACHINISTS table — name, PARTS INSPECTED, DAYS, first and last — each tickable, each showing how many of that person’s runs fall in the chosen window, and the choice carries straight through to the screen after the download rather than being asked twice. A machinist filter applies only to runs that are IN the table; an unindexed run has no name attached yet and is left out rather than quietly counted as somebody. Writing the table reads, merges and writes, and on a 409 — another device writing in the same moment — goes round again with a fresh sha instead of flattening their additions. If the table cannot be saved the screen says so and the choices still work for that visit. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — expect a yellow bar saying the runs are not in the table yet; press BUILD THE TABLE and let it run once; the MACHINISTS table should then list SIM, SIM-A to SIM-D with their parts-inspected counts. Close the panel and reopen it: the table should appear instantly with no reading at all."] },
   { ts: "2026-08-08", rev: "App Rev-1005", type: "App", changes: ["HARDWARE NEEDED — A LIST OF WHAT THE FLOOR IS STILL MISSING (Rev-1005, embedded validation REV-260) — per Rich. Admin gains a HARDWARE section with one button, Hardware Needed, which opens its own screen. Four items are on it the first time it opens: MONITOR, MONITOR HANGER, KEYBOARD / KEYPAD and CAMERAS. Anything else is typed into the box at the top and added, so the list grows to whatever the floor actually needs. Press an item and it opens: HOW MANY ARE NEEDED (yellow, because it is the field that matters, per the CAMCO UI standard for a mandatory field), WHERE IT GOES, and NOTES. A tile with a quantity on it turns green and shows the number large enough to read across a desk; one still at zero stays grey. COPY THE LIST puts the whole thing on the clipboard as plain text, ready to paste into an email or a purchase request, because a list that cannot leave the app is a list somebody retypes. DELETE THIS ITEM removes one, asking first. The list is kept ON THIS DEVICE and does not yet sync to the other machines — say the word and it can ride along with the rest of the data. TWO BUILD NOTES. The screen is a full-screen overlay rather than another hidden panel in the page: every one of those has to be named by hand in a dozen different show-this-hide-that functions, and the one that gets missed is a screen that will not close. And the button is spelled HARDWARE — the request read ‘hardward’, and a typo baked into a button is an IT ticket later. WHAT TO TEST (rule 8): Admin → Hardware Needed, press MONITOR, put 3 in the yellow box and CELL 4 in where it goes, press SAVE — the tile should turn green and read 3. Add one of your own, then leave the screen and come back: everything should still be there."] },
@@ -3105,7 +3106,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:34 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:37 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -14566,8 +14567,18 @@ async function _cpReviewDataPanel(idx){
   c.style.cssText = 'background:#fff; border-radius:12px; width:100%;'
     + ' max-width:' + (odsImg ? '98vw' : 'min(1400px, 96vw)') + ';'
     + ' box-shadow:0 16px 60px rgba(0,0,0,.5); font-family:inherit; overflow:hidden;';
-  c.innerHTML = '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.04em; padding:14px 20px; font-size:17px;">'
-    + '\ud83d\udcca REVIEW DATA \u00b7 ' + part + ' \u00b7 ' + op + '</div>'
+  /* Rev-1008: CLOSE SITS AT THE TOP, per Rich, and it is red like every other Close in
+     the app. Under a full-height drawing and two tables the old footer button was below the
+     fold - leaving the panel meant scrolling to the bottom first. Same reasoning as Rev-607,
+     which moved Close to the top of the full-screen drawing viewer for the same reason. */
+  c.innerHTML = '<div style="background:#1a5276; color:#fff; padding:12px 20px; display:flex;'
+    + ' align-items:center; gap:14px;">'
+    +   '<div style="font-weight:800; letter-spacing:.04em; font-size:17px; flex:1 1 auto;">'
+    +     '\ud83d\udcca REVIEW DATA \u00b7 ' + part + ' \u00b7 ' + op + '</div>'
+    +   '<button id="capX" style="background:#a02020; color:#fff; border:2px solid #7a1414;'
+    +     ' border-radius:8px; padding:8px 22px; font-weight:800; font-size:13px; cursor:pointer;">'
+    +     '\u2715 Close</button>'
+    + '</div>'
     + '<div style="display:flex; align-items:flex-start; gap:0;">'
     +   '<div id="capBody" style="padding:16px 20px; font-size:14px; color:#3a352e; flex:1 1 auto; min-width:0;">Reading stored runs\u2026</div>'
     +   (odsImg
@@ -14586,9 +14597,7 @@ async function _cpReviewDataPanel(idx){
            + '</div>'
          : '')
     + '</div>'
-    + '<div style="display:flex; gap:12px; padding:12px 20px; border-top:1px solid #e2ddd4; background:#faf7f2;">'
-    +   '<button id="capX" style="margin-left:auto; padding:10px 20px; border:1px solid #c9c0b4; background:#fff; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer;">Close</button>'
-    + '</div>';
+    + '';
   ov.appendChild(c); document.body.appendChild(ov);
   ov.addEventListener('click', e => { if(e.target === ov) ov.remove(); });
   document.getElementById('capX').onclick = () => ov.remove();
