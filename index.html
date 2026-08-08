@@ -1685,7 +1685,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-990";
+const APP_REV = "Rev-991";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2213,6 +2213,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-991", type: "App", changes: ["THE PART DESCRIPTION AND THE ODS DRAWING BOTH SHOW ON THE OPERATIONS LIST (Rev-991, embedded validation REV-260) \u2014 per Rich, who circled two empty patches of screen. (1) THE PART DESCRIPTION now sits under the CONTROL PLANS heading whenever a part is open, in large type beside the part number - 1000237620 \u00b7 AIR COIL, upper case per Rev-974. With a part open there was nothing on that line saying WHICH part, since Rev-953 removed the crumb; the description brings the answer back in a more useful form than the number alone. It hides again on the All Parts view, where each row already carries its own. (2) THE ODS DRAWING now sits in the STATUS column, under the status pill, at 180px wide with the column widened to suit - click it and it opens full size. It is that operation\u2019s own drawing, so a part with six operations shows six different prints, which is the fastest way to see at a glance that the right print landed on the right operation. Operations with no drawing yet show a quiet NO ODS DRAWING box rather than a gap, so a missing print is visible instead of invisible. WHAT TO TEST (rule 8): open 1000237620 - the heading should read the part number and AIR COIL, and each operation row should show its own drawing under the status pill. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-990", type: "App", changes: ["INJECT AND REVIEW NOW SAY WHY THEY FAILED INSTEAD OF DOING NOTHING (Rev-990, embedded validation REV-260) \u2014 Rich pressed \ud83e\uddea INJECT and no pop-up appeared. The wiring was read and is correct - the button calls the panel with the right plan index - so something inside is throwing and dying quietly, which is the single most expensive shape of bug in this app and the one the standing rule exists for. Both panels are now wrapped so a failure SPEAKS: the message, and the file and line it came from, appear on screen and go into the Action Log rather than vanishing into the console. Two specific traps closed while looking: the panel now checks that its own card actually reached the page before wiring the buttons - if the browser refused the markup, getElementById comes back null and the old code threw on the very next line - and every getElementById is guarded, so one missing element can no longer take the whole panel down with it. It also reports plainly when a plan has no rows to generate against. NO BEHAVIOUR CHANGED: the same scenarios, the same pieces, the same refusal on a released operation. WHAT TO TEST (rule 8): press \ud83e\uddea INJECT again - either the pop-up opens, or a red message names the fault. Send me whichever appears. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-989", type: "App", changes: ["THE THIRD BACKGROUND TIMER IS GATED TOO, AND THE CHASE STOPS AFTER ONE TRY (Rev-989, embedded validation REV-260) \u2014 Rich reported the blinking again, and the curtain he photographed named it: Publishing Rev-988, the site is catching up. That is ghAutoPublishPages, a THIRD background timer - and Rev-983 gated only two of them. My miss, stated plainly: the leader guard covered the update check and the app push and left the website publisher running in every copy. It is gated now. TWO MORE CHANGES THAT ATTACK THE BLINK ITSELF. (1) The reload chase drops from three attempts to ONE: the API reports a new revision the instant it is pushed, but GitHub Pages serves the old file for a while afterwards, so reloading to chase it lands back on the old copy and tries again - three times per revision, and every new revision reset the counter. One try, then the quiet one-tap banner, which is what should have happened all along. (2) The cooldown between self-updates goes from 45 seconds to THREE MINUTES, so a burst of revisions arriving minutes apart can no longer turn into a burst of reloads. HONESTLY: while revisions are being pushed every few minutes some updating is unavoidable - the app is doing its job. These changes stop it happening several times per revision and in several copies at once. WHAT TO TEST (rule 8): with one tab open, the app should update at most once per revision and show a banner rather than reloading again. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-988", type: "App", changes: ["THE ACTIONS ROW FITS THE SCREEN AGAIN (Rev-988, embedded validation REV-260) \u2014 per Rich: two new buttons in three revisions - \ud83e\uddea Inject Data at Rev-986 and \ud83d\udcca Review Data at Rev-987 - pushed the actions row past the window and put a horizontal scrollbar across the bottom of the whole app. Every action button is smaller: 32px tall to 26, 12px text to 10.5, padding 12 to 7, and each fixed width cut - the row went from about 970px of buttons to about 700, roughly 28 percent narrower, which is more than the two new buttons cost. The two new ones drop their words to \ud83e\uddea INJECT and \ud83d\udcca REVIEW, since the tooltips already carry the full explanation. The row also WRAPS now instead of forcing the page wider, so a narrower window stacks the buttons onto a second line rather than growing a scrollbar - the scrollbar can no longer come back on a smaller screen. AND A SILENT FAILURE CLOSED: if an injection saves nothing at all, it now says so in red instead of reporting 0 of 10 in a neutral tone, because a run of zeros read as success is exactly how Rich came to think Review Data was broken when the problem was upstream of it. WHAT TO TEST (rule 8): the Control Plans list should have no scrollbar along the bottom. Payload verified in both repos before this entry."] },
@@ -3080,7 +3081,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:38 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4767,11 +4768,23 @@ function renderProjects(){
      repeated part number / operation count. The beige part-header row directly below already
      names the part, so this line said the same thing twice. The way back out of a part now
      lives on \u2190 Back (see the projectsBack handler). */
-  if(crumb){ crumb.style.display = 'none'; crumb.innerHTML = ''; }
+  /* Rev-991: the crumb bar is reused to carry the PART DESCRIPTION. Rev-953 emptied it
+     because it repeated the part number the beige header already showed; a description is
+     new information, and with a part open nothing else on this line says which part. */
+  if(crumb){
+    let _pd = '';
+    try{ _pd = String((cpPartInfoGet(filtered[0].data.partNum) || {}).partDesc || '').trim().toUpperCase(); }
+    catch(e){ console.warn('Rev-991 part description read failed', e); }
+    if(_pd){
+      crumb.style.display = 'flex';
+      crumb.innerHTML = '<span style="font-size:21px; font-weight:800; letter-spacing:.02em; color:#5a5148;">'
+        + String(filtered[0].data.partNum || '') + ' \u00b7 ' + _pd + '</span>';
+    } else { crumb.style.display = 'none'; crumb.innerHTML = ''; }
+  }
   const head = $('cpPlanHeadRow');
   if(head) head.innerHTML =
       '<th>Operation</th>'
-    + '<th>Status</th>'
+    + '<th style="min-width:196px;">Status</th>'   /* Rev-991: room for the drawing */
     + '<th style="border-left:2px solid #c9c0b4;">Construction Steps</th>'
     + '<th style="border-left:2px solid #c9c0b4;">Actions</th>'
     + '<th style="text-align:right;">CP Rev</th>';
@@ -4890,6 +4903,7 @@ function renderProjects(){
     // Rev-583: Part Rev column removed — the CONTROL PLAN's own revision (how many times
     // this plan has been saved) rides at the far right instead, after the buttons.
     const tdStatus = document.createElement('td');
+    tdStatus.style.cssText = 'vertical-align:top; min-width:196px;';   /* Rev-991 */
     if(item.kind === 'draft'){
       tdStatus.innerHTML = '<span class="cp-pill" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">DRAFT</span>';
     } else {
@@ -4904,6 +4918,32 @@ function renderProjects(){
           + ' style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">IN PROGRESS'
           + ' <span style="font-weight:700; opacity:.8;">(' + st.missing.length + ')</span></span>';
       }
+    }
+    /* Rev-991: THE ODS DRAWING RIDES UNDER THE STATUS PILL, per Rich. It is THIS operation's
+       own drawing, so six operations show six prints - the fastest way to see that the right
+       print landed on the right operation. A missing one says so rather than leaving a gap. */
+    if(item.kind !== 'draft'){
+      try{
+        const _ods = (typeof cpOpOdsImage === 'function') ? cpOpOdsImage(p) : null;
+        const _box = document.createElement('div');
+        _box.style.cssText = 'margin-top:7px;';
+        if(_ods){
+          const im = document.createElement('img');
+          im.src = _ods;
+          im.title = 'ODS drawing for OP-' + String(p.opNum || '') + ' \u2014 click to open full size';
+          im.style.cssText = 'width:180px; max-height:130px; object-fit:contain; background:#fff;'
+            + ' border:1px solid #c9c0b4; border-radius:5px; cursor:zoom-in; display:block;';
+          im.onclick = (e) => { e.stopPropagation();
+            try{ cpUploadOpOds({ partNum: p.partNum, opNum: p.opNum }); }
+            catch(err){ console.error('Rev-991 open ODS failed', err); } };
+          _box.appendChild(im);
+        } else {
+          _box.innerHTML = '<div style="width:180px; padding:14px 6px; text-align:center; font:700 10px system-ui;'
+            + ' letter-spacing:.05em; color:#a5342a; background:#fdecea; border:1px dashed #e6b3ad; border-radius:5px;">'
+            + 'NO ODS DRAWING</div>';
+        }
+        tdStatus.appendChild(_box);
+      }catch(e){ console.warn('Rev-991 ODS thumbnail failed', e); }
     }
     // Rev-620: the ODS cell used to live here — Step 2 owns the ODS drawing now, so the
     // column was dropped and this cell with it.
