@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1009</title>
+<title>CONTROL PLAN GENERATOR - Rev-1010</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1009 · 2026-08-08 11:41 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1010 · 2026-08-08 11:58 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1009 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:41 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1010 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:58 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1009 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1010 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1009";
+const APP_REV = "Rev-1010";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1010", type: "App", changes: ["LINE INSPECTIONS CAN BE FILED AGAINST AN OPERATION (Rev-1010, embedded validation REV-260) — per Rich, who needs the LINE INSPECTION / FIRST ARTICLE INSPECTION forms out of CAMCO QUALITY and sitting with the operation they belong to. A LINE INSP button joins the action buttons; it carries the count, and turns RED the moment one of them is a FAIL, because a failed first article is not something to find by opening a panel. The panel lists what has been filed — date, result, shop order, inspector, file — with Download and Remove on each, and more than one can be filed, since there is one form per inspection rather than one per operation. THE FORM IS STORED EXACTLY AS EXPORTED, whatever the Export button gives — PDF, spreadsheet or picture — in the private data repository under lineinsp/PART/OPnnn/, the same road a CNC program travels. NOTHING PARSES THE FORM. The result, shop order and inspector are TYPED IN when it is filed, so nothing in here can quietly misread a form and put a PASS against a FAIL; three boxes is a fair price for that. Reading the findings out of the export — characteristic numbers, severity ranks, actions taken — and tying them back to bubble numbers is the obvious next step, and it needs a real exported file in hand first: what it parses depends entirely on what Export actually produces. WHAT TO TEST (rule 8): on 1000222892 OP-080, press LINE INSP, set the result, type the shop order and inspector, and pick an exported form — it should appear in the list with the button now reading LINE INSP 1. File a FAIL and the button should turn red."] },
   { ts: "2026-08-08", rev: "App Rev-1009", type: "App", changes: ["STEP 8 IS NOW GAGES, AND THE CNC PROGRAM MOVES TO THE ACTION BUTTONS (Rev-1009, embedded validation REV-260) — per Rich, and the swap is the right way round. A CNC program is a file to attach, not a stage of building a Control Plan, and it was holding the slot the gages deserve. CNC now sits with the other action buttons on the right and carries a tick when a program is stored. IN ITS PLACE, STEP 8 GAGES shows what the operation still needs to be inspectable: the tile reads NONE NEEDED, or 3 OPEN / 5, or ALL 5 COMPLETE, and clicking it lists every special gage with THE BUBBLE NUMBER IT IS FOR, the feature, the spec and tolerance, what the gage is, its status — TO BE MADE, DESIGNED, ORDERED, IN PROGRESS, COMPLETE, coloured so an open one cannot be mistaken for a finished one — and who it is assigned to. NOTHING HERE IS A SECOND COPY: every line comes from the gage register the app already keeps, which fills itself the moment the Special Gage / Fixture box is filled on a row in Step 6. That is also why the panel is read-only and carries one button to the full gage list — a gage is edited in ONE place, not in two that can disagree. Where no gage has been called for the panel says how to call for one rather than showing an empty grid. Like the CNC step before it, GAGES never locks and is worth nothing toward the percentage: a gage that has not been made yet is a purchasing problem, not a reason to call the Control Plan unfinished. WHAT TO TEST (rule 8): on 1000237620 OP-030 the STEP 8 tile should read GAGES with a count, and CNC should now be a button on the right beside Download. Press STEP 8 — with no special gages called for it should explain where they come from; fill the Special Gage / Fixture box on a row in Step 6 and it should appear here against that bubble number."] },
   { ts: "2026-08-08", rev: "App Rev-1008", type: "App", changes: ["CLOSE MOVES TO THE TOP OF REVIEW DATA (Rev-1008, embedded validation REV-260) — per Rich. The Close button sat in a footer strip under everything, so with a full-height drawing down one side and two tables down the other it was below the fold: leaving the panel meant scrolling to the bottom to find the way out. It now sits in the blue title bar at the top right, and it is RED with a ✕ like every other Close in the app rather than a quiet grey one. This is the same correction Rev-607 made to the full-screen drawing viewer, for the same reason. The footer strip is gone entirely — it held nothing else — which also gives the tables back a little height. Clicking the dark surround still closes the panel as it always did. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — Close should be top right in the blue bar, in red, reachable without scrolling, and there should be no button left at the bottom."] },
   { ts: "2026-08-08", rev: "App Rev-1007", type: "App", changes: ["TICKING A MACHINIST NARROWS THE SHOP ORDERS, AND GENERATED DATA GETS REAL NAMES (Rev-1007, embedded validation REV-260) — three things from Rich, all on the download screen. FIRST, the shop-order table now FOLLOWS the machinist tick: tick HICKEY and the table below drops to the shop orders he actually worked, with the caption saying so. It is rebuilt on every draw rather than once, and the (n in window) figure honours the machinist tick as well, so the two tables can never tell different stories. SECOND, a MACHINIST column sits between SHOP ORDER and RUNS, listing everyone who ran that job — a job number belongs to a run rather than a person, so two machinists can share one and both are named. A dash there means those runs are not in the summary table yet, NOT that nobody ran them. THIRD, generated data is now attributed to HICKEY, ISAIAH, ZAK, GRANT and STEVE instead of SIM-A to SIM-D, and HOW MANY MACHINISTS runs 1 to 5. BE CLEAR ABOUT WHAT THAT COSTS: the operator field no longer announces itself as fake. Every other declaration stands and must stay — simulated:true on the run AND on every single reading, the shop order still SIM-xxxx so the FILE NAME declares it, the red SIM tag beside the name in the machinist table, hidden from Reports and Review unless simulated runs are switched on, the banner across the top of any summary saying the runs are not measurement evidence, and a released operation still refuses the whole thing outright. Names already generated keep saying SIM-A to SIM-D until those runs are deleted and re-injected. WHAT TO TEST (rule 8): on 1000237620 OP-030 tick one machinist — the shop-order table under it should shrink to that person’s jobs and the MACHINIST column should name them; press Every machinist and it should come back. Then inject a fresh batch and the new machinist table should read HICKEY, ISAIAH, ZAK."] },
@@ -3107,7 +3108,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:41 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:58 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5244,6 +5245,18 @@ function renderProjects(){
         + (has ? '' : ' \u2014 no plan data to build a validation from'), () => createMachinistValidation(i), has);
       mkBtn('Excel CP', 'quiet', 66, 'Build the L3Harris-format Control Plan xlsx for THIS operation'
         + (has ? '' : ' \u2014 no plan data to export'), () => cpCustomerExport(i), has);
+      /* Rev-1010: line inspections / first articles filed against this operation. */
+      const _li = (function(){ try{ return ((p.lineInsp || []).length) || 0; }catch(e){ return 0; } })();
+      const _liFail = (function(){ try{
+        return (p.lineInsp || []).filter(x => String(x.result || '').toUpperCase() === 'FAIL').length;
+      }catch(e){ return 0; } })();
+      mkBtn('LINE INSP' + (_li ? (' ' + _li) : ''), (_liFail ? 'danger' : 'quiet'), _li ? 92 : 82,
+        (_li
+          ? (_li + ' line inspection(s) filed against this operation'
+             + (_liFail ? (', ' + _liFail + ' of them a FAIL') : '') + '.\nOpen to read, add or download them.')
+          : 'File the LINE INSPECTION / FIRST ARTICLE forms for this operation.\n'
+            + 'The exported form is stored in the private data repository, so every device gets it.'),
+        () => cpLineInspPanel(i), has);
       /* Rev-1009: moved out of the construction steps, per Rich. */
       mkBtn((st.s8.done ? '\u2713 CNC' : 'CNC'), 'quiet', 62,
         (st.s8.done
@@ -16055,6 +16068,236 @@ function cpCncBytes(n){
   return b < 1024 ? (b + ' B') : (b < 1048576 ? ((b / 1024).toFixed(1) + ' KB') : ((b / 1048576).toFixed(2) + ' MB'));
 }
 /* The Step 8 panel. Shows what is stored and the three things that can be done with it. */
+/* ===== Rev-1010: LINE INSPECTIONS / FIRST ARTICLES ============================
+   Rich files a LINE INSPECTION / FIRST ARTICLE INSPECTION form in CAMCO QUALITY and
+   needs it to live with the operation it belongs to. This stores the EXPORTED FORM
+   itself - whatever the Export button produces - in the private data repository under
+   lineinsp/PART/OPnnn/, exactly the way a CNC program is stored, and keeps the handful
+   of facts worth seeing without opening the file: the result, the date, the shop order,
+   the inspector. Those four are TYPED IN, not read out of the file: nothing here parses
+   the form, so nothing here can quietly get it wrong. More than one form can be filed
+   against an operation - there is one per inspection, not one per operation. */
+const CP_LI_RESULTS = ['PASS', 'FAIL', 'N/A PROCESS PROVE OUT ONLY'];
+function cpLiPath(part, op, name){
+  const clean = t => String(t || '').replace(/[^A-Za-z0-9._-]/g, '-');
+  return 'lineinsp/' + clean(part) + '/OP' + clean(op) + '/'
+       + new Date().toISOString().replace(/[:.]/g, '-') + '_' + clean(name);
+}
+function cpLiSave(idx, list){
+  try{
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    if(!projects[idx]) return false;
+    projects[idx].lineInsp = list;
+    projects[idx].updated = new Date().toISOString();
+    localStorage.setItem('cpProjects', JSON.stringify(projects));
+    try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
+    return true;
+  }catch(e){
+    console.error('Rev-1010 line inspection save failed', e);
+    try{ flash('\u26a0 Could not save it \u2014 ' + (e && e.message || e), true); }catch(_){ }
+    return false;
+  }
+}
+function cpLineInspPanel(idx){
+  try{
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
+    const part = String(p.partNum || ''), op = String(p.opNum || '');
+    const head = part + (op ? ('  \u00b7  OP-' + op) : '');
+    let list = (p.lineInsp || []).slice()
+      .sort((a, b) => String(b.when || '').localeCompare(String(a.when || '')));
+    const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g,
+      ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+    const ready = (typeof ghConfigured === 'function') && ghConfigured();
+
+    const old = document.getElementById('cpLiPanel'); if(old) old.remove();
+    const ov = document.createElement('div');
+    ov.id = 'cpLiPanel';
+    ov.style.cssText = 'position:fixed; inset:0; z-index:10675; background:rgba(0,0,0,.65);'
+      + ' display:flex; align-items:flex-start; justify-content:center; padding:24px 16px; overflow:auto;';
+    const c = document.createElement('div');
+    c.style.cssText = 'background:#fff; border-radius:12px; width:100%; max-width:min(1150px, 96vw);'
+      + ' box-shadow:0 16px 60px rgba(0,0,0,.5); font-family:inherit; overflow:hidden;';
+
+    const resColour = r => {
+      const u = String(r || '').toUpperCase();
+      if(u === 'PASS') return '#1d6b3f';
+      if(u === 'FAIL') return '#a5342a';
+      return '#5c4708';
+    };
+    const day = t => { try{ return new Date(t).toLocaleDateString('en-US',
+      { month:'2-digit', day:'2-digit', year:'2-digit' }); }catch(e){ return ''; } };
+
+    let rows;
+    if(!list.length){
+      rows = '<div style="padding:24px 4px; font-size:13.5px; color:#6b6257; line-height:1.6;">'
+        + 'No line inspection has been filed against this operation yet.<br><br>'
+        + 'In CAMCO QUALITY, press <b>EXPORT</b> on the LINE INSPECTION / FIRST ARTICLE INSPECTION '
+        + 'form, then press <b>ADD A LINE INSPECTION</b> below and pick that file.</div>';
+    } else {
+      rows = '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
+        + '<thead><tr>'
+        + ['DATE', 'RESULT', 'SHOP ORDER', 'INSPECTOR', 'FILE', ''].map((th, ix) =>
+            '<th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e;'
+            + ' font-weight:800; font-size:11px; letter-spacing:.05em; text-align:'
+            + (ix === 1 ? 'center' : 'left') + ';">' + th + '</th>').join('')
+        + '</tr></thead><tbody>'
+        + list.map((x, n) =>
+            '<tr>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#3a352e; white-space:nowrap;">'
+            +   day(x.when) + '</td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;">'
+            +   '<b style="color:' + resColour(x.result) + '; letter-spacing:.04em;">'
+            +   esc(x.result || '\u2014') + '</b></td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#000; font-weight:700;">'
+            +   (x.shopOrder ? esc(x.shopOrder) : '<span style="color:#b9b3aa;">\u2014</span>') + '</td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#3a352e;">'
+            +   (x.inspector ? esc(x.inspector) : '<span style="color:#b9b3aa;">\u2014</span>') + '</td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#3a352e;'
+            +   ' word-break:break-all;">' + esc(x.name || '') + '</td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; white-space:nowrap;">'
+            +   '<button data-lidl="' + n + '" style="font-size:11px; font-weight:800; padding:5px 11px;'
+            +     ' margin-right:5px; border:1px solid #1a5276; background:#fff; color:#1a5276;'
+            +     ' border-radius:6px; cursor:pointer;">Download</button>'
+            +   '<button data-lirm="' + n + '" style="font-size:11px; font-weight:800; padding:5px 11px;'
+            +     ' border:1px solid #8a2a2a; background:#fff; color:#8a2a2a; border-radius:6px;'
+            +     ' cursor:pointer;">Remove</button></td>'
+            + '</tr>').join('')
+        + '</tbody></table>';
+    }
+
+    c.innerHTML = '<div style="background:#1a5276; color:#fff; padding:12px 20px; display:flex;'
+        + ' align-items:center; gap:14px;">'
+      +   '<div style="font-weight:800; letter-spacing:.04em; font-size:17px; flex:1 1 auto;">'
+      +     '\U0001F4CB LINE INSPECTIONS \u00b7 ' + esc(head) + '</div>'
+      +   '<button id="cpLiX" style="background:#a02020; color:#fff; border:2px solid #7a1414;'
+      +     ' border-radius:8px; padding:8px 22px; font-weight:800; font-size:13px; cursor:pointer;">'
+      +     '\u2715 Close</button>'
+      + '</div>'
+      + '<div style="padding:16px 20px 20px;">'
+      +   (ready ? '' : '<div style="background:#fdf3d5; border:1px solid #d9b64a; border-radius:8px;'
+                        + ' padding:10px 12px; margin-bottom:14px; font-size:12.5px; color:#5c4708;">'
+                        + 'GitHub is not set up on this device, so a form cannot be stored yet.</div>')
+      +   rows
+      +   '<div style="border-top:1px solid #e2ddd4; margin-top:18px; padding-top:16px;">'
+      +     '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;'
+      +       ' margin-bottom:10px;">ADD A LINE INSPECTION</div>'
+      +     '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px;">'
+      +       '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">RESULT'
+      +         '<select id="cpLiRes" style="display:block; width:100%; margin-top:5px; padding:10px;'
+      +         ' border:1px solid #c9c0b4; border-radius:8px; font-size:13px; font-weight:800;'
+      +         ' background:#fafa96;">'
+      +         CP_LI_RESULTS.map(r => '<option>' + r + '</option>').join('')
+      +         '</select></label>'
+      +       '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">SHOP ORDER #'
+      +         '<input id="cpLiSo" style="display:block; width:100%; margin-top:5px; padding:10px;'
+      +         ' border:1px solid #c9c0b4; border-radius:8px; font-size:13px;"></label>'
+      +       '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">INSPECTOR'
+      +         '<input id="cpLiWho" style="display:block; width:100%; margin-top:5px; padding:10px;'
+      +         ' border:1px solid #c9c0b4; border-radius:8px; font-size:13px;"></label>'
+      +     '</div>'
+      +     '<button id="cpLiUp" ' + (ready ? '' : 'disabled ') + 'style="margin-top:14px; padding:11px 22px;'
+      +       ' border:none; background:' + (ready ? '#1a5276' : '#b9b3aa') + '; color:#fff;'
+      +       ' border-radius:8px; font-weight:800; font-size:13.5px; cursor:'
+      +       (ready ? 'pointer' : 'not-allowed') + ';">\u2b06 CHOOSE THE EXPORTED FORM</button>'
+      +     '<div style="font-size:11.5px; color:#6b6257; margin-top:10px; line-height:1.6;">'
+      +       'The form itself is stored exactly as exported \u2014 PDF, spreadsheet or picture, whatever '
+      +       'Export gives you. The three boxes above are what shows in the list without opening it; '
+      +       'they are typed rather than read out of the file, so nothing here can misread your form.</div>'
+      +   '</div>'
+      + '</div>';
+
+    ov.appendChild(c); document.body.appendChild(ov);
+    ov.addEventListener('click', e => { if(e.target === ov) ov.remove(); });
+    const $$ = id => document.getElementById(id);
+    if(!$$('cpLiX') || !$$('cpLiUp')){
+      try{ flash('\u26a0 The Line Inspections panel did not build correctly. Send the Action Log.', true); }catch(_){ }
+      try{ logAct('error', 'line inspection panel markup did not build'); }catch(_){ }
+      ov.remove(); return;
+    }
+    $$('cpLiX').onclick = () => ov.remove();
+    try{ logAct('nav', 'line inspections'); }catch(_){ }
+
+    c.querySelectorAll('[data-lidl]').forEach(b => { b.onclick = async () => {
+      const x = list[parseInt(b.getAttribute('data-lidl'), 10)]; if(!x) return;
+      try{
+        const b64 = await cpCncGet(x.path);
+        const bin = atob(b64); const arr = new Uint8Array(bin.length);
+        for(let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        const url = URL.createObjectURL(new Blob([arr], { type: 'application/octet-stream' }));
+        const a = document.createElement('a'); a.href = url; a.download = x.name || 'line-inspection';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+        try{ logAct('line-insp', 'downloaded'); }catch(_){ }
+      }catch(err){
+        console.error('Rev-1010 line inspection download failed', err);
+        flash('Could not download it: ' + (err && err.message || err), true);
+      }
+    }; });
+
+    c.querySelectorAll('[data-lirm]').forEach(b => { b.onclick = async () => {
+      const n = parseInt(b.getAttribute('data-lirm'), 10);
+      const x = list[n]; if(!x) return;
+      const ok = await cpConfirmBox('REMOVE THIS LINE INSPECTION?',
+        'This deletes <b>' + String(x.name || '') + '</b> from the data repository as well as from '
+        + 'this operation.<br><br>Nothing else on the operation is touched.', '\ud83d\uddd1 Remove it');
+      if(!ok) return;
+      try{
+        try{ await cpCncDelete(x.path, x.sha); }
+        catch(e){ console.warn('Rev-1010 repo delete failed, removing the entry anyway', e); }
+        list.splice(n, 1);
+        if(cpLiSave(idx, list)){
+          try{ logAct('line-insp', 'removed'); }catch(_){ }
+          flash('\u2713 Line inspection removed.');
+        }
+        ov.remove(); renderProjects(); cpLineInspPanel(idx);
+      }catch(err){
+        console.error('Rev-1010 line inspection remove failed', err);
+        flash('Could not remove it: ' + (err && err.message || err), true);
+      }
+    }; });
+
+    $$('cpLiUp').onclick = () => {
+      const res = ($$('cpLiRes') || {}).value || CP_LI_RESULTS[0];
+      const so = String((($$('cpLiSo') || {}).value) || '').trim();
+      const who = String((($$('cpLiWho') || {}).value) || '').trim();
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.style.display = 'none';
+      document.body.appendChild(inp);
+      inp.onchange = async () => {
+        const f = (inp.files || [])[0];
+        inp.remove();
+        if(!f) return;
+        try{
+          flash('\u2b06 Storing ' + f.name + ' \u2026');
+          const buf = await f.arrayBuffer();
+          let bin = ''; const bytes = new Uint8Array(buf);
+          for(let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+          const path = cpLiPath(part, op, f.name);
+          const r = await cpCncPut(path, btoa(bin), 'Line inspection for ' + head);
+          list.unshift({ name: f.name, size: f.size, path: path,
+                         sha: (r && r.content && r.content.sha) || '',
+                         result: res, shopOrder: so, inspector: who,
+                         when: new Date().toISOString() });
+          if(cpLiSave(idx, list)){
+            try{ logAct('line-insp', 'filed \u00b7 ' + res); }catch(_){ }
+            flash('\u2713 Line inspection filed \u2014 ' + f.name);
+          }
+          ov.remove(); renderProjects(); cpLineInspPanel(idx);
+        }catch(err){
+          console.error('Rev-1010 line inspection upload failed', err);
+          flash('Could not store it: ' + (err && err.message || err), true);
+        }
+      };
+      inp.click();
+    };
+  }catch(e){
+    console.error('Rev-1010 line inspection panel failed', e);
+    try{ logAct('error', 'line inspection panel: ' + (e && e.message || e)); }catch(_){ }
+    try{ flash('\u26a0 LINE INSPECTIONS failed to open \u2014 ' + (e && e.message || e), true); }catch(_){ }
+  }
+}
 function cpCncPanel(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
