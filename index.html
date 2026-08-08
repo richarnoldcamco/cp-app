@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1012</title>
+<title>CONTROL PLAN GENERATOR - Rev-1013</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1012 · 2026-08-08 3:34 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1013 · 2026-08-08 3:38 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1012 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:34 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1013 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:38 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1012 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1013 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1012";
+const APP_REV = "Rev-1013";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1013", type: "App", changes: ["STEP 6 SITS BACK ON THE LINE WITH THE OTHERS (Rev-1013, embedded validation REV-260) — per Rich, and it is Rev-1012’s doing. The step row centres its columns vertically, which never showed while every column was the same height. Hanging the GAGES button under Step 6 made that one column taller, and centring then lifted the whole column — caption and tile together — above the line of the rest. The row now top-aligns its columns, so every caption and every tile starts at the same height and GAGES simply hangs below Step 6 without moving it. One line of layout; nothing else touched. WHAT TO TEST (rule 8): on 1000237620 OP-030 the STEP 6 caption and tile should line up with STEP 5 and STEP 7, with GAGES · 2 OPEN / 2 underneath it. Same on OP-040, where Step 6 is locked and greyed."] },
   { ts: "2026-08-08", rev: "App Rev-1012", type: "App", changes: ["GAGES MOVES UNDER ASSIGN MEASUREMENT TYPES, IN WHITE (Rev-1012, embedded validation REV-260) — per Rich, and it belongs there. A gage exists only because the Special Gage / Fixture box was filled on a row in STEP 6, so the button now hangs directly beneath that step rather than standing in the numbered track. White background, and it turns red-edged with red text when any gage is still open, so an outstanding gage is visible from the list without opening anything. It stops being a numbered step for a reason worth keeping: in the track it read as one more thing to finish before the plan was done, and it never was — a gage that has not been made yet is a purchasing problem, not an unfinished Control Plan. LINE INSPECTION takes the freed number and is now STEP 8, so the track runs 1 to 8 with no gap. Nothing about what either button does has changed. WHAT TO TEST (rule 8): on 1000237620 OP-030 the GAGES button should sit under ASSIGN MEASUREMENT TYPES, white, reading GAGES · 2 OPEN / 2 in red, and still open the gage list on a click. LINE INSPECTION should now be labelled STEP 8, and OP-040 — which needs no gages — should show a plain white GAGES · NONE NEEDED."] },
   { ts: "2026-08-08", rev: "App Rev-1011", type: "App", changes: ["STEP 9 — LINE INSPECTION LEVELS (Rev-1011, embedded validation REV-260) — per Rich. A new tile beside GAGES, reading 0 / 14 SET or ALL 14 SET, opening a table of every feature row on the operation: BUBBLE, FEATURE DESCRIPTION, SPEC / TOLERANCE, MACHINIST CHECKS — the frequency already on the Control Plan, shown but never changed here — then LINE INSPECTION LEVEL and QUALITY PULLS A PART. The level is set per feature with three buttons, 1 2 3, plus NONE; the INTERVAL for each level is set once for the whole operation at the top, in yellow boxes because they are the numbers that matter, and the last column resolves the two into plain words: EVERY 25 PARTS, or NEVER where no level is set. A running count sits beside each level so an operation with everything on Level 1 is obvious before it becomes a workload. Features with no level are called out in a yellow bar, because no level means never pulled and that should be a decision rather than an oversight. Defaults are every 5, 25 and 100 parts — they are a starting point to change, not a recommendation. Levels ride on the plan and sync like everything else on it. Like STEP 8 this never locks and is worth nothing toward the percentage: it says how often quality re-checks a feature, not whether the plan is built. THE EMAIL IS NOT BUILT AND IS NOT CLAIMED TO BE. Nothing is sent — outbound mail is still waiting on the Office 365 sign-in fix that is holding up the nightly digest, and the panel says so on its face. Recording the intervals now means there is something to send the day it works. WHAT TO TEST (rule 8): on 1000237620 OP-030 press STEP 9, set a few features to 1, 2 and 3, change Level 2 to every 40 parts, and watch the last column follow. Close and reopen — it should all still be there, and the tile should count what is set."] },
   { ts: "2026-08-08", rev: "App Rev-1010", type: "App", changes: ["LINE INSPECTIONS CAN BE FILED AGAINST AN OPERATION (Rev-1010, embedded validation REV-260) — per Rich, who needs the LINE INSPECTION / FIRST ARTICLE INSPECTION forms out of CAMCO QUALITY and sitting with the operation they belong to. A LINE INSP button joins the action buttons; it carries the count, and turns RED the moment one of them is a FAIL, because a failed first article is not something to find by opening a panel. The panel lists what has been filed — date, result, shop order, inspector, file — with Download and Remove on each, and more than one can be filed, since there is one form per inspection rather than one per operation. THE FORM IS STORED EXACTLY AS EXPORTED, whatever the Export button gives — PDF, spreadsheet or picture — in the private data repository under lineinsp/PART/OPnnn/, the same road a CNC program travels. NOTHING PARSES THE FORM. The result, shop order and inspector are TYPED IN when it is filed, so nothing in here can quietly misread a form and put a PASS against a FAIL; three boxes is a fair price for that. Reading the findings out of the export — characteristic numbers, severity ranks, actions taken — and tying them back to bubble numbers is the obvious next step, and it needs a real exported file in hand first: what it parses depends entirely on what Export actually produces. WHAT TO TEST (rule 8): on 1000222892 OP-080, press LINE INSP, set the result, type the shop order and inspector, and pick an exported form — it should appear in the list with the button now reading LINE INSP 1. File a FAIL and the button should turn red."] },
@@ -3110,7 +3111,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:34 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:38 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5047,6 +5048,11 @@ function renderProjects(){
       // was a flex child of this same row; the bar has its own row now.
       stepWrap.style.flexWrap = 'nowrap';
       stepWrap.style.gap = '6px';
+      /* Rev-1013: TOP-ALIGN THE STEP COLUMNS. .cp-act centres its children, which was
+         invisible while every column was the same height. Rev-1012 hung the GAGES button
+         under Step 6, that column grew taller than the rest, and centring lifted Step 6 -
+         caption and all - above the line of the others. */
+      stepWrap.style.alignItems = 'flex-start';
 
       const mkStep = (n, title, state, tip, fn) => {
         const b = document.createElement('button');
