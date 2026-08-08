@@ -1685,7 +1685,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-994";
+const APP_REV = "Rev-995";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2213,6 +2213,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-995", type: "App", changes: ["REVIEW DATA ASKS WHAT TO REVIEW BEFORE IT SUMMARISES (Rev-995, embedded validation REV-260) \u2014 per Rich. Pressing \ud83d\udcca REVIEW used to dump every run ever stored for the operation into one summary; on OP-030 that is 110 runs and a Cpk that blends every machinist and every shift into one number, which is exactly how a real capability problem hides. A chooser now comes first. WHO: every machinist found in the stored runs, listed with how many pieces each ran, all ticked to start - untick to compare one against another. WHEN: ALL TIME, LAST DAY, 2 DAYS, 1 WEEK, 2 WEEKS or 1 MONTH, counted back from now against each run\u2019s completion date. Simulated runs have their own tick, off by default, exactly as in Reports. Each option shows the number of runs it would include, so an empty selection is visible BEFORE it is applied rather than as a blank table afterwards. The runs are read once when the panel opens; changing the selection after that is instant, and CHANGE SELECTION on the summary goes back without re-reading a thing. THE SUMMARY ITSELF IS UNCHANGED - same columns, same Cpk, same refusal under 5 pieces, same orange banner when simulated runs are in. WHAT TO TEST (rule 8): press \ud83d\udcca REVIEW on OP-030 - a chooser appears listing SIM with 110 pieces; tick simulated runs, pick 1 WEEK, and the summary should match what the full list showed. Payload verified in both repos before this entry."] },
   { ts: "2026-08-09", rev: "App Rev-994", type: "App", changes: ["THE RELEASED-OPERATION REFUSAL BECOMES A CHOICE (Rev-994, embedded validation REV-260) \u2014 Rich pressed \ud83e\uddea INJECT and got no Cpk dialog. The whole generate-and-save path was run against his real OP-040 with a stubbed GitHub and it worked - built the panel, generated ten pieces, asked to write all ten files. So nothing was broken: he was pressing INJECT on OP-030, which is RELEASED, and Rev-986 refused outright on a released operation. That safeguard was mine and it was blocking the workflow he asked for, with a dialog that named the problem and offered no way forward. It is now a choice: the dialog explains that a released operation carries a production sign-off and offers \u21ba WITHDRAW RELEASE & INJECT, which does exactly what the Step 7 dialog\u2019s own Withdraw button does - clears the sign-off, drops the operation below 100 percent - and then opens the Cpk panel. THE RULE IS UNCHANGED: simulated readings are still never written against an operation that is currently released. The difference is that withdrawing is now one press instead of a hunt, and it is stated plainly rather than implied. Cancel leaves the release exactly as it was. WHAT TO TEST (rule 8): press \ud83e\uddea INJECT on OP-030 - the dialog should offer to withdraw and inject; take it, generate 10 pieces at Cpk 1.33, then press \ud83d\udcca REVIEW and tick include simulated runs. Payload verified in both repos before this entry."] },
   { ts: "2026-08-09", rev: "App Rev-993", type: "App", changes: ["THE PART DESCRIPTION RIDES BESIDE THE PART NUMBER (Rev-993, embedded validation REV-260) \u2014 per Rich, who circled the empty space in the beige part-header row. This is the right home for it and the two earlier attempts were not: Rev-991 put it on its own line under the heading where it repeated the part number, and Rev-992 removed it again. Here it adds a word to a line that already exists and repeats nothing - 1000237620 in its usual 33px, then a thinner grey AIR COIL beside it. Upper case, per Rev-974. A part with no description shows nothing extra, so the header is exactly as it was before for the parts that have none. WHAT TO TEST (rule 8): open 1000237620 - the beige row should read the part number then AIR COIL; open 912993, which has no description, and the row should look untouched. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-992", type: "App", changes: ["THE PART LINE UNDER THE HEADING IS GONE AGAIN (Rev-992, embedded validation REV-260) \u2014 Rich crossed out the 1000237620 \u00b7 AIR COIL line one revision after asking for it, and he is right: the beige header row directly beneath already says 1000237620 in large type, so the line said the part number twice and only added a word. That is the same reason Rev-953 emptied this bar in the first place; I put it back at Rev-991 without weighing it against the header sitting right under it. The bar is empty again. THE DRAWING FROM Rev-991 STAYS - that was the half that added something the screen did not already show. WHAT TO TEST (rule 8): open 1000237620 - no line between the subtitle and the table, and each operation still shows its own drawing in the STATUS column. Payload verified in both repos before this entry."] },
@@ -3084,7 +3085,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-09";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:26 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "1:04 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -14584,84 +14585,180 @@ async function _cpReviewDataPanel(idx){
     if(!runs.length){ say('<div style="padding:20px 0; color:#a5342a;">Found ' + mine.length
       + ' run file(s) but none could be read.</div>'); return; }
 
-    /* Group every reading by bubble. Limits come off the READING (what was actually in force
-       when the piece was measured), not off today's plan - the plan may have moved since. */
-    const byBubble = {};
-    let simCount = 0;
-    runs.forEach(rn => {
-      if(rn && (rn.simulated || (rn.run && rn.run.simulated))) simCount++;
-      (rn.readings || []).forEach(rd => {
-        const b = String(rd.bubble || '').trim(); if(!b) return;
-        const g = byBubble[b] = byBubble[b] || { bubble: b, desc: rd.characteristic || '', instr: rd.instrument || '',
-                                                lo: null, hi: null, vals: [], rows: [], attr: 0, attrPass: 0 };
-        if(!g.desc && rd.characteristic) g.desc = rd.characteristic;
-        if(rd.valueType === 'dim' && isFinite(rd.measuredValue) && isFinite(rd.tolLow) && isFinite(rd.tolHigh)){
-          if(g.lo === null){ g.lo = rd.tolLow; g.hi = rd.tolHigh; }
-          g.vals.push(+rd.measuredValue);
-          g.rows.push({ sn: (rn.run && rn.run.serialNumber) || '', v: +rd.measuredValue,
-                        ok: (rd.inTolerance !== false), sim: !!(rn.simulated || rd.simulated) });
-        } else {
-          g.attr++; if(rd.attributeResult !== 'FAIL' && rd.inTolerance !== false) g.attrPass++;
-        }
-      });
-    });
-    const groups = Object.values(byBubble).sort((a, b) => {
-      const x = parseFloat(a.bubble), y = parseFloat(b.bubble);
-      if(!isNaN(x) && !isNaN(y) && x !== y) return x - y;
-      return String(a.bubble) < String(b.bubble) ? -1 : 1;
-    });
-    const num = (v, dp) => (v == null ? '\u2014' : Number(v).toFixed(dp));
-    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
-    let h = '';
-    if(simCount){
-      h += '<div style="background:#fdf3d5; border:1px solid #d9b64a; border-radius:8px; padding:10px 12px;'
-        +  ' font-weight:800; color:#7a5a00; margin-bottom:12px;">\u26a0 ' + simCount + ' OF THESE '
-        +  runs.length + ' RUNS ARE SIMULATED \u2014 THIS SUMMARY IS NOT MEASUREMENT EVIDENCE.</div>';
-    }
-    h += '<div style="font-size:12px; color:#6b6257; margin-bottom:10px;">'
-      +  runs.length + ' run(s) read \u00b7 Cpk = min(USL\u2212mean, mean\u2212LSL) \u00f7 3\u03c3, '
-      +  '\u03c3 = sample standard deviation \u00b7 not computed under ' + CP_CAP_MIN_N + ' pieces</div>';
-    h += '<div style="overflow:auto;"><table style="border-collapse:collapse; width:100%; font-size:13px;">'
-      +  '<tr style="background:#9DC3E6; color:#1c1c1c; font-weight:800; font-size:11px; letter-spacing:.03em;">'
-      +  ['BUBBLE','FEATURE','LOW','HIGH','n','MEAN','MIN','MAX','\u03c3','CPK','OUT OF TOL']
-           .map(t => '<th style="border:1px solid #7fa9cc; padding:7px 6px; text-align:center;">' + t + '</th>').join('')
-      +  '</tr>';
-    groups.forEach((g, gi) => {
-      if(g.lo === null){
-        h += '<tr><td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:800;">' + esc(g.bubble) + '</td>'
-          +  '<td style="border:1px solid #d8d3ca; padding:7px;">' + esc(g.desc) + '</td>'
-          +  '<td colspan="9" style="border:1px solid #d8d3ca; padding:7px; text-align:center; color:#6b6257;">'
-          +  'no numeric limits \u2014 ' + g.attrPass + ' of ' + g.attr + ' recorded as a pass</td></tr>';
-        return;
+    /* ===== Rev-995: CHOOSE WHAT TO REVIEW FIRST ==========================
+       Every run in one summary blends machinists and shifts into a single Cpk, which is how a
+       real capability problem hides. The runs are read ONCE above; everything below filters
+       that list in memory, so changing the selection costs nothing. */
+    const _rDate = rn => {
+      const s = (rn.run && (rn.run.dateCompletedUtc || rn.run.createdUtc)) || rn.savedUtc || '';
+      const t = Date.parse(s); return isFinite(t) ? t : 0;
+    };
+    const _rWho = rn => String((rn.run && rn.run.operatorInitials) || '').trim().toUpperCase() || '(NONE)';
+    const _rSim = rn => !!(rn.simulated || (rn.run && rn.run.simulated));
+    const WINDOWS = [ ['all','ALL TIME',0], ['d1','LAST DAY',1], ['d2','2 DAYS',2],
+                      ['w1','1 WEEK',7], ['w2','2 WEEKS',14], ['m1','1 MONTH',30] ];
+    const whoCount = {};
+    runs.forEach(rn => { const w = _rWho(rn); whoCount[w] = (whoCount[w] || 0) + 1; });
+    const whoList = Object.keys(whoCount).sort();
+    let pickWho = whoList.slice();
+    let pickWin = 'all';
+    let pickSim = showSim;
+    const passes = rn => {
+      if(_rSim(rn) && !pickSim) return false;
+      if(pickWho.indexOf(_rWho(rn)) < 0) return false;
+      const days = (WINDOWS.find(w => w[0] === pickWin) || WINDOWS[0])[2];
+      if(days){ const t = _rDate(rn); if(!t || t < (Date.now() - days * 86400000)) return false; }
+      return true;
+    };
+    const countIf = fn => runs.filter(fn).length;
+    const esc0 = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+
+    const showChooser = () => {
+      let c = '<div style="font-size:12px; color:#6b6257; margin-bottom:12px;">'
+        + runs.length + ' run(s) stored for this operation. Choose what to summarise.</div>';
+      c += '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">WHO RAN THEM</div>'
+        +  '<div id="rvWho" style="display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 16px;">'
+        +  whoList.map(w => '<label style="display:inline-flex; align-items:center; gap:6px; padding:7px 11px;'
+             + ' border:1px solid #c9c0b4; border-radius:8px; background:#fff; font-size:13px; font-weight:700; cursor:pointer;">'
+             + '<input type="checkbox" data-who="' + esc0(w) + '"' + (pickWho.indexOf(w) >= 0 ? ' checked' : '') + '>'
+             + esc0(w) + ' <span style="font-weight:600; color:#6b6257;">' + whoCount[w] + '</span></label>').join('')
+        +  '</div>';
+      c += '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">HOW FAR BACK</div>'
+        +  '<div id="rvWin" style="display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 16px;">'
+        +  WINDOWS.map(([k, lab, days]) => {
+               const n = countIf(rn => { if(_rSim(rn) && !pickSim) return false;
+                 if(!days) return true; const t = _rDate(rn);
+                 return t && t >= (Date.now() - days * 86400000); });
+               return '<button type="button" data-win="' + k + '" style="padding:8px 13px; border-radius:8px; font-size:12.5px;'
+                 + ' font-weight:800; cursor:pointer; border:1px solid ' + (pickWin === k ? '#154360' : '#c9c0b4') + ';'
+                 + ' background:' + (pickWin === k ? '#1a5276' : '#fff') + '; color:' + (pickWin === k ? '#fff' : '#3a352e') + ';">'
+                 + lab + ' <span style="opacity:.75;">' + n + '</span></button>'; }).join('')
+        +  '</div>';
+      const simN = countIf(_rSim);
+      if(simN){
+        c += '<label style="display:inline-flex; align-items:center; gap:8px; padding:8px 12px; margin-bottom:14px;'
+          +  ' background:#fdf3d5; border:1px solid #d9b64a; border-radius:8px; font-size:12.5px; font-weight:700; color:#5c4708; cursor:pointer;">'
+          +  '<input type="checkbox" id="rvSim"' + (pickSim ? ' checked' : '') + '>'
+          +  'INCLUDE SIMULATED RUNS (' + simN + ') \u2014 not measurement evidence</label>';
       }
-      const dp = Math.max(3, (String(g.lo).split('.')[1] || '').length, (String(g.hi).split('.')[1] || '').length);
-      const s = cpCapStats(g.vals, g.lo, g.hi);
-      const col = _cpCapColour(s);
-      h += '<tr style="cursor:pointer; background:' + col.bg + ';" onclick="cpCapToggle(' + gi + ')">'
-        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:800;">' + esc(g.bubble) + '</td>'
-        +  '<td style="border:1px solid #d8d3ca; padding:7px;">' + esc(g.desc)
-        +    (g.instr ? ('<div style="font-size:10.5px; color:#6b6257;">' + esc(g.instr) + '</div>') : '') + '</td>'
-        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(g.lo, dp) + '</td>'
-        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(g.hi, dp) + '</td>'
-        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:700;">' + s.n + '</td>'
-        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.mean, dp + 1) + '</td>'
-        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.min, dp) + '</td>'
-        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.max, dp) + '</td>'
-        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.sd, dp + 2) + '</td>'
-        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:900; font-size:15px; color:' + col.fg + ';">'
-        +    (s.cpk == null ? ('<span style="font-size:10.5px; font-weight:700;">' + esc(s.why || '\u2014') + '</span>') : s.cpk.toFixed(2)) + '</td>'
-        +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:800; color:' + (s.oot ? '#a5342a' : '#1d6b3f') + ';">'
-        +    s.oot + (col.note ? ('<div style="font-size:9.5px;">' + col.note + '</div>') : '') + '</td></tr>';
-      h += '<tr id="capDet' + gi + '" style="display:none;"><td colspan="11" style="border:1px solid #d8d3ca; padding:8px 10px; background:#fbfaf8;">'
-        +  '<div style="display:flex; flex-wrap:wrap; gap:6px;">'
-        +  g.rows.map(r => '<span style="font:700 11px system-ui; padding:4px 8px; border-radius:5px; border:1px solid '
-             + (r.ok ? '#cfe0d2' : '#e6b3ad') + '; background:' + (r.ok ? '#f2f6f2' : '#fdecea') + '; color:'
-             + (r.ok ? '#1d6b3f' : '#a5342a') + ';">#' + esc(r.sn) + ' &nbsp;' + r.v.toFixed(dp)
-             + (r.sim ? ' <span style="opacity:.7;">SIM</span>' : '') + '</span>').join('')
-        +  '</div></td></tr>';
-    });
-    h += '</table></div>';
-    say(h);
+      const sel = countIf(passes);
+      c += '<div style="display:flex; align-items:center; gap:14px; padding-top:6px; border-top:1px solid #e2ddd4;">'
+        +  '<div style="font-size:13px; font-weight:800; color:' + (sel ? '#1d6b3f' : '#a5342a') + ';">'
+        +    sel + ' run(s) selected</div>'
+        +  '<button id="rvGo" ' + (sel ? '' : 'disabled ') + 'style="margin-left:auto; padding:11px 22px; border:none;'
+        +    ' background:' + (sel ? '#1a5276' : '#b9b3aa') + '; color:#fff; border-radius:8px; font-weight:800;'
+        +    ' font-size:14px; cursor:' + (sel ? 'pointer' : 'not-allowed') + ';">\ud83d\udcca Summarise</button>'
+        +  '</div>';
+      say(c);
+      const b = body(); if(!b) return;
+      b.querySelectorAll('#rvWho input').forEach(cb => { cb.onchange = () => {
+        const w = cb.getAttribute('data-who');
+        if(cb.checked){ if(pickWho.indexOf(w) < 0) pickWho.push(w); }
+        else pickWho = pickWho.filter(x => x !== w);
+        showChooser(); }; });
+      b.querySelectorAll('#rvWin button').forEach(bt => { bt.onclick = () => {
+        pickWin = bt.getAttribute('data-win'); showChooser(); }; });
+      const sc = document.getElementById('rvSim');
+      if(sc) sc.onchange = () => { pickSim = sc.checked;
+        try{ localStorage.setItem('cpShowSimRuns', pickSim ? '1' : '0'); }catch(e){}
+        showChooser(); };
+      const go = document.getElementById('rvGo');
+      if(go) go.onclick = () => showSummary(runs.filter(passes));
+    };
+
+    const showSummary = (list) => {
+      /* Group every reading by bubble. Limits come off the READING (what was actually in force
+         when the piece was measured), not off today's plan - the plan may have moved since. */
+      const byBubble = {};
+      let simCount = 0;
+        list.forEach(rn => {
+        if(rn && (rn.simulated || (rn.run && rn.run.simulated))) simCount++;
+        (rn.readings || []).forEach(rd => {
+          const b = String(rd.bubble || '').trim(); if(!b) return;
+          const g = byBubble[b] = byBubble[b] || { bubble: b, desc: rd.characteristic || '', instr: rd.instrument || '',
+                                                  lo: null, hi: null, vals: [], rows: [], attr: 0, attrPass: 0 };
+          if(!g.desc && rd.characteristic) g.desc = rd.characteristic;
+          if(rd.valueType === 'dim' && isFinite(rd.measuredValue) && isFinite(rd.tolLow) && isFinite(rd.tolHigh)){
+            if(g.lo === null){ g.lo = rd.tolLow; g.hi = rd.tolHigh; }
+            g.vals.push(+rd.measuredValue);
+            g.rows.push({ sn: (rn.run && rn.run.serialNumber) || '', v: +rd.measuredValue,
+                          ok: (rd.inTolerance !== false), sim: !!(rn.simulated || rd.simulated) });
+          } else {
+            g.attr++; if(rd.attributeResult !== 'FAIL' && rd.inTolerance !== false) g.attrPass++;
+          }
+        });
+      });
+      const groups = Object.values(byBubble).sort((a, b) => {
+        const x = parseFloat(a.bubble), y = parseFloat(b.bubble);
+        if(!isNaN(x) && !isNaN(y) && x !== y) return x - y;
+        return String(a.bubble) < String(b.bubble) ? -1 : 1;
+      });
+      const num = (v, dp) => (v == null ? '\u2014' : Number(v).toFixed(dp));
+      const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+      let h = '';
+      if(simCount){
+        h += '<div style="background:#fdf3d5; border:1px solid #d9b64a; border-radius:8px; padding:10px 12px;'
+          +  ' font-weight:800; color:#7a5a00; margin-bottom:12px;">\u26a0 ' + simCount + ' OF THESE '
+          +  list.length + ' RUNS ARE SIMULATED \u2014 THIS SUMMARY IS NOT MEASUREMENT EVIDENCE.</div>';
+      }
+      h += '<div style="font-size:12px; color:#6b6257; margin-bottom:10px;">'
+        +  list.length + ' run(s) read \u00b7 Cpk = min(USL\u2212mean, mean\u2212LSL) \u00f7 3\u03c3, '
+        +  '\u03c3 = sample standard deviation \u00b7 not computed under ' + CP_CAP_MIN_N + ' pieces</div>';
+      h += '<div style="overflow:auto;"><table style="border-collapse:collapse; width:100%; font-size:13px;">'
+        +  '<tr style="background:#9DC3E6; color:#1c1c1c; font-weight:800; font-size:11px; letter-spacing:.03em;">'
+        +  ['BUBBLE','FEATURE','LOW','HIGH','n','MEAN','MIN','MAX','\u03c3','CPK','OUT OF TOL']
+             .map(t => '<th style="border:1px solid #7fa9cc; padding:7px 6px; text-align:center;">' + t + '</th>').join('')
+        +  '</tr>';
+      groups.forEach((g, gi) => {
+        if(g.lo === null){
+          h += '<tr><td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:800;">' + esc(g.bubble) + '</td>'
+            +  '<td style="border:1px solid #d8d3ca; padding:7px;">' + esc(g.desc) + '</td>'
+            +  '<td colspan="9" style="border:1px solid #d8d3ca; padding:7px; text-align:center; color:#6b6257;">'
+            +  'no numeric limits \u2014 ' + g.attrPass + ' of ' + g.attr + ' recorded as a pass</td></tr>';
+          return;
+        }
+        const dp = Math.max(3, (String(g.lo).split('.')[1] || '').length, (String(g.hi).split('.')[1] || '').length);
+        const s = cpCapStats(g.vals, g.lo, g.hi);
+        const col = _cpCapColour(s);
+        h += '<tr style="cursor:pointer; background:' + col.bg + ';" onclick="cpCapToggle(' + gi + ')">'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:800;">' + esc(g.bubble) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px;">' + esc(g.desc)
+          +    (g.instr ? ('<div style="font-size:10.5px; color:#6b6257;">' + esc(g.instr) + '</div>') : '') + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(g.lo, dp) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(g.hi, dp) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:700;">' + s.n + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.mean, dp + 1) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.min, dp) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.max, dp) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.sd, dp + 2) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:900; font-size:15px; color:' + col.fg + ';">'
+          +    (s.cpk == null ? ('<span style="font-size:10.5px; font-weight:700;">' + esc(s.why || '\u2014') + '</span>') : s.cpk.toFixed(2)) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:800; color:' + (s.oot ? '#a5342a' : '#1d6b3f') + ';">'
+          +    s.oot + (col.note ? ('<div style="font-size:9.5px;">' + col.note + '</div>') : '') + '</td></tr>';
+        h += '<tr id="capDet' + gi + '" style="display:none;"><td colspan="11" style="border:1px solid #d8d3ca; padding:8px 10px; background:#fbfaf8;">'
+          +  '<div style="display:flex; flex-wrap:wrap; gap:6px;">'
+          +  g.rows.map(r => '<span style="font:700 11px system-ui; padding:4px 8px; border-radius:5px; border:1px solid '
+               + (r.ok ? '#cfe0d2' : '#e6b3ad') + '; background:' + (r.ok ? '#f2f6f2' : '#fdecea') + '; color:'
+               + (r.ok ? '#1d6b3f' : '#a5342a') + ';">#' + esc(r.sn) + ' &nbsp;' + r.v.toFixed(dp)
+               + (r.sim ? ' <span style="opacity:.7;">SIM</span>' : '') + '</span>').join('')
+          +  '</div></td></tr>';
+      });
+      h += '</table></div>';
+      say(h);
+      /* Rev-995: back to the chooser without re-reading a single file. */
+      try{
+        const b2 = body();
+        if(b2){
+          const back = document.createElement('button');
+          back.textContent = '\u21a9 Change selection';
+          back.style.cssText = 'margin-top:14px; padding:9px 16px; border:1px solid #c9c0b4; background:#fff;'
+            + ' border-radius:8px; font-weight:700; font-size:13px; cursor:pointer;';
+          back.onclick = showChooser;
+          b2.appendChild(back);
+        }
+      }catch(e){ console.warn('Rev-995 back button failed', e); }
+    };
+    showChooser();
   }catch(e){
     console.error('Rev-987 review data failed', e);
     say('<div style="padding:18px 0; color:#a5342a; font-weight:700;">Could not build the summary: '
