@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1006</title>
+<title>CONTROL PLAN GENERATOR - Rev-1007</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1006 · 2026-08-08 11:21 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1007 · 2026-08-08 11:34 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1006 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:21 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1007 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:34 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1006 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1007 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1006";
+const APP_REV = "Rev-1007";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1007", type: "App", changes: ["TICKING A MACHINIST NARROWS THE SHOP ORDERS, AND GENERATED DATA GETS REAL NAMES (Rev-1007, embedded validation REV-260) — three things from Rich, all on the download screen. FIRST, the shop-order table now FOLLOWS the machinist tick: tick HICKEY and the table below drops to the shop orders he actually worked, with the caption saying so. It is rebuilt on every draw rather than once, and the (n in window) figure honours the machinist tick as well, so the two tables can never tell different stories. SECOND, a MACHINIST column sits between SHOP ORDER and RUNS, listing everyone who ran that job — a job number belongs to a run rather than a person, so two machinists can share one and both are named. A dash there means those runs are not in the summary table yet, NOT that nobody ran them. THIRD, generated data is now attributed to HICKEY, ISAIAH, ZAK, GRANT and STEVE instead of SIM-A to SIM-D, and HOW MANY MACHINISTS runs 1 to 5. BE CLEAR ABOUT WHAT THAT COSTS: the operator field no longer announces itself as fake. Every other declaration stands and must stay — simulated:true on the run AND on every single reading, the shop order still SIM-xxxx so the FILE NAME declares it, the red SIM tag beside the name in the machinist table, hidden from Reports and Review unless simulated runs are switched on, the banner across the top of any summary saying the runs are not measurement evidence, and a released operation still refuses the whole thing outright. Names already generated keep saying SIM-A to SIM-D until those runs are deleted and re-injected. WHAT TO TEST (rule 8): on 1000237620 OP-030 tick one machinist — the shop-order table under it should shrink to that person’s jobs and the MACHINIST column should name them; press Every machinist and it should come back. Then inject a fresh batch and the new machinist table should read HICKEY, ISAIAH, ZAK."] },
   { ts: "2026-08-08", rev: "App Rev-1006", type: "App", changes: ["A SMALL RUN INDEX NOW FEEDS THE FILTERS, SO MACHINISTS CAN BE PICKED BEFORE ANYTHING IS DOWNLOADED (Rev-1006, embedded validation REV-260) — Rich’s idea, and the right one. Rev-1004 could offer days and shop orders on the download screen because those are in the file NAME, but not machinists, because the operator is inside the file. The answer is a table beside the runs: one line per run holding the machinist, the day, the shop order, how many readings it carried and whether it is simulated. It lives at runs_index/PART_OP-nnn.json in the data repository and is KEYED BY FILE NAME, so two devices’ additions merge for free and a run can never be counted twice. Reading it is ONE small fetch. THE READER BUILDS IT, NOT THE WRITER. The machinist app pushes a run and knows nothing about this file; the review screen notices any run missing from the table and offers BUILD THE TABLE (n), reading just those runs once. That choice means no change to the validation app, it back-fills every run already in the repository, and it repairs itself if a run lands from a device that never opened the screen. A run is read once for this and never again for the purpose of drawing filters. The download screen gains a MACHINISTS table — name, PARTS INSPECTED, DAYS, first and last — each tickable, each showing how many of that person’s runs fall in the chosen window, and the choice carries straight through to the screen after the download rather than being asked twice. A machinist filter applies only to runs that are IN the table; an unindexed run has no name attached yet and is left out rather than quietly counted as somebody. Writing the table reads, merges and writes, and on a 409 — another device writing in the same moment — goes round again with a fresh sha instead of flattening their additions. If the table cannot be saved the screen says so and the choices still work for that visit. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — expect a yellow bar saying the runs are not in the table yet; press BUILD THE TABLE and let it run once; the MACHINISTS table should then list SIM, SIM-A to SIM-D with their parts-inspected counts. Close the panel and reopen it: the table should appear instantly with no reading at all."] },
   { ts: "2026-08-08", rev: "App Rev-1005", type: "App", changes: ["HARDWARE NEEDED — A LIST OF WHAT THE FLOOR IS STILL MISSING (Rev-1005, embedded validation REV-260) — per Rich. Admin gains a HARDWARE section with one button, Hardware Needed, which opens its own screen. Four items are on it the first time it opens: MONITOR, MONITOR HANGER, KEYBOARD / KEYPAD and CAMERAS. Anything else is typed into the box at the top and added, so the list grows to whatever the floor actually needs. Press an item and it opens: HOW MANY ARE NEEDED (yellow, because it is the field that matters, per the CAMCO UI standard for a mandatory field), WHERE IT GOES, and NOTES. A tile with a quantity on it turns green and shows the number large enough to read across a desk; one still at zero stays grey. COPY THE LIST puts the whole thing on the clipboard as plain text, ready to paste into an email or a purchase request, because a list that cannot leave the app is a list somebody retypes. DELETE THIS ITEM removes one, asking first. The list is kept ON THIS DEVICE and does not yet sync to the other machines — say the word and it can ride along with the rest of the data. TWO BUILD NOTES. The screen is a full-screen overlay rather than another hidden panel in the page: every one of those has to be named by hand in a dozen different show-this-hide-that functions, and the one that gets missed is a screen that will not close. And the button is spelled HARDWARE — the request read ‘hardward’, and a typo baked into a button is an IT ticket later. WHAT TO TEST (rule 8): Admin → Hardware Needed, press MONITOR, put 3 in the yellow box and CELL 4 in where it goes, press SAVE — the tile should turn green and read 3. Add one of your own, then leave the screen and come back: everything should still be there."] },
   { ts: "2026-08-08", rev: "App Rev-1004", type: "App", changes: ["REVIEW DATA CHOOSES BEFORE IT DOWNLOADS (Rev-1004, embedded validation REV-260) — per Rich, who is looking a year ahead rather than at today. Rev-987 read EVERY run file for the operation before it drew the chooser. At 170 files that is merely slow; a year of production is thousands, and the whole wait landed BEFORE he could say he only wanted last week. Now the panel opens on a DOWNLOAD SCREEN and nothing is fetched until it is chosen. Listing the files costs one call and was already being made, so the screen is free. It is built from the FILE NAMES alone: a run is named PART_OP-nnn_SHOPORDER_YYYYMMDD_SERIAL_RUNID.json, so the shop order, the day and whether it is simulated are all readable without opening anything. The screen offers HOW FAR BACK with true counts (now out to 3 MONTHS and 1 YEAR), the simulated tick, and a TABLE OF EVERY SHOP ORDER in the repository — runs, first day, last day, REAL or SIMULATED — each tickable, with how many of its runs fall inside the chosen window. The button states the exact cost before it is paid: Download 34 run(s), and it counts them down as they come. THE MACHINIST IS NOT ON THIS SCREEN, and that is a fact about the data rather than a choice: the operator’s name is INSIDE each run file, on the run record, not in its name. Listing machinists up front would mean downloading everything to find out — the exact cost this removes. So WHO RAN THEM appears on the next screen, built from what actually came down, and a ↩ Change what is downloaded button on that screen returns here without closing the panel. Simulated files are no longer dropped from the listing behind the scenes; they are counted and ticked here instead, so the number on screen always matches what is really in the repository. NOTHING ABOUT THE MATHS OR THE SUMMARY CHANGED. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — it should open instantly on the download screen with no wait at all, listing the shop orders; press 1 WEEK, then Download, and only that week’s files should come down, after which the machinist chooser lists only the machinists inside them."] },
@@ -3104,7 +3105,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:21 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:34 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -14910,17 +14911,23 @@ async function _cpReviewDataPanel(idx){
       if(preWho.length && preWho.indexOf(_rowWho(nm)) < 0) return false;
       return preInWin(nm, preDays());
     };
-    const soRows = (() => {
+    /* Rev-1007: rebuilt on every draw rather than once, because ticking a machinist now
+       narrows this table to that person's shop orders. It also collects WHO worked each
+       shop order, from the run index - a job number belongs to a run, not a person, so
+       two machinists can share one. */
+    const soRows = () => {
       const m = {};
       mine.forEach(nm => {
+        if(preWho.length && preWho.indexOf(_rowWho(nm)) < 0) return;
         const so = _fSo(nm);
-        const r = m[so] = m[so] || { so: so, n: 0, first: 0, last: 0, sim: _fSim(nm) };
+        const r = m[so] = m[so] || { so: so, n: 0, first: 0, last: 0, sim: _fSim(nm), who: {} };
         r.n++;
-        const t = _fTime(nm);
+        const w = _rowWho(nm); if(w) r.who[w] = (r.who[w] || 0) + 1;
+        const t = _rowTime(nm);
         if(t){ if(!r.first || t < r.first) r.first = t; if(t > r.last) r.last = t; }
       });
       return Object.keys(m).map(k => m[k]).sort((a, b) => (b.last - a.last) || a.so.localeCompare(b.so));
-    })();
+    };
     /* Rev-1006: one small fetch. Everything the download screen offers is drawn from it. */
     let idxRows = {};
     let idxErr = '';
@@ -15080,23 +15087,32 @@ async function _cpReviewDataPanel(idx){
         +    'Every shop order</button>'
         +  '<div style="font-size:11.5px; color:#6b6257;">'
         +    (preSo.length ? (preSo.length + ' ticked') : 'none ticked \u2014 every shop order included')
+        +    (preWho.length ? ('  \u00b7  showing only ' + esc0(preWho.join(', ')) + '\u2019s shop orders') : '')
         +  '</div></div>'
         +  '<div style="max-height:290px; overflow:auto; border:1px solid #e2ddd4; border-radius:8px; margin-bottom:16px;">'
         +  '<table id="pvSo" style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
         +  '<thead><tr>'
-        +    ['', 'SHOP ORDER', 'RUNS', 'FIRST', 'LAST', 'TYPE'].map((th, i) =>
+        +    ['', 'SHOP ORDER', 'MACHINIST', 'RUNS', 'FIRST', 'LAST', 'TYPE'].map((th, i) =>
               '<th style="border-bottom:1px solid #d8d3ca; padding:7px 9px; background:#f3efe8; color:#3a352e;'
               + ' font-weight:800; font-size:11px; letter-spacing:.05em; text-align:'
-              + (i <= 1 ? 'left' : 'center') + '; position:sticky; top:0;">' + th + '</th>').join('')
+              + (i <= 2 ? 'left' : 'center') + '; position:sticky; top:0;">' + th + '</th>').join('')
         +  '</tr></thead><tbody>'
-        +  soRows.filter(r => !r.sim || preSim).map(r => {
+        +  soRows().filter(r => !r.sim || preSim).map(r => {
               const on = preSo.indexOf(r.so) >= 0;
-              const inWin = mine.filter(nm => _fSo(nm) === r.so && preInWin(nm, preDays())).length;
+              const inWin = mine.filter(nm => _fSo(nm) === r.so
+                              && (!preWho.length || preWho.indexOf(_rowWho(nm)) >= 0)
+                              && preInWin(nm, preDays())).length;
               return '<tr style="background:#fff;">'
                 + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px;">'
                 +   '<input type="checkbox" data-so="' + esc0(r.so) + '"' + (on ? ' checked' : '') + '></td>'
                 + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; font-weight:700; color:#000;">'
                 +   esc0(r.so) + '</td>'
+                /* Rev-1007: who actually ran this shop order, from the index. A dash means the
+                   runs are not in the summary table yet, not that nobody ran them. */
+                + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; color:#3a352e;">'
+                +   (Object.keys(r.who).length
+                      ? esc0(Object.keys(r.who).sort().join(', '))
+                      : '<span style="color:#b9b3aa;">\u2014</span>') + '</td>'
                 + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; text-align:center; color:#000;">'
                 +   r.n + (inWin !== r.n ? ' <span style="color:#6b6257;">(' + inWin + ' in window)</span>' : '') + '</td>'
                 + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; text-align:center; color:#3a352e;">'
@@ -15484,6 +15500,9 @@ function cpInjValues(lo, hi, n, sc){
 }
 /* Build the run records. Shape copied from a real stored run so Reports reads them
    identically - runId, valDoc, operation, partNumber, shopOrder, serialNumber, readings[]. */
+/* Rev-1007: the names generated data is attributed to, per Rich. Five of them, so the
+   HOW MANY MACHINISTS list runs 1 to 5. */
+const CP_INJ_WHO = ['HICKEY', 'ISAIAH', 'ZAK', 'GRANT', 'STEVE'];
 function cpInjBuild(p, sc, pieces, machinists, days){   /* Rev-996 */
   const rows = (((p.builderState || {}).rows) || []).filter(r => String(r.bubble || '').trim());
   const feats = [];
@@ -15506,9 +15525,15 @@ function cpInjBuild(p, sc, pieces, machinists, days){   /* Rev-996 */
      one machinist, one instant. Machinists round-robin so each gets a fair share; days spread
      evenly backwards from today, each piece landing at a believable hour of a shift rather
      than all at midnight, so the 1 WEEK and 2 WEEKS windows genuinely cut the set. */
+  /* Rev-1007: named machinists on generated data, per Rich. NOTE WHAT THIS COSTS: the
+     operator field no longer announces itself as fake. Every other declaration stands and
+     must stay - simulated:true on the run AND on every reading, the shop order still
+     SIM-xxxx so the FILE NAME declares it, the SIM tag beside the name in the machinist
+     table, hidden from Reports and Review unless switched on, the banner across the top of
+     any summary, and a released operation still refuses the whole thing. */
   const who = [];
-  for(let m = 0; m < Math.max(1, Math.min(4, machinists || 1)); m++){
-    who.push('SIM-' + String.fromCharCode(65 + m));
+  for(let m = 0; m < Math.max(1, Math.min(CP_INJ_WHO.length, machinists || 1)); m++){
+    who.push(CP_INJ_WHO[m] || ('SIM-' + String.fromCharCode(65 + m)));
   }
   const spanDays = Math.max(1, days || 1);
   /* one shop order per machinist - in the shop a job number belongs to a run, not a person */
@@ -15645,8 +15670,9 @@ function _cpInjectPanel(idx){
     +     '<div style="flex:1;">'
     +       '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">HOW MANY MACHINISTS</div>'
     +       '<select id="injM" style="width:100%; font-size:15px; padding:9px; margin-top:6px; border:1px solid #c9c0b4; border-radius:8px;">'
-    +         '<option value="1">1 \u00b7 SIM-A</option><option value="2">2 \u00b7 SIM-A, SIM-B</option>'
-    +         '<option value="3" selected>3 \u00b7 SIM-A to SIM-C</option><option value="4">4 \u00b7 SIM-A to SIM-D</option></select>'
+    +         CP_INJ_WHO.map((w, i) => '<option value="' + (i + 1) + '"' + (i === 2 ? ' selected' : '') + '>'
+                    + (i + 1) + ' \u00b7 ' + CP_INJ_WHO.slice(0, i + 1).join(', ') + '</option>').join('')
+    +         '</select>'
     +     '</div>'
     +     '<div style="flex:1;">'
     +       '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">HOW MANY DAYS OF MACHINING</div>'
@@ -22381,7 +22407,7 @@ AUG 7-9 SESSION STATE (Rev-951 → Rev-999) — read before touching anything:
     an older rev appearing mid-burst.
   · INJECT DATA (Rev-986/994/996), expert-user only, beside Inspect. Eight scenarios
     (Cpk 2.00/1.67/1.33/1.00/0.67, SHIFTED, DRIFTING, ONE BAD PIECE), 5-50 pieces, 1-4
-    machinists named SIM-A..SIM-D, 1-30 days. EVERY safety stamp matters and must stay:
+    machinists named HICKEY/ISAIAH/ZAK/GRANT/STEVE (Rev-1007), 1-30 days. EVERY safety stamp matters and must stay:
     simulated:true on run AND every reading, operator = the SIM-x name, shop order SIM-xxxx
     so the FILENAME declares it, hidden from Reports and Review unless switched on. Refused
     on a released operation - the dialog offers WITHDRAW RELEASE & INJECT instead.
