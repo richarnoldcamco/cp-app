@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1020</title>
+<title>CONTROL PLAN GENERATOR - Rev-1021</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1020 · 2026-08-08 3:58 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1021 · 2026-08-08 4:04 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1020 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:58 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1021 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 4:04 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1020 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1021 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1020";
+const APP_REV = "Rev-1021";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1021", type: "App", changes: ["▶ PERFORM LINE INSPECTION, UNDER STEP 8 (Rev-1021, embedded validation REV-260) — per Rich. The button hangs under the LINE INSPECTION tile the way GAGES hangs under Step 6, and it opens THE SAME inspection the machinist runs. Not a copy of it — the same call, so the two cannot drift: a feature added to the machinist’s program is in the quality technician’s the same moment, with the same reference crops, the same limits and the same order. It is greyed out on an operation with no plan data to inspect, and says so. ONE THING IT DOES NOT YET DO, and it should be said plainly rather than discovered later: the run it saves is indistinguishable in the data from a machinist run. It carries whoever types their name in at the start and nothing marks it as a LINE inspection, so Review Data cannot yet separate the quality technician’s rounds from the machinist’s. Marking them apart means a change inside the embedded machinist app, which is its own revision and its own testing. WHAT TO TEST (rule 8): on 1000237620 OP-030 the button should sit under STEP 8 and open the inspection exactly as the Inspect button does; on an operation with no rows it should be greyed."] },
   { ts: "2026-08-08", rev: "App Rev-1020", type: "App", changes: ["EVERY FEATURE IS ON THE LEVEL 1 ROUND, AND THE SCREEN NOW SHOWS IT (Rev-1020, embedded validation REV-260) — per Rich, and it is the honest reading of what he has been saying for three revisions. A Level 1 check is the quality technician going over the WHOLE part, so every feature is on it — including the ones marked 2 or 3. The screen was showing those rows with an empty 1, which read as though they were skipped. THE 1 IS NOW ALWAYS ON, on every row, and it is not a button: it is a statement of fact and cannot be turned off. 2 and 3 became what they always meant — the EXTRA rounds a feature also gets looked at on — and each toggles, so pressing the level a feature already carries takes it back off with the same button that put it on. NONE became L1 ONLY, which is what it actually means: still inspected, just not on an extra round. THE LAST COLUMN NOW LISTS EVERY ROUND a feature is on, Level 1 first, so a critical feature reads EVERY 30 PARTS · COMPLETE CHECK above EVERY 15 PARTS · CRITICAL ONLY instead of pretending the complete check does not touch it. The Level 1 card counts the whole list, and the old yellow no-level-yet warning is gone — nothing is unset any more, so it was warning about a state that cannot exist. It is replaced by a quiet blue note saying how many features are on the Level 1 round only. The AI is asked the new question too: every feature is already on the complete check, choose which ALSO need an extra round. WHAT TO TEST (rule 8): open STEP 8 on 1000237620 OP-030 — every row should show a solid red 1, the rows marked 2 should list both rounds down the right, and pressing 2 on a row that already has it should take it back to L1 ONLY."] },
   { ts: "2026-08-08", rev: "App Rev-1019", type: "App", changes: ["REV-1018 REVERSED — LEVEL 1 KEEPS ITS PARTS INTERVAL (Rev-1019, embedded validation REV-260) — I read Rich wrong and built the wrong thing. He said Level 1 is a 100% check and I took it to mean every PART; he meant every FEATURE. A Level 1 check is the quality technician going over the WHOLE part — the entire level column marked 1 — rather than a sample of features. HOW OFTEN that round happens is still an interval, so Level 1 gets its parts box back exactly as it was at Rev-1017, and any interval already stored against it is honoured again rather than forced to 1. The AI instruction is put back with it, since Rev-1018 had told it Level 1 meant every part. AND THE SCREEN NOW SAYS WHAT A LEVEL IS, so the same misreading cannot happen twice: a level says WHICH FEATURES get looked at when quality comes round — Level 1 every feature on the part, Level 2 the critical ones, Level 3 the odd ones — and the parts figure on each card is how often that round comes. WHAT TO TEST (rule 8): open STEP 8 on 1000237620 OP-030 — all three cards should take a number again, Level 1 should show whatever it held before Rev-1018 rather than 100%, and the rows should read EVERY 30 PARTS · COMPLETE CHECK instead of EVERY PART · 100%."] },
   { ts: "2026-08-08", rev: "App Rev-1018", type: "App", changes: ["LEVEL 1 IS A 100% CHECK, NOT A SAMPLE (Rev-1018, embedded validation REV-260) — per Rich, and it changes what the level MEANS rather than just what it says. Level 1 carried an editable parts interval like the other two, so it read as one part in 30. It is every part. The card now shows a fixed 100% · EVERY PART where the number box was, and there is NO BOX AT ALL rather than a box reading 1 — a box reading 1 invites somebody to type 30 into it and quietly turn a 100% check into a sample, which is the kind of change nobody notices until a part gets out. Levels 2 and 3 keep their intervals and stay editable. Every row set to Level 1 now reads EVERY PART · 100% in the last column instead of a parts figure. THE AI WAS BEING TOLD THE WRONG THING TOO and is corrected in the same rev: it was asked to treat Level 1 as a twice-a-shift re-check, so it was weighing the levels against a rule that was not CAMCO’s. It is now told Level 1 means 100%, every part. WHAT TO TEST (rule 8): open STEP 8 on 1000237620 OP-030 — the LEVEL 1 card should read 100% · EVERY PART with no editable box, Levels 2 and 3 should still take a number, and every Level 1 row should read EVERY PART · 100% down the right."] },
@@ -3118,7 +3119,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:58 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "4:04 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5250,13 +5251,41 @@ function renderProjects(){
       /* Rev-1011: STEP 9 - LINE INSPECTION LEVELS. Like 8, never locks, worth nothing
          toward the percentage: it says how OFTEN quality re-checks a feature, not whether
          the plan is built. */
-      mkStep(8, 'LINE INSPECTION', (_l9.done ? 'done' : 'todo'),
+      const _b8 = mkStep(8, 'LINE INSPECTION', (_l9.done ? 'done' : 'todo'),
         (!_l9.total
           ? 'STEP 8 \u2014 give each feature its line-inspection level once the rows exist.'
           : ('STEP 8 \u2014 ' + _l9.set + ' of ' + _l9.total + ' features have a line-inspection '
              + 'level.\nLevel 1, 2 or 3 sets how often the quality technician re-checks that '
              + 'feature.')),
         () => cpLineLevelPanel(i));
+
+      /* Rev-1021: PERFORM LINE INSPECTION hangs under Step 8, the way GAGES hangs under
+         Step 6. It opens THE SAME inspection the machinist runs - deliberately the same
+         call, not a copy of it, so the two can never drift apart and a feature added to
+         the machinist's program is in the quality technician's the same moment. */
+      try{
+        const _w8 = _b8 && _b8.parentNode;
+        if(_w8){
+          const _lb = document.createElement('button');
+          _lb.type = 'button';
+          _lb.textContent = '\u25b6 PERFORM LINE INSPECTION';
+          _lb.title = has
+            ? 'Run the inspection for this operation \u2014 the SAME program the machinist runs,\n'
+              + 'feature for feature. Readings are saved like any other run.'
+            : 'There is no plan data to inspect yet.';
+          _lb.disabled = !has;
+          _lb.style.cssText = 'display:block; width:100%; margin-top:6px; background:#fff;'
+            + ' border:1px solid ' + (has ? '#1a5276' : '#d8d3ca') + '; border-radius:8px;'
+            + ' padding:7px 6px; font-size:10.5px; font-weight:800; letter-spacing:.04em;'
+            + ' color:' + (has ? '#1a5276' : '#b9b3aa') + '; line-height:1.35; cursor:'
+            + (has ? 'pointer' : 'not-allowed') + ';';
+          if(has) _lb.onclick = () => {
+            try{ logAct('line-insp', 'started from Step 8'); }catch(_){ }
+            inspectMachinistValidation(i);
+          };
+          _w8.appendChild(_lb);
+        }
+      }catch(e){ console.warn('Rev-1021 line inspection button failed', e); }
 
       // Rev-620: built here, hung on its own row below
       _cpBarFor = (() => {
