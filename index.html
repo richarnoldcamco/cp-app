@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1004</title>
+<title>CONTROL PLAN GENERATOR - Rev-1005</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1004 · 2026-08-08 11:12 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1005 · 2026-08-08 11:14 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1004 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:12 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1005 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:14 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1004 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1005 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1320,6 +1320,14 @@
     </button>
   </div>
 
+  <!-- Rev-1005: HARDWARE NEEDED -->
+  <div style="margin-bottom: 24px; padding-top: 24px; border-top: 1px solid var(--line);">
+    <h3 style="font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px;">Hardware</h3>
+    <button class="btn-secondary" id="mHardwareNeeded" onclick="cpHwOpen()" style="width:100%;">🖥️ Hardware Needed</button>
+    <p style="font-size:11px; color:var(--ink-dim); margin:8px 0 0;">
+      What the shop floor still needs to run this app — screens, mounts, keypads, cameras. Add your own items.</p>
+  </div>
+
   <div style="margin-bottom: 24px;">
     <h3 style="font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px;">API Key &amp; GitHub Sync</h3>
     <button class="btn-primary" onclick="showSettings()" style="width:100%; margin-bottom:8px;">⚙️ API Key &amp; GitHub Sync Settings</button>
@@ -1685,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1004";
+const APP_REV = "Rev-1005";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2213,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1005", type: "App", changes: ["HARDWARE NEEDED — A LIST OF WHAT THE FLOOR IS STILL MISSING (Rev-1005, embedded validation REV-260) — per Rich. Admin gains a HARDWARE section with one button, Hardware Needed, which opens its own screen. Four items are on it the first time it opens: MONITOR, MONITOR HANGER, KEYBOARD / KEYPAD and CAMERAS. Anything else is typed into the box at the top and added, so the list grows to whatever the floor actually needs. Press an item and it opens: HOW MANY ARE NEEDED (yellow, because it is the field that matters, per the CAMCO UI standard for a mandatory field), WHERE IT GOES, and NOTES. A tile with a quantity on it turns green and shows the number large enough to read across a desk; one still at zero stays grey. COPY THE LIST puts the whole thing on the clipboard as plain text, ready to paste into an email or a purchase request, because a list that cannot leave the app is a list somebody retypes. DELETE THIS ITEM removes one, asking first. The list is kept ON THIS DEVICE and does not yet sync to the other machines — say the word and it can ride along with the rest of the data. TWO BUILD NOTES. The screen is a full-screen overlay rather than another hidden panel in the page: every one of those has to be named by hand in a dozen different show-this-hide-that functions, and the one that gets missed is a screen that will not close. And the button is spelled HARDWARE — the request read ‘hardward’, and a typo baked into a button is an IT ticket later. WHAT TO TEST (rule 8): Admin → Hardware Needed, press MONITOR, put 3 in the yellow box and CELL 4 in where it goes, press SAVE — the tile should turn green and read 3. Add one of your own, then leave the screen and come back: everything should still be there."] },
   { ts: "2026-08-08", rev: "App Rev-1004", type: "App", changes: ["REVIEW DATA CHOOSES BEFORE IT DOWNLOADS (Rev-1004, embedded validation REV-260) — per Rich, who is looking a year ahead rather than at today. Rev-987 read EVERY run file for the operation before it drew the chooser. At 170 files that is merely slow; a year of production is thousands, and the whole wait landed BEFORE he could say he only wanted last week. Now the panel opens on a DOWNLOAD SCREEN and nothing is fetched until it is chosen. Listing the files costs one call and was already being made, so the screen is free. It is built from the FILE NAMES alone: a run is named PART_OP-nnn_SHOPORDER_YYYYMMDD_SERIAL_RUNID.json, so the shop order, the day and whether it is simulated are all readable without opening anything. The screen offers HOW FAR BACK with true counts (now out to 3 MONTHS and 1 YEAR), the simulated tick, and a TABLE OF EVERY SHOP ORDER in the repository — runs, first day, last day, REAL or SIMULATED — each tickable, with how many of its runs fall inside the chosen window. The button states the exact cost before it is paid: Download 34 run(s), and it counts them down as they come. THE MACHINIST IS NOT ON THIS SCREEN, and that is a fact about the data rather than a choice: the operator’s name is INSIDE each run file, on the run record, not in its name. Listing machinists up front would mean downloading everything to find out — the exact cost this removes. So WHO RAN THEM appears on the next screen, built from what actually came down, and a ↩ Change what is downloaded button on that screen returns here without closing the panel. Simulated files are no longer dropped from the listing behind the scenes; they are counted and ticked here instead, so the number on screen always matches what is really in the repository. NOTHING ABOUT THE MATHS OR THE SUMMARY CHANGED. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — it should open instantly on the download screen with no wait at all, listing the shop orders; press 1 WEEK, then Download, and only that week’s files should come down, after which the machinist chooser lists only the machinists inside them."] },
   { ts: "2026-08-08", rev: "App Rev-1003", type: "App", changes: ["EVERY REVIEW ROW CAN PUT ITS OWN INSPECTION CROP ON THE PANEL (Rev-1003, embedded validation REV-260) — per Rich. Each row of 📊 REVIEW DATA now carries a small INSPECTION CROP button under the feature name. Press it and the right-hand panel swaps from the whole ODS print to the cropped reference picture saved for THAT bubble — the same picture the machinist looks at when measuring it. The button then reads FULL DRAWING and turns solid; press it again, or press another row’s button, and the panel follows. Only one crop is on screen at a time and every button re-labels itself on each swap, so what is showing and what the buttons say cannot drift apart. The panel heading changes with it, reading INSPECTION CROP · BUBBLE 7 instead of ODS DRAWING · OP-030, because a zoomed crop and a zoomed print look alike and an unlabelled panel would leave you guessing which you were reading. CLICKING THE PICTURE NOW OPENS WHAT IS ACTUALLY SHOWING: at Rev-1001 full screen always reopened the whole print, which after a swap was the wrong picture. THE BUTTON IS ON EVERY ROW ON PURPOSE, including the attribute rows with no limits. Where no crop has been saved for a feature it sits greyed and disabled and its tooltip says why — a missing button would read as a bug, and hunting for one that was never there is the kind of trip this app exists to save. The crops come from the plan’s saved reference images, the same ones the inspection uses; the automatic balloon crop is built on the fly at inspection time and never stored, so showing it here would have meant inventing a second version of the picture. NOTHING ELSE MOVED — same maths, same columns, same chooser, readings still open on a row click. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030, summarise, and press INSPECTION CROP on BUBBLE 7 — the panel should show that feature’s crop with the heading naming bubble 7, the button should read FULL DRAWING, and clicking the picture should open the CROP full screen, not the whole print."] },
   { ts: "2026-08-08", rev: "App Rev-1002", type: "App", changes: ["REVIEW DATA TAKES THE WHOLE SCREEN, THE PRINT GROWS BY HALF, AND NO MACHINIST IS PRE-TICKED (Rev-1002, embedded validation REV-260) — three things from Rich, all in the 📊 REVIEW panel. FIRST, WIDTH. The box was capped at 1780px, so on a wide monitor it sat in the middle with screen going spare either side; it now takes 98% of the window whenever a drawing is showing. The no-drawing case widens too, from a fixed 1180px to 1400px or 96% of the window, whichever is smaller. SECOND, THE DRAWING IS HALF AGAIN AS BIG: the panel goes from 620px to 930px wide, exactly 1.5x, and its share of a narrow window from 38% to 46%. The image was running out of WIDTH rather than height, so widening the panel is what actually enlarges the print; its height ceiling was also lifted 40px to let the taller image through instead of capping it. THIRD, WHO RAN THEM NOW STARTS EMPTY. Every machinist used to be ticked, which made the blended all-hands summary the path of least resistance — and that is precisely the summary that buries one operator’s problem inside four operators’ average. Nothing is ticked now, the count reads 0 run(s) selected and Summarise stays greyed out until a name is chosen. Picking is a deliberate act. The HOW FAR BACK buttons, the simulated tick and the maths are untouched. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — no machinist should be ticked and Summarise should be grey; tick one, press Summarise, and the panel should fill the screen with a noticeably larger OP-030 print down the right."] },
@@ -3094,7 +3103,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:12 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:14 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -15010,6 +15019,202 @@ async function _cpReviewDataPanel(idx){
     console.error('Rev-987 review data failed', e);
     say('<div style="padding:18px 0; color:#a5342a; font-weight:700;">Could not build the summary: '
       + String(e && e.message || e) + '</div>');
+  }
+}
+/* ===== Rev-1005: HARDWARE NEEDED ==============================================
+   A list of the kit the shop floor still needs, kept on THIS DEVICE in localStorage
+   under cpHardwareNeeded. Built as a full-screen overlay rather than another hidden
+   panel in the page, because every one of those has to be added by hand to a dozen
+   show* functions and the one that gets missed is a screen that will not close.
+   Four items are seeded on first open: monitor, monitor hanger, keyboard/keypad,
+   cameras. Anything else is added here. */
+const CP_HW_KEY = 'cpHardwareNeeded';
+const CP_HW_SEED = ['MONITOR', 'MONITOR HANGER', 'KEYBOARD / KEYPAD', 'CAMERAS'];
+function cpHwLoad(){
+  try{
+    const raw = localStorage.getItem(CP_HW_KEY);
+    if(raw){
+      const a = JSON.parse(raw);
+      if(Array.isArray(a)) return a;
+    }
+  }catch(e){ console.warn('Rev-1005 hardware read failed', e); }
+  const seeded = CP_HW_SEED.map((n, i) => ({ id: 'hw' + (Date.now() + i), name: n,
+                                             qty: 0, where: '', notes: '' }));
+  cpHwSave(seeded);
+  return seeded;
+}
+function cpHwSave(list){
+  try{ localStorage.setItem(CP_HW_KEY, JSON.stringify(list)); return true; }
+  catch(e){
+    console.error('Rev-1005 hardware save failed', e);
+    try{ flash('\u26a0 Could not save the hardware list \u2014 ' + (e && e.message || e), true); }catch(_){ }
+    return false;
+  }
+}
+function cpHwOpen(){
+  try{
+    const old = document.getElementById('cpHwScreen'); if(old) old.remove();
+    let list = cpHwLoad();
+    let editId = null;
+    const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g,
+      ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+
+    const ov = document.createElement('div');
+    ov.id = 'cpHwScreen';
+    ov.style.cssText = 'position:fixed; inset:0; z-index:10680; background:#f7f4ef; overflow:auto;';
+    ov.innerHTML = '<div style="background:#1a5276; color:#fff; padding:14px 20px; display:flex;'
+        + ' align-items:center; gap:14px;">'
+      +   '<div style="font-weight:800; letter-spacing:.04em; font-size:17px; flex:1 1 auto;">'
+      +     '\U0001F5A5\uFE0F HARDWARE NEEDED</div>'
+      +   '<button id="cpHwBack" style="background:#fff; color:#1a5276; border:none; border-radius:8px;'
+      +     ' padding:8px 18px; font-weight:800; font-size:13px; cursor:pointer;">\u21a9 Back</button>'
+      + '</div>'
+      + '<div id="cpHwBody" style="max-width:1100px; margin:0 auto; padding:20px 18px 60px;"></div>';
+    document.body.appendChild(ov);
+    /* Rev-990 lesson, applied here: prove the screen reached the page before wiring
+       anything to it. Reaching through a null is what "the button does nothing" is. */
+    const _bk = document.getElementById('cpHwBack');
+    if(!_bk || !document.getElementById('cpHwBody')){
+      try{ flash('\u26a0 The Hardware screen did not build correctly. Send the Action Log.', true); }catch(_){ }
+      try{ logAct('error', 'hardware screen markup did not build'); }catch(_){ }
+      ov.remove(); return;
+    }
+    _bk.onclick = () => ov.remove();
+    try{ logAct('nav', 'hardware needed'); }catch(_){ }
+
+    const body = () => document.getElementById('cpHwBody');
+    const render = () => {
+      const b = body(); if(!b) return;
+      const total = list.reduce((a, x) => a + (parseInt(x.qty, 10) || 0), 0);
+      let h = '<div style="font-size:12.5px; color:#6b6257; margin-bottom:16px;">'
+        + 'Press an item to say how many are needed and where they go. '
+        + '<b>' + list.length + '</b> item(s) on the list, <b>' + total + '</b> unit(s) needed in total. '
+        + 'This list is kept on this device.</div>';
+
+      h += '<div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:18px;">'
+        +  '<input id="cpHwNew" placeholder="NAME OF NEW HARDWARE" style="flex:1 1 260px; max-width:420px;'
+        +    ' padding:10px 12px; border:1px solid #c9c0b4; border-radius:8px; font-size:13px;'
+        +    ' font-weight:700; text-transform:uppercase;">'
+        +  '<button id="cpHwAdd" style="padding:10px 18px; border:none; background:#1d6b3f; color:#fff;'
+        +    ' border-radius:8px; font-weight:800; font-size:13px; cursor:pointer;">+ ADD HARDWARE</button>'
+        +  '<button id="cpHwCopy" style="padding:10px 18px; border:1px solid #c9c0b4; background:#fff;'
+        +    ' color:#3a352e; border-radius:8px; font-weight:800; font-size:13px; cursor:pointer;">'
+        +    'COPY THE LIST</button>'
+        +  '</div>';
+
+      h += '<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px;">';
+      list.forEach((x, i) => {
+        const q = parseInt(x.qty, 10) || 0;
+        h += '<button type="button" data-hw="' + esc(x.id) + '" style="text-align:left; cursor:pointer;'
+          +   ' border:2px solid ' + (q ? '#1d6b3f' : '#d8d3ca') + '; background:#fff; border-radius:10px;'
+          +   ' padding:14px; display:block; width:100%;">'
+          +   '<div style="font-size:14px; font-weight:800; color:#000; letter-spacing:.03em;">'
+          +     esc(x.name) + '</div>'
+          +   '<div style="font-size:22px; font-weight:800; margin-top:6px; color:'
+          +     (q ? '#1d6b3f' : '#b9b3aa') + ';">' + q + '<span style="font-size:11px; font-weight:700;'
+          +     ' letter-spacing:.06em; margin-left:6px; color:#6b6257;">NEEDED</span></div>'
+          +   (x.where ? '<div style="font-size:11.5px; color:#3a352e; margin-top:6px;">'
+                        + esc(x.where) + '</div>' : '')
+          +   (x.notes ? '<div style="font-size:11px; color:#6b6257; margin-top:4px;">'
+                        + esc(x.notes) + '</div>' : '')
+          + '</button>';
+      });
+      h += '</div>';
+
+      const e = list.find(x => x.id === editId);
+      if(e){
+        h += '<div style="margin-top:22px; border:2px solid #1a5276; border-radius:10px; background:#fff; padding:16px;">'
+          +  '<div style="font-size:14px; font-weight:800; color:#000; margin-bottom:12px;">'
+          +    esc(e.name) + '</div>'
+          +  '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">'
+          +    '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">HOW MANY ARE NEEDED'
+          +      '<input id="cpHwQty" type="number" min="0" value="' + (parseInt(e.qty, 10) || 0) + '"'
+          +      ' style="display:block; width:100%; margin-top:5px; padding:10px; border:1px solid #c9c0b4;'
+          +      ' border-radius:8px; font-size:15px; font-weight:800; background:#fafa96;"></label>'
+          +    '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">WHERE IT GOES'
+          +      '<input id="cpHwWhere" value="' + esc(e.where || '') + '"'
+          +      ' style="display:block; width:100%; margin-top:5px; padding:10px; border:1px solid #c9c0b4;'
+          +      ' border-radius:8px; font-size:13px;"></label>'
+          +  '</div>'
+          +  '<label style="display:block; margin-top:12px; font-size:11px; font-weight:800;'
+          +    ' letter-spacing:.06em; color:#6b6257;">NOTES'
+          +    '<textarea id="cpHwNotes" rows="2" style="display:block; width:100%; margin-top:5px; padding:10px;'
+          +    ' border:1px solid #c9c0b4; border-radius:8px; font-size:13px; resize:vertical;">'
+          +    esc(e.notes || '') + '</textarea></label>'
+          +  '<div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">'
+          +    '<button id="cpHwSave" style="padding:11px 22px; border:none; background:#1a5276; color:#fff;'
+          +      ' border-radius:8px; font-weight:800; font-size:13px; cursor:pointer;">SAVE</button>'
+          +    '<button id="cpHwCancel" style="padding:11px 18px; border:1px solid #c9c0b4; background:#fff;'
+          +      ' color:#3a352e; border-radius:8px; font-weight:800; font-size:13px; cursor:pointer;">CANCEL</button>'
+          +    '<button id="cpHwDel" style="margin-left:auto; padding:11px 18px; border:1px solid #a02020;'
+          +      ' background:#fff; color:#a02020; border-radius:8px; font-weight:800; font-size:13px;'
+          +      ' cursor:pointer;">DELETE THIS ITEM</button>'
+          +  '</div></div>';
+      }
+      b.innerHTML = h;
+
+      b.querySelectorAll('button[data-hw]').forEach(bt => { bt.onclick = () => {
+        editId = (editId === bt.getAttribute('data-hw')) ? null : bt.getAttribute('data-hw');
+        render(); }; });
+
+      const addBtn = document.getElementById('cpHwAdd');
+      const addIn = document.getElementById('cpHwNew');
+      const doAdd = () => {
+        const nm = String((addIn && addIn.value) || '').trim().toUpperCase();
+        if(!nm){ try{ flash('Type a name for the new hardware first.', true); }catch(_){ } return; }
+        if(list.some(x => x.name === nm)){
+          try{ flash(nm + ' is already on the list.', true); }catch(_){ } return; }
+        list.push({ id: 'hw' + Date.now(), name: nm, qty: 0, where: '', notes: '' });
+        if(cpHwSave(list)){ try{ logAct('hardware', 'added an item'); }catch(_){ } }
+        editId = list[list.length - 1].id;
+        render();
+      };
+      if(addBtn) addBtn.onclick = doAdd;
+      if(addIn) addIn.onkeydown = ev => { if(ev.key === 'Enter'){ ev.preventDefault(); doAdd(); } };
+
+      const cp = document.getElementById('cpHwCopy');
+      if(cp) cp.onclick = () => {
+        const txt = 'HARDWARE NEEDED\n' + list.map(x =>
+          (parseInt(x.qty, 10) || 0) + ' x ' + x.name
+          + (x.where ? '  -  ' + x.where : '')
+          + (x.notes ? '  (' + x.notes + ')' : '')).join('\n');
+        try{
+          navigator.clipboard.writeText(txt);
+          flash('\u2714 The hardware list is on the clipboard.');
+        }catch(err){ try{ flash('Could not copy: ' + (err && err.message || err), true); }catch(_){ } }
+      };
+
+      const sv = document.getElementById('cpHwSave');
+      if(sv) sv.onclick = () => {
+        const t = list.find(x => x.id === editId); if(!t) return;
+        const qEl = document.getElementById('cpHwQty');
+        const wEl = document.getElementById('cpHwWhere');
+        const nEl = document.getElementById('cpHwNotes');
+        t.qty = Math.max(0, parseInt(qEl && qEl.value, 10) || 0);
+        t.where = String((wEl && wEl.value) || '').trim();
+        t.notes = String((nEl && nEl.value) || '').trim();
+        if(cpHwSave(list)){
+          try{ logAct('hardware', 'saved an item'); }catch(_){ }
+          try{ flash('\u2714 Saved.'); }catch(_){ }
+        }
+        editId = null; render();
+      };
+      const cn = document.getElementById('cpHwCancel');
+      if(cn) cn.onclick = () => { editId = null; render(); };
+      const dl = document.getElementById('cpHwDel');
+      if(dl) dl.onclick = () => {
+        const t = list.find(x => x.id === editId); if(!t) return;
+        if(!confirm('Remove ' + t.name + ' from the hardware list?')) return;
+        list = list.filter(x => x.id !== t.id);
+        if(cpHwSave(list)){ try{ logAct('hardware', 'removed an item'); }catch(_){ } }
+        editId = null; render();
+      };
+    };
+    render();
+  }catch(e){
+    console.error('Rev-1005 hardware screen failed', e);
+    try{ logAct('error', 'hardware screen: ' + (e && e.message || e)); }catch(_){ }
+    try{ flash('\u26a0 HARDWARE NEEDED failed to open \u2014 ' + (e && e.message || e), true); }catch(_){ }
   }
 }
 /* ===== Rev-1003: SWAP THE PANEL BETWEEN THE PRINT AND THE FEATURE CROP ==========
