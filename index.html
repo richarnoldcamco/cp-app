@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1002</title>
+<title>CONTROL PLAN GENERATOR - Rev-1003</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1002 · 2026-08-08 9:07 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1003 · 2026-08-08 9:16 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1002 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 9:07 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1003 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 9:16 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1002 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1003 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1685,7 +1685,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1002";
+const APP_REV = "Rev-1003";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2213,6 +2213,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1003", type: "App", changes: ["EVERY REVIEW ROW CAN PUT ITS OWN INSPECTION CROP ON THE PANEL (Rev-1003, embedded validation REV-260) — per Rich. Each row of 📊 REVIEW DATA now carries a small INSPECTION CROP button under the feature name. Press it and the right-hand panel swaps from the whole ODS print to the cropped reference picture saved for THAT bubble — the same picture the machinist looks at when measuring it. The button then reads FULL DRAWING and turns solid; press it again, or press another row’s button, and the panel follows. Only one crop is on screen at a time and every button re-labels itself on each swap, so what is showing and what the buttons say cannot drift apart. The panel heading changes with it, reading INSPECTION CROP · BUBBLE 7 instead of ODS DRAWING · OP-030, because a zoomed crop and a zoomed print look alike and an unlabelled panel would leave you guessing which you were reading. CLICKING THE PICTURE NOW OPENS WHAT IS ACTUALLY SHOWING: at Rev-1001 full screen always reopened the whole print, which after a swap was the wrong picture. THE BUTTON IS ON EVERY ROW ON PURPOSE, including the attribute rows with no limits. Where no crop has been saved for a feature it sits greyed and disabled and its tooltip says why — a missing button would read as a bug, and hunting for one that was never there is the kind of trip this app exists to save. The crops come from the plan’s saved reference images, the same ones the inspection uses; the automatic balloon crop is built on the fly at inspection time and never stored, so showing it here would have meant inventing a second version of the picture. NOTHING ELSE MOVED — same maths, same columns, same chooser, readings still open on a row click. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030, summarise, and press INSPECTION CROP on BUBBLE 7 — the panel should show that feature’s crop with the heading naming bubble 7, the button should read FULL DRAWING, and clicking the picture should open the CROP full screen, not the whole print."] },
   { ts: "2026-08-08", rev: "App Rev-1002", type: "App", changes: ["REVIEW DATA TAKES THE WHOLE SCREEN, THE PRINT GROWS BY HALF, AND NO MACHINIST IS PRE-TICKED (Rev-1002, embedded validation REV-260) — three things from Rich, all in the 📊 REVIEW panel. FIRST, WIDTH. The box was capped at 1780px, so on a wide monitor it sat in the middle with screen going spare either side; it now takes 98% of the window whenever a drawing is showing. The no-drawing case widens too, from a fixed 1180px to 1400px or 96% of the window, whichever is smaller. SECOND, THE DRAWING IS HALF AGAIN AS BIG: the panel goes from 620px to 930px wide, exactly 1.5x, and its share of a narrow window from 38% to 46%. The image was running out of WIDTH rather than height, so widening the panel is what actually enlarges the print; its height ceiling was also lifted 40px to let the taller image through instead of capping it. THIRD, WHO RAN THEM NOW STARTS EMPTY. Every machinist used to be ticked, which made the blended all-hands summary the path of least resistance — and that is precisely the summary that buries one operator’s problem inside four operators’ average. Nothing is ticked now, the count reads 0 run(s) selected and Summarise stays greyed out until a name is chosen. Picking is a deliberate act. The HOW FAR BACK buttons, the simulated tick and the maths are untouched. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — no machinist should be ticked and Summarise should be grey; tick one, press Summarise, and the panel should fill the screen with a noticeably larger OP-030 print down the right."] },
   { ts: "2026-08-08", rev: "App Rev-1001", type: "App", changes: ["THE ODS DRAWING SITS BESIDE THE NUMBERS IN REVIEW DATA (Rev-1001, embedded validation REV-260) — per Rich. Reading a capability table meant knowing from memory which feature BUBBLE 7 is, or closing the panel to go and look. The operation’s own ODS drawing now fills a panel down the RIGHT-HAND side of 📊 REVIEW DATA, so the bubble numbers in the first column and the balloons on the print are read together. The drawing STAYS PUT while the table scrolls, and clicking it opens the same full-screen viewer the operations list uses — deliberately the existing viewer rather than a second one, so zooming behaves the way it already does everywhere else. The panel takes its image from cpOpOdsImage, the same getter Step 2 and the operations list use, which means a drawing deleted for this operation stays deleted here and no stale part-level print can leak in (the Rev-721 and Rev-929 traps). WHEN THERE IS NO DRAWING the panel does not appear at all and the box keeps its old width — no empty grey rectangle. With a drawing the box widens to 1780px or 98% of the window, whichever is smaller, and the drawing takes 620px or 38% of the window, whichever is smaller, so a narrow screen gives the numbers the room. NOTHING ABOUT THE MATHS, THE COLUMNS OR THE CHOOSER CHANGED — same Cpk, same white rows, same readings on a click. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 and summarise — the OP-030 print should fill the right side, hold still while the table scrolls, and go full screen on a click. Then try an operation with no drawing loaded: no panel, old width."] },
   { ts: "2026-08-08", rev: "App Rev-1000", type: "App", changes: ["THE FOUR TYPED REV STAMPS WERE FROZEN AT REV-951, AND THE PRIVATE COPY WAS A PHOTOGRAPH (Rev-1000, embedded validation REV-260) — found while proving a fresh push token, not reported by anyone, which is the point: nothing on screen was wrong in normal use so nothing raised a hand. TWO FAULTS. FIRST, the four hand-typed rev stamps in cp-app/index.html — browser tab title, header, red badge and footer — all still read Rev-951 and 2026-08-05 9:06 PM. Forty-eight revisions bumped APP_REV without touching them, in spite of the Rev-829 rule that says all four are verified equal to APP_REV before every push; that rule was being claimed in changelog entries and not performed. It hid because the code overwrites all four the instant it runs, so the stale text is a flash on first paint — EXCEPT when a build fails to start, which is exactly when the frozen screen would have said Rev-951 and sent the next diagnosis after the wrong version. All four now carry Rev-1000. SECOND, BUILD_DATE and BUILD_TIME read 2026-08-09 3:05 AM when the true build moment was 2026-08-08 12:24 AM — the same guessed-rather-than-read drift corrected at Rev-590 and again at Rev-627, back for a third time, roughly 27 hours ahead. Both are now read off the machine clock converted to Eastern. THIRD, and the one with teeth: cp-generator-data/cp_app.html was not source code. It was a save of the running screen — menu badges with this device’s live numbers baked into the text (13 Projects, 2 OPEN gages, 75 Control Types, 11 Customers), a GitHub status line stamped 8/8 12:28 AM, and a floating button strip that only exists at runtime, 2,972 bytes of frozen state. Any future revision built from that file would have shipped one device’s numbers to every device. This push overwrites it with clean source, and the standing rule from here is that revisions are BUILT FROM cp-app/index.html and pushed to both, never the reverse. No behaviour changed: no feature added, removed or altered, seven stamps and one changelog entry only. WHAT TO TEST (rule 8): reload the app and read the red badge, the header and the footer — all three should say REV-1000 — then look at the browser tab title, which should also say Rev-1000 rather than Rev-951."] },
@@ -3092,7 +3093,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:07 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:16 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -14537,6 +14538,13 @@ async function _cpReviewDataPanel(idx){
      here - no second source of truth for what drawing belongs to this operation. */
   let odsImg = '';
   try{ odsImg = cpOpOdsImage(p) || ''; }catch(e){ console.warn('Rev-1001 ODS lookup failed', e); }
+  /* Rev-1003: the crops cut in the inspection reference editor, keyed by bubble. These are
+     the SAVED ones (p.valRefImages) - the same pictures the machinist sees on the feature
+     during an inspection. The automatic balloon crop is generated on the fly at inspection
+     build time and is not stored, so it cannot be shown here without inventing a second
+     version of the picture; a row with no saved crop gets a disabled button that says so. */
+  let odsCrops = {};
+  try{ odsCrops = (p && p.valRefImages) || {}; }catch(e){ console.warn('Rev-1003 crop lookup failed', e); }
   const showSim = (function(){ try{ return localStorage.getItem('cpShowSimRuns') === '1'; }catch(e){ return false; } })();
 
   const ov = document.createElement('div');
@@ -14554,7 +14562,7 @@ async function _cpReviewDataPanel(idx){
          ? '<div id="capOdsPane" style="flex:0 0 min(930px, 46vw); align-self:stretch;'
            + ' border-left:1px solid #e2ddd4; background:#faf7f2; padding:14px 14px 18px;">'
            +   '<div style="position:sticky; top:0;">'
-           +     '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#5c5349; margin-bottom:8px;">'
+           +     '<div id="capOdsLbl" style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#5c5349; margin-bottom:8px;">'
            +       'ODS DRAWING \u00b7 ' + op + '</div>'
            +     '<img id="capOdsImg" src="' + odsImg + '" alt="ODS drawing for ' + op + '"'
            +       ' title="Click to open the drawing full screen"'
@@ -14572,11 +14580,14 @@ async function _cpReviewDataPanel(idx){
   ov.appendChild(c); document.body.appendChild(ov);
   ov.addEventListener('click', e => { if(e.target === ov) ov.remove(); });
   document.getElementById('capX').onclick = () => ov.remove();
+  /* Rev-1003: what the right-hand panel is showing right now. */
+  try{ window._cpCapOds = { base: odsImg, op: op, crops: odsCrops, cur: null }; }
+  catch(e){ console.warn('Rev-1003 panel state failed', e); }
   /* Rev-1001: reuse the operations-list viewer rather than building a second one. */
   try{
     const oi = document.getElementById('capOdsImg');
-    if(oi) oi.onclick = () => { try{ cpViewOpOds(p); }
-      catch(e){ console.warn('Rev-1001 ODS viewer failed', e); } };
+    if(oi) oi.onclick = () => { try{ cpCapOdsFull(); }
+      catch(e){ console.warn('Rev-1003 full view failed', e); } };
   }catch(e){ console.warn('Rev-1001 ODS click wiring failed', e); }
   const body = () => document.getElementById('capBody');
   const say = h => { const b = body(); if(b) b.innerHTML = h; };
@@ -14743,6 +14754,22 @@ async function _cpReviewDataPanel(idx){
       });
       const num = (v, dp) => (v == null ? '\u2014' : Number(v).toFixed(dp));
       const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+      /* Rev-1003: swap the right-hand panel between the whole ODS print and the crop the
+         machinist actually sees for THIS feature. Every row carries the button so its
+         absence is never a mystery; rows with no saved crop carry it greyed and say why. */
+      const cropBtn = (bub) => {
+        const has = !!odsCrops[String(bub)];
+        return '<button type="button" data-capbub="' + esc(bub) + '"'
+          + (has ? '' : ' disabled')
+          + ' title="' + (has ? 'Show this feature\u2019s inspection crop on the right'
+                              : 'No inspection crop has been saved for this feature yet') + '"'
+          + ' onclick="event.stopPropagation(); cpCapCropSwap(this.dataset.capbub);"'
+          + ' style="margin-top:5px; padding:3px 9px; font-size:10px; font-weight:800;'
+          + ' letter-spacing:.04em; border-radius:5px; border:1px solid '
+          + (has ? '#1a5276' : '#cfc9c0') + '; background:#fff; color:'
+          + (has ? '#1a5276' : '#a49c90') + '; cursor:' + (has ? 'pointer' : 'default') + ';">'
+          + 'INSPECTION CROP</button>';
+      };
       let h = '';
       if(simCount){
         h += '<div style="background:#fdf3d5; border:1px solid #d9b64a; border-radius:8px; padding:10px 12px;'
@@ -14762,7 +14789,8 @@ async function _cpReviewDataPanel(idx){
       groups.forEach((g, gi) => {
         if(g.lo === null){
           h += '<tr><td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff; text-align:center; font-weight:800;">' + esc(g.bubble) + '</td>'
-            +  '<td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff;">' + esc(g.desc) + '</td>'
+            +  '<td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff;">' + esc(g.desc)
+            +    '<div>' + cropBtn(g.bubble) + '</div></td>'
             +  '<td colspan="8" style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff; text-align:center; color:#6b6257;">'
             +  'no numeric limits \u2014 ' + g.attrPass + ' of ' + g.attr + ' recorded as a pass</td></tr>';
           return;
@@ -14777,7 +14805,8 @@ async function _cpReviewDataPanel(idx){
           /* Rev-997: SAY that the readings are here. They have been one click away since
              Rev-987 with nothing on screen announcing it. */
           +    '<div id="capLbl' + gi + '" style="margin-top:4px; font-size:10.5px; font-weight:800;'
-          +      ' letter-spacing:.04em; color:#1a5276;">\u25b8 SHOW THE ' + s.n + ' READINGS</div>' + '</td>'
+          +      ' letter-spacing:.04em; color:#1a5276;">\u25b8 SHOW THE ' + s.n + ' READINGS</div>'
+          +    '<div>' + cropBtn(g.bubble) + '</div>' + '</td>'
           /* Rev-998: upper on top, lower beneath - one cell, not two columns. */
           +  '<td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff; text-align:center; line-height:1.35;">'
           +    num(g.hi, dp) + '<br>' + num(g.lo, dp) + '</td>'
@@ -14824,6 +14853,62 @@ async function _cpReviewDataPanel(idx){
     say('<div style="padding:18px 0; color:#a5342a; font-weight:700;">Could not build the summary: '
       + String(e && e.message || e) + '</div>');
   }
+}
+/* ===== Rev-1003: SWAP THE PANEL BETWEEN THE PRINT AND THE FEATURE CROP ==========
+   Clicking a row's INSPECTION CROP button puts that feature's saved reference picture in
+   the right-hand panel; clicking the same button again puts the whole print back. Only one
+   crop shows at a time and every button re-labels itself, so what is on screen and what the
+   buttons say can never disagree. */
+function cpCapCropSwap(bub){
+  try{
+    const st = window._cpCapOds; if(!st) return;
+    const img = document.getElementById('capOdsImg');
+    const lbl = document.getElementById('capOdsLbl');
+    if(!img || !lbl) return;
+    const key = String(bub);
+    if(st.cur === key || !st.crops[key]){
+      img.src = st.base; st.cur = null;
+      lbl.textContent = 'ODS DRAWING \u00b7 ' + st.op;
+    }else{
+      img.src = st.crops[key]; st.cur = key;
+      lbl.textContent = 'INSPECTION CROP \u00b7 BUBBLE ' + key;
+    }
+    document.querySelectorAll('button[data-capbub]').forEach(b => {
+      if(b.disabled) return;
+      const on = (b.getAttribute('data-capbub') === st.cur);
+      b.textContent = on ? 'FULL DRAWING' : 'INSPECTION CROP';
+      b.style.background = on ? '#1a5276' : '#fff';
+      b.style.color = on ? '#fff' : '#1a5276';
+    });
+    try{ logAct('review-crop', st.cur ? 'crop shown' : 'full drawing shown'); }catch(_){ }
+  }catch(e){ console.warn('Rev-1003 crop swap failed', e); }
+}
+/* Full screen shows WHAT IS ON THE PANEL - print or crop. Rev-1001 always reopened the
+   whole print, which after a swap was the wrong picture. */
+function cpCapOdsFull(){
+  try{
+    const st = window._cpCapOds; if(!st) return;
+    const img = document.getElementById('capOdsImg');
+    if(!img || !img.getAttribute('src')) return;
+    const old = document.getElementById('cpCapOdsFull'); if(old) old.remove();
+    const v = document.createElement('div');
+    v.id = 'cpCapOdsFull';
+    v.style.cssText = 'position:fixed; inset:0; z-index:100009; background:rgba(20,15,12,.92);'
+      + ' display:flex; flex-direction:column; align-items:center; padding:14px; overflow:auto;';
+    const ttl = st.cur ? ('INSPECTION CROP \u2014 BUBBLE ' + st.cur)
+                       : ('ODS DRAWING \u2014 ' + st.op);
+    v.innerHTML = '<div style="display:flex; align-items:center; gap:12px; width:100%;'
+        + ' max-width:1500px; margin-bottom:10px; flex:0 0 auto;">'
+      +   '<div style="color:#fff; font-weight:800; letter-spacing:.05em; flex:1 1 auto;">' + ttl + '</div>'
+      +   '<button id="capOdsFullX" style="background:#a02020; color:#fff; border:2px solid #7a1414;'
+      +     ' border-radius:8px; padding:8px 22px; font-weight:800; cursor:pointer;">\u2715 Close</button>'
+      + '</div>'
+      + '<img src="' + img.getAttribute('src') + '" style="max-width:96vw; max-height:86vh;'
+      +   ' background:#fff; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5);">';
+    document.body.appendChild(v);
+    document.getElementById('capOdsFullX').onclick = () => v.remove();
+    v.onclick = e => { if(e.target === v) v.remove(); };
+  }catch(e){ console.warn('Rev-1003 full view failed', e); }
 }
 function cpCapToggle(i){
   try{
