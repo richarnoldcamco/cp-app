@@ -1685,7 +1685,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-989";
+const APP_REV = "Rev-990";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2213,6 +2213,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-990", type: "App", changes: ["INJECT AND REVIEW NOW SAY WHY THEY FAILED INSTEAD OF DOING NOTHING (Rev-990, embedded validation REV-260) \u2014 Rich pressed \ud83e\uddea INJECT and no pop-up appeared. The wiring was read and is correct - the button calls the panel with the right plan index - so something inside is throwing and dying quietly, which is the single most expensive shape of bug in this app and the one the standing rule exists for. Both panels are now wrapped so a failure SPEAKS: the message, and the file and line it came from, appear on screen and go into the Action Log rather than vanishing into the console. Two specific traps closed while looking: the panel now checks that its own card actually reached the page before wiring the buttons - if the browser refused the markup, getElementById comes back null and the old code threw on the very next line - and every getElementById is guarded, so one missing element can no longer take the whole panel down with it. It also reports plainly when a plan has no rows to generate against. NO BEHAVIOUR CHANGED: the same scenarios, the same pieces, the same refusal on a released operation. WHAT TO TEST (rule 8): press \ud83e\uddea INJECT again - either the pop-up opens, or a red message names the fault. Send me whichever appears. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-989", type: "App", changes: ["THE THIRD BACKGROUND TIMER IS GATED TOO, AND THE CHASE STOPS AFTER ONE TRY (Rev-989, embedded validation REV-260) \u2014 Rich reported the blinking again, and the curtain he photographed named it: Publishing Rev-988, the site is catching up. That is ghAutoPublishPages, a THIRD background timer - and Rev-983 gated only two of them. My miss, stated plainly: the leader guard covered the update check and the app push and left the website publisher running in every copy. It is gated now. TWO MORE CHANGES THAT ATTACK THE BLINK ITSELF. (1) The reload chase drops from three attempts to ONE: the API reports a new revision the instant it is pushed, but GitHub Pages serves the old file for a while afterwards, so reloading to chase it lands back on the old copy and tries again - three times per revision, and every new revision reset the counter. One try, then the quiet one-tap banner, which is what should have happened all along. (2) The cooldown between self-updates goes from 45 seconds to THREE MINUTES, so a burst of revisions arriving minutes apart can no longer turn into a burst of reloads. HONESTLY: while revisions are being pushed every few minutes some updating is unavoidable - the app is doing its job. These changes stop it happening several times per revision and in several copies at once. WHAT TO TEST (rule 8): with one tab open, the app should update at most once per revision and show a banner rather than reloading again. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-988", type: "App", changes: ["THE ACTIONS ROW FITS THE SCREEN AGAIN (Rev-988, embedded validation REV-260) \u2014 per Rich: two new buttons in three revisions - \ud83e\uddea Inject Data at Rev-986 and \ud83d\udcca Review Data at Rev-987 - pushed the actions row past the window and put a horizontal scrollbar across the bottom of the whole app. Every action button is smaller: 32px tall to 26, 12px text to 10.5, padding 12 to 7, and each fixed width cut - the row went from about 970px of buttons to about 700, roughly 28 percent narrower, which is more than the two new buttons cost. The two new ones drop their words to \ud83e\uddea INJECT and \ud83d\udcca REVIEW, since the tooltips already carry the full explanation. The row also WRAPS now instead of forcing the page wider, so a narrower window stacks the buttons onto a second line rather than growing a scrollbar - the scrollbar can no longer come back on a smaller screen. AND A SILENT FAILURE CLOSED: if an injection saves nothing at all, it now says so in red instead of reporting 0 of 10 in a neutral tone, because a run of zeros read as success is exactly how Rich came to think Review Data was broken when the problem was upstream of it. WHAT TO TEST (rule 8): the Control Plans list should have no scrollbar along the bottom. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-987", type: "App", changes: ["\ud83d\udcca REVIEW DATA - CAPABILITY PER FEATURE (Rev-987, embedded validation REV-260) \u2014 per Rich: a button beside Inspect that reads every run stored for the operation and reports what the process is actually doing. One line per ballooned feature: pieces measured, mean, min, max, CPK and how many fell out of tolerance, with the Cpk coloured - 1.33 and above green, 1.00 to 1.33 amber, below 1.00 red, and any feature with a piece out of tolerance flagged regardless of what its Cpk says. Click a line to see every individual reading behind it with the out-of-tolerance ones marked. THE MATHS IS STATED, NOT ASSUMED: Cpk is min(USL-mean, mean-LSL) / 3 sigma with sigma the SAMPLE standard deviation (n-1), and it is refused outright on fewer than 5 pieces - a Cpk off three parts is a number with no meaning, and printing one would be worse than printing nothing. Features with no numeric limits are listed with their pass count rather than an invented capability. SIMULATED RUNS ARE EXCLUDED unless the same tick used in Reports is on, and when they are included the panel says so in orange across the top - a capability number off fabricated data must never be mistaken for evidence. Runs are fetched in parallel batches with a progress line, because the store already holds over a thousand files. WHAT TO TEST (rule 8): press \ud83d\udcca Review Data on 1000237620 OP-030 - with simulated runs off it should say there is nothing to summarise; tick them on and the injected batch should appear with a Cpk near what was asked for. Payload verified in both repos before this entry."] },
@@ -3079,7 +3080,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:14 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -14456,7 +14457,18 @@ function _cpCapColour(s){
   if(s.cpk >= 1.00) return { bg:'#fdf3d5', fg:'#7a5a00', note:'MARGINAL' };
   return { bg:'#fdecea', fg:'#a5342a', note:'NOT CAPABLE' };
 }
+/* Rev-990: same speaking wrapper on Review Data. */
 async function cpReviewDataPanel(idx){
+  try{ await _cpReviewDataPanel(idx); }
+  catch(e){
+    const where = (e && e.stack ? String(e.stack).split("\n")[1] : "") || "";
+    console.error("Rev-990 REVIEW panel failed", e);
+    try{ logAct("error", "review panel: " + (e && e.message || e)); }catch(_){ }
+    try{ flash("\u26a0 REVIEW DATA FAILED TO OPEN \u2014 " + (e && e.message || e)
+      + (where ? ("  \u00b7  " + where.trim()) : ""), true); }catch(_){ }
+  }
+}
+async function _cpReviewDataPanel(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
   if(!ghConfigured()){ flash('GitHub is not set up on this device, so there are no stored runs to read.', true); return; }
@@ -14728,7 +14740,20 @@ function cpInjBuild(p, sc, pieces){
   return { runs: runs, shopOrder: so, features: feats.length,
            dims: feats.filter(f => !f.attribute).length };
 }
+/* Rev-990: a SPEAKING wrapper. Rich pressed the button and nothing happened, which means a
+   throw went to the console where he will never see it. Now it lands on screen and in the
+   Action Log, with the file and line. */
 function cpInjectPanel(idx){
+  try{ _cpInjectPanel(idx); }
+  catch(e){
+    const where = (e && e.stack ? String(e.stack).split("\n")[1] : "") || "";
+    console.error("Rev-990 INJECT panel failed", e);
+    try{ logAct("error", "inject panel: " + (e && e.message || e)); }catch(_){ }
+    try{ flash("\u26a0 INJECT FAILED TO OPEN \u2014 " + (e && e.message || e)
+      + (where ? ("  \u00b7  " + where.trim()) : ""), true); }catch(_){ }
+  }
+}
+function _cpInjectPanel(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
   /* Refused on a released operation. This is the one that could actually hurt someone. */
@@ -14768,14 +14793,27 @@ function cpInjectPanel(idx){
   ov.appendChild(c); document.body.appendChild(ov);
   const close = () => ov.remove();
   ov.addEventListener('click', e => { if(e.target === ov) close(); });
-  document.getElementById('injX').onclick = close;
+  /* Rev-990: prove the card reached the page before wiring anything to it. If the browser
+     refused the markup, getElementById returns null and the old code threw on this line -
+     which is exactly what "the button does nothing" looks like from the outside. */
+  const _q = id => document.getElementById(id);
+  if(!_q('injGo') || !_q('injSc') || !_q('injN')){
+    flash('\u26a0 The Inject panel did not build correctly \u2014 nothing was written. Send the Action Log.', true);
+    try{ logAct('error', 'inject panel markup did not build'); }catch(_){ }
+    return;
+  }
+  if(_q('injX')) _q('injX').onclick = close;
   const rows = (((p.builderState || {}).rows) || []).filter(r => String(r.bubble || '').trim());
-  document.getElementById('injNote').textContent =
+  if(!rows.length){
+    /* Rev-990: say it here, not after the Generate press. */
+    if(_q('injNote')) _q('injNote').innerHTML =
+      '<b style="color:#a5342a;">This operation has no ballooned rows, so there is nothing to generate against.</b>';
+  } else if(_q('injNote')) _q('injNote').textContent =
     rows.length + ' ballooned row(s) on this operation. Features with no numeric limits are recorded as a PASS rather than a made-up number.';
-  document.getElementById('injGo').onclick = async () => {
+  _q('injGo').onclick = async () => {
     try{
-      const sc = CP_INJ_SCENARIOS.find(s => s.k === document.getElementById('injSc').value) || CP_INJ_SCENARIOS[2];
-      const n = parseInt(document.getElementById('injN').value, 10) || 10;
+      const sc = CP_INJ_SCENARIOS.find(s => s.k === _q('injSc').value) || CP_INJ_SCENARIOS[2];
+      const n = parseInt(_q('injN').value, 10) || 10;
       if(!rows.length){ flash('This operation has no ballooned rows to generate against.', true); return; }
       if(!ghConfigured()){ flash('GitHub is not set up on this device, so runs cannot be saved.', true); return; }
       const built = cpInjBuild(p, sc, n);
