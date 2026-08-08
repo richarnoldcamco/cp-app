@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1015</title>
+<title>CONTROL PLAN GENERATOR - Rev-1016</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1015 · 2026-08-08 3:42 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1016 · 2026-08-08 3:43 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1015 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:42 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1016 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:43 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1015 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1016 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1015";
+const APP_REV = "Rev-1016";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1016", type: "App", changes: ["✨ AI SUGGESTION PROPOSES A LEVEL FOR EVERY FEATURE (Rev-1016, embedded validation REV-260) — per Rich. The button sits beside the three level cards and asks the AI to put a 1, 2 or 3 against every feature on the operation, judging from the feature name and the tolerance band: tighter band, lower number. It is told what the three levels MEAN in this shop — complete check twice a shift, critical only four times a shift, odd checks every other day — so it is answering CAMCO’s question rather than a generic one. THREE THINGS BUILT INTO IT ON PURPOSE. ITAR: feature descriptions and tolerances are export-controlled part data, so nothing leaves the device until the ITAR confirmation is accepted — the same gate every other AI call in this app sits behind, and cancelling sends nothing. IT PROPOSES RATHER THAN WRITES: the suggestion is shown as a table — bubble, feature, level and a few words of why — with a count of how many would actually CHANGE, and not one level is written until that is accepted. AND IT IS CHECKED: a level that is not 1, 2 or 3 is thrown away, and a bubble that is not on this operation is thrown away, so a confused answer cannot invent a feature or write a nonsense level. If the reply comes back in a shape the screen cannot read it says so and changes nothing. The confirmation says plainly that this is a starting point and not a ruling: it sees a name and a tolerance, and knows nothing about which features have bitten this shop before. WHAT TO TEST (rule 8): open STEP 8 on 1000237620 OP-030 and press ✨ AI SUGGESTION — the ITAR box should come up first, cancelling it should send nothing, and accepting should bring back a table of proposed levels with a change count. Accept it and the buttons and the last column should follow."] },
   { ts: "2026-08-08", rev: "App Rev-1015", type: "App", changes: ["EACH LINE-INSPECTION LEVEL NOW SAYS WHAT IT MEANS (Rev-1015, embedded validation REV-260) — Rich’s own words, straight off the marked-up screen. A number on its own said nothing about intent: LEVEL 1 now reads COMPLETE CHECK with QUALITY COMES ROUND · TWICE A SHIFT beneath it, LEVEL 2 reads CRITICAL ONLY · 4 TIMES PER SHIFT, LEVEL 3 reads ODD CHECKS · ONCE EVERY OTHER DAY. The parts interval stays exactly where it was and stays editable — the two lines are the INTENT, the number is the TRIGGER, and anyone setting a feature to Level 2 can now see they are saying critical-only rather than guessing what 2 stood for. The QUALITY PULLS A PART column names the level too, so a row reads EVERY 25 PARTS with CRITICAL ONLY under it and the table can be read without looking back up at the cards. WHAT TO TEST (rule 8): open STEP 8 LINE INSPECTION on 1000237620 OP-030 — the three cards should carry their names and cadences, and setting a feature to 2 should put CRITICAL ONLY in the last column under the parts figure."] },
   { ts: "2026-08-08", rev: "App Rev-1014", type: "App", changes: ["EDIT AND DELETE ON EVERY GAGE ROW, AND FOUR BROKEN ICONS FIXED (Rev-1014, embedded validation REV-260) — per Rich. FIRST, THE ICONS, and this one is mine: four panel headings were written with a backslash-U escape, which JavaScript does not understand, so the GAGES heading read U0001F527 GAGES instead of showing a spanner. The same mistake was sitting unnoticed in LINE INSPECTION LEVELS, LINE INSPECTIONS and HARDWARE NEEDED. All four now carry the character itself, which is the standing rule in this file and was the rule before I broke it. SECOND, EDIT and DELETE on every row of the gage panel. Without them a wrong gage meant leaving for the full list and finding it again among every other part’s gages. EDIT walks the four fields that matter — what the gage is, its status, who has it, notes — and REFUSES a status that is not one of the five rather than writing a word the list cannot colour. DELETE asks first, and says the thing that is easy to get wrong: taking a gage off the list does NOT clear the Special Gage / Fixture box on the Control Plan row, so editing that row will put the gage back. Clear the box on the row if it should stay gone. Both write to the gage register itself, so this panel and the full gage list cannot end up showing different facts. WHAT TO TEST (rule 8): open GAGES on 1000237620 OP-030 — the heading should show a spanner, not U0001F527. Press EDIT on bubble 3, set the status to ORDERED and assign it to somebody; the row should redraw in orange and the under-Step-6 button should still read 2 OPEN / 2. Try a status of BANANA and it should refuse it."] },
   { ts: "2026-08-08", rev: "App Rev-1013", type: "App", changes: ["STEP 6 SITS BACK ON THE LINE WITH THE OTHERS (Rev-1013, embedded validation REV-260) — per Rich, and it is Rev-1012’s doing. The step row centres its columns vertically, which never showed while every column was the same height. Hanging the GAGES button under Step 6 made that one column taller, and centring then lifted the whole column — caption and tile together — above the line of the rest. The row now top-aligns its columns, so every caption and every tile starts at the same height and GAGES simply hangs below Step 6 without moving it. One line of layout; nothing else touched. WHAT TO TEST (rule 8): on 1000237620 OP-030 the STEP 6 caption and tile should line up with STEP 5 and STEP 7, with GAGES · 2 OPEN / 2 underneath it. Same on OP-040, where Step 6 is locked and greyed."] },
@@ -3113,7 +3114,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:42 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:43 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -11562,6 +11563,12 @@ function cpLineLevelPanel(idx){
               + '<div style="font-size:11px; font-weight:700; letter-spacing:.04em; color:#6b6257;">'
               +   'QUALITY COMES ROUND \u00b7 ' + LDESC[l].when + '</div>'
               + '</div>').join('')
+          + '<button type="button" id="cpLlAi" style="align-self:center; margin-left:auto;'
+          +   ' padding:12px 20px; border:2px solid #4a2a5a; background:#fff; color:#4a2a5a;'
+          +   ' border-radius:9px; font-size:12.5px; font-weight:800; letter-spacing:.04em;'
+          +   ' cursor:pointer; line-height:1.4;">\u2728 AI SUGGESTION'
+          +   '<div style="font-size:10px; font-weight:600; color:#6b6257; margin-top:3px;">'
+          +   'proposes a level for every feature</div></button>'
           + '</div>'
           + (cnt.none ? ('<div style="background:#fdf3d5; border:1px solid #d9b64a; border-radius:8px;'
               + ' padding:10px 12px; margin-bottom:14px; font-size:12.5px; color:#5c4708;"><b>'
@@ -11643,6 +11650,103 @@ function cpLineLevelPanel(idx){
         if(save()){ try{ logAct('line-level', 'level set'); }catch(_){ } }
         render();
       }; });
+      /* ===== Rev-1016: AI SUGGESTION =========================================
+         Proposes a level for every feature. THREE THINGS ABOUT IT.
+         (1) ITAR: feature descriptions and tolerances are export-controlled part data, so
+             nothing is sent until the ITAR confirmation is accepted - the same gate every
+             other AI call in this app sits behind.
+         (2) It PROPOSES. Nothing is written until the proposal is read and accepted, and
+             the confirmation says how many features it would change.
+         (3) It is a starting point, not a ruling. A tolerance band and a feature name are
+             all it sees - it does not know which features have bitten this shop before. */
+      const _ai = document.getElementById('cpLlAi');
+      if(_ai) _ai.onclick = async () => {
+        try{
+          if(!rows.length){ flash('There are no feature rows to suggest levels for.', true); return; }
+          const key = localStorage.getItem('anthropicApiKey');
+          if(!key){ flash('No Anthropic API key set. Admin \u2192 Settings \u2192 API key.', true); return; }
+          let ok = true;
+          try{ if(typeof showItarConfirm === 'function') ok = await showItarConfirm(); }catch(_){ }
+          if(!ok){ flash('Cancelled \u2014 nothing was sent.'); return; }
+          _ai.disabled = true; _ai.style.opacity = '.6';
+          const was = _ai.innerHTML; _ai.textContent = '\u2728 Thinking\u2026';
+          const feats = rows.map(r => ({ bubble: String(r.bubble).trim(),
+                                         feature: String(r.featureDesc || ''),
+                                         spec: String(r.spec || '').replace(/\s+/g, ' ').trim(),
+                                         machinist: String(r.freqEvery || '') }));
+          const r = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json', 'x-api-key': key,
+                       'anthropic-version':'2023-06-01',
+                       'anthropic-dangerous-direct-browser-access':'true' },
+            body: JSON.stringify({
+              model: 'claude-sonnet-4-6', max_tokens: 1200,
+              system: 'You assign line-inspection levels to machined features on a CAMCO '
+                + 'Control Plan. LEVEL 1 = COMPLETE CHECK, quality re-checks twice a shift - '
+                + 'for the tightest and most critical features. LEVEL 2 = CRITICAL ONLY, four '
+                + 'times per shift - important features with moderate tolerance. LEVEL 3 = ODD '
+                + 'CHECKS, once every other day - loose, attribute or cosmetic features. Judge '
+                + 'from the tolerance band and what the feature is: tighter band means lower '
+                + 'level number. Reply with JSON ONLY, no prose and no code fence, in the shape '
+                + '[{"bubble":"3","level":1,"why":"six words"}] with one entry per feature given.',
+              messages: [{ role:'user', content: JSON.stringify(feats) }]
+            })
+          });
+          const d = await r.json();
+          const txt = (d.content || []).filter(x => x.type === 'text').map(x => x.text).join('').trim();
+          _ai.disabled = false; _ai.style.opacity = ''; _ai.innerHTML = was;
+          if(!txt){
+            const em = (d.error && d.error.message) ? String(d.error.message) : 'no answer came back';
+            flash('\u26a0 The AI did not answer \u2014 ' + em, true); return;
+          }
+          let arr = null;
+          try{ arr = JSON.parse(txt.replace(/^```(json)?/i, '').replace(/```$/, '').trim()); }
+          catch(e){ console.warn('Rev-1016 AI reply was not JSON', txt); }
+          if(!Array.isArray(arr) || !arr.length){
+            flash('\u26a0 The AI answered in a shape this screen could not read \u2014 nothing '
+              + 'was changed.', true); return;
+          }
+          const valid = {}; let changed = 0, kept = 0;
+          arr.forEach(x => {
+            const b = String((x && x.bubble) || '').trim();
+            const l = parseInt(x && x.level, 10);
+            if(!b || [1,2,3].indexOf(l) < 0) return;
+            if(!rows.some(r => String(r.bubble).trim() === b)) return;   /* never invent a row */
+            valid[b] = { level: l, why: String((x && x.why) || '').slice(0, 60) };
+            if(levels[b] === l) kept++; else changed++;
+          });
+          if(!Object.keys(valid).length){
+            flash('\u26a0 Nothing in the AI answer matched a feature on this operation.', true); return;
+          }
+          const lines = rows.filter(r => valid[String(r.bubble).trim()]).slice(0, 20).map(r => {
+            const b = String(r.bubble).trim(), v = valid[b];
+            return '<tr><td style="padding:3px 8px;"><b>' + esc(b) + '</b></td>'
+              + '<td style="padding:3px 8px;">' + esc(r.featureDesc || '') + '</td>'
+              + '<td style="padding:3px 8px; text-align:center; font-weight:800; color:'
+              + LCOL[v.level] + ';">' + v.level + '</td>'
+              + '<td style="padding:3px 8px; color:#6b6257;">' + esc(v.why) + '</td></tr>';
+          }).join('');
+          const okGo = await cpConfirmBox('USE THE AI SUGGESTION?',
+            '<div style="font-size:12.5px; margin-bottom:8px;">It proposes a level for <b>'
+            + Object.keys(valid).length + '</b> feature(s) \u2014 <b>' + changed + '</b> would '
+            + 'change, ' + kept + ' already match.</div>'
+            + '<div style="max-height:260px; overflow:auto;"><table style="border-collapse:collapse;'
+            + ' font-size:12px;">' + lines + '</table></div>'
+            + '<div style="font-size:11.5px; color:#6b6257; margin-top:10px;">This is a starting '
+            + 'point, not a ruling \u2014 it sees a feature name and a tolerance, and knows '
+            + 'nothing about which features have bitten this shop before. Check every one.</div>',
+            '\u2728 Use these levels');
+          if(!okGo){ flash('Left as it was \u2014 nothing changed.'); return; }
+          Object.keys(valid).forEach(b => { levels[b] = valid[b].level; });
+          if(save()){ try{ logAct('line-level', 'AI suggestion applied'); }catch(_){ } }
+          flash('\u2714 ' + changed + ' level(s) changed from the AI suggestion.');
+          render();
+        }catch(e){
+          console.error('Rev-1016 AI suggestion failed', e);
+          try{ _ai.disabled = false; _ai.style.opacity = ''; }catch(_){ }
+          flash('The AI suggestion failed: ' + (e && e.message || e), true);
+        }
+      };
       c.querySelectorAll('[data-lvset]').forEach(inp => { inp.onchange = () => {
         const l = inp.getAttribute('data-lvset');
         every[l] = Math.max(1, parseInt(inp.value, 10) || 1);
