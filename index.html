@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1016</title>
+<title>CONTROL PLAN GENERATOR - Rev-1017</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1016 · 2026-08-08 3:43 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1017 · 2026-08-08 3:45 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1016 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:43 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1017 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:45 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1016 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1017 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1016";
+const APP_REV = "Rev-1017";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1017", type: "App", changes: ["THE GAGE LIST SHOWS THE FEATURE AND WHO OWNS IT (Rev-1017, embedded validation REV-260) — per Rich, two columns. AN ODS COLUMN carries the inspection crop cut for that bubble — the same picture the machinist sees on that feature — at thumbnail size, and clicking it opens the crop full size. It comes from the plan’s own saved reference images, so a crop deleted there is gone here too and there is no second copy to drift. Where no crop has been cut the cell shows a dash rather than the whole ODS print, which at 54 pixels tall would say nothing. AN AUTHOR COLUMN names who is responsible for the gage, defaulting to RICH ARNOLD and editable per gage through EDIT, upper-cased like every other name in the app. A gage with no author recorded reads RICH ARNOLD rather than blank, so the column is never a row of dashes on the existing list. WHAT TO TEST (rule 8): open GAGES on 1000237620 OP-030 — bubble 3 and bubble 7 should each show a small crop if one has been cut for them, clicking one should open it full size, and both should read RICH ARNOLD under AUTHOR. Press EDIT and the last question should offer the author."] },
   { ts: "2026-08-08", rev: "App Rev-1016", type: "App", changes: ["✨ AI SUGGESTION PROPOSES A LEVEL FOR EVERY FEATURE (Rev-1016, embedded validation REV-260) — per Rich. The button sits beside the three level cards and asks the AI to put a 1, 2 or 3 against every feature on the operation, judging from the feature name and the tolerance band: tighter band, lower number. It is told what the three levels MEAN in this shop — complete check twice a shift, critical only four times a shift, odd checks every other day — so it is answering CAMCO’s question rather than a generic one. THREE THINGS BUILT INTO IT ON PURPOSE. ITAR: feature descriptions and tolerances are export-controlled part data, so nothing leaves the device until the ITAR confirmation is accepted — the same gate every other AI call in this app sits behind, and cancelling sends nothing. IT PROPOSES RATHER THAN WRITES: the suggestion is shown as a table — bubble, feature, level and a few words of why — with a count of how many would actually CHANGE, and not one level is written until that is accepted. AND IT IS CHECKED: a level that is not 1, 2 or 3 is thrown away, and a bubble that is not on this operation is thrown away, so a confused answer cannot invent a feature or write a nonsense level. If the reply comes back in a shape the screen cannot read it says so and changes nothing. The confirmation says plainly that this is a starting point and not a ruling: it sees a name and a tolerance, and knows nothing about which features have bitten this shop before. WHAT TO TEST (rule 8): open STEP 8 on 1000237620 OP-030 and press ✨ AI SUGGESTION — the ITAR box should come up first, cancelling it should send nothing, and accepting should bring back a table of proposed levels with a change count. Accept it and the buttons and the last column should follow."] },
   { ts: "2026-08-08", rev: "App Rev-1015", type: "App", changes: ["EACH LINE-INSPECTION LEVEL NOW SAYS WHAT IT MEANS (Rev-1015, embedded validation REV-260) — Rich’s own words, straight off the marked-up screen. A number on its own said nothing about intent: LEVEL 1 now reads COMPLETE CHECK with QUALITY COMES ROUND · TWICE A SHIFT beneath it, LEVEL 2 reads CRITICAL ONLY · 4 TIMES PER SHIFT, LEVEL 3 reads ODD CHECKS · ONCE EVERY OTHER DAY. The parts interval stays exactly where it was and stays editable — the two lines are the INTENT, the number is the TRIGGER, and anyone setting a feature to Level 2 can now see they are saying critical-only rather than guessing what 2 stood for. The QUALITY PULLS A PART column names the level too, so a row reads EVERY 25 PARTS with CRITICAL ONLY under it and the table can be read without looking back up at the cards. WHAT TO TEST (rule 8): open STEP 8 LINE INSPECTION on 1000237620 OP-030 — the three cards should carry their names and cadences, and setting a feature to 2 should put CRITICAL ONLY in the last column under the parts figure."] },
   { ts: "2026-08-08", rev: "App Rev-1014", type: "App", changes: ["EDIT AND DELETE ON EVERY GAGE ROW, AND FOUR BROKEN ICONS FIXED (Rev-1014, embedded validation REV-260) — per Rich. FIRST, THE ICONS, and this one is mine: four panel headings were written with a backslash-U escape, which JavaScript does not understand, so the GAGES heading read U0001F527 GAGES instead of showing a spanner. The same mistake was sitting unnoticed in LINE INSPECTION LEVELS, LINE INSPECTIONS and HARDWARE NEEDED. All four now carry the character itself, which is the standing rule in this file and was the rule before I broke it. SECOND, EDIT and DELETE on every row of the gage panel. Without them a wrong gage meant leaving for the full list and finding it again among every other part’s gages. EDIT walks the four fields that matter — what the gage is, its status, who has it, notes — and REFUSES a status that is not one of the five rather than writing a word the list cannot colour. DELETE asks first, and says the thing that is easy to get wrong: taking a gage off the list does NOT clear the Special Gage / Fixture box on the Control Plan row, so editing that row will put the gage back. Clear the box on the row if it should stay gone. Both write to the gage register itself, so this panel and the full gage list cannot end up showing different facts. WHAT TO TEST (rule 8): open GAGES on 1000237620 OP-030 — the heading should show a spanner, not U0001F527. Press EDIT on bubble 3, set the status to ORDERED and assign it to somebody; the row should redraw in orange and the under-Step-6 button should still read 2 OPEN / 2. Try a status of BANANA and it should refuse it."] },
@@ -3114,7 +3115,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:43 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:45 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -11786,6 +11787,12 @@ function cpGagePanel(idx){
     c.style.cssText = 'background:#fff; border-radius:12px; width:100%; max-width:min(1300px, 96vw);'
       + ' box-shadow:0 16px 60px rgba(0,0,0,.5); font-family:inherit; overflow:hidden;';
 
+    /* Rev-1017: the inspection crop saved for each bubble - the same picture the machinist
+       sees on that feature. One getter, the plan's own store, so a crop deleted there is
+       gone here too. */
+    let gCrops = {};
+    try{ gCrops = (p && p.valRefImages) || {}; }catch(e){ console.warn('Rev-1017 crop lookup failed', e); }
+    const CP_GAGE_AUTHOR = 'RICH ARNOLD';   /* Rev-1017: current author, per Rich */
     const statusColour = st => {
       const u = String(st || '').toUpperCase();
       if(u === 'COMPLETE') return '#1d6b3f';
@@ -11804,10 +11811,11 @@ function cpGagePanel(idx){
     } else {
       rows = '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
         + '<thead><tr>'
-        + ['BUBBLE', 'FEATURE', 'SPEC / TOLERANCE', 'GAGE OR FIXTURE NEEDED', 'STATUS', 'ASSIGNED TO', '']
+        + ['BUBBLE', 'FEATURE', 'ODS', 'SPEC / TOLERANCE', 'AUTHOR', 'GAGE OR FIXTURE NEEDED',
+           'STATUS', 'ASSIGNED TO', '']
             .map((th, ix) => '<th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8;'
               + ' color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:'
-              + (ix === 0 || ix >= 4 ? 'center' : 'left') + ';">' + th + '</th>').join('')
+              + ([1, 3, 5].indexOf(ix) >= 0 ? 'left' : 'center') + ';">' + th + '</th>').join('')
         + '</tr></thead><tbody>'
         + list.map(g => {
             const done = String(g.status || '').toUpperCase() === 'COMPLETE';
@@ -11816,8 +11824,21 @@ function cpGagePanel(idx){
               +   ' font-size:16px; font-weight:800; color:#000;">' + esc(g.bubble || '') + '</td>'
               + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#000;">'
               +   esc(g.feature || '') + '</td>'
+              /* Rev-1017: the feature's own inspection crop, small. A dash means no crop has
+                 been cut for that bubble yet - the whole ODS print would say nothing at this size. */
+              + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; text-align:center;">'
+              +   (gCrops[String(g.bubble || '')]
+                    ? ('<img data-gods="' + esc(g.bubble || '') + '" src="'
+                       + gCrops[String(g.bubble || '')] + '" alt="ODS crop for bubble '
+                       + esc(g.bubble || '') + '" title="Click to see it full size"'
+                       + ' style="height:54px; max-width:110px; object-fit:contain; background:#fff;'
+                       + ' border:1px solid #d8d3ca; border-radius:6px; cursor:zoom-in;'
+                       + ' display:inline-block;">')
+                    : '<span style="color:#b9b3aa;">\u2014</span>') + '</td>'
               + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#3a352e;">'
               +   esc(g.spec || '') + '</td>'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+              +   ' color:#3a352e;">' + esc(g.author || CP_GAGE_AUTHOR) + '</td>'
               + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#000; font-weight:700;">'
               +   esc(g.desc || '')
               +   (g.notes ? '<div style="font-size:11px; font-weight:400; color:#6b6257; margin-top:4px;">\u270e '
@@ -11900,6 +11921,10 @@ function cpGagePanel(idx){
         if(who === null) return;
         const note = prompt('NOTES (leave empty for none)', g.notes || '');
         if(note === null) return;
+        const auth = prompt('AUTHOR \u2014 who is responsible for this gage',
+                            g.author || CP_GAGE_AUTHOR);
+        if(auth === null) return;
+        g.author = String(auth).trim().toUpperCase() || CP_GAGE_AUTHOR;
         g.desc = String(desc).trim(); g.status = su;
         g.assignedTo = String(who).trim(); g.notes = String(note).trim();
         g.ut = new Date().toISOString();
@@ -11931,6 +11956,29 @@ function cpGagePanel(idx){
         console.error('Rev-1014 gage delete failed', e);
         flash('Could not remove it: ' + (e && e.message || e), true);
       }
+    }; });
+    /* Rev-1017: click a crop to see it at full size. */
+    c.querySelectorAll('[data-gods]').forEach(im => { im.onclick = () => {
+      try{
+        const b = im.getAttribute('data-gods');
+        const src = gCrops[String(b)]; if(!src) return;
+        const v = document.createElement('div');
+        v.style.cssText = 'position:fixed; inset:0; z-index:100011; background:rgba(20,15,12,.92);'
+          + ' display:flex; flex-direction:column; align-items:center; padding:14px; overflow:auto;';
+        v.innerHTML = '<div style="display:flex; align-items:center; gap:12px; width:100%;'
+            + ' max-width:1400px; margin-bottom:10px;">'
+          +   '<div style="color:#fff; font-weight:800; letter-spacing:.05em; flex:1 1 auto;">'
+          +     'INSPECTION CROP \u2014 BUBBLE ' + esc(b) + '</div>'
+          +   '<button id="cpGgImgX" style="background:#a02020; color:#fff; border:2px solid #7a1414;'
+          +     ' border-radius:8px; padding:8px 22px; font-weight:800; cursor:pointer;">'
+          +     '\u2715 Close</button></div>'
+          + '<img src="' + src + '" style="max-width:96vw; max-height:86vh; background:#fff;'
+          +   ' border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5);">';
+        document.body.appendChild(v);
+        const xb = document.getElementById('cpGgImgX');
+        if(xb) xb.onclick = () => v.remove();
+        v.onclick = e => { if(e.target === v) v.remove(); };
+      }catch(e){ console.warn('Rev-1017 crop view failed', e); }
     }; });
     const _f = document.getElementById('cpGgFull');
     if(_f) _f.onclick = () => { ov.remove(); try{ showGages(); }
