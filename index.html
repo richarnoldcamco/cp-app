@@ -1685,7 +1685,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-998";
+const APP_REV = "Rev-999";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2213,6 +2213,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-999", type: "App", changes: ["THE NEW CHAT PROMPT CARRIES THIS SESSION, AND THE FORMAT RULE MOVES TO THE END (Rev-999, embedded validation REV-260) \u2014 Rich is changing chats and asked whether the handoff needs updating. It did, on two counts. FIRST: the baked session state still described Rev-950 and a six-step flow, forty-eight revisions out of date - a fresh chat would have started by rediscovering STEP 8, the tab guard, Inject and Review Data. It now carries the Aug 7-9 state: the eighth optional CNC PROGRAM step and where its files live, the leader-election tab guard and the three timers it covers, Inject Data with its scenarios and every safety stamp, Review Data with its who/when chooser and the Cpk rules, the tolerance helpers cpSplitLimits / cpJoinLimits / cpSplitSingle and why the prefix and suffix must survive an edit, the crop prompt, the red-circle highlight convention, and the rounding-resolution lesson that a .0005 band cannot be told in four decimals. SECOND, and overdue: the end-of-response format rule now sits at the LITERAL END of the assembled prompt rather than mid-block, because the CP-specific section used to be appended after it - so the last thing a new chat read was an architecture map, not the rule it must follow on every reply. That was the fix Rich asked about when the rev heading slipped four responses running. WHAT TO TEST (rule 8): press \ud83d\udcac New Chat Prompt and read the last lines - they should be the token estimate and rev-heading rule. Payload verified in both repos before this entry."] },
   { ts: "2026-08-09", rev: "App Rev-998", type: "App", changes: ["LIMITS STACK UPPER OVER LOWER, AND THE TABLE GOES WHITE (Rev-998, embedded validation REV-260) \u2014 per Rich. (1) The separate LOW and HIGH columns are now ONE column, upper limit on top and lower limit directly beneath it, which is how the print reads and how the Control Plan itself renders a limit pair (CP \u00a70.14, Rev-33). Two columns became one and the table lost a column of width. (2) EVERY CELL IS WHITE WITH BLACK TEXT. The tinted rows - green for capable, amber for marginal, pink for out of tolerance - washed the numbers out, and on a printed copy they come out as grey mud. COLOUR IS KEPT IN EXACTLY TWO PLACES, and this is a deliberate judgement rather than an oversight: the CPK figure and the OUT OF TOL count. In those two cells the colour IS the information - a not-capable feature must not look identical to a capable one at arm\u2019s length - and it is carried on the digits themselves, not behind them. Say the word and those go black too. Nothing else changed: same columns, same maths, same readings underneath. WHAT TO TEST (rule 8): open \ud83d\udcca REVIEW - one LIMITS column reading .6040 over .6035, white rows throughout, and only the Cpk and out-of-tolerance figures carrying colour. Payload verified in both repos before this entry."] },
   { ts: "2026-08-09", rev: "App Rev-997", type: "App", changes: ["n IS NOW PIECES, AND THE READINGS SAY THEY ARE THERE (Rev-997, embedded validation REV-260) \u2014 Rich asked what n meant and asked to see the measured points. Both are on me. n is the sample size, standard statistics shorthand and no business being shorthand on a shop-floor screen: the column now reads PIECES. And the individual readings have been one click away since Rev-987 with NOTHING ON SCREEN SAYING SO - a feature nobody can find is a feature that does not exist. Every measured row now carries a \u25b8 SHOW THE n READINGS line under the feature name, which turns to \u25be HIDE THE READINGS when open, and the whole row still toggles on a click. The readings themselves gained what they were missing: each one names the piece number, the machinist who ran it and the day, so an out-of-tolerance piece can be traced to a person and a shift rather than being an anonymous red chip. They are laid out oldest first. WHAT TO TEST (rule 8): open \ud83d\udcca REVIEW and click any row with numbers - the readings should open, each showing piece, value, who and when. Payload verified in both repos before this entry."] },
   { ts: "2026-08-09", rev: "App Rev-996", type: "App", changes: ["INJECT SPREADS ITS PIECES ACROSS MACHINISTS AND DAYS (Rev-996, embedded validation REV-260) \u2014 per Rich, and it is the change that makes Rev-995\u2019s chooser worth having: every injected piece used to carry the same operator SIM and the same timestamp, so filtering by who ran them or how far back had exactly one answer. INJECT now asks two more questions - HOW MANY MACHINISTS (1, 2, 3 or 4, named SIM-A through SIM-D) and HOW MANY DAYS (1, 2, 7, 14 or 30) - and deals the pieces out across them: machinists round-robin so each gets a fair share, days spread evenly backwards from today with each piece landing at a believable hour of a working shift rather than all at midnight. Each machinist gets their own SHOP ORDER, since in the shop a job number belongs to a run rather than to a person, and each day\u2019s stamp is real enough that the 1 WEEK and 2 WEEKS windows in Review Data actually cut the set differently. THE CAPABILITY MATHS IS UNTOUCHED: the readings are generated exactly as before against each feature\u2019s own limits, so a Cpk 1.33 batch still measures back as 1.33 whether it is one machinist or four. Every safety stamp stands - simulated on the run and every reading, SIM- shop orders, hidden from Reports unless switched on. WHAT TO TEST (rule 8): inject 30 pieces across 3 machinists and 7 days, then press \ud83d\udcca REVIEW - the chooser should list SIM-A, SIM-B and SIM-C with ten each, and LAST DAY should select fewer than ALL TIME. Payload verified in both repos before this entry."] },
@@ -3088,7 +3089,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-09";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:34 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:05 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -21656,33 +21657,62 @@ STILL OUTSTANDING:
     source of truth; the standalone machinist app is no longer used.
   · AUDIT should count declared machinist exceptions so plans carrying many are visible.
 
-AUG 5 SESSION STATE (Rev-871 → Rev-950) — read before touching anything:
-  · SEVEN construction steps now: 1 Edit Op# · 2 Upload ODS · 3 Assign Bubbles · 4 ASSIGN
-    TOLERANCES (new) · 5 Control Types · 6 Measurement Types · 7 Review Inspection.
-    Internal builder keys are '1','T','2','3' — NEVER renumber them (Rev-738 rule; every
-    recorded approval is keyed on them). Weights: 5/5/20/15/20/20/15.
-  · Tolerances UI is ONE column: the spec input is HIDDEN on the open row; the UPPER/LOWER
-    pair (or single LIMIT via the per-row tolMode toggle) is the only typing place. The pair
-    seeds from a two-number spec and writes row.spec back on every edit — export and
-    validation read spec exactly as before. Do not resurrect the spec input.
-  · Builder header is the construction BANNER (tiles + hazard ribbon), half-height, tiles
-    sized to labels. Old tab buttons remain hidden in the DOM — cpSetStep highlights them
-    by id; removing them breaks the step switch.
-  · Zero-width td rule: the old Upper/Lower tds still render at width:0 because every step
-    view's column indices count them. Removing a td renumbers every view.
-  · Traveller: primary system live (::TRAVELLER holds the primary; true scan preserved in
-    ::TRAVELLER_SCAN, 446,872 bytes, 1019x1492). GEN is primary for 1000237498 by choice.
-    AI-read + compares always read the true scan.
-  · Bare-part-key fallbacks (ODS image AND drawing-recovery-with-pins) now serve OP-LESS
-    plans only — they leaked June data into new operations twice (Rev-929, Rev-933).
+AUG 7-9 SESSION STATE (Rev-951 → Rev-999) — read before touching anything:
+  · EIGHT construction steps now. Step 8 CNC PROGRAM (Rev-977) is OPTIONAL in the real
+    sense: never locked, zero weight in the percentage, never blocks COMPLETE. Its stage
+    object s8 sits OUTSIDE the sequential lock walk in cpOpStages. Program files go to the
+    PRIVATE data repo under programs/PART/OPnnn/ ; the plan stores only name/size/path/when.
+  · STEPS LOCK SEQUENTIALLY AGAIN (Rev-961), reversing Rev-683. The contradiction that
+    killed it is gone: ready is now simply "every step before this one is done", so LOCKED
+    and COMPLETED can no longer disagree. Steps 1-7 chain; step 8 never locks.
+  · COMPLETE means ALL SEVEN steps (Rev-964) and the percentage counts s6 - before that,
+    100% was unreachable and a plan could read COMPLETE at 85%.
+  · ONE TAB DRIVES (Rev-983/989). Leader election in localStorage key cpTabLeader with an
+    8s heartbeat; the leader alone runs THREE background timers - update check, 90s app
+    push, 60s Pages publish. Followers show an amber note. Chase is ONE reload per rev
+    (was 3) and the self-update cooldown is 180s (was 45s). Several open copies reloading
+    each other was the "blinking" - proved from the Action Log, 21 app-starts in 40s with
+    an older rev appearing mid-burst.
+  · INJECT DATA (Rev-986/994/996), expert-user only, beside Inspect. Eight scenarios
+    (Cpk 2.00/1.67/1.33/1.00/0.67, SHIFTED, DRIFTING, ONE BAD PIECE), 5-50 pieces, 1-4
+    machinists named SIM-A..SIM-D, 1-30 days. EVERY safety stamp matters and must stay:
+    simulated:true on run AND every reading, operator = the SIM-x name, shop order SIM-xxxx
+    so the FILENAME declares it, hidden from Reports and Review unless switched on. Refused
+    on a released operation - the dialog offers WITHDRAW RELEASE & INJECT instead.
+  · REVIEW DATA (Rev-987/995/997/998), beside Inspect. Reads every run for the operation
+    ONCE, then a chooser: which machinists (with counts) and how far back (all/1/2/7/14/30
+    days), plus the simulated tick. Then one line per feature: LIMITS stacked upper over
+    lower, PIECES, MEAN, MIN, MAX, sigma, CPK, OUT OF TOL. Cpk = min(USL-mean, mean-LSL)/3s
+    with SAMPLE sd (n-1); REFUSED under 5 pieces and when sd = 0. Rows are white with black
+    text; colour survives only on the Cpk figure and the out-of-tolerance count. Click a row
+    for the individual readings - each names piece, value, who ran it and the day.
+  · TOLERANCE HELPERS: cpSplitLimits (two limits; accepts / \ , or a LINE BREAK, never a
+    plain space), cpSplitSingle (one limit, 1-DIM rows), cpJoinLimits (rebuilds the spec).
+    A row REMEMBERS specPre and specSuf so DIA, R, C, MAX, MIN and notes like 2 PLACES
+    survive an edit - dropping them silently was the whole reason those fields exist.
+    MAX/MIN buttons on 1-DIM rows; Ø DIA / R RAD / C CHAM buttons on every tolerance row.
+  · ROUNDING RESOLUTION (Rev-996): generated readings need ~50 steps across the tolerance.
+    Rounding to the limits' own decimals made a .0005 band six possible values and dragged
+    a Cpk 1.33 batch back to 1.19 in test. _cpInjDecimals now widens dp accordingly.
+  · HIGHLIGHT CONVENTION: a RED CIRCLE, never a glow and never a fill. Rev-978 for the
+    builder pin marker, Rev-985 for the validation app's baked reference-image ring (white
+    ring under, red ring over, no fill). Reference images cut before Rev-985 keep yellow.
+  · The crop editor shows a ghosted prompt PRESS ENTER TO ZOOM INTO CROPPED AREA while a
+    crop exists and not yet zoomed; it disappears on zoom rather than changing wording.
   · Instructions Rev-92 baked in still describes the OLD six-step flow and two-column
-    tolerances — needs a rev for Rev-942–950; NEVER edit without explicit go-ahead.
-  · First-visit AI-tolerance-fill popup asks once per plan (stepSeen.T); already consumed
-    on 1000237498 OP-040 — the purple Read dimensions button is the door there.
+    tolerances, and knows nothing of Step 8. NEVER edit without explicit go-ahead.
+  · Actions row is compact and WRAPS (Rev-988) - two added buttons had grown a page-wide
+    scrollbar. The operations list shows each operation's own ODS drawing in the STATUS
+    column and the part description beside the part number in the beige header.
   · SHIP DISCIPLINE (three empty-ship postmortems: 903/908/916): patch script standalone,
     assert FEATURE MARKERS in the file, node --check, then embed && push && verify chained;
     post-push verify markers in BOTH repos via blob API. File anchors contain literal UTF-8
-    → ← — ✔ characters, not backslash-u escapes.
+    → ← — ✔ characters, not backslash-u escapes. A push returning 409 means an open
+    tab wrote the same file - re-run with fresh SHAs.
+  · STILL OPEN AT Rev-999: a histogram per row in Review Data (asked for, not built); the
+    Instructions rev covering Rev-93's three approved changes plus steps 7 and 8; the
+    .xlsx import map accepting both FREQ (EVERY) and MACHINIST CHECK FREQ; Step 6 returning
+    to the feature rather than the step; making the remaining ~20 data-path catches speak.
 `;
 // ===== NEW CHAT PROMPT =====
 // The COMMON block is shared across all CAMCO apps and lives on GitHub so it can be
@@ -21711,6 +21741,22 @@ function buildCpSpecific(){
   const projLines = projects.map(p => '- ' + p.partNum + (p.opNum ? ' OP-' + p.opNum : '') + ' ' + (p.rev||'') + (p.customerName? ' · ' + p.customerName : '') + (p.updatedAt? ' · updated ' + String(p.updatedAt).slice(0,10) : '')).join('\n') || '- (none on this device — Pull Data first)';
   let valRev = '?';
   try{ const m = /const APP_REV\s*=\s*(\d+)/.exec(decodeURIComponent(escape(atob(VALIDATION_APP_B64.slice(0, 400000))))); if(m) valRev = m[1]; }catch(e){}
+  /* Rev-999: THE FORMAT RULE GOES LAST. It used to sit at the end of the COMMON block -
+     but this CP-specific section is appended AFTER that, so the last thing a fresh chat read
+     was an architecture map rather than the rule it must obey on every reply. Recency is the
+     only lever available here, and the rule slipped four responses running before Rich caught
+     it. Repeated at the literal end, in full. */
+  const FORMAT_RULE_LAST =
+    '\n\n=== READ THIS LAST \u2014 IT GOVERNS EVERY SINGLE REPLY ===\n'
+    + 'End EVERY response with these two things, in this order, and NOTHING after them:\n'
+    + '  (1) a token estimate from visible context (characters / 4, images ~1.5k each),\n'
+    + '      formatted "~Tokens: input \u2248 Nk \u00b7 output \u2248 Nk" (approximate); then\n'
+    + '  (2) the current app revision on its own line as a level-1 markdown heading,\n'
+    + '      "# Rev-NNN". It renders large so the rev is read at a glance.\n'
+    + 'No sign-off, no follow-up question, no postscript after the heading. EVERY response,\n'
+    + 'not just ones that ship code. If a rev was pushed this turn, show THAT number. Never\n'
+    + 'guess: a rev is only claimed once it has been READ BACK from the repository - the\n'
+    + 'heading states what is LIVE, not what was intended.';
   const logs = (typeof CHANGE_LOG !== 'undefined' ? CHANGE_LOG : []).slice(0, 8)
     .map(e => '- ' + e.rev + ' (' + e.ts + '): ' + String((e.changes&&e.changes[0])||'').slice(0, 220) + '…').join('\n');
   return [
@@ -21738,7 +21784,8 @@ function buildCpSpecific(){
 projLines,
 '',
 'LAST 8 REVS (from the live CHANGE_LOG — full history inside the app):',
-logs
+logs,
+    FORMAT_RULE_LAST   /* Rev-999: the LAST thing a fresh chat reads */
   ].join('\n');
 }
 function assembleNewChatPrompt(commonText){
