@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1014</title>
+<title>CONTROL PLAN GENERATOR - Rev-1015</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1014 · 2026-08-08 3:40 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1015 · 2026-08-08 3:42 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1014 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:40 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1015 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:42 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1014 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1015 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1014";
+const APP_REV = "Rev-1015";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1015", type: "App", changes: ["EACH LINE-INSPECTION LEVEL NOW SAYS WHAT IT MEANS (Rev-1015, embedded validation REV-260) — Rich’s own words, straight off the marked-up screen. A number on its own said nothing about intent: LEVEL 1 now reads COMPLETE CHECK with QUALITY COMES ROUND · TWICE A SHIFT beneath it, LEVEL 2 reads CRITICAL ONLY · 4 TIMES PER SHIFT, LEVEL 3 reads ODD CHECKS · ONCE EVERY OTHER DAY. The parts interval stays exactly where it was and stays editable — the two lines are the INTENT, the number is the TRIGGER, and anyone setting a feature to Level 2 can now see they are saying critical-only rather than guessing what 2 stood for. The QUALITY PULLS A PART column names the level too, so a row reads EVERY 25 PARTS with CRITICAL ONLY under it and the table can be read without looking back up at the cards. WHAT TO TEST (rule 8): open STEP 8 LINE INSPECTION on 1000237620 OP-030 — the three cards should carry their names and cadences, and setting a feature to 2 should put CRITICAL ONLY in the last column under the parts figure."] },
   { ts: "2026-08-08", rev: "App Rev-1014", type: "App", changes: ["EDIT AND DELETE ON EVERY GAGE ROW, AND FOUR BROKEN ICONS FIXED (Rev-1014, embedded validation REV-260) — per Rich. FIRST, THE ICONS, and this one is mine: four panel headings were written with a backslash-U escape, which JavaScript does not understand, so the GAGES heading read U0001F527 GAGES instead of showing a spanner. The same mistake was sitting unnoticed in LINE INSPECTION LEVELS, LINE INSPECTIONS and HARDWARE NEEDED. All four now carry the character itself, which is the standing rule in this file and was the rule before I broke it. SECOND, EDIT and DELETE on every row of the gage panel. Without them a wrong gage meant leaving for the full list and finding it again among every other part’s gages. EDIT walks the four fields that matter — what the gage is, its status, who has it, notes — and REFUSES a status that is not one of the five rather than writing a word the list cannot colour. DELETE asks first, and says the thing that is easy to get wrong: taking a gage off the list does NOT clear the Special Gage / Fixture box on the Control Plan row, so editing that row will put the gage back. Clear the box on the row if it should stay gone. Both write to the gage register itself, so this panel and the full gage list cannot end up showing different facts. WHAT TO TEST (rule 8): open GAGES on 1000237620 OP-030 — the heading should show a spanner, not U0001F527. Press EDIT on bubble 3, set the status to ORDERED and assign it to somebody; the row should redraw in orange and the under-Step-6 button should still read 2 OPEN / 2. Try a status of BANANA and it should refuse it."] },
   { ts: "2026-08-08", rev: "App Rev-1013", type: "App", changes: ["STEP 6 SITS BACK ON THE LINE WITH THE OTHERS (Rev-1013, embedded validation REV-260) — per Rich, and it is Rev-1012’s doing. The step row centres its columns vertically, which never showed while every column was the same height. Hanging the GAGES button under Step 6 made that one column taller, and centring then lifted the whole column — caption and tile together — above the line of the rest. The row now top-aligns its columns, so every caption and every tile starts at the same height and GAGES simply hangs below Step 6 without moving it. One line of layout; nothing else touched. WHAT TO TEST (rule 8): on 1000237620 OP-030 the STEP 6 caption and tile should line up with STEP 5 and STEP 7, with GAGES · 2 OPEN / 2 underneath it. Same on OP-040, where Step 6 is locked and greyed."] },
   { ts: "2026-08-08", rev: "App Rev-1012", type: "App", changes: ["GAGES MOVES UNDER ASSIGN MEASUREMENT TYPES, IN WHITE (Rev-1012, embedded validation REV-260) — per Rich, and it belongs there. A gage exists only because the Special Gage / Fixture box was filled on a row in STEP 6, so the button now hangs directly beneath that step rather than standing in the numbered track. White background, and it turns red-edged with red text when any gage is still open, so an outstanding gage is visible from the list without opening anything. It stops being a numbered step for a reason worth keeping: in the track it read as one more thing to finish before the plan was done, and it never was — a gage that has not been made yet is a purchasing problem, not an unfinished Control Plan. LINE INSPECTION takes the freed number and is now STEP 8, so the track runs 1 to 8 with no gap. Nothing about what either button does has changed. WHAT TO TEST (rule 8): on 1000237620 OP-030 the GAGES button should sit under ASSIGN MEASUREMENT TYPES, white, reading GAGES · 2 OPEN / 2 in red, and still open the gage list on a click. LINE INSPECTION should now be labelled STEP 8, and OP-040 — which needs no gages — should show a plain white GAGES · NONE NEEDED."] },
@@ -3112,7 +3113,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:40 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:42 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -11497,6 +11498,14 @@ function cpLineLevelPanel(idx){
     let levels = Object.assign({}, p.lineLevels || {});
     let every = Object.assign({ 1: 5, 2: 25, 3: 100 }, p.lineLevelSet || {});
     const LCOL = { 1: '#a5342a', 2: '#a35400', 3: '#1d6b3f' };
+    /* Rev-1015: what each level MEANS, in Rich's own words off the marked-up screen. WHAT is
+       checked, and HOW OFTEN quality comes round. The parts interval stays editable beside
+       them - these two lines are the intent, the number is the trigger. */
+    const LDESC = {
+      1: { what: 'COMPLETE CHECK', when: 'TWICE A SHIFT' },
+      2: { what: 'CRITICAL ONLY',  when: '4 TIMES PER SHIFT' },
+      3: { what: 'ODD CHECKS',     when: 'ONCE EVERY OTHER DAY' }
+    };
 
     const save = () => {
       try{
@@ -11539,14 +11548,20 @@ function cpLineLevelPanel(idx){
       } else {
         body = '<div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">'
           + [1,2,3].map(l =>
-              '<label style="display:flex; align-items:center; gap:8px; border:2px solid ' + LCOL[l]
-              + '; border-radius:9px; padding:9px 13px; font-size:12px; font-weight:800; color:' + LCOL[l] + ';">'
-              + 'LEVEL ' + l + ' \u2014 EVERY'
-              + '<input type="number" min="1" data-lvset="' + l + '" value="' + (parseInt(every[l], 10) || 1) + '"'
-              + ' style="width:78px; padding:7px; border:1px solid #c9c0b4; border-radius:7px;'
-              + ' font-size:14px; font-weight:800; text-align:center; background:#fafa96;">'
-              + 'PARTS <span style="font-weight:600; color:#6b6257;">(' + cnt[l] + ' feature'
-              + (cnt[l] === 1 ? '' : 's') + ')</span></label>').join('')
+              '<div style="display:flex; flex-direction:column; gap:7px; border:2px solid ' + LCOL[l]
+              + '; border-radius:9px; padding:11px 14px;">'
+              + '<div style="font-size:13px; font-weight:800; letter-spacing:.03em; color:' + LCOL[l] + ';">'
+              +   'LEVEL ' + l + ' \u2014 ' + LDESC[l].what + '</div>'
+              + '<label style="display:flex; align-items:center; gap:8px; font-size:11.5px;'
+              +   ' font-weight:800; color:' + LCOL[l] + ';">EVERY'
+              +   '<input type="number" min="1" data-lvset="' + l + '" value="' + (parseInt(every[l], 10) || 1) + '"'
+              +   ' style="width:76px; padding:7px; border:1px solid #c9c0b4; border-radius:7px;'
+              +   ' font-size:14px; font-weight:800; text-align:center; background:#fafa96;">'
+              +   'PARTS <span style="font-weight:600; color:#6b6257;">(' + cnt[l] + ' feature'
+              +   (cnt[l] === 1 ? '' : 's') + ')</span></label>'
+              + '<div style="font-size:11px; font-weight:700; letter-spacing:.04em; color:#6b6257;">'
+              +   'QUALITY COMES ROUND \u00b7 ' + LDESC[l].when + '</div>'
+              + '</div>').join('')
           + '</div>'
           + (cnt.none ? ('<div style="background:#fdf3d5; border:1px solid #d9b64a; border-radius:8px;'
               + ' padding:10px 12px; margin-bottom:14px; font-size:12.5px; color:#5c4708;"><b>'
@@ -11586,7 +11601,9 @@ function cpLineLevelPanel(idx){
                 +     ' color:#6b6257;">NONE</button></td>'
                 + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
                 +   ' font-weight:800; color:' + (l ? LCOL[l] : '#b9b3aa') + ';">'
-                +   (l ? ('EVERY ' + (parseInt(every[l], 10) || 1) + ' PARTS') : 'NEVER') + '</td>'
+                +   (l ? ('EVERY ' + (parseInt(every[l], 10) || 1) + ' PARTS'
+                          + '<div style="font-size:10px; font-weight:700; color:#6b6257; margin-top:2px;">'
+                          + LDESC[l].what + '</div>') : 'NEVER') + '</td>'
                 + '</tr>'; }).join('')
           + '</tbody></table>';
       }
