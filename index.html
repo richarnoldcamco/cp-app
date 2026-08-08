@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1005</title>
+<title>CONTROL PLAN GENERATOR - Rev-1006</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1005 · 2026-08-08 11:14 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1006 · 2026-08-08 11:21 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1005 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:14 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1006 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:21 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1005 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1006 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1005";
+const APP_REV = "Rev-1006";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1006", type: "App", changes: ["A SMALL RUN INDEX NOW FEEDS THE FILTERS, SO MACHINISTS CAN BE PICKED BEFORE ANYTHING IS DOWNLOADED (Rev-1006, embedded validation REV-260) — Rich’s idea, and the right one. Rev-1004 could offer days and shop orders on the download screen because those are in the file NAME, but not machinists, because the operator is inside the file. The answer is a table beside the runs: one line per run holding the machinist, the day, the shop order, how many readings it carried and whether it is simulated. It lives at runs_index/PART_OP-nnn.json in the data repository and is KEYED BY FILE NAME, so two devices’ additions merge for free and a run can never be counted twice. Reading it is ONE small fetch. THE READER BUILDS IT, NOT THE WRITER. The machinist app pushes a run and knows nothing about this file; the review screen notices any run missing from the table and offers BUILD THE TABLE (n), reading just those runs once. That choice means no change to the validation app, it back-fills every run already in the repository, and it repairs itself if a run lands from a device that never opened the screen. A run is read once for this and never again for the purpose of drawing filters. The download screen gains a MACHINISTS table — name, PARTS INSPECTED, DAYS, first and last — each tickable, each showing how many of that person’s runs fall in the chosen window, and the choice carries straight through to the screen after the download rather than being asked twice. A machinist filter applies only to runs that are IN the table; an unindexed run has no name attached yet and is left out rather than quietly counted as somebody. Writing the table reads, merges and writes, and on a 409 — another device writing in the same moment — goes round again with a fresh sha instead of flattening their additions. If the table cannot be saved the screen says so and the choices still work for that visit. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — expect a yellow bar saying the runs are not in the table yet; press BUILD THE TABLE and let it run once; the MACHINISTS table should then list SIM, SIM-A to SIM-D with their parts-inspected counts. Close the panel and reopen it: the table should appear instantly with no reading at all."] },
   { ts: "2026-08-08", rev: "App Rev-1005", type: "App", changes: ["HARDWARE NEEDED — A LIST OF WHAT THE FLOOR IS STILL MISSING (Rev-1005, embedded validation REV-260) — per Rich. Admin gains a HARDWARE section with one button, Hardware Needed, which opens its own screen. Four items are on it the first time it opens: MONITOR, MONITOR HANGER, KEYBOARD / KEYPAD and CAMERAS. Anything else is typed into the box at the top and added, so the list grows to whatever the floor actually needs. Press an item and it opens: HOW MANY ARE NEEDED (yellow, because it is the field that matters, per the CAMCO UI standard for a mandatory field), WHERE IT GOES, and NOTES. A tile with a quantity on it turns green and shows the number large enough to read across a desk; one still at zero stays grey. COPY THE LIST puts the whole thing on the clipboard as plain text, ready to paste into an email or a purchase request, because a list that cannot leave the app is a list somebody retypes. DELETE THIS ITEM removes one, asking first. The list is kept ON THIS DEVICE and does not yet sync to the other machines — say the word and it can ride along with the rest of the data. TWO BUILD NOTES. The screen is a full-screen overlay rather than another hidden panel in the page: every one of those has to be named by hand in a dozen different show-this-hide-that functions, and the one that gets missed is a screen that will not close. And the button is spelled HARDWARE — the request read ‘hardward’, and a typo baked into a button is an IT ticket later. WHAT TO TEST (rule 8): Admin → Hardware Needed, press MONITOR, put 3 in the yellow box and CELL 4 in where it goes, press SAVE — the tile should turn green and read 3. Add one of your own, then leave the screen and come back: everything should still be there."] },
   { ts: "2026-08-08", rev: "App Rev-1004", type: "App", changes: ["REVIEW DATA CHOOSES BEFORE IT DOWNLOADS (Rev-1004, embedded validation REV-260) — per Rich, who is looking a year ahead rather than at today. Rev-987 read EVERY run file for the operation before it drew the chooser. At 170 files that is merely slow; a year of production is thousands, and the whole wait landed BEFORE he could say he only wanted last week. Now the panel opens on a DOWNLOAD SCREEN and nothing is fetched until it is chosen. Listing the files costs one call and was already being made, so the screen is free. It is built from the FILE NAMES alone: a run is named PART_OP-nnn_SHOPORDER_YYYYMMDD_SERIAL_RUNID.json, so the shop order, the day and whether it is simulated are all readable without opening anything. The screen offers HOW FAR BACK with true counts (now out to 3 MONTHS and 1 YEAR), the simulated tick, and a TABLE OF EVERY SHOP ORDER in the repository — runs, first day, last day, REAL or SIMULATED — each tickable, with how many of its runs fall inside the chosen window. The button states the exact cost before it is paid: Download 34 run(s), and it counts them down as they come. THE MACHINIST IS NOT ON THIS SCREEN, and that is a fact about the data rather than a choice: the operator’s name is INSIDE each run file, on the run record, not in its name. Listing machinists up front would mean downloading everything to find out — the exact cost this removes. So WHO RAN THEM appears on the next screen, built from what actually came down, and a ↩ Change what is downloaded button on that screen returns here without closing the panel. Simulated files are no longer dropped from the listing behind the scenes; they are counted and ticked here instead, so the number on screen always matches what is really in the repository. NOTHING ABOUT THE MATHS OR THE SUMMARY CHANGED. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — it should open instantly on the download screen with no wait at all, listing the shop orders; press 1 WEEK, then Download, and only that week’s files should come down, after which the machinist chooser lists only the machinists inside them."] },
   { ts: "2026-08-08", rev: "App Rev-1003", type: "App", changes: ["EVERY REVIEW ROW CAN PUT ITS OWN INSPECTION CROP ON THE PANEL (Rev-1003, embedded validation REV-260) — per Rich. Each row of 📊 REVIEW DATA now carries a small INSPECTION CROP button under the feature name. Press it and the right-hand panel swaps from the whole ODS print to the cropped reference picture saved for THAT bubble — the same picture the machinist looks at when measuring it. The button then reads FULL DRAWING and turns solid; press it again, or press another row’s button, and the panel follows. Only one crop is on screen at a time and every button re-labels itself on each swap, so what is showing and what the buttons say cannot drift apart. The panel heading changes with it, reading INSPECTION CROP · BUBBLE 7 instead of ODS DRAWING · OP-030, because a zoomed crop and a zoomed print look alike and an unlabelled panel would leave you guessing which you were reading. CLICKING THE PICTURE NOW OPENS WHAT IS ACTUALLY SHOWING: at Rev-1001 full screen always reopened the whole print, which after a swap was the wrong picture. THE BUTTON IS ON EVERY ROW ON PURPOSE, including the attribute rows with no limits. Where no crop has been saved for a feature it sits greyed and disabled and its tooltip says why — a missing button would read as a bug, and hunting for one that was never there is the kind of trip this app exists to save. The crops come from the plan’s saved reference images, the same ones the inspection uses; the automatic balloon crop is built on the fly at inspection time and never stored, so showing it here would have meant inventing a second version of the picture. NOTHING ELSE MOVED — same maths, same columns, same chooser, readings still open on a row click. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030, summarise, and press INSPECTION CROP on BUBBLE 7 — the panel should show that feature’s crop with the heading naming bubble 7, the button should read FULL DRAWING, and clicking the picture should open the CROP full screen, not the whole print."] },
@@ -3103,7 +3104,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:14 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:21 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -14896,13 +14897,17 @@ async function _cpReviewDataPanel(idx){
                         { month:'2-digit', day:'2-digit', year:'2-digit' }) : '\u2014';
     const PWIN = [ ['all','ALL TIME',0], ['d1','LAST DAY',1], ['d2','2 DAYS',2], ['w1','1 WEEK',7],
                    ['w2','2 WEEKS',14], ['m1','1 MONTH',30], ['m3','3 MONTHS',90], ['y1','1 YEAR',365] ];
-    let preWin = 'all', preSim = showSim, preSo = [];
+    let preWin = 'all', preSim = showSim, preSo = [], preWho = [];
     const preDays = () => (PWIN.find(w => w[0] === preWin) || PWIN[0])[2];
     const preInWin = (nm, days) => { if(!days) return true; const t = _fTime(nm);
       return !!t && t >= (Date.now() - days * 86400000); };
     const preHit = nm => {
       if(_fSim(nm) && !preSim) return false;
       if(preSo.length && preSo.indexOf(_fSo(nm)) < 0) return false;
+      /* Rev-1006: a machinist choice can only apply to runs that are IN the index -
+         an unindexed run has no name attached to it yet, so it is left out rather
+         than quietly counted as somebody. */
+      if(preWho.length && preWho.indexOf(_rowWho(nm)) < 0) return false;
       return preInWin(nm, preDays());
     };
     const soRows = (() => {
@@ -14916,6 +14921,70 @@ async function _cpReviewDataPanel(idx){
       });
       return Object.keys(m).map(k => m[k]).sort((a, b) => (b.last - a.last) || a.so.localeCompare(b.so));
     })();
+    /* Rev-1006: one small fetch. Everything the download screen offers is drawn from it. */
+    let idxRows = {};
+    let idxErr = '';
+    try{
+      const _ix = await cpRunIdxRead(part, op);
+      idxRows = _ix.rows || {};
+      idxErr = _ix.error || '';
+    }catch(e){ console.warn('Rev-1006 index load failed', e); idxErr = String(e && e.message || e); }
+
+    const _rowWho = nm => { const r = idxRows[nm];
+      return r ? (String(r.w || '').trim().toUpperCase() || '(NONE)') : ''; };
+    const _rowTime = nm => { const r = idxRows[nm];
+      const t = r && r.d ? Date.parse(r.d + 'T12:00:00Z') : 0;
+      return t || _fTime(nm); };
+    const whoRows = () => {
+      const m = {};
+      mine.forEach(nm => {
+        const r = idxRows[nm]; if(!r) return;
+        if(r.sim && !preSim) return;
+        const w = _rowWho(nm);
+        const e = m[w] = m[w] || { w: w, n: 0, days: {}, first: 0, last: 0, sim: 0, pieces: 0 };
+        e.n++; if(r.sim) e.sim++;
+        const t = _rowTime(nm);
+        if(t){
+          if(!e.first || t < e.first) e.first = t;
+          if(t > e.last) e.last = t;
+          e.days[new Date(t).toISOString().slice(0, 10)] = 1;
+        }
+      });
+      return Object.keys(m).map(k => m[k]).sort((a, b) => (b.n - a.n) || a.w.localeCompare(b.w));
+    };
+    const indexMissing = async () => {
+      const missing = mine.filter(nm => !idxRows[nm]);
+      if(!missing.length) return;
+      for(let i = 0; i < missing.length; i += 8){
+        const chunk = missing.slice(i, i + 8);
+        say('<div style="padding:26px 0; font-size:14px; color:#3a352e;">Building the summary table\u2026 <b>'
+          + Math.min(i + chunk.length, missing.length) + ' of ' + missing.length + '</b>'
+          + '<div style="font-size:12px; color:#6b6257; margin-top:8px;">Each run is read once for this. '
+          + 'After today only brand-new runs need it.</div></div>');
+        const got = await Promise.all(chunk.map(async nm => {
+          try{
+            const r = await fetch('https://api.github.com/repos/' + cfg.user + '/' + cfg.repo
+                     + '/contents/runs/' + encodeURIComponent(nm),
+                     { headers: { 'Authorization': 'Bearer ' + cfg.token, 'Accept': 'application/vnd.github.raw' },
+                       cache: 'no-store' });
+            return r.ok ? [nm, await r.json()] : [nm, null];
+          }catch(e){ console.warn('Rev-1006 index read of run failed', nm, e); return [nm, null]; }
+        }));
+        got.forEach(([nm, j]) => { if(j) idxRows[nm] = cpRunIdxRowFrom(j, nm); });
+      }
+      try{
+        const merged = await cpRunIdxWrite(part, op, idxRows);
+        idxRows = merged;
+        try{ logAct('run-index', 'indexed ' + missing.length + ' run(s)'); }catch(_){ }
+        try{ flash('\u2714 Summary table updated \u2014 ' + Object.keys(idxRows).length + ' run(s) listed.'); }catch(_){ }
+      }catch(e){
+        console.error('Rev-1006 index write failed', e);
+        try{ flash('\u26a0 The summary table could not be saved \u2014 ' + (e && e.message || e)
+          + '  The choices below still work for this visit.', true); }catch(_){ }
+      }
+      showPreload();
+    };
+
     const showPreload = () => {
       const chosen = mine.filter(preHit);
       const simN = mine.filter(_fSim).length;
@@ -14941,6 +15010,67 @@ async function _cpReviewDataPanel(idx){
           +  ' font-weight:700; color:#5c4708; cursor:pointer;">'
           +  '<input type="checkbox" id="pvSim"' + (preSim ? ' checked' : '') + '>'
           +  'INCLUDE SIMULATED RUNS (' + simN + ') \u2014 not measurement evidence</label>';
+      }
+      /* ----- Rev-1006: WHO RAN THEM, straight off the index ----- */
+      const unidx = mine.filter(nm => !idxRows[nm]).length;
+      const wr = whoRows();
+      h += '<div style="display:flex; align-items:center; gap:12px; margin-bottom:8px; flex-wrap:wrap;">'
+        +  '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
+        +    'MACHINISTS</div>'
+        +  '<button type="button" id="pvWhoAll" style="padding:5px 11px; font-size:11px; font-weight:800;'
+        +    ' border:1px solid #c9c0b4; background:#fff; color:#3a352e; border-radius:7px; cursor:pointer;">'
+        +    'Every machinist</button>'
+        +  '<div style="font-size:11.5px; color:#6b6257;">'
+        +    (preWho.length ? (preWho.length + ' ticked') : 'none ticked \u2014 every machinist included')
+        +  '</div></div>';
+      if(unidx){
+        h += '<div style="background:#fdf3d5; border:1px solid #d9b64a; border-radius:8px; padding:11px 13px;'
+          +  ' margin-bottom:12px; font-size:12.5px; color:#5c4708; display:flex; align-items:center; gap:12px;'
+          +  ' flex-wrap:wrap;">'
+          +  '<div style="flex:1 1 320px;"><b>' + unidx + ' run(s) are not in the summary table yet.</b> '
+          +  'Their machinist and day are inside the file, so each has to be read once to list it here. '
+          +  'After that they never need reading again.</div>'
+          +  '<button type="button" id="pvIndex" style="padding:9px 16px; border:none; background:#8a6d1f;'
+          +    ' color:#fff; border-radius:8px; font-weight:800; font-size:12.5px; cursor:pointer;">'
+          +    'BUILD THE TABLE (' + unidx + ')</button></div>';
+      }
+      if(idxErr){
+        h += '<div style="font-size:11.5px; color:#a5342a; margin-bottom:10px;">The summary table could not '
+          +  'be read (' + esc0(idxErr) + '). The day and shop-order choices below still work.</div>';
+      }
+      if(wr.length){
+        h += '<div style="max-height:250px; overflow:auto; border:1px solid #e2ddd4; border-radius:8px; margin-bottom:18px;">'
+          +  '<table id="pvWho" style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
+          +  '<thead><tr>'
+          +    ['', 'MACHINIST', 'PARTS INSPECTED', 'DAYS', 'FIRST', 'LAST'].map((th, i) =>
+                '<th style="border-bottom:1px solid #d8d3ca; padding:7px 9px; background:#f3efe8; color:#3a352e;'
+                + ' font-weight:800; font-size:11px; letter-spacing:.05em; text-align:'
+                + (i <= 1 ? 'left' : 'center') + '; position:sticky; top:0;">' + th + '</th>').join('')
+          +  '</tr></thead><tbody>'
+          +  wr.map(r => {
+                const on = preWho.indexOf(r.w) >= 0;
+                const inWin = mine.filter(nm => _rowWho(nm) === r.w
+                                && (!idxRows[nm] || !idxRows[nm].sim || preSim)
+                                && preInWin(nm, preDays())).length;
+                return '<tr style="background:#fff;">'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px;">'
+                  +   '<input type="checkbox" data-who2="' + esc0(r.w) + '"' + (on ? ' checked' : '') + '></td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; font-weight:700; color:#000;">'
+                  +   esc0(r.w) + (r.sim ? ' <span style="font-size:10px; font-weight:800; color:#a5342a;">SIM</span>' : '')
+                  +   '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; text-align:center; color:#000; font-weight:700;">'
+                  +   r.n + (inWin !== r.n ? ' <span style="font-weight:600; color:#6b6257;">(' + inWin + ' in window)</span>' : '')
+                  +   '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; text-align:center; color:#3a352e;">'
+                  +   Object.keys(r.days).length + '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; text-align:center; color:#3a352e;">'
+                  +   _fDay(r.first) + '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; text-align:center; color:#3a352e;">'
+                  +   _fDay(r.last) + '</td>'
+                  + '</tr>'; }).join('')
+          +  '</tbody></table></div>';
+      } else if(!unidx){
+        h += '<div style="font-size:12px; color:#6b6257; margin-bottom:16px;">No machinists listed yet.</div>';
       }
       h += '<div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">'
         +  '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
@@ -15000,6 +15130,17 @@ async function _cpReviewDataPanel(idx){
         showPreload(); }; });
       const pa = document.getElementById('pvAll');
       if(pa) pa.onclick = () => { preSo = []; showPreload(); };
+      b.querySelectorAll('#pvWho input').forEach(cb => { cb.onchange = () => {
+        const w = cb.getAttribute('data-who2');
+        if(cb.checked){ if(preWho.indexOf(w) < 0) preWho.push(w); }
+        else preWho = preWho.filter(x => x !== w);
+        showPreload(); }; });
+      const pwa = document.getElementById('pvWhoAll');
+      if(pwa) pwa.onclick = () => { preWho = []; showPreload(); };
+      const pix = document.getElementById('pvIndex');
+      if(pix) pix.onclick = async () => { try{ await indexMissing(); }
+        catch(e){ console.error('Rev-1006 indexing failed', e);
+          try{ flash('\u26a0 Building the table failed \u2014 ' + (e && e.message || e), true); }catch(_){ } } };
       const pg = document.getElementById('pvGo');
       if(pg) pg.onclick = async () => {
         const list = mine.filter(preHit);
@@ -15009,7 +15150,8 @@ async function _cpReviewDataPanel(idx){
         if(!got.length){ say('<div style="padding:20px 0; color:#a5342a;">Chose ' + list.length
           + ' run file(s) but none of them could be read.</div>'); return; }
         runs.length = 0; got.forEach(g => runs.push(g));
-        pickWho = []; pickWin = 'all'; pickSim = preSim;
+        /* Rev-1006: a machinist chosen before the download is already chosen after it. */
+        pickWho = preWho.slice(); pickWin = 'all'; pickSim = preSim;
         recomputeWho();
         showChooser();
       };
@@ -15580,6 +15722,86 @@ function cpCncPath(part, op, name){
   const P = String(part || '').trim().toUpperCase().replace(/[^A-Za-z0-9._-]+/g, '_');
   const O = String(op || '').trim().toUpperCase().replace(/[^A-Za-z0-9._-]+/g, '_');
   return 'programs/' + P + '/' + (O ? ('OP' + O) : 'NO-OP') + '/' + cpCncSafeName(name);
+}
+/* ===== Rev-1006: THE RUN INDEX ================================================
+   Rich's idea, and the right one. A small table beside the runs - one line per run
+   holding the machinist, the day, the shop order, how many readings it carried and
+   whether it is simulated - lets the download screen offer real filter choices
+   WITHOUT opening a single run file. One file per part+operation at
+   runs_index/PART_OP-nnn.json, keyed BY FILE NAME so merging two devices' additions
+   is free and a run can never be counted twice.
+
+   IT IS BUILT BY THE READER, NOT THE WRITER. The machinist app pushes a run and knows
+   nothing about this file; the review screen notices any run missing from the index
+   and offers to add it. That means no change to the validation app, it back-fills the
+   runs already in the repository, and it repairs itself if a run ever lands from a
+   device that never opened this screen. A run is downloaded ONCE for indexing and
+   never again for the purpose of drawing filters. */
+function cpRunIdxPath(part, op){
+  const clean = t => String(t || '').replace(/[^A-Za-z0-9._-]/g, '-');
+  return 'runs_index/' + clean(part) + '_' + clean(op) + '.json';
+}
+function cpRunIdxRowFrom(j, nm){
+  const run = (j && j.run) || {};
+  const t = Date.parse(run.dateCompletedUtc || run.createdUtc || (j && j.savedUtc) || '') || 0;
+  const tok = String(nm.replace(/\.json$/, '').split('_')[3] || '');
+  const d = t ? new Date(t).toISOString().slice(0, 10)
+              : (/^\d{8}$/.test(tok) ? (tok.slice(0,4) + '-' + tok.slice(4,6) + '-' + tok.slice(6,8)) : '');
+  return {
+    w: String(run.operatorInitials || '').trim().toUpperCase() || '(NONE)',
+    d: d,
+    n: (((j && j.readings) || []).length) || 0,
+    so: String(run.shopOrder || nm.split('_')[2] || ''),
+    sim: !!((j && j.simulated) || run.simulated)
+  };
+}
+async function cpRunIdxRead(part, op){
+  try{
+    const c = ghConfig();
+    const url = 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/'
+              + cpRunIdxPath(part, op) + '?cb=' + Date.now();
+    const r = await fetch(url, { cache: 'no-store',
+      headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw' } });
+    if(r.status === 404) return { rows: {} };            /* no index yet - not an error */
+    if(!r.ok) throw new Error('index read failed (' + r.status + ')');
+    const j = await r.json();
+    return { rows: (j && j.rows) || {} };
+  }catch(e){
+    console.warn('Rev-1006 run index read failed', e);
+    return { rows: {}, error: String(e && e.message || e) };
+  }
+}
+async function cpRunIdxWrite(part, op, rows){
+  const c = ghConfig();
+  const url = 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/' + cpRunIdxPath(part, op);
+  const hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+  /* Read, merge, write - and on a 409 (another device wrote between the read and the
+     write) go round again with a fresh sha rather than clobbering their additions. */
+  for(let attempt = 1; attempt <= 3; attempt++){
+    let sha = null, existing = {};
+    try{
+      const g = await fetch(url + '?cb=' + Date.now(), { headers: hdrs, cache: 'no-store' });
+      if(g.ok){
+        const j = await g.json();
+        sha = j.sha;
+        try{
+          const txt = decodeURIComponent(escape(atob(String(j.content || '').replace(/\s/g, ''))));
+          existing = (JSON.parse(txt).rows) || {};
+        }catch(e2){ console.warn('Rev-1006 existing index unreadable, rebuilding it', e2); existing = {}; }
+      }
+    }catch(e){ console.warn('Rev-1006 index pre-read failed', e); }
+    const merged = Object.assign({}, existing, rows);
+    const payload = { part: part, op: op, updated: new Date().toISOString(),
+                      count: Object.keys(merged).length, rows: merged };
+    const body = { message: 'Run index ' + part + ' ' + op + ' (' + payload.count + ' runs)',
+                   content: btoa(unescape(encodeURIComponent(JSON.stringify(payload)))) };
+    if(sha) body.sha = sha;
+    const r = await fetch(url, { method: 'PUT',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, hdrs), body: JSON.stringify(body) });
+    if(r.ok) return merged;
+    if(r.status !== 409) throw new Error('the index would not save (' + r.status + ')');
+  }
+  throw new Error('another device kept writing the index at the same moment');
 }
 async function cpCncPut(path, b64, msg){
   const c = ghConfig();
