@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1010</title>
+<title>CONTROL PLAN GENERATOR - Rev-1011</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1010 · 2026-08-08 11:58 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1011 · 2026-08-08 3:29 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1010 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:58 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1011 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:29 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1010 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1011 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1010";
+const APP_REV = "Rev-1011";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1011", type: "App", changes: ["STEP 9 — LINE INSPECTION LEVELS (Rev-1011, embedded validation REV-260) — per Rich. A new tile beside GAGES, reading 0 / 14 SET or ALL 14 SET, opening a table of every feature row on the operation: BUBBLE, FEATURE DESCRIPTION, SPEC / TOLERANCE, MACHINIST CHECKS — the frequency already on the Control Plan, shown but never changed here — then LINE INSPECTION LEVEL and QUALITY PULLS A PART. The level is set per feature with three buttons, 1 2 3, plus NONE; the INTERVAL for each level is set once for the whole operation at the top, in yellow boxes because they are the numbers that matter, and the last column resolves the two into plain words: EVERY 25 PARTS, or NEVER where no level is set. A running count sits beside each level so an operation with everything on Level 1 is obvious before it becomes a workload. Features with no level are called out in a yellow bar, because no level means never pulled and that should be a decision rather than an oversight. Defaults are every 5, 25 and 100 parts — they are a starting point to change, not a recommendation. Levels ride on the plan and sync like everything else on it. Like STEP 8 this never locks and is worth nothing toward the percentage: it says how often quality re-checks a feature, not whether the plan is built. THE EMAIL IS NOT BUILT AND IS NOT CLAIMED TO BE. Nothing is sent — outbound mail is still waiting on the Office 365 sign-in fix that is holding up the nightly digest, and the panel says so on its face. Recording the intervals now means there is something to send the day it works. WHAT TO TEST (rule 8): on 1000237620 OP-030 press STEP 9, set a few features to 1, 2 and 3, change Level 2 to every 40 parts, and watch the last column follow. Close and reopen — it should all still be there, and the tile should count what is set."] },
   { ts: "2026-08-08", rev: "App Rev-1010", type: "App", changes: ["LINE INSPECTIONS CAN BE FILED AGAINST AN OPERATION (Rev-1010, embedded validation REV-260) — per Rich, who needs the LINE INSPECTION / FIRST ARTICLE INSPECTION forms out of CAMCO QUALITY and sitting with the operation they belong to. A LINE INSP button joins the action buttons; it carries the count, and turns RED the moment one of them is a FAIL, because a failed first article is not something to find by opening a panel. The panel lists what has been filed — date, result, shop order, inspector, file — with Download and Remove on each, and more than one can be filed, since there is one form per inspection rather than one per operation. THE FORM IS STORED EXACTLY AS EXPORTED, whatever the Export button gives — PDF, spreadsheet or picture — in the private data repository under lineinsp/PART/OPnnn/, the same road a CNC program travels. NOTHING PARSES THE FORM. The result, shop order and inspector are TYPED IN when it is filed, so nothing in here can quietly misread a form and put a PASS against a FAIL; three boxes is a fair price for that. Reading the findings out of the export — characteristic numbers, severity ranks, actions taken — and tying them back to bubble numbers is the obvious next step, and it needs a real exported file in hand first: what it parses depends entirely on what Export actually produces. WHAT TO TEST (rule 8): on 1000222892 OP-080, press LINE INSP, set the result, type the shop order and inspector, and pick an exported form — it should appear in the list with the button now reading LINE INSP 1. File a FAIL and the button should turn red."] },
   { ts: "2026-08-08", rev: "App Rev-1009", type: "App", changes: ["STEP 8 IS NOW GAGES, AND THE CNC PROGRAM MOVES TO THE ACTION BUTTONS (Rev-1009, embedded validation REV-260) — per Rich, and the swap is the right way round. A CNC program is a file to attach, not a stage of building a Control Plan, and it was holding the slot the gages deserve. CNC now sits with the other action buttons on the right and carries a tick when a program is stored. IN ITS PLACE, STEP 8 GAGES shows what the operation still needs to be inspectable: the tile reads NONE NEEDED, or 3 OPEN / 5, or ALL 5 COMPLETE, and clicking it lists every special gage with THE BUBBLE NUMBER IT IS FOR, the feature, the spec and tolerance, what the gage is, its status — TO BE MADE, DESIGNED, ORDERED, IN PROGRESS, COMPLETE, coloured so an open one cannot be mistaken for a finished one — and who it is assigned to. NOTHING HERE IS A SECOND COPY: every line comes from the gage register the app already keeps, which fills itself the moment the Special Gage / Fixture box is filled on a row in Step 6. That is also why the panel is read-only and carries one button to the full gage list — a gage is edited in ONE place, not in two that can disagree. Where no gage has been called for the panel says how to call for one rather than showing an empty grid. Like the CNC step before it, GAGES never locks and is worth nothing toward the percentage: a gage that has not been made yet is a purchasing problem, not a reason to call the Control Plan unfinished. WHAT TO TEST (rule 8): on 1000237620 OP-030 the STEP 8 tile should read GAGES with a count, and CNC should now be a button on the right beside Download. Press STEP 8 — with no special gages called for it should explain where they come from; fill the Special Gage / Fixture box on a row in Step 6 and it should appear here against that bubble number."] },
   { ts: "2026-08-08", rev: "App Rev-1008", type: "App", changes: ["CLOSE MOVES TO THE TOP OF REVIEW DATA (Rev-1008, embedded validation REV-260) — per Rich. The Close button sat in a footer strip under everything, so with a full-height drawing down one side and two tables down the other it was below the fold: leaving the panel meant scrolling to the bottom to find the way out. It now sits in the blue title bar at the top right, and it is RED with a ✕ like every other Close in the app rather than a quiet grey one. This is the same correction Rev-607 made to the full-screen drawing viewer, for the same reason. The footer strip is gone entirely — it held nothing else — which also gives the tables back a little height. Clicking the dark surround still closes the panel as it always did. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — Close should be top right in the blue bar, in red, reachable without scrolling, and there should be no button left at the bottom."] },
@@ -3108,7 +3109,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:58 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:29 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5073,6 +5074,7 @@ function renderProjects(){
             + '\n\nEvery step has to be completed in order.';
         }
         if(n === 8) tag = _g8.text;   /* Rev-1009: gages count, not a done/todo word */
+        else if(n === 9) tag = _l9.text;   /* Rev-1011 */
         else if(state === 'done') tag = '\u2713 COMPLETED';
         else if(_R && _R.ready === false) tag = 'NEEDS EARLIER STEP';
         else if(_S && _S.total > 1 && _S.left < _S.total)
@@ -5135,6 +5137,21 @@ function renderProjects(){
         }catch(e){
           console.warn('Rev-1009 gage count failed', e);
           return { total:0, open:0, list:[], done:true, text:'  \u2013 NONE NEEDED' };
+        }
+      })();
+      /* Rev-1011: how many feature rows have been given a line-inspection level. */
+      const _l9 = (function(){
+        try{
+          const rws = (((p.builderState || {}).rows) || []).filter(r => String(r.bubble || '').trim());
+          const lv = p.lineLevels || {};
+          const set = rws.filter(r => lv[String(r.bubble).trim()]).length;
+          return { total: rws.length, set: set, done: rws.length > 0 && set >= rws.length,
+                   text: !rws.length ? '  \u2013 NO ROWS YET'
+                         : (set >= rws.length ? ('  \u2013 ALL ' + rws.length + ' SET')
+                                              : ('  \u2013 ' + set + ' / ' + rws.length + ' SET')) };
+        }catch(e){
+          console.warn('Rev-1011 level count failed', e);
+          return { total:0, set:0, done:false, text:'  \u2013 NO ROWS YET' };
         }
       })();
       const _s6 = (function(){
@@ -5204,6 +5221,17 @@ function renderProjects(){
              + _g8.open + ' still open.\nClick to see which bubble each one is for and where it '
              + 'has got to.')),
         () => cpGagePanel(i));
+
+      /* Rev-1011: STEP 9 - LINE INSPECTION LEVELS. Like 8, never locks, worth nothing
+         toward the percentage: it says how OFTEN quality re-checks a feature, not whether
+         the plan is built. */
+      mkStep(9, 'LINE INSPECTION', (_l9.done ? 'done' : 'todo'),
+        (!_l9.total
+          ? 'STEP 9 \u2014 give each feature its line-inspection level once the rows exist.'
+          : ('STEP 9 \u2014 ' + _l9.set + ' of ' + _l9.total + ' features have a line-inspection '
+             + 'level.\nLevel 1, 2 or 3 sets how often the quality technician re-checks that '
+             + 'feature.')),
+        () => cpLineLevelPanel(i));
 
       // Rev-620: built here, hung on its own row below
       _cpBarFor = (() => {
@@ -11429,6 +11457,173 @@ function cpUpdateGageBadge(){
    is filled on a Control Plan row - so this reads that register rather than keeping a
    second copy of the same facts. Editing still lives on the full Special Gages screen,
    one button away, so there is one place where a gage is changed. */
+/* ===== Rev-1011: LINE INSPECTION LEVELS =======================================
+   Every feature row gets a level, and the level says how often the quality technician
+   re-checks that feature independently of the machinist's own frequency. The interval
+   for each level is set once for the operation; the level is set per feature. Stored on
+   the plan as lineLevels (bubble -> 1/2/3) and lineLevelSet (the three intervals), so it
+   rides along with the plan to every device like everything else on it.
+
+   THE EMAIL IS NOT BUILT. The intervals are recorded here and nothing sends anything
+   yet - outbound mail is still waiting on the Office 365 authentication fix that is
+   holding up the nightly digest. Recording the numbers now means the day mail works,
+   there is something to send. */
+function cpLineLevelPanel(idx){
+  try{
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
+    const part = String(p.partNum || ''), op = String(p.opNum || '');
+    const head = part + (op ? ('  \u00b7  OP-' + op) : '');
+    const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g,
+      ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+    const rows = (((p.builderState || {}).rows) || []).filter(r => String(r.bubble || '').trim());
+    let levels = Object.assign({}, p.lineLevels || {});
+    let every = Object.assign({ 1: 5, 2: 25, 3: 100 }, p.lineLevelSet || {});
+    const LCOL = { 1: '#a5342a', 2: '#a35400', 3: '#1d6b3f' };
+
+    const save = () => {
+      try{
+        const pr = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+        if(!pr[idx]) return false;
+        pr[idx].lineLevels = levels;
+        pr[idx].lineLevelSet = every;
+        pr[idx].updated = new Date().toISOString();
+        localStorage.setItem('cpProjects', JSON.stringify(pr));
+        try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(e){}
+        return true;
+      }catch(e){
+        console.error('Rev-1011 level save failed', e);
+        try{ flash('\u26a0 Could not save it \u2014 ' + (e && e.message || e), true); }catch(_){ }
+        return false;
+      }
+    };
+
+    const old = document.getElementById('cpLlPanel'); if(old) old.remove();
+    const ov = document.createElement('div');
+    ov.id = 'cpLlPanel';
+    ov.style.cssText = 'position:fixed; inset:0; z-index:10676; background:rgba(0,0,0,.65);'
+      + ' display:flex; align-items:flex-start; justify-content:center; padding:24px 16px; overflow:auto;';
+    const c = document.createElement('div');
+    c.style.cssText = 'background:#fff; border-radius:12px; width:100%; max-width:min(1400px, 96vw);'
+      + ' box-shadow:0 16px 60px rgba(0,0,0,.5); font-family:inherit; overflow:hidden;';
+    ov.appendChild(c); document.body.appendChild(ov);
+    ov.addEventListener('click', e => { if(e.target === ov) ov.remove(); });
+
+    const render = () => {
+      const cnt = { 1:0, 2:0, 3:0, none:0 };
+      rows.forEach(r => { const l = levels[String(r.bubble).trim()];
+        if(l === 1 || l === 2 || l === 3) cnt[l]++; else cnt.none++; });
+
+      let body = '';
+      if(!rows.length){
+        body = '<div style="padding:24px 4px; font-size:13.5px; color:#6b6257; line-height:1.6;">'
+          + 'This operation has no feature rows yet. Finish <b>STEP 3 \u00b7 ASSIGN BUBBLES</b> and '
+          + 'they will be listed here.</div>';
+      } else {
+        body = '<div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">'
+          + [1,2,3].map(l =>
+              '<label style="display:flex; align-items:center; gap:8px; border:2px solid ' + LCOL[l]
+              + '; border-radius:9px; padding:9px 13px; font-size:12px; font-weight:800; color:' + LCOL[l] + ';">'
+              + 'LEVEL ' + l + ' \u2014 EVERY'
+              + '<input type="number" min="1" data-lvset="' + l + '" value="' + (parseInt(every[l], 10) || 1) + '"'
+              + ' style="width:78px; padding:7px; border:1px solid #c9c0b4; border-radius:7px;'
+              + ' font-size:14px; font-weight:800; text-align:center; background:#fafa96;">'
+              + 'PARTS <span style="font-weight:600; color:#6b6257;">(' + cnt[l] + ' feature'
+              + (cnt[l] === 1 ? '' : 's') + ')</span></label>').join('')
+          + '</div>'
+          + (cnt.none ? ('<div style="background:#fdf3d5; border:1px solid #d9b64a; border-radius:8px;'
+              + ' padding:10px 12px; margin-bottom:14px; font-size:12.5px; color:#5c4708;"><b>'
+              + cnt.none + ' feature(s) have no level yet.</b> A feature with no level is never '
+              + 'pulled for a line inspection.</div>') : '')
+          + '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
+          + '<thead><tr>'
+          + ['BUBBLE', 'FEATURE DESCRIPTION', 'SPEC / TOLERANCE', 'MACHINIST CHECKS',
+             'LINE INSPECTION LEVEL', 'QUALITY PULLS A PART'].map((th, ix) =>
+              '<th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8;'
+              + ' color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:'
+              + (ix === 1 || ix === 2 ? 'left' : 'center') + ';">' + th + '</th>').join('')
+          + '</tr></thead><tbody>'
+          + rows.map(r => {
+              const b = String(r.bubble).trim();
+              const l = levels[b];
+              return '<tr>'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+                +   ' font-size:16px; font-weight:800; color:#000;">' + esc(b) + '</td>'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#000;">'
+                +   esc(r.featureDesc || '') + '</td>'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#3a352e;'
+                +   ' white-space:pre-line;">' + esc(r.spec || '') + '</td>'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+                +   ' color:#3a352e;">' + (r.freqEvery ? esc(r.freqEvery)
+                      : '<span style="color:#b9b3aa;">\u2014</span>') + '</td>'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+                +   ' white-space:nowrap;">'
+                +   [1,2,3].map(n => '<button type="button" data-lvb="' + esc(b) + '" data-lvn="' + n + '"'
+                      + ' style="min-width:38px; margin:0 3px; padding:6px 9px; border-radius:7px;'
+                      + ' font-size:12px; font-weight:800; cursor:pointer; border:2px solid ' + LCOL[n]
+                      + '; background:' + (l === n ? LCOL[n] : '#fff')
+                      + '; color:' + (l === n ? '#fff' : LCOL[n]) + ';">' + n + '</button>').join('')
+                +   '<button type="button" data-lvb="' + esc(b) + '" data-lvn="0"'
+                +     ' style="margin-left:6px; padding:6px 9px; border-radius:7px; font-size:11px;'
+                +     ' font-weight:800; cursor:pointer; border:1px solid #c9c0b4; background:#fff;'
+                +     ' color:#6b6257;">NONE</button></td>'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+                +   ' font-weight:800; color:' + (l ? LCOL[l] : '#b9b3aa') + ';">'
+                +   (l ? ('EVERY ' + (parseInt(every[l], 10) || 1) + ' PARTS') : 'NEVER') + '</td>'
+                + '</tr>'; }).join('')
+          + '</tbody></table>';
+      }
+
+      c.innerHTML = '<div style="background:#1a5276; color:#fff; padding:12px 20px; display:flex;'
+          + ' align-items:center; gap:14px;">'
+        +   '<div style="font-weight:800; letter-spacing:.04em; font-size:17px; flex:1 1 auto;">'
+        +     '\U0001F4D0 LINE INSPECTION LEVELS \u00b7 ' + esc(head) + '</div>'
+        +   '<button id="cpLlX" style="background:#a02020; color:#fff; border:2px solid #7a1414;'
+        +     ' border-radius:8px; padding:8px 22px; font-weight:800; font-size:13px; cursor:pointer;">'
+        +     '\u2715 Close</button>'
+        + '</div>'
+        + '<div style="padding:16px 20px 20px;">'
+        +   '<div style="font-size:12.5px; color:#6b6257; margin-bottom:14px; line-height:1.6;">'
+        +     'The MACHINIST CHECKS column is the frequency already on the Control Plan and is not '
+        +     'changed here. The level is a SECOND check on top of it: how often the quality '
+        +     'technician pulls a part and re-inspects that feature.</div>'
+        +   body
+        +   '<div style="font-size:11.5px; color:#6b6257; margin-top:14px; line-height:1.6;">'
+        +     '<b>The email is not built yet.</b> These intervals are recorded against the plan and '
+        +     'nothing is sent \u2014 outbound mail is still waiting on the Office 365 sign-in fix '
+        +     'that is holding up the nightly digest. Setting the numbers now means there is '
+        +     'something to send the day it works.</div>'
+        + '</div>';
+
+      const x = document.getElementById('cpLlX');
+      if(!x){
+        try{ flash('\u26a0 The Line Inspection panel did not build correctly. Send the Action Log.', true); }catch(_){ }
+        try{ logAct('error', 'line level panel markup did not build'); }catch(_){ }
+        ov.remove(); return;
+      }
+      x.onclick = () => { ov.remove(); try{ renderProjects(); }catch(e){} };
+
+      c.querySelectorAll('[data-lvb]').forEach(btn => { btn.onclick = () => {
+        const b = btn.getAttribute('data-lvb'), n = parseInt(btn.getAttribute('data-lvn'), 10);
+        if(n) levels[b] = n; else delete levels[b];
+        if(save()){ try{ logAct('line-level', 'level set'); }catch(_){ } }
+        render();
+      }; });
+      c.querySelectorAll('[data-lvset]').forEach(inp => { inp.onchange = () => {
+        const l = inp.getAttribute('data-lvset');
+        every[l] = Math.max(1, parseInt(inp.value, 10) || 1);
+        if(save()){ try{ logAct('line-level', 'interval changed'); }catch(_){ } }
+        render();
+      }; });
+    };
+    render();
+    try{ logAct('nav', 'line inspection levels'); }catch(_){ }
+  }catch(e){
+    console.error('Rev-1011 line level panel failed', e);
+    try{ logAct('error', 'line level panel: ' + (e && e.message || e)); }catch(_){ }
+    try{ flash('\u26a0 LINE INSPECTION failed to open \u2014 ' + (e && e.message || e), true); }catch(_){ }
+  }
+}
 function cpGagePanel(idx){
   try{
     const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
