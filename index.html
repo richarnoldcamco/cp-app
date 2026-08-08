@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1019</title>
+<title>CONTROL PLAN GENERATOR - Rev-1020</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1019 · 2026-08-08 3:52 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1020 · 2026-08-08 3:58 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1019 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:52 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1020 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:58 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1019 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1020 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1019";
+const APP_REV = "Rev-1020";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1020", type: "App", changes: ["EVERY FEATURE IS ON THE LEVEL 1 ROUND, AND THE SCREEN NOW SHOWS IT (Rev-1020, embedded validation REV-260) — per Rich, and it is the honest reading of what he has been saying for three revisions. A Level 1 check is the quality technician going over the WHOLE part, so every feature is on it — including the ones marked 2 or 3. The screen was showing those rows with an empty 1, which read as though they were skipped. THE 1 IS NOW ALWAYS ON, on every row, and it is not a button: it is a statement of fact and cannot be turned off. 2 and 3 became what they always meant — the EXTRA rounds a feature also gets looked at on — and each toggles, so pressing the level a feature already carries takes it back off with the same button that put it on. NONE became L1 ONLY, which is what it actually means: still inspected, just not on an extra round. THE LAST COLUMN NOW LISTS EVERY ROUND a feature is on, Level 1 first, so a critical feature reads EVERY 30 PARTS · COMPLETE CHECK above EVERY 15 PARTS · CRITICAL ONLY instead of pretending the complete check does not touch it. The Level 1 card counts the whole list, and the old yellow no-level-yet warning is gone — nothing is unset any more, so it was warning about a state that cannot exist. It is replaced by a quiet blue note saying how many features are on the Level 1 round only. The AI is asked the new question too: every feature is already on the complete check, choose which ALSO need an extra round. WHAT TO TEST (rule 8): open STEP 8 on 1000237620 OP-030 — every row should show a solid red 1, the rows marked 2 should list both rounds down the right, and pressing 2 on a row that already has it should take it back to L1 ONLY."] },
   { ts: "2026-08-08", rev: "App Rev-1019", type: "App", changes: ["REV-1018 REVERSED — LEVEL 1 KEEPS ITS PARTS INTERVAL (Rev-1019, embedded validation REV-260) — I read Rich wrong and built the wrong thing. He said Level 1 is a 100% check and I took it to mean every PART; he meant every FEATURE. A Level 1 check is the quality technician going over the WHOLE part — the entire level column marked 1 — rather than a sample of features. HOW OFTEN that round happens is still an interval, so Level 1 gets its parts box back exactly as it was at Rev-1017, and any interval already stored against it is honoured again rather than forced to 1. The AI instruction is put back with it, since Rev-1018 had told it Level 1 meant every part. AND THE SCREEN NOW SAYS WHAT A LEVEL IS, so the same misreading cannot happen twice: a level says WHICH FEATURES get looked at when quality comes round — Level 1 every feature on the part, Level 2 the critical ones, Level 3 the odd ones — and the parts figure on each card is how often that round comes. WHAT TO TEST (rule 8): open STEP 8 on 1000237620 OP-030 — all three cards should take a number again, Level 1 should show whatever it held before Rev-1018 rather than 100%, and the rows should read EVERY 30 PARTS · COMPLETE CHECK instead of EVERY PART · 100%."] },
   { ts: "2026-08-08", rev: "App Rev-1018", type: "App", changes: ["LEVEL 1 IS A 100% CHECK, NOT A SAMPLE (Rev-1018, embedded validation REV-260) — per Rich, and it changes what the level MEANS rather than just what it says. Level 1 carried an editable parts interval like the other two, so it read as one part in 30. It is every part. The card now shows a fixed 100% · EVERY PART where the number box was, and there is NO BOX AT ALL rather than a box reading 1 — a box reading 1 invites somebody to type 30 into it and quietly turn a 100% check into a sample, which is the kind of change nobody notices until a part gets out. Levels 2 and 3 keep their intervals and stay editable. Every row set to Level 1 now reads EVERY PART · 100% in the last column instead of a parts figure. THE AI WAS BEING TOLD THE WRONG THING TOO and is corrected in the same rev: it was asked to treat Level 1 as a twice-a-shift re-check, so it was weighing the levels against a rule that was not CAMCO’s. It is now told Level 1 means 100%, every part. WHAT TO TEST (rule 8): open STEP 8 on 1000237620 OP-030 — the LEVEL 1 card should read 100% · EVERY PART with no editable box, Levels 2 and 3 should still take a number, and every Level 1 row should read EVERY PART · 100% down the right."] },
   { ts: "2026-08-08", rev: "App Rev-1017", type: "App", changes: ["THE GAGE LIST SHOWS THE FEATURE AND WHO OWNS IT (Rev-1017, embedded validation REV-260) — per Rich, two columns. AN ODS COLUMN carries the inspection crop cut for that bubble — the same picture the machinist sees on that feature — at thumbnail size, and clicking it opens the crop full size. It comes from the plan’s own saved reference images, so a crop deleted there is gone here too and there is no second copy to drift. Where no crop has been cut the cell shows a dash rather than the whole ODS print, which at 54 pixels tall would say nothing. AN AUTHOR COLUMN names who is responsible for the gage, defaulting to RICH ARNOLD and editable per gage through EDIT, upper-cased like every other name in the app. A gage with no author recorded reads RICH ARNOLD rather than blank, so the column is never a row of dashes on the existing list. WHAT TO TEST (rule 8): open GAGES on 1000237620 OP-030 — bubble 3 and bubble 7 should each show a small crop if one has been cut for them, clicking one should open it full size, and both should read RICH ARNOLD under AUTHOR. Press EDIT and the last question should offer the author."] },
@@ -3117,7 +3118,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:52 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:58 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5154,13 +5155,15 @@ function renderProjects(){
       /* Rev-1011: how many feature rows have been given a line-inspection level. */
       const _l9 = (function(){
         try{
+          /* Rev-1020: EVERY feature is in the Level 1 round, so there is nothing to count
+             as unset. What is worth counting is how many also carry Level 2 or Level 3. */
           const rws = (((p.builderState || {}).rows) || []).filter(r => String(r.bubble || '').trim());
           const lv = p.lineLevels || {};
-          const set = rws.filter(r => lv[String(r.bubble).trim()]).length;
-          return { total: rws.length, set: set, done: rws.length > 0 && set >= rws.length,
+          const n2 = rws.filter(r => lv[String(r.bubble).trim()] === 2).length;
+          const n3 = rws.filter(r => lv[String(r.bubble).trim()] === 3).length;
+          return { total: rws.length, set: n2 + n3, done: rws.length > 0,
                    text: !rws.length ? '  \u2013 NO ROWS YET'
-                         : (set >= rws.length ? ('  \u2013 ALL ' + rws.length + ' SET')
-                                              : ('  \u2013 ' + set + ' / ' + rws.length + ' SET')) };
+                         : ('  \u2013 ALL ' + rws.length + ' \u00b7 ' + n2 + ' L2 \u00b7 ' + n3 + ' L3') };
         }catch(e){
           console.warn('Rev-1011 level count failed', e);
           return { total:0, set:0, done:false, text:'  \u2013 NO ROWS YET' };
@@ -11544,9 +11547,13 @@ function cpLineLevelPanel(idx){
     ov.addEventListener('click', e => { if(e.target === ov) ov.remove(); });
 
     const render = () => {
-      const cnt = { 1:0, 2:0, 3:0, none:0 };
+      /* Rev-1020: a LEVEL 1 round covers EVERY feature, so its count is the whole list.
+         Levels 2 and 3 are the extra rounds, and a feature is named on one of those only if
+         it has been marked for it. Nothing is "unset" any more - the worst a feature can be
+         is Level 1 only, which is still inspected. */
+      const cnt = { 1: rows.length, 2:0, 3:0, none:0 };
       rows.forEach(r => { const l = levels[String(r.bubble).trim()];
-        if(l === 1 || l === 2 || l === 3) cnt[l]++; else cnt.none++; });
+        if(l === 2 || l === 3) cnt[l]++; else cnt.none++; });
 
       let body = '';
       if(!rows.length){
@@ -11577,10 +11584,11 @@ function cpLineLevelPanel(idx){
           +   '<div style="font-size:10px; font-weight:600; color:#6b6257; margin-top:3px;">'
           +   'proposes a level for every feature</div></button>'
           + '</div>'
-          + (cnt.none ? ('<div style="background:#fdf3d5; border:1px solid #d9b64a; border-radius:8px;'
-              + ' padding:10px 12px; margin-bottom:14px; font-size:12.5px; color:#5c4708;"><b>'
-              + cnt.none + ' feature(s) have no level yet.</b> A feature with no level is never '
-              + 'pulled for a line inspection.</div>') : '')
+          + (cnt.none ? ('<div style="background:#eef4f8; border:1px solid #a8c4d6; border-radius:8px;'
+              + ' padding:10px 12px; margin-bottom:14px; font-size:12.5px; color:#1a5276;"><b>'
+              + cnt.none + ' feature(s) are covered by the Level 1 round only.</b> They are still '
+              + 'inspected \u2014 mark one Level 2 or Level 3 to have it looked at on those '
+              + 'rounds as well.</div>') : '')
           + '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
           + '<thead><tr>'
           + ['BUBBLE', 'FEATURE DESCRIPTION', 'SPEC / TOLERANCE', 'MACHINIST CHECKS',
@@ -11604,20 +11612,34 @@ function cpLineLevelPanel(idx){
                       : '<span style="color:#b9b3aa;">\u2014</span>') + '</td>'
                 + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
                 +   ' white-space:nowrap;">'
-                +   [1,2,3].map(n => '<button type="button" data-lvb="' + esc(b) + '" data-lvn="' + n + '"'
+                /* Rev-1020: LEVEL 1 IS ALWAYS ON. A Level 1 round covers every feature, so
+                   this is a marker of fact rather than a choice - it is not a button and it
+                   cannot be turned off. 2 and 3 are the choices, and each toggles. */
+                +   '<span title="Every feature is inspected on a Level 1 round"'
+                +     ' style="display:inline-block; min-width:38px; margin:0 3px; padding:6px 9px;'
+                +     ' border-radius:7px; font-size:12px; font-weight:800; text-align:center;'
+                +     ' border:2px solid ' + LCOL[1] + '; background:' + LCOL[1] + '; color:#fff;'
+                +     ' cursor:default;">1</span>'
+                +   [2,3].map(n => '<button type="button" data-lvb="' + esc(b) + '" data-lvn="' + n + '"'
+                      + ' title="' + (l === n ? 'Take this feature off the Level ' + n + ' round'
+                                             : 'Also inspect this feature on the Level ' + n + ' round') + '"'
                       + ' style="min-width:38px; margin:0 3px; padding:6px 9px; border-radius:7px;'
                       + ' font-size:12px; font-weight:800; cursor:pointer; border:2px solid ' + LCOL[n]
                       + '; background:' + (l === n ? LCOL[n] : '#fff')
                       + '; color:' + (l === n ? '#fff' : LCOL[n]) + ';">' + n + '</button>').join('')
                 +   '<button type="button" data-lvb="' + esc(b) + '" data-lvn="0"'
-                +     ' style="margin-left:6px; padding:6px 9px; border-radius:7px; font-size:11px;'
-                +     ' font-weight:800; cursor:pointer; border:1px solid #c9c0b4; background:#fff;'
-                +     ' color:#6b6257;">NONE</button></td>'
-                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
-                +   ' font-weight:800; color:' + (l ? LCOL[l] : '#b9b3aa') + ';">'
-                +   (l ? ('EVERY ' + (parseInt(every[l], 10) || 1) + ' PARTS'
-                          + '<div style="font-size:10px; font-weight:700; color:#6b6257; margin-top:2px;">'
-                          + LDESC[l].what + '</div>') : 'NEVER') + '</td>'
+                +     ' title="Level 1 round only" style="margin-left:6px; padding:6px 9px;'
+                +     ' border-radius:7px; font-size:11px; font-weight:800; cursor:pointer;'
+                +     ' border:1px solid #c9c0b4; background:' + (l ? '#fff' : '#efeae1')
+                +     '; color:#6b6257;">L1 ONLY</button></td>'
+                /* Rev-1020: every round this feature is looked at on, Level 1 always first. */
+                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;">'
+                +   [1].concat(l ? [l] : []).map(n =>
+                      '<div style="font-weight:800; color:' + LCOL[n] + '; margin:1px 0;">'
+                      + 'EVERY ' + (parseInt(every[n], 10) || 1) + ' PARTS'
+                      + '<span style="font-size:10px; font-weight:700; color:#6b6257;"> \u00b7 '
+                      + LDESC[n].what + '</span></div>').join('')
+                +   '</td>'
                 + '</tr>'; }).join('')
           + '</tbody></table>';
       }
@@ -11657,7 +11679,9 @@ function cpLineLevelPanel(idx){
 
       c.querySelectorAll('[data-lvb]').forEach(btn => { btn.onclick = () => {
         const b = btn.getAttribute('data-lvb'), n = parseInt(btn.getAttribute('data-lvn'), 10);
-        if(n) levels[b] = n; else delete levels[b];
+        /* Rev-1020: pressing the level a feature already carries takes it back off, so a
+           mistake is undone with the same button that made it. */
+        if(n && levels[b] !== n) levels[b] = n; else delete levels[b];
         if(save()){ try{ logAct('line-level', 'level set'); }catch(_){ } }
         render();
       }; });
@@ -11693,10 +11717,12 @@ function cpLineLevelPanel(idx){
             body: JSON.stringify({
               model: 'claude-sonnet-4-6', max_tokens: 1200,
               system: 'You assign line-inspection levels to machined features on a CAMCO '
-                + 'Control Plan. LEVEL 1 = COMPLETE CHECK, quality re-checks twice a shift - '
-                + 'for the tightest and most critical features. LEVEL 2 = CRITICAL ONLY, four '
-                + 'times per shift - important features with moderate tolerance. LEVEL 3 = ODD '
-                + 'CHECKS, once every other day - loose, attribute or cosmetic features. Judge '
+                + 'Control Plan. EVERY feature is already inspected on the LEVEL 1 round, which '
+                + 'is a complete check of the whole part, so you are choosing which features ALSO '
+                + 'get looked at on the two extra rounds. LEVEL 2 = CRITICAL ONLY, four times per '
+                + 'shift - the tightest and most critical features. LEVEL 3 = ODD CHECKS, once '
+                + 'every other day - loose, attribute or cosmetic features. Answer 1 for a '
+                + 'feature that needs no extra round beyond the complete check. Judge '
                 + 'from the tolerance band and what the feature is: tighter band means lower '
                 + 'level number. Reply with JSON ONLY, no prose and no code fence, in the shape '
                 + '[{"bubble":"3","level":1,"why":"six words"}] with one entry per feature given.',
