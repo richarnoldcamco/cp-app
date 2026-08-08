@@ -1683,7 +1683,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-985";
+const APP_REV = "Rev-986";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2211,6 +2211,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-986", type: "App", changes: ["\ud83e\uddea INJECT DATA - SIMULATED RUNS AT A CHOSEN CPK (Rev-986, embedded validation REV-260) \u2014 per Rich: a button beside Inspect that fills an operation with believable measurement data so the reports, the capability maths and the whole inspection flow can be exercised without machining fifty parts. Eight scenarios - Cpk 2.00, 1.67, 1.33, 1.00, 0.67, SHIFTED (capable but off-centre), DRIFTING (walks across the run like tool wear) and ONE BAD PIECE - across 5, 10, 30 or 50 pieces. Readings are generated against EACH FEATURE\u2019S OWN limits read off the plan, rounded to the decimal places those limits imply, so a .0005 band gets four-place numbers and a .010 band gets three. Features with no numeric limits get a pass rather than an invented number. THE SAFETY, WHICH IS THE POINT: this writes fabricated readings into a quality-records system for ITAR parts, so a simulated run can never be mistaken for a real one. Every record carries simulated:true, the scenario that made it, and an appRev reading SIMULATED - NOT REAL MEASUREMENT DATA; the operator initials are SIM; the shop order is SIM-xxxx so the filename itself declares it; and Reports HIDES them unless \u2018include simulated runs\u2019 is ticked, saying how many it is hiding. Injection is REFUSED outright on any operation already marked ready for production - that is where the real damage would be - and the button is EXPERT USER only so it never sits in front of a machinist. WHAT TO TEST (rule 8): press \ud83e\uddea INJECT DATA on an unreleased operation, choose Cpk 1.33 and 30 pieces, then open Reports and confirm the batch is hidden until the tick is on. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-985", type: "App", changes: ["THE BUBBLE HIGHLIGHT IS A RED CIRCLE HERE TOO (Rev-985, embedded validation REV-260) \u2014 Rich asked whether we had not already moved off the yellow bubble highlight. Rev-978 changed a DIFFERENT one: the pin marker in the Control Plan builder\u2019s drawing panel, and the entry said so and asked him to point at any others. This is the second one, in the validation app, and it is not an overlay at all - a filled yellow ellipse is PAINTED INTO the reference image at the moment the crop is saved. A fill tints the very number it points at and washes out on a photographed print. It is now the same ring as Rev-978: no fill, a white ring laid down first so it holds on ink and on white paper, then the red ring over it. The live box that is dragged to place it is red now as well, so what is drawn is what gets saved, and the two size buttons no longer call it yellow. HONESTLY STATED: reference images CUT BEFORE THIS REV KEEP THEIR YELLOW - the colour is baked into those pictures and only a re-cut can change them. WHAT TO TEST (rule 8): open a feature, Grab this bubble from the ODS, place the circle and save - the saved reference image should carry a red ring, not a yellow blob. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-984", type: "App", changes: ["THE CROP PROMPT SAYS ONE THING (Rev-984, embedded validation REV-259) \u2014 per Rich, in his words: PRESS ENTER TO ZOOM INTO CROPPED AREA. Rev-981 had it swap to a save prompt after the first press, on the reasoning that Enter does two things in a row; Rich does not want that second wording and he is right that one prompt should say one thing. Once the zoom has happened the prompt simply GOES rather than changing - silence beats telling him to zoom into an area he is already zoomed into, and it leaves the zoomed view clean to work in. Everything else is unchanged: still ghosted, still centred on the crop, still takes no clicks. WHAT TO TEST (rule 8): drag a crop - the prompt reads PRESS ENTER TO ZOOM INTO CROPPED AREA; press Enter - it disappears rather than changing. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-983", type: "App", changes: ["ONE TAB DRIVES - SEVERAL OPEN COPIES NO LONGER RELOAD EACH OTHER (Rev-983, embedded validation REV-258) \u2014 Rich reported the screen blinking, and the Action Log settled it rather than any guess. Between 23:09:07 and 23:09:47 there were TWENTY-ONE app-starts, one every two seconds - which the updater cannot do, being throttled to once a minute and capped at three tries per target. The giveaway was an OLDER rev appearing mid-burst: app-start Rev-977 inside a run of Rev-978, and Rev-961 inside runs of Rev-963 and Rev-964. One copy cannot start as two revisions in the same minute. SEVERAL COPIES WERE OPEN AT ONCE, each on its own revision, each self-updating on its own timer, all writing into the one shared log - and the curtain reading Rev-979 while the title bar read Rev-978 was simply a different tab. It also explains the GitHub refused the write (409) entries: two copies writing the same file in the same instant. FIXED BY ELECTION: every copy now claims a leader slot in shared storage with a heartbeat. Exactly one copy - the leader - runs the background update check and the periodic app push. The others do nothing in the background and say so in a small amber note at the top: another copy is driving. If the leader is closed its claim goes stale within eight seconds and the next copy takes over, so closing the driving tab does not strand the rest. WHAT IS DELIBERATELY NOT GATED: anything Rich actually presses. Saving, pushing data, pulling code and the manual update banner work in every copy - the guard covers only the machinery that runs by itself. WHAT TO TEST (rule 8): open the app in two tabs; the second should show the amber note, and neither should reload on its own. Payload verified in both repos before this entry."] },
@@ -3073,7 +3074,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:22 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:14 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5117,6 +5118,15 @@ function renderProjects(){
       })();
 
       _target = actWrap;
+      /* Rev-986: EXPERT USER only - a machinist should never meet a button that writes
+         fabricated readings. Refuses outright on a released operation (see cpInjectPanel). */
+      if(cpUserMode() === 'expert'){
+        mkBtn('\ud83e\uddea Inject Data', 'quiet', 104,
+          'Generate SIMULATED readings at a chosen Cpk and save them as runs.\n'
+          + 'Marked simulated, operator SIM, hidden from Reports unless switched on.\n'
+          + 'Refused on an operation already released to production.',
+          () => cpInjectPanel(i), has);
+      }
       mkBtn('Inspect', 'go', 84, 'Machinist: start a real inspection run for this plan (readings are saved)'
         + (has ? '' : ' \u2014 no plan data to inspect'), () => inspectMachinistValidation(i), has);
       mkBtn('Validation', 'quiet', 94, (mvIsCreated(p)
@@ -14399,6 +14409,198 @@ window.cpMvMasterRows = function(controlTypeId){
    the drawings, so it reaches every device and survives a wiped machine. The PLAN records
    only name / size / path / when - never the program text - so cp_data.json stays small.
    Optional means optional: zero weight, never locked, never blocks COMPLETE. */
+/* ===== Rev-986: INJECT DATA =============================================
+   Simulated inspection runs, so the reports and the capability maths can be exercised without
+   machining fifty parts. Rich asked for it; the safety around it is mine, and deliberate:
+   this writes FABRICATED READINGS into a quality-records system for ITAR parts, so every
+   record says so in the record itself, the filename declares it, Reports hides them by
+   default, and a released operation refuses the whole thing outright. */
+const CP_INJ_SCENARIOS = [
+  { k:'cpk200', label:'Cpk 2.00 \u00b7 dead centre, very tight',      cpk:2.00, mode:'centred' },
+  { k:'cpk167', label:'Cpk 1.67 \u00b7 comfortably capable',          cpk:1.67, mode:'centred' },
+  { k:'cpk133', label:'Cpk 1.33 \u00b7 capable',                      cpk:1.33, mode:'centred' },
+  { k:'cpk100', label:'Cpk 1.00 \u00b7 marginal',                     cpk:1.00, mode:'centred' },
+  { k:'cpk067', label:'Cpk 0.67 \u00b7 failing, scrap expected',      cpk:0.67, mode:'centred' },
+  { k:'shift',  label:'SHIFTED \u00b7 capable spread, off centre',    cpk:1.00, mode:'shifted' },
+  { k:'drift',  label:'DRIFTING \u00b7 walks across the run (tool wear)', cpk:1.33, mode:'drift' },
+  { k:'onebad', label:'ONE BAD PIECE \u00b7 all good but one',        cpk:1.67, mode:'onebad' }
+];
+/* Box-Muller: a real normal distribution, so the numbers scatter like measurements rather
+   than sitting in a neat line. */
+function _cpInjNormal(){
+  let u = 0, v = 0;
+  while(u === 0) u = Math.random();
+  while(v === 0) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+/* How many decimals do these limits imply? A .0005 band must not come back as .123. */
+function _cpInjDecimals(a, b){
+  const d = s => { const m = String(s).match(/\.(\d+)/); return m ? m[1].length : 0; };
+  return Math.min(5, Math.max(3, d(a), d(b)));
+}
+/* Generate the values for ONE feature across n pieces, aimed at the chosen scenario.
+   Cpk = min(USL-mean, mean-LSL) / 3sigma. Centred, that is (USL-LSL)/(6*sigma). */
+function cpInjValues(lo, hi, n, sc){
+  const out = [];
+  const tol = hi - lo, mid = (lo + hi) / 2;
+  const sigma = tol / (6 * Math.max(0.2, sc.cpk));
+  for(let i = 0; i < n; i++){
+    let mean = mid;
+    if(sc.mode === 'shifted'){
+      /* capable spread, deliberately off centre - the classic "why is Cpk worse than Cp" */
+      mean = mid + tol * 0.17;
+    } else if(sc.mode === 'drift'){
+      /* walks from below centre to above it across the run, like a tool wearing */
+      mean = mid - tol * 0.22 + (tol * 0.44) * (n > 1 ? (i / (n - 1)) : 0);
+    }
+    const s = (sc.mode === 'shifted' || sc.mode === 'drift') ? (tol / (6 * 1.67)) : sigma;
+    out.push(mean + _cpInjNormal() * s);
+  }
+  if(sc.mode === 'onebad' && n > 1){
+    /* exactly one piece put just outside a limit - the case reports are supposed to catch */
+    const j = Math.floor(Math.random() * n);
+    out[j] = (Math.random() < 0.5) ? (lo - tol * 0.06) : (hi + tol * 0.06);
+  }
+  return out;
+}
+/* Build the run records. Shape copied from a real stored run so Reports reads them
+   identically - runId, valDoc, operation, partNumber, shopOrder, serialNumber, readings[]. */
+function cpInjBuild(p, sc, pieces){
+  const rows = (((p.builderState || {}).rows) || []).filter(r => String(r.bubble || '').trim());
+  const feats = [];
+  rows.forEach(r => {
+    let lo = parseFloat(r.lowerLimit), hi = parseFloat(r.upperLimit);
+    if(!(isFinite(lo) && isFinite(hi))){
+      const sp = (typeof cpSplitLimits === 'function') ? cpSplitLimits(r.spec) : null;
+      if(sp){ hi = parseFloat(sp.hi); lo = parseFloat(sp.lo); }
+    }
+    if(isFinite(lo) && isFinite(hi) && hi !== lo){
+      if(hi < lo){ const t = hi; hi = lo; lo = t; }
+      feats.push({ row: r, lo: lo, hi: hi, dp: _cpInjDecimals(r.lowerLimit || lo, r.upperLimit || hi),
+                   vals: cpInjValues(lo, hi, pieces, sc) });
+    } else {
+      feats.push({ row: r, attribute: true });   // visual / attribute: a pass, never a made-up number
+    }
+  });
+  const so = 'SIM-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+  const now = new Date();
+  const y = now.getUTCFullYear(), mo = String(now.getUTCMonth() + 1).padStart(2, '0'), da = String(now.getUTCDate()).padStart(2, '0');
+  const dtok = '' + y + mo + da;
+  const runs = [];
+  for(let i = 0; i < pieces; i++){
+    const sn = String(i + 1);
+    const runId = 'R-' + so.slice(4) + String(i + 1).padStart(3, '0');
+    const stamp = new Date(now.getTime() + i * 60000).toISOString();
+    const readings = feats.map(f => {
+      const r = f.row;
+      const base = {
+        runId: runId, bubble: String(r.bubble || ''),
+        characteristic: String(r.featureDesc || r.spec || ''),
+        instrument: String(r.measMethod || ''), frequency: String(r.freqEvery || ''),
+        createdUtc: stamp, updatedUtc: stamp, createdBy: 'SIM', committed: true, photo: '',
+        simulated: true
+      };
+      if(f.attribute){
+        return Object.assign(base, { valueType: 'attr', tolLow: null, tolHigh: null,
+          tolRaw: String(r.spec || ''), raw: 'PASS', measuredValue: null,
+          attributeResult: 'PASS', inTolerance: true });
+      }
+      const v = +f.vals[i].toFixed(f.dp);
+      return Object.assign(base, { valueType: 'dim', tolLow: f.lo, tolHigh: f.hi,
+        tolRaw: f.lo.toFixed(f.dp) + '/' + f.hi.toFixed(f.dp),
+        raw: v.toFixed(f.dp), measuredValue: v, attributeResult: null,
+        inTolerance: (v >= f.lo && v <= f.hi) });
+    });
+    runs.push({
+      file: String(p.partNum || 'PART') + '_OP-' + String(p.opNum || '') + '_' + so + '_' + dtok + '_' + sn + '_' + runId + '.json',
+      body: {
+        savedUtc: stamp,
+        appRev: 'SIMULATED \u2014 NOT REAL MEASUREMENT DATA \u00b7 ' + APP_REV + ' \u00b7 ' + sc.label,
+        simulated: true, simulatedScenario: sc.k, simulatedLabel: sc.label,
+        run: { runId: runId, valDoc: 'INSP-' + String(p.partNum || '') + '-' + String(p.rev || 'REV1'),
+               operation: 'OP-' + String(p.opNum || ''), partNumber: String(p.partNum || ''),
+               shopOrder: so, serialNumber: sn, operatorInitials: 'SIM',
+               cycleMinutes: null, dateStartedUtc: stamp, dateCompletedUtc: stamp,
+               createdUtc: stamp, cloudSavedUtc: stamp, freqSkipped: [],
+               simulated: true, simulatedScenario: sc.k },
+        readings: readings
+      }
+    });
+  }
+  return { runs: runs, shopOrder: so, features: feats.length,
+           dims: feats.filter(f => !f.attribute).length };
+}
+function cpInjectPanel(idx){
+  const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+  const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
+  /* Refused on a released operation. This is the one that could actually hurt someone. */
+  if(p.inspReviewed && p.inspReviewed.when){
+    cpConfirmBox('RELEASED \u2014 INJECTION REFUSED',
+      'This operation is marked <b>ready for production</b>. Simulated readings are not written '
+      + 'against a released operation.<br><br>Withdraw the release first if this really is a test.',
+      'Understood');
+    return;
+  }
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed; inset:0; z-index:10650; background:rgba(0,0,0,.65);'
+    + ' display:flex; align-items:center; justify-content:center; padding:20px;';
+  const c = document.createElement('div');
+  c.style.cssText = 'background:#fff; border-radius:12px; max-width:720px; width:100%;'
+    + ' box-shadow:0 16px 60px rgba(0,0,0,.5); font-family:inherit; overflow:auto; max-height:90vh;';
+  c.innerHTML =
+      '<div style="background:#8a5a00; color:#fff; font-weight:800; letter-spacing:.04em; padding:14px 20px; font-size:17px;">'
+    +   '\ud83e\uddea INJECT DATA \u00b7 ' + String(p.partNum || '') + (p.opNum ? ('  \u00b7  OP-' + p.opNum) : '') + '</div>'
+    + '<div style="padding:16px 20px; font-size:14px; line-height:1.6; color:#3a352e;">'
+    +   '<div style="background:#fdecea; border:1px solid #e6b3ad; border-radius:8px; padding:10px 12px; font-weight:700; color:#a5342a;">'
+    +     'SIMULATED DATA. Every run written here is stamped as simulated, uses operator SIM, and is '
+    +     'hidden from Reports unless simulated runs are switched on. It is not measurement evidence.</div>'
+    +   '<div style="margin-top:14px; font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">SCENARIO</div>'
+    +   '<select id="injSc" style="width:100%; font-size:15px; padding:9px; margin-top:6px; border:1px solid #c9c0b4; border-radius:8px;">'
+    +     CP_INJ_SCENARIOS.map(s => '<option value="' + s.k + '">' + s.label + '</option>').join('')
+    +   '</select>'
+    +   '<div style="margin-top:14px; font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">HOW MANY PIECES</div>'
+    +   '<select id="injN" style="width:100%; font-size:15px; padding:9px; margin-top:6px; border:1px solid #c9c0b4; border-radius:8px;">'
+    +     '<option>5</option><option selected>10</option><option>30</option><option>50</option></select>'
+    +   '<div id="injNote" style="margin-top:14px; font-size:12px; color:#6b6257;"></div>'
+    + '</div>'
+    + '<div style="display:flex; gap:12px; padding:14px 20px; border-top:1px solid #e2ddd4; background:#faf7f2;">'
+    +   '<button id="injX" style="padding:11px 18px; border:1px solid #c9c0b4; background:#fff; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer;">Cancel</button>'
+    +   '<button id="injGo" style="margin-left:auto; padding:11px 22px; border:none; background:#8a5a00; color:#fff; border-radius:8px; font-weight:800; font-size:15px; cursor:pointer;">\ud83e\uddea Generate &amp; save</button>'
+    + '</div>';
+  ov.appendChild(c); document.body.appendChild(ov);
+  const close = () => ov.remove();
+  ov.addEventListener('click', e => { if(e.target === ov) close(); });
+  document.getElementById('injX').onclick = close;
+  const rows = (((p.builderState || {}).rows) || []).filter(r => String(r.bubble || '').trim());
+  document.getElementById('injNote').textContent =
+    rows.length + ' ballooned row(s) on this operation. Features with no numeric limits are recorded as a PASS rather than a made-up number.';
+  document.getElementById('injGo').onclick = async () => {
+    try{
+      const sc = CP_INJ_SCENARIOS.find(s => s.k === document.getElementById('injSc').value) || CP_INJ_SCENARIOS[2];
+      const n = parseInt(document.getElementById('injN').value, 10) || 10;
+      if(!rows.length){ flash('This operation has no ballooned rows to generate against.', true); return; }
+      if(!ghConfigured()){ flash('GitHub is not set up on this device, so runs cannot be saved.', true); return; }
+      const built = cpInjBuild(p, sc, n);
+      close();
+      flash('\ud83e\uddea Generating ' + built.runs.length + ' simulated piece(s) \u2026');
+      let ok = 0;
+      for(const r of built.runs){
+        try{
+          const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(r.body, null, 1))));
+          await cpCncPut('runs/' + r.file, b64, 'SIMULATED run ' + r.file);
+          ok++;
+        }catch(e){ console.error('Rev-986 run save failed', r.file, e); }
+      }
+      try{ logAct('inject', 'simulated ' + ok + '/' + built.runs.length + ' pieces \u00b7 ' + sc.k); }catch(e){}
+      flash('\u2713 ' + ok + ' of ' + built.runs.length + ' simulated pieces saved as shop order '
+        + built.shopOrder + ' \u2014 ' + built.dims + ' measured feature(s). Reports hides them until '
+        + 'simulated runs are switched on.');
+    }catch(e){
+      console.error('Rev-986 inject failed', e);
+      flash('Could not inject: ' + (e && e.message || e), true);
+    }
+  };
+}
 function cpCncSafeName(n){
   return String(n || 'program').trim().replace(/[^A-Za-z0-9._-]+/g, '_').slice(0, 120) || 'program';
 }
@@ -16865,10 +17067,16 @@ async function loadRunReports(){
   // Rev-466: filename -> part / op / shop order / DATE (PART_OP_SO_YYYYMMDD_SN_RID.json).
   // Each day is its OWN batch -- never rolled up. Legacy names without the date token
   // group under their shop order and get a date from the one-file fetch.
+  /* Rev-986: SIMULATED RUNS ARE HIDDEN HERE. Injected runs carry a SIM- shop order, so the
+     FILENAME alone declares them - no extra reads to work out what to hide. The count is
+     reported rather than swallowed, and the tick brings them back. */
+  let _simHidden = 0;
+  const _showSim = (function(){ try{ return localStorage.getItem('cpShowSimRuns') === '1'; }catch(e){ return false; } })();
   const byPart = {};
   files.forEach(f => {
     const t = f.name.replace(/\.json$/,'').split('_');
     const part = t[0] || '?', op = t[1] || '?', so = t[2] || '?';
+    if(String(so).toUpperCase().indexOf('SIM-') === 0 && !_showSim){ _simHidden++; return; }
     const dtok = (t[3] && /^\d{8}$/.test(t[3])) ? t[3] : '';
     const pk = byPart[part] = byPart[part] || {};
     const bk = op + ' \u00b7 ' + (dtok || ('SO ' + so));
@@ -16877,6 +17085,29 @@ async function loadRunReports(){
     if(dtok && !b.date) b.date = dtok.slice(0,4) + '-' + dtok.slice(4,6) + '-' + dtok.slice(6,8) + 'T12:00:00Z';
   });
 
+  /* Rev-986: say what is being hidden, and offer the tick. Silence would be worse. */
+  try{
+    const st = $('reportsStatus');
+    if(st){
+      const old = document.getElementById('cpSimToggleWrap'); if(old) old.remove();
+      if(_simHidden || _showSim){
+        const w = document.createElement('label');
+        w.id = 'cpSimToggleWrap';
+        w.style.cssText = 'display:inline-flex; align-items:center; gap:7px; margin:0 0 10px; padding:6px 10px;'
+          + ' background:#fdf3d5; border:1px solid #d9b64a; border-radius:8px; font-size:12px; font-weight:700; color:#5c4708; cursor:pointer;';
+        w.innerHTML = '<input type="checkbox" id="cpSimToggle"' + (_showSim ? ' checked' : '') + '>'
+          + '<span>' + (_showSim ? 'SHOWING SIMULATED RUNS \u2014 not measurement evidence'
+                                 : ('INCLUDE SIMULATED RUNS (' + _simHidden + ' file(s) hidden)')) + '</span>';
+        st.parentNode.insertBefore(w, st);
+        const cb = document.getElementById('cpSimToggle');
+        if(cb) cb.onchange = () => {
+          try{ localStorage.setItem('cpShowSimRuns', cb.checked ? '1' : '0'); }catch(e){}
+          try{ window._reportBatchCache = {}; }catch(e){}
+          loadReports();
+        };
+      }
+    }
+  }catch(e){ console.warn('Rev-986 sim toggle failed', e); }
   window._reportIndex = byPart;
   window._reportBatchCache = window._reportBatchCache || {};
   renderRunIndex();   // Rev-472: renderRunIndex sets the count line (it knows what's hidden)
