@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1018</title>
+<title>CONTROL PLAN GENERATOR - Rev-1019</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1018 · 2026-08-08 3:47 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1019 · 2026-08-08 3:52 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1018 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:47 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1019 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:52 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1018 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1019 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1018";
+const APP_REV = "Rev-1019";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1019", type: "App", changes: ["REV-1018 REVERSED — LEVEL 1 KEEPS ITS PARTS INTERVAL (Rev-1019, embedded validation REV-260) — I read Rich wrong and built the wrong thing. He said Level 1 is a 100% check and I took it to mean every PART; he meant every FEATURE. A Level 1 check is the quality technician going over the WHOLE part — the entire level column marked 1 — rather than a sample of features. HOW OFTEN that round happens is still an interval, so Level 1 gets its parts box back exactly as it was at Rev-1017, and any interval already stored against it is honoured again rather than forced to 1. The AI instruction is put back with it, since Rev-1018 had told it Level 1 meant every part. AND THE SCREEN NOW SAYS WHAT A LEVEL IS, so the same misreading cannot happen twice: a level says WHICH FEATURES get looked at when quality comes round — Level 1 every feature on the part, Level 2 the critical ones, Level 3 the odd ones — and the parts figure on each card is how often that round comes. WHAT TO TEST (rule 8): open STEP 8 on 1000237620 OP-030 — all three cards should take a number again, Level 1 should show whatever it held before Rev-1018 rather than 100%, and the rows should read EVERY 30 PARTS · COMPLETE CHECK instead of EVERY PART · 100%."] },
   { ts: "2026-08-08", rev: "App Rev-1018", type: "App", changes: ["LEVEL 1 IS A 100% CHECK, NOT A SAMPLE (Rev-1018, embedded validation REV-260) — per Rich, and it changes what the level MEANS rather than just what it says. Level 1 carried an editable parts interval like the other two, so it read as one part in 30. It is every part. The card now shows a fixed 100% · EVERY PART where the number box was, and there is NO BOX AT ALL rather than a box reading 1 — a box reading 1 invites somebody to type 30 into it and quietly turn a 100% check into a sample, which is the kind of change nobody notices until a part gets out. Levels 2 and 3 keep their intervals and stay editable. Every row set to Level 1 now reads EVERY PART · 100% in the last column instead of a parts figure. THE AI WAS BEING TOLD THE WRONG THING TOO and is corrected in the same rev: it was asked to treat Level 1 as a twice-a-shift re-check, so it was weighing the levels against a rule that was not CAMCO’s. It is now told Level 1 means 100%, every part. WHAT TO TEST (rule 8): open STEP 8 on 1000237620 OP-030 — the LEVEL 1 card should read 100% · EVERY PART with no editable box, Levels 2 and 3 should still take a number, and every Level 1 row should read EVERY PART · 100% down the right."] },
   { ts: "2026-08-08", rev: "App Rev-1017", type: "App", changes: ["THE GAGE LIST SHOWS THE FEATURE AND WHO OWNS IT (Rev-1017, embedded validation REV-260) — per Rich, two columns. AN ODS COLUMN carries the inspection crop cut for that bubble — the same picture the machinist sees on that feature — at thumbnail size, and clicking it opens the crop full size. It comes from the plan’s own saved reference images, so a crop deleted there is gone here too and there is no second copy to drift. Where no crop has been cut the cell shows a dash rather than the whole ODS print, which at 54 pixels tall would say nothing. AN AUTHOR COLUMN names who is responsible for the gage, defaulting to RICH ARNOLD and editable per gage through EDIT, upper-cased like every other name in the app. A gage with no author recorded reads RICH ARNOLD rather than blank, so the column is never a row of dashes on the existing list. WHAT TO TEST (rule 8): open GAGES on 1000237620 OP-030 — bubble 3 and bubble 7 should each show a small crop if one has been cut for them, clicking one should open it full size, and both should read RICH ARNOLD under AUTHOR. Press EDIT and the last question should offer the author."] },
   { ts: "2026-08-08", rev: "App Rev-1016", type: "App", changes: ["✨ AI SUGGESTION PROPOSES A LEVEL FOR EVERY FEATURE (Rev-1016, embedded validation REV-260) — per Rich. The button sits beside the three level cards and asks the AI to put a 1, 2 or 3 against every feature on the operation, judging from the feature name and the tolerance band: tighter band, lower number. It is told what the three levels MEAN in this shop — complete check twice a shift, critical only four times a shift, odd checks every other day — so it is answering CAMCO’s question rather than a generic one. THREE THINGS BUILT INTO IT ON PURPOSE. ITAR: feature descriptions and tolerances are export-controlled part data, so nothing leaves the device until the ITAR confirmation is accepted — the same gate every other AI call in this app sits behind, and cancelling sends nothing. IT PROPOSES RATHER THAN WRITES: the suggestion is shown as a table — bubble, feature, level and a few words of why — with a count of how many would actually CHANGE, and not one level is written until that is accepted. AND IT IS CHECKED: a level that is not 1, 2 or 3 is thrown away, and a bubble that is not on this operation is thrown away, so a confused answer cannot invent a feature or write a nonsense level. If the reply comes back in a shape the screen cannot read it says so and changes nothing. The confirmation says plainly that this is a starting point and not a ruling: it sees a name and a tolerance, and knows nothing about which features have bitten this shop before. WHAT TO TEST (rule 8): open STEP 8 on 1000237620 OP-030 and press ✨ AI SUGGESTION — the ITAR box should come up first, cancelling it should send nothing, and accepting should bring back a table of proposed levels with a change count. Accept it and the buttons and the last column should follow."] },
@@ -3116,7 +3117,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:47 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -11504,15 +11505,15 @@ function cpLineLevelPanel(idx){
     /* Rev-1015: what each level MEANS, in Rich's own words off the marked-up screen. WHAT is
        checked, and HOW OFTEN quality comes round. The parts interval stays editable beside
        them - these two lines are the intent, the number is the trigger. */
+    /* Rev-1019: Rev-1018 is reversed. "100%" is about FEATURES, not parts: when the quality
+       technician does a Level 1 check they check EVERY FEATURE on the part - the whole level
+       column reads 1. How often they come round is still an interval, so Level 1 keeps its
+       parts box like the other two. */
     const LDESC = {
-      /* Rev-1018: LEVEL 1 IS A 100% CHECK, per Rich - every part, not one in N. It carries no
-         interval at all rather than an interval of 1, because a box reading 1 invites somebody
-         to type 30 into it and quietly turn a 100% check into a sample. */
-      1: { what: 'COMPLETE CHECK', when: 'TWICE A SHIFT', all: true },
+      1: { what: 'COMPLETE CHECK', when: 'TWICE A SHIFT' },
       2: { what: 'CRITICAL ONLY',  when: '4 TIMES PER SHIFT' },
       3: { what: 'ODD CHECKS',     when: 'ONCE EVERY OTHER DAY' }
     };
-    every[1] = 1;   /* never a sample */
 
     const save = () => {
       try{
@@ -11559,20 +11560,13 @@ function cpLineLevelPanel(idx){
               + '; border-radius:9px; padding:11px 14px;">'
               + '<div style="font-size:13px; font-weight:800; letter-spacing:.03em; color:' + LCOL[l] + ';">'
               +   'LEVEL ' + l + ' \u2014 ' + LDESC[l].what + '</div>'
-              + (LDESC[l].all
-                  ? ('<div style="display:flex; align-items:center; gap:8px; font-size:11.5px;'
-                     + ' font-weight:800; color:' + LCOL[l] + ';">'
-                     + '<span style="padding:7px 12px; border:1px solid #c9c0b4; border-radius:7px;'
-                     +   ' background:#fafa96; font-size:14px; font-weight:800;">100%</span>'
-                     + 'EVERY PART <span style="font-weight:600; color:#6b6257;">(' + cnt[l]
-                     + ' feature' + (cnt[l] === 1 ? '' : 's') + ')</span></div>')
-                  : ('<label style="display:flex; align-items:center; gap:8px; font-size:11.5px;'
-                     + ' font-weight:800; color:' + LCOL[l] + ';">EVERY'
-                     + '<input type="number" min="1" data-lvset="' + l + '" value="' + (parseInt(every[l], 10) || 1) + '"'
-                     + ' style="width:76px; padding:7px; border:1px solid #c9c0b4; border-radius:7px;'
-                     + ' font-size:14px; font-weight:800; text-align:center; background:#fafa96;">'
-                     + 'PARTS <span style="font-weight:600; color:#6b6257;">(' + cnt[l] + ' feature'
-                     + (cnt[l] === 1 ? '' : 's') + ')</span></label>'))
+              + '<label style="display:flex; align-items:center; gap:8px; font-size:11.5px;'
+              +   ' font-weight:800; color:' + LCOL[l] + ';">EVERY'
+              +   '<input type="number" min="1" data-lvset="' + l + '" value="' + (parseInt(every[l], 10) || 1) + '"'
+              +   ' style="width:76px; padding:7px; border:1px solid #c9c0b4; border-radius:7px;'
+              +   ' font-size:14px; font-weight:800; text-align:center; background:#fafa96;">'
+              +   'PARTS <span style="font-weight:600; color:#6b6257;">(' + cnt[l] + ' feature'
+              +   (cnt[l] === 1 ? '' : 's') + ')</span></label>'
               + '<div style="font-size:11px; font-weight:700; letter-spacing:.04em; color:#6b6257;">'
               +   'QUALITY COMES ROUND \u00b7 ' + LDESC[l].when + '</div>'
               + '</div>').join('')
@@ -11621,8 +11615,7 @@ function cpLineLevelPanel(idx){
                 +     ' color:#6b6257;">NONE</button></td>'
                 + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
                 +   ' font-weight:800; color:' + (l ? LCOL[l] : '#b9b3aa') + ';">'
-                +   (l ? ((LDESC[l].all ? 'EVERY PART \u00b7 100%'
-                                          : ('EVERY ' + (parseInt(every[l], 10) || 1) + ' PARTS'))
+                +   (l ? ('EVERY ' + (parseInt(every[l], 10) || 1) + ' PARTS'
                           + '<div style="font-size:10px; font-weight:700; color:#6b6257; margin-top:2px;">'
                           + LDESC[l].what + '</div>') : 'NEVER') + '</td>'
                 + '</tr>'; }).join('')
@@ -11641,7 +11634,11 @@ function cpLineLevelPanel(idx){
         +   '<div style="font-size:12.5px; color:#6b6257; margin-bottom:14px; line-height:1.6;">'
         +     'The MACHINIST CHECKS column is the frequency already on the Control Plan and is not '
         +     'changed here. The level is a SECOND check on top of it: how often the quality '
-        +     'technician pulls a part and re-inspects that feature.</div>'
+        +     'technician pulls a part and re-inspects that feature.<br>'
+        +     'A level says WHICH FEATURES get looked at when quality comes round \u2014 a '
+        +     '<b>Level 1 check covers every feature on the part</b>, so a part checked at that '
+        +     'level has this whole column marked 1. Level 2 covers the critical ones, Level 3 '
+        +     'the odd ones. The parts figure on each card is how often that round comes.</div>'
         +   body
         +   '<div style="font-size:11.5px; color:#6b6257; margin-top:14px; line-height:1.6;">'
         +     '<b>The email is not built yet.</b> These intervals are recorded against the plan and '
@@ -11696,7 +11693,7 @@ function cpLineLevelPanel(idx){
             body: JSON.stringify({
               model: 'claude-sonnet-4-6', max_tokens: 1200,
               system: 'You assign line-inspection levels to machined features on a CAMCO '
-                + 'Control Plan. LEVEL 1 = COMPLETE CHECK, a 100% check - EVERY part - '
+                + 'Control Plan. LEVEL 1 = COMPLETE CHECK, quality re-checks twice a shift - '
                 + 'for the tightest and most critical features. LEVEL 2 = CRITICAL ONLY, four '
                 + 'times per shift - important features with moderate tolerance. LEVEL 3 = ODD '
                 + 'CHECKS, once every other day - loose, attribute or cosmetic features. Judge '
