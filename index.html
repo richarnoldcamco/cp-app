@@ -1685,7 +1685,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-993";
+const APP_REV = "Rev-994";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2213,6 +2213,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-994", type: "App", changes: ["THE RELEASED-OPERATION REFUSAL BECOMES A CHOICE (Rev-994, embedded validation REV-260) \u2014 Rich pressed \ud83e\uddea INJECT and got no Cpk dialog. The whole generate-and-save path was run against his real OP-040 with a stubbed GitHub and it worked - built the panel, generated ten pieces, asked to write all ten files. So nothing was broken: he was pressing INJECT on OP-030, which is RELEASED, and Rev-986 refused outright on a released operation. That safeguard was mine and it was blocking the workflow he asked for, with a dialog that named the problem and offered no way forward. It is now a choice: the dialog explains that a released operation carries a production sign-off and offers \u21ba WITHDRAW RELEASE & INJECT, which does exactly what the Step 7 dialog\u2019s own Withdraw button does - clears the sign-off, drops the operation below 100 percent - and then opens the Cpk panel. THE RULE IS UNCHANGED: simulated readings are still never written against an operation that is currently released. The difference is that withdrawing is now one press instead of a hunt, and it is stated plainly rather than implied. Cancel leaves the release exactly as it was. WHAT TO TEST (rule 8): press \ud83e\uddea INJECT on OP-030 - the dialog should offer to withdraw and inject; take it, generate 10 pieces at Cpk 1.33, then press \ud83d\udcca REVIEW and tick include simulated runs. Payload verified in both repos before this entry."] },
   { ts: "2026-08-09", rev: "App Rev-993", type: "App", changes: ["THE PART DESCRIPTION RIDES BESIDE THE PART NUMBER (Rev-993, embedded validation REV-260) \u2014 per Rich, who circled the empty space in the beige part-header row. This is the right home for it and the two earlier attempts were not: Rev-991 put it on its own line under the heading where it repeated the part number, and Rev-992 removed it again. Here it adds a word to a line that already exists and repeats nothing - 1000237620 in its usual 33px, then a thinner grey AIR COIL beside it. Upper case, per Rev-974. A part with no description shows nothing extra, so the header is exactly as it was before for the parts that have none. WHAT TO TEST (rule 8): open 1000237620 - the beige row should read the part number then AIR COIL; open 912993, which has no description, and the row should look untouched. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-992", type: "App", changes: ["THE PART LINE UNDER THE HEADING IS GONE AGAIN (Rev-992, embedded validation REV-260) \u2014 Rich crossed out the 1000237620 \u00b7 AIR COIL line one revision after asking for it, and he is right: the beige header row directly beneath already says 1000237620 in large type, so the line said the part number twice and only added a word. That is the same reason Rev-953 emptied this bar in the first place; I put it back at Rev-991 without weighing it against the header sitting right under it. The bar is empty again. THE DRAWING FROM Rev-991 STAYS - that was the half that added something the screen did not already show. WHAT TO TEST (rule 8): open 1000237620 - no line between the subtitle and the table, and each operation still shows its own drawing in the STATUS column. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-991", type: "App", changes: ["THE PART DESCRIPTION AND THE ODS DRAWING BOTH SHOW ON THE OPERATIONS LIST (Rev-991, embedded validation REV-260) \u2014 per Rich, who circled two empty patches of screen. (1) THE PART DESCRIPTION now sits under the CONTROL PLANS heading whenever a part is open, in large type beside the part number - 1000237620 \u00b7 AIR COIL, upper case per Rev-974. With a part open there was nothing on that line saying WHICH part, since Rev-953 removed the crumb; the description brings the answer back in a more useful form than the number alone. It hides again on the All Parts view, where each row already carries its own. (2) THE ODS DRAWING now sits in the STATUS column, under the status pill, at 180px wide with the column widened to suit - click it and it opens full size. It is that operation\u2019s own drawing, so a part with six operations shows six different prints, which is the fastest way to see at a glance that the right print landed on the right operation. Operations with no drawing yet show a quiet NO ODS DRAWING box rather than a gap, so a missing print is visible instead of invisible. WHAT TO TEST (rule 8): open 1000237620 - the heading should read the part number and AIR COIL, and each operation row should show its own drawing under the status pill. Payload verified in both repos before this entry."] },
@@ -3083,7 +3084,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-09";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:02 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:26 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -14802,12 +14803,36 @@ function cpInjectPanel(idx){
 function _cpInjectPanel(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
-  /* Refused on a released operation. This is the one that could actually hurt someone. */
+  /* Rev-994: still never written against a CURRENTLY released operation - but the refusal
+     now offers the way forward instead of just naming the wall. Withdrawing is the same act
+     the Step 7 dialog already offers; doing it here saves a hunt. */
   if(p.inspReviewed && p.inspReviewed.when){
-    cpConfirmBox('RELEASED \u2014 INJECTION REFUSED',
-      'This operation is marked <b>ready for production</b>. Simulated readings are not written '
-      + 'against a released operation.<br><br>Withdraw the release first if this really is a test.',
-      'Understood');
+    let when = '';
+    try{ when = new Date(p.inspReviewed.when).toLocaleDateString(undefined,
+      { year:'numeric', month:'long', day:'numeric' }); }catch(_){ when = String(p.inspReviewed.when); }
+    cpConfirmBox('THIS OPERATION IS RELEASED',
+      '<b>' + String(p.partNum || '') + (p.opNum ? (' \u00b7 OP-' + p.opNum) : '') + '</b> was marked '
+      + 'ready for production by <b>' + ((p.inspReviewed.who) || 'someone') + '</b> on ' + when + '.'
+      + '<br><br>Simulated readings are never written against a released operation \u2014 a production '
+      + 'sign-off and fabricated data must not sit on the same record.'
+      + '<br><br>Withdrawing puts Step 7 back to outstanding and drops the operation below 100%. '
+      + 'Nothing about the inspection program itself changes, and it can be released again afterwards.',
+      '\u21ba WITHDRAW RELEASE & INJECT').then(okWithdraw => {
+        if(!okWithdraw) return;
+        try{
+          const pj = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+          if(pj[idx]){ delete pj[idx].inspReviewed; pj[idx].updated = new Date().toISOString();
+            localStorage.setItem('cpProjects', JSON.stringify(pj)); }
+          try{ logAct('inject', 'release withdrawn to allow injection'); }catch(_){ }
+          try{ renderProjects(); }catch(_){ }
+          try{ if(typeof ghConfigured === 'function' && ghConfigured()) ghPush(true); }catch(_){ }
+          flash('\u21ba Release withdrawn \u2014 Step 7 is outstanding again.');
+          cpInjectPanel(idx);   // straight into the Cpk panel
+        }catch(e){
+          console.error('Rev-994 withdraw-and-inject failed', e);
+          flash('Could not withdraw the release: ' + (e && e.message || e), true);
+        }
+      });
     return;
   }
   const ov = document.createElement('div');
