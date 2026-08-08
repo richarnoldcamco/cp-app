@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1000</title>
+<title>CONTROL PLAN GENERATOR - Rev-1001</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1000 · 2026-08-08 12:31 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1001 · 2026-08-08 12:47 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1000 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 12:31 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1001 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 12:47 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1000 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1001 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1685,7 +1685,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1000";
+const APP_REV = "Rev-1001";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2213,6 +2213,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1001", type: "App", changes: ["THE ODS DRAWING SITS BESIDE THE NUMBERS IN REVIEW DATA (Rev-1001, embedded validation REV-260) — per Rich. Reading a capability table meant knowing from memory which feature BUBBLE 7 is, or closing the panel to go and look. The operation’s own ODS drawing now fills a panel down the RIGHT-HAND side of 📊 REVIEW DATA, so the bubble numbers in the first column and the balloons on the print are read together. The drawing STAYS PUT while the table scrolls, and clicking it opens the same full-screen viewer the operations list uses — deliberately the existing viewer rather than a second one, so zooming behaves the way it already does everywhere else. The panel takes its image from cpOpOdsImage, the same getter Step 2 and the operations list use, which means a drawing deleted for this operation stays deleted here and no stale part-level print can leak in (the Rev-721 and Rev-929 traps). WHEN THERE IS NO DRAWING the panel does not appear at all and the box keeps its old width — no empty grey rectangle. With a drawing the box widens to 1780px or 98% of the window, whichever is smaller, and the drawing takes 620px or 38% of the window, whichever is smaller, so a narrow screen gives the numbers the room. NOTHING ABOUT THE MATHS, THE COLUMNS OR THE CHOOSER CHANGED — same Cpk, same white rows, same readings on a click. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 and summarise — the OP-030 print should fill the right side, hold still while the table scrolls, and go full screen on a click. Then try an operation with no drawing loaded: no panel, old width."] },
   { ts: "2026-08-08", rev: "App Rev-1000", type: "App", changes: ["THE FOUR TYPED REV STAMPS WERE FROZEN AT REV-951, AND THE PRIVATE COPY WAS A PHOTOGRAPH (Rev-1000, embedded validation REV-260) — found while proving a fresh push token, not reported by anyone, which is the point: nothing on screen was wrong in normal use so nothing raised a hand. TWO FAULTS. FIRST, the four hand-typed rev stamps in cp-app/index.html — browser tab title, header, red badge and footer — all still read Rev-951 and 2026-08-05 9:06 PM. Forty-eight revisions bumped APP_REV without touching them, in spite of the Rev-829 rule that says all four are verified equal to APP_REV before every push; that rule was being claimed in changelog entries and not performed. It hid because the code overwrites all four the instant it runs, so the stale text is a flash on first paint — EXCEPT when a build fails to start, which is exactly when the frozen screen would have said Rev-951 and sent the next diagnosis after the wrong version. All four now carry Rev-1000. SECOND, BUILD_DATE and BUILD_TIME read 2026-08-09 3:05 AM when the true build moment was 2026-08-08 12:24 AM — the same guessed-rather-than-read drift corrected at Rev-590 and again at Rev-627, back for a third time, roughly 27 hours ahead. Both are now read off the machine clock converted to Eastern. THIRD, and the one with teeth: cp-generator-data/cp_app.html was not source code. It was a save of the running screen — menu badges with this device’s live numbers baked into the text (13 Projects, 2 OPEN gages, 75 Control Types, 11 Customers), a GitHub status line stamped 8/8 12:28 AM, and a floating button strip that only exists at runtime, 2,972 bytes of frozen state. Any future revision built from that file would have shipped one device’s numbers to every device. This push overwrites it with clean source, and the standing rule from here is that revisions are BUILT FROM cp-app/index.html and pushed to both, never the reverse. No behaviour changed: no feature added, removed or altered, seven stamps and one changelog entry only. WHAT TO TEST (rule 8): reload the app and read the red badge, the header and the footer — all three should say REV-1000 — then look at the browser tab title, which should also say Rev-1000 rather than Rev-951."] },
   { ts: "2026-08-09", rev: "App Rev-999", type: "App", changes: ["THE NEW CHAT PROMPT CARRIES THIS SESSION, AND THE FORMAT RULE MOVES TO THE END (Rev-999, embedded validation REV-260) \u2014 Rich is changing chats and asked whether the handoff needs updating. It did, on two counts. FIRST: the baked session state still described Rev-950 and a six-step flow, forty-eight revisions out of date - a fresh chat would have started by rediscovering STEP 8, the tab guard, Inject and Review Data. It now carries the Aug 7-9 state: the eighth optional CNC PROGRAM step and where its files live, the leader-election tab guard and the three timers it covers, Inject Data with its scenarios and every safety stamp, Review Data with its who/when chooser and the Cpk rules, the tolerance helpers cpSplitLimits / cpJoinLimits / cpSplitSingle and why the prefix and suffix must survive an edit, the crop prompt, the red-circle highlight convention, and the rounding-resolution lesson that a .0005 band cannot be told in four decimals. SECOND, and overdue: the end-of-response format rule now sits at the LITERAL END of the assembled prompt rather than mid-block, because the CP-specific section used to be appended after it - so the last thing a new chat read was an architecture map, not the rule it must follow on every reply. That was the fix Rich asked about when the rev heading slipped four responses running. WHAT TO TEST (rule 8): press \ud83d\udcac New Chat Prompt and read the last lines - they should be the token estimate and rev-heading rule. Payload verified in both repos before this entry."] },
   { ts: "2026-08-09", rev: "App Rev-998", type: "App", changes: ["LIMITS STACK UPPER OVER LOWER, AND THE TABLE GOES WHITE (Rev-998, embedded validation REV-260) \u2014 per Rich. (1) The separate LOW and HIGH columns are now ONE column, upper limit on top and lower limit directly beneath it, which is how the print reads and how the Control Plan itself renders a limit pair (CP \u00a70.14, Rev-33). Two columns became one and the table lost a column of width. (2) EVERY CELL IS WHITE WITH BLACK TEXT. The tinted rows - green for capable, amber for marginal, pink for out of tolerance - washed the numbers out, and on a printed copy they come out as grey mud. COLOUR IS KEPT IN EXACTLY TWO PLACES, and this is a deliberate judgement rather than an oversight: the CPK figure and the OUT OF TOL count. In those two cells the colour IS the information - a not-capable feature must not look identical to a capable one at arm\u2019s length - and it is carried on the digits themselves, not behind them. Say the word and those go black too. Nothing else changed: same columns, same maths, same readings underneath. WHAT TO TEST (rule 8): open \ud83d\udcca REVIEW - one LIMITS column reading .6040 over .6035, white rows throughout, and only the Cpk and out-of-tolerance figures carrying colour. Payload verified in both repos before this entry."] },
@@ -3090,7 +3091,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:31 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:47 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -14530,23 +14531,52 @@ async function _cpReviewDataPanel(idx){
   const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
   if(!ghConfigured()){ flash('GitHub is not set up on this device, so there are no stored runs to read.', true); return; }
   const part = String(p.partNum || ''), op = 'OP-' + String(p.opNum || '');
+  /* Rev-1001: the operation's own ODS drawing, shown beside the numbers. Same getter the
+     operations list and Step 2 use, so a deleted or op-less drawing behaves identically
+     here - no second source of truth for what drawing belongs to this operation. */
+  let odsImg = '';
+  try{ odsImg = cpOpOdsImage(p) || ''; }catch(e){ console.warn('Rev-1001 ODS lookup failed', e); }
   const showSim = (function(){ try{ return localStorage.getItem('cpShowSimRuns') === '1'; }catch(e){ return false; } })();
 
   const ov = document.createElement('div');
   ov.style.cssText = 'position:fixed; inset:0; z-index:10660; background:rgba(0,0,0,.65);'
     + ' display:flex; align-items:flex-start; justify-content:center; padding:24px 16px; overflow:auto;';
   const c = document.createElement('div');
-  c.style.cssText = 'background:#fff; border-radius:12px; max-width:1180px; width:100%;'
+  c.style.cssText = 'background:#fff; border-radius:12px; width:100%;'
+    + ' max-width:' + (odsImg ? 'min(1780px, 98vw)' : '1180px') + ';'
     + ' box-shadow:0 16px 60px rgba(0,0,0,.5); font-family:inherit; overflow:hidden;';
   c.innerHTML = '<div style="background:#1a5276; color:#fff; font-weight:800; letter-spacing:.04em; padding:14px 20px; font-size:17px;">'
     + '\ud83d\udcca REVIEW DATA \u00b7 ' + part + ' \u00b7 ' + op + '</div>'
-    + '<div id="capBody" style="padding:16px 20px; font-size:14px; color:#3a352e;">Reading stored runs\u2026</div>'
+    + '<div style="display:flex; align-items:flex-start; gap:0;">'
+    +   '<div id="capBody" style="padding:16px 20px; font-size:14px; color:#3a352e; flex:1 1 auto; min-width:0;">Reading stored runs\u2026</div>'
+    +   (odsImg
+         ? '<div id="capOdsPane" style="flex:0 0 min(620px, 38vw); align-self:stretch;'
+           + ' border-left:1px solid #e2ddd4; background:#faf7f2; padding:14px 14px 18px;">'
+           +   '<div style="position:sticky; top:0;">'
+           +     '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#5c5349; margin-bottom:8px;">'
+           +       'ODS DRAWING \u00b7 ' + op + '</div>'
+           +     '<img id="capOdsImg" src="' + odsImg + '" alt="ODS drawing for ' + op + '"'
+           +       ' title="Click to open the drawing full screen"'
+           +       ' style="width:100%; height:auto; max-height:calc(100vh - 190px); object-fit:contain;'
+           +       ' background:#fff; border:1px solid #d8d3ca; border-radius:8px; cursor:zoom-in; display:block;">'
+           +     '<div style="font-size:10.5px; color:#6b6257; margin-top:7px; text-align:center;">'
+           +       'Click the drawing to open it full screen</div>'
+           +   '</div>'
+           + '</div>'
+         : '')
+    + '</div>'
     + '<div style="display:flex; gap:12px; padding:12px 20px; border-top:1px solid #e2ddd4; background:#faf7f2;">'
     +   '<button id="capX" style="margin-left:auto; padding:10px 20px; border:1px solid #c9c0b4; background:#fff; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer;">Close</button>'
     + '</div>';
   ov.appendChild(c); document.body.appendChild(ov);
   ov.addEventListener('click', e => { if(e.target === ov) ov.remove(); });
   document.getElementById('capX').onclick = () => ov.remove();
+  /* Rev-1001: reuse the operations-list viewer rather than building a second one. */
+  try{
+    const oi = document.getElementById('capOdsImg');
+    if(oi) oi.onclick = () => { try{ cpViewOpOds(p); }
+      catch(e){ console.warn('Rev-1001 ODS viewer failed', e); } };
+  }catch(e){ console.warn('Rev-1001 ODS click wiring failed', e); }
   const body = () => document.getElementById('capBody');
   const say = h => { const b = body(); if(b) b.innerHTML = h; };
 
