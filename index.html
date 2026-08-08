@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1008</title>
+<title>CONTROL PLAN GENERATOR - Rev-1009</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1008 · 2026-08-08 11:37 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1009 · 2026-08-08 11:41 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1008 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:37 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1009 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:41 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1008 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1009 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1008";
+const APP_REV = "Rev-1009";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1009", type: "App", changes: ["STEP 8 IS NOW GAGES, AND THE CNC PROGRAM MOVES TO THE ACTION BUTTONS (Rev-1009, embedded validation REV-260) — per Rich, and the swap is the right way round. A CNC program is a file to attach, not a stage of building a Control Plan, and it was holding the slot the gages deserve. CNC now sits with the other action buttons on the right and carries a tick when a program is stored. IN ITS PLACE, STEP 8 GAGES shows what the operation still needs to be inspectable: the tile reads NONE NEEDED, or 3 OPEN / 5, or ALL 5 COMPLETE, and clicking it lists every special gage with THE BUBBLE NUMBER IT IS FOR, the feature, the spec and tolerance, what the gage is, its status — TO BE MADE, DESIGNED, ORDERED, IN PROGRESS, COMPLETE, coloured so an open one cannot be mistaken for a finished one — and who it is assigned to. NOTHING HERE IS A SECOND COPY: every line comes from the gage register the app already keeps, which fills itself the moment the Special Gage / Fixture box is filled on a row in Step 6. That is also why the panel is read-only and carries one button to the full gage list — a gage is edited in ONE place, not in two that can disagree. Where no gage has been called for the panel says how to call for one rather than showing an empty grid. Like the CNC step before it, GAGES never locks and is worth nothing toward the percentage: a gage that has not been made yet is a purchasing problem, not a reason to call the Control Plan unfinished. WHAT TO TEST (rule 8): on 1000237620 OP-030 the STEP 8 tile should read GAGES with a count, and CNC should now be a button on the right beside Download. Press STEP 8 — with no special gages called for it should explain where they come from; fill the Special Gage / Fixture box on a row in Step 6 and it should appear here against that bubble number."] },
   { ts: "2026-08-08", rev: "App Rev-1008", type: "App", changes: ["CLOSE MOVES TO THE TOP OF REVIEW DATA (Rev-1008, embedded validation REV-260) — per Rich. The Close button sat in a footer strip under everything, so with a full-height drawing down one side and two tables down the other it was below the fold: leaving the panel meant scrolling to the bottom to find the way out. It now sits in the blue title bar at the top right, and it is RED with a ✕ like every other Close in the app rather than a quiet grey one. This is the same correction Rev-607 made to the full-screen drawing viewer, for the same reason. The footer strip is gone entirely — it held nothing else — which also gives the tables back a little height. Clicking the dark surround still closes the panel as it always did. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — Close should be top right in the blue bar, in red, reachable without scrolling, and there should be no button left at the bottom."] },
   { ts: "2026-08-08", rev: "App Rev-1007", type: "App", changes: ["TICKING A MACHINIST NARROWS THE SHOP ORDERS, AND GENERATED DATA GETS REAL NAMES (Rev-1007, embedded validation REV-260) — three things from Rich, all on the download screen. FIRST, the shop-order table now FOLLOWS the machinist tick: tick HICKEY and the table below drops to the shop orders he actually worked, with the caption saying so. It is rebuilt on every draw rather than once, and the (n in window) figure honours the machinist tick as well, so the two tables can never tell different stories. SECOND, a MACHINIST column sits between SHOP ORDER and RUNS, listing everyone who ran that job — a job number belongs to a run rather than a person, so two machinists can share one and both are named. A dash there means those runs are not in the summary table yet, NOT that nobody ran them. THIRD, generated data is now attributed to HICKEY, ISAIAH, ZAK, GRANT and STEVE instead of SIM-A to SIM-D, and HOW MANY MACHINISTS runs 1 to 5. BE CLEAR ABOUT WHAT THAT COSTS: the operator field no longer announces itself as fake. Every other declaration stands and must stay — simulated:true on the run AND on every single reading, the shop order still SIM-xxxx so the FILE NAME declares it, the red SIM tag beside the name in the machinist table, hidden from Reports and Review unless simulated runs are switched on, the banner across the top of any summary saying the runs are not measurement evidence, and a released operation still refuses the whole thing outright. Names already generated keep saying SIM-A to SIM-D until those runs are deleted and re-injected. WHAT TO TEST (rule 8): on 1000237620 OP-030 tick one machinist — the shop-order table under it should shrink to that person’s jobs and the MACHINIST column should name them; press Every machinist and it should come back. Then inject a fresh batch and the new machinist table should read HICKEY, ISAIAH, ZAK."] },
   { ts: "2026-08-08", rev: "App Rev-1006", type: "App", changes: ["A SMALL RUN INDEX NOW FEEDS THE FILTERS, SO MACHINISTS CAN BE PICKED BEFORE ANYTHING IS DOWNLOADED (Rev-1006, embedded validation REV-260) — Rich’s idea, and the right one. Rev-1004 could offer days and shop orders on the download screen because those are in the file NAME, but not machinists, because the operator is inside the file. The answer is a table beside the runs: one line per run holding the machinist, the day, the shop order, how many readings it carried and whether it is simulated. It lives at runs_index/PART_OP-nnn.json in the data repository and is KEYED BY FILE NAME, so two devices’ additions merge for free and a run can never be counted twice. Reading it is ONE small fetch. THE READER BUILDS IT, NOT THE WRITER. The machinist app pushes a run and knows nothing about this file; the review screen notices any run missing from the table and offers BUILD THE TABLE (n), reading just those runs once. That choice means no change to the validation app, it back-fills every run already in the repository, and it repairs itself if a run lands from a device that never opened the screen. A run is read once for this and never again for the purpose of drawing filters. The download screen gains a MACHINISTS table — name, PARTS INSPECTED, DAYS, first and last — each tickable, each showing how many of that person’s runs fall in the chosen window, and the choice carries straight through to the screen after the download rather than being asked twice. A machinist filter applies only to runs that are IN the table; an unindexed run has no name attached yet and is left out rather than quietly counted as somebody. Writing the table reads, merges and writes, and on a 409 — another device writing in the same moment — goes round again with a fresh sha instead of flattening their additions. If the table cannot be saved the screen says so and the choices still work for that visit. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — expect a yellow bar saying the runs are not in the table yet; press BUILD THE TABLE and let it run once; the MACHINISTS table should then list SIM, SIM-A to SIM-D with their parts-inspected counts. Close the panel and reopen it: the table should appear instantly with no reading at all."] },
@@ -3106,7 +3107,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:37 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:41 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5070,7 +5071,8 @@ function renderProjects(){
           b.title = '\ud83d\udd12 LOCKED \u2014 finish ' + (_by || 'the step before this one') + ' first.'
             + '\n\nEvery step has to be completed in order.';
         }
-        if(state === 'done') tag = '\u2713 COMPLETED';
+        if(n === 8) tag = _g8.text;   /* Rev-1009: gages count, not a done/todo word */
+        else if(state === 'done') tag = '\u2713 COMPLETED';
         else if(_R && _R.ready === false) tag = 'NEEDS EARLIER STEP';
         else if(_S && _S.total > 1 && _S.left < _S.total)
           tag = '  \u2013 IN PROGRESS  ' + (_S.total - _S.left) + '/' + _S.total;
@@ -5116,6 +5118,24 @@ function renderProjects(){
          ready for production. Only the second writes the sign-off. With every row approved and
          the release still outstanding the tile said DO THIS NEXT, which reads as nothing done.
          Counted here from the stored plan so the tile can say which of the two is left. */
+      /* Rev-1009: the special gages this operation needs, off the gage register. They are
+         created automatically whenever the Special Gage / Fixture column is filled on a row
+         in Step 6, so this counts rather than invents. */
+      const _g8 = (function(){
+        try{
+          const all = Object.values(cpGagesGet()).filter(g =>
+            String(g.part || '').toUpperCase() === String(p.partNum || '').toUpperCase()
+            && String(g.opNum || '') === String(p.opNum || ''));
+          const open = all.filter(g => String(g.status || '').toUpperCase() !== 'COMPLETE').length;
+          return { total: all.length, open: open, list: all, done: (!all.length || open === 0),
+                   text: !all.length ? '  \u2013 NONE NEEDED'
+                         : (open ? ('  \u2013 ' + open + ' OPEN / ' + all.length)
+                                 : ('  \u2013 ALL ' + all.length + ' COMPLETE')) };
+        }catch(e){
+          console.warn('Rev-1009 gage count failed', e);
+          return { total:0, open:0, list:[], done:true, text:'  \u2013 NONE NEEDED' };
+        }
+      })();
       const _s6 = (function(){
         try{
           const rws = (((p.builderState || {}).rows) || []).filter(r => String(r.bubble || '').trim());
@@ -5169,15 +5189,20 @@ function renderProjects(){
                 + 'asks whether to release the operation to production.'))),   /* Rev-870 */
         () => cpReviewInspection(i));
 
-      /* Rev-977: STEP 8 - CNC PROGRAM. Optional, so stateOf is never asked for a lock. */
-      mkStep(8, 'CNC PROGRAM', (st.s8.done ? 'done' : 'todo'),
-        (st.s8.done
-          ? ('STEP 8 \u2014 ' + String((p.cncProgram && p.cncProgram.name) || 'a program')
-             + ' is stored for this operation.\nOpen to download, replace or remove it.')
-          : 'STEP 8 \u2014 OPTIONAL. Upload the CNC program for this operation.\n'
-            + 'It is stored in the private data repository, so every device gets it.\n'
-            + 'This step never holds the plan back and is worth nothing toward the percentage.'),
-        () => cpCncPanel(i));
+      /* Rev-1009: STEP 8 is now GAGES. The CNC program moved to the ACTIONS buttons - it is
+         a file to attach, not a stage of building the plan, and it was taking the slot the
+         gages deserve. Like the CNC step before it this one never locks and is worth nothing
+         toward the percentage: a gage that has not been made yet is a purchasing problem, not
+         a reason to call the Control Plan unfinished. */
+      mkStep(8, 'GAGES', (_g8.done ? 'done' : 'todo'),
+        (!_g8.total
+          ? 'STEP 8 \u2014 no special gage or fixture has been called for on any row of this\n'
+            + 'operation. They appear here the moment the Special Gage / Fixture column is\n'
+            + 'filled in on a row in Step 6.'
+          : ('STEP 8 \u2014 ' + _g8.total + ' special gage(s) called for on this operation, '
+             + _g8.open + ' still open.\nClick to see which bubble each one is for and where it '
+             + 'has got to.')),
+        () => cpGagePanel(i));
 
       // Rev-620: built here, hung on its own row below
       _cpBarFor = (() => {
@@ -5219,6 +5244,14 @@ function renderProjects(){
         + (has ? '' : ' \u2014 no plan data to build a validation from'), () => createMachinistValidation(i), has);
       mkBtn('Excel CP', 'quiet', 66, 'Build the L3Harris-format Control Plan xlsx for THIS operation'
         + (has ? '' : ' \u2014 no plan data to export'), () => cpCustomerExport(i), has);
+      /* Rev-1009: moved out of the construction steps, per Rich. */
+      mkBtn((st.s8.done ? '\u2713 CNC' : 'CNC'), 'quiet', 62,
+        (st.s8.done
+          ? (String((p.cncProgram && p.cncProgram.name) || 'A program') + ' is stored for this '
+             + 'operation.\nOpen to download, replace or remove it.')
+          : 'OPTIONAL \u2014 upload the CNC program for this operation.\n'
+            + 'It is stored in the private data repository, so every device gets it.'),
+        () => cpCncPanel(i));
       mkBtn('Download', 'quiet', 68, 'Download this plan\u2019s .xlsx', () => downloadProject(i));
       mkBtn('Rename', 'quiet', 58, 'Change this plan\u2019s part number (and rev) IN PLACE \u2014 no duplicate is created', () => renameProject(i));
       mkBtn('Delete', 'danger', 54, 'Delete this Control Plan', () => deleteProject(i));
@@ -11376,6 +11409,130 @@ function cpUpdateGageBadge(){
   const all = Object.values(cpGagesGet());
   const open = all.filter(g => String(g.status || '').toUpperCase() !== 'COMPLETE').length;
   b.textContent = all.length ? (open + ' OPEN / ' + all.length) : '0';
+}
+/* ===== Rev-1009: GAGES FOR ONE OPERATION ======================================
+   Step 8 opens this. Everything shown is already in the gage register (cpGageList) -
+   entries are written there automatically whenever the Special Gage / Fixture column
+   is filled on a Control Plan row - so this reads that register rather than keeping a
+   second copy of the same facts. Editing still lives on the full Special Gages screen,
+   one button away, so there is one place where a gage is changed. */
+function cpGagePanel(idx){
+  try{
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    const p = projects[idx];
+    if(!p){ flash('Plan not found.', true); return; }
+    const part = String(p.partNum || ''), opNum = String(p.opNum || '');
+    const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g,
+      ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+    const list = Object.values(cpGagesGet())
+      .filter(g => String(g.part || '').toUpperCase() === part.toUpperCase()
+                && String(g.opNum || '') === opNum)
+      .sort((a, b) => (parseInt(a.bubble, 10) || 0) - (parseInt(b.bubble, 10) || 0)
+                   || String(a.bubble).localeCompare(String(b.bubble)));
+    const open = list.filter(g => String(g.status || '').toUpperCase() !== 'COMPLETE').length;
+
+    const old = document.getElementById('cpGagePanel'); if(old) old.remove();
+    const ov = document.createElement('div');
+    ov.id = 'cpGagePanel';
+    ov.style.cssText = 'position:fixed; inset:0; z-index:10670; background:rgba(0,0,0,.65);'
+      + ' display:flex; align-items:flex-start; justify-content:center; padding:24px 16px; overflow:auto;';
+    const c = document.createElement('div');
+    c.style.cssText = 'background:#fff; border-radius:12px; width:100%; max-width:min(1300px, 96vw);'
+      + ' box-shadow:0 16px 60px rgba(0,0,0,.5); font-family:inherit; overflow:hidden;';
+
+    const statusColour = st => {
+      const u = String(st || '').toUpperCase();
+      if(u === 'COMPLETE') return '#1d6b3f';
+      if(u === 'IN PROGRESS') return '#a35400';
+      if(u === 'ORDERED' || u === 'DESIGNED') return '#5c4708';
+      return '#a5342a';
+    };
+
+    let rows = '';
+    if(!list.length){
+      rows = '<div style="padding:26px 4px; font-size:13.5px; color:#6b6257; line-height:1.6;">'
+        + 'No special gage or fixture has been called for on any row of this operation.<br><br>'
+        + 'They appear here on their own: open <b>Step 6 \u00b7 ASSIGN MEASUREMENT TYPES</b> and fill '
+        + 'the <b>Special Gage / Fixture</b> box on any row that needs one. The bubble number, the '
+        + 'feature and the tolerance come with it.</div>';
+    } else {
+      rows = '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
+        + '<thead><tr>'
+        + ['BUBBLE', 'FEATURE', 'SPEC / TOLERANCE', 'GAGE OR FIXTURE NEEDED', 'STATUS', 'ASSIGNED TO']
+            .map((th, ix) => '<th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8;'
+              + ' color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:'
+              + (ix === 0 || ix === 4 || ix === 5 ? 'center' : 'left') + ';">' + th + '</th>').join('')
+        + '</tr></thead><tbody>'
+        + list.map(g => {
+            const done = String(g.status || '').toUpperCase() === 'COMPLETE';
+            return '<tr style="background:' + (done ? '#f4faf5' : '#fff') + ';">'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+              +   ' font-size:16px; font-weight:800; color:#000;">' + esc(g.bubble || '') + '</td>'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#000;">'
+              +   esc(g.feature || '') + '</td>'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#3a352e;">'
+              +   esc(g.spec || '') + '</td>'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#000; font-weight:700;">'
+              +   esc(g.desc || '')
+              +   (g.notes ? '<div style="font-size:11px; font-weight:400; color:#6b6257; margin-top:4px;">\u270e '
+                             + esc(g.notes) + '</div>' : '')
+              +   '</td>'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;">'
+              +   '<b style="color:' + statusColour(g.status) + '; letter-spacing:.04em;">'
+              +   esc(g.status || 'TO BE MADE') + '</b>'
+              +   (g.ut ? ('<div style="font-size:10px; color:#6b6257; margin-top:3px;">'
+                           + new Date(g.ut).toLocaleDateString() + '</div>') : '')
+              +   '</td>'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center; color:#3a352e;">'
+              +   (g.assignedTo ? esc(g.assignedTo) : '<span style="color:#b9b3aa;">\u2014</span>') + '</td>'
+              + '</tr>'; }).join('')
+        + '</tbody></table>';
+    }
+
+    c.innerHTML = '<div style="background:#1a5276; color:#fff; padding:12px 20px; display:flex;'
+        + ' align-items:center; gap:14px;">'
+      +   '<div style="font-weight:800; letter-spacing:.04em; font-size:17px; flex:1 1 auto;">'
+      +     '\U0001F527 GAGES \u00b7 ' + esc(part) + (opNum ? (' \u00b7 OP-' + esc(opNum)) : '') + '</div>'
+      +   '<button id="cpGgX" style="background:#a02020; color:#fff; border:2px solid #7a1414;'
+      +     ' border-radius:8px; padding:8px 22px; font-weight:800; font-size:13px; cursor:pointer;">'
+      +     '\u2715 Close</button>'
+      + '</div>'
+      + '<div style="padding:16px 20px 20px;">'
+      +   '<div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:14px;">'
+      +     '<div style="font-size:13px; color:#3a352e;">'
+      +       (list.length
+                 ? ('<b>' + list.length + '</b> special gage(s) called for on this operation \u00b7 '
+                    + '<b style="color:' + (open ? '#a5342a' : '#1d6b3f') + ';">' + open + ' still open</b>')
+                 : 'Nothing called for on this operation yet.')
+      +     '</div>'
+      +     '<button id="cpGgFull" style="margin-left:auto; padding:9px 16px; border:1px solid #1a5276;'
+      +       ' background:#fff; color:#1a5276; border-radius:8px; font-weight:800; font-size:12.5px;'
+      +       ' cursor:pointer;">OPEN THE FULL GAGE LIST</button>'
+      +   '</div>'
+      +   rows
+      +   '<div style="font-size:11.5px; color:#6b6257; margin-top:14px; line-height:1.6;">'
+      +     'Status, who it is assigned to, notes and gage drawings are changed on the full gage '
+      +     'list, so there is one place a gage is edited rather than two that can disagree.</div>'
+      + '</div>';
+
+    ov.appendChild(c); document.body.appendChild(ov);
+    ov.addEventListener('click', e => { if(e.target === ov) ov.remove(); });
+    const _x = document.getElementById('cpGgX');
+    if(!_x){
+      try{ flash('\u26a0 The Gages panel did not build correctly. Send the Action Log.', true); }catch(_){ }
+      try{ logAct('error', 'gage panel markup did not build'); }catch(_){ }
+      ov.remove(); return;
+    }
+    _x.onclick = () => ov.remove();
+    const _f = document.getElementById('cpGgFull');
+    if(_f) _f.onclick = () => { ov.remove(); try{ showGages(); }
+      catch(e){ console.warn('Rev-1009 could not open the gage list', e); } };
+    try{ logAct('nav', 'gages for one operation'); }catch(_){ }
+  }catch(e){
+    console.error('Rev-1009 gage panel failed', e);
+    try{ logAct('error', 'gage panel: ' + (e && e.message || e)); }catch(_){ }
+    try{ flash('\u26a0 GAGES failed to open \u2014 ' + (e && e.message || e), true); }catch(_){ }
+  }
 }
 function showGages(){
   ['menuScreen','newCPScreen','projectsScreen','masterListScreen','customersScreen','instructionsScreen',
