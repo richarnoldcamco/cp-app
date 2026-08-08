@@ -1685,7 +1685,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-997";
+const APP_REV = "Rev-998";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2213,6 +2213,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-998", type: "App", changes: ["LIMITS STACK UPPER OVER LOWER, AND THE TABLE GOES WHITE (Rev-998, embedded validation REV-260) \u2014 per Rich. (1) The separate LOW and HIGH columns are now ONE column, upper limit on top and lower limit directly beneath it, which is how the print reads and how the Control Plan itself renders a limit pair (CP \u00a70.14, Rev-33). Two columns became one and the table lost a column of width. (2) EVERY CELL IS WHITE WITH BLACK TEXT. The tinted rows - green for capable, amber for marginal, pink for out of tolerance - washed the numbers out, and on a printed copy they come out as grey mud. COLOUR IS KEPT IN EXACTLY TWO PLACES, and this is a deliberate judgement rather than an oversight: the CPK figure and the OUT OF TOL count. In those two cells the colour IS the information - a not-capable feature must not look identical to a capable one at arm\u2019s length - and it is carried on the digits themselves, not behind them. Say the word and those go black too. Nothing else changed: same columns, same maths, same readings underneath. WHAT TO TEST (rule 8): open \ud83d\udcca REVIEW - one LIMITS column reading .6040 over .6035, white rows throughout, and only the Cpk and out-of-tolerance figures carrying colour. Payload verified in both repos before this entry."] },
   { ts: "2026-08-09", rev: "App Rev-997", type: "App", changes: ["n IS NOW PIECES, AND THE READINGS SAY THEY ARE THERE (Rev-997, embedded validation REV-260) \u2014 Rich asked what n meant and asked to see the measured points. Both are on me. n is the sample size, standard statistics shorthand and no business being shorthand on a shop-floor screen: the column now reads PIECES. And the individual readings have been one click away since Rev-987 with NOTHING ON SCREEN SAYING SO - a feature nobody can find is a feature that does not exist. Every measured row now carries a \u25b8 SHOW THE n READINGS line under the feature name, which turns to \u25be HIDE THE READINGS when open, and the whole row still toggles on a click. The readings themselves gained what they were missing: each one names the piece number, the machinist who ran it and the day, so an out-of-tolerance piece can be traced to a person and a shift rather than being an anonymous red chip. They are laid out oldest first. WHAT TO TEST (rule 8): open \ud83d\udcca REVIEW and click any row with numbers - the readings should open, each showing piece, value, who and when. Payload verified in both repos before this entry."] },
   { ts: "2026-08-09", rev: "App Rev-996", type: "App", changes: ["INJECT SPREADS ITS PIECES ACROSS MACHINISTS AND DAYS (Rev-996, embedded validation REV-260) \u2014 per Rich, and it is the change that makes Rev-995\u2019s chooser worth having: every injected piece used to carry the same operator SIM and the same timestamp, so filtering by who ran them or how far back had exactly one answer. INJECT now asks two more questions - HOW MANY MACHINISTS (1, 2, 3 or 4, named SIM-A through SIM-D) and HOW MANY DAYS (1, 2, 7, 14 or 30) - and deals the pieces out across them: machinists round-robin so each gets a fair share, days spread evenly backwards from today with each piece landing at a believable hour of a working shift rather than all at midnight. Each machinist gets their own SHOP ORDER, since in the shop a job number belongs to a run rather than to a person, and each day\u2019s stamp is real enough that the 1 WEEK and 2 WEEKS windows in Review Data actually cut the set differently. THE CAPABILITY MATHS IS UNTOUCHED: the readings are generated exactly as before against each feature\u2019s own limits, so a Cpk 1.33 batch still measures back as 1.33 whether it is one machinist or four. Every safety stamp stands - simulated on the run and every reading, SIM- shop orders, hidden from Reports unless switched on. WHAT TO TEST (rule 8): inject 30 pieces across 3 machinists and 7 days, then press \ud83d\udcca REVIEW - the chooser should list SIM-A, SIM-B and SIM-C with ten each, and LAST DAY should select fewer than ALL TIME. Payload verified in both repos before this entry."] },
   { ts: "2026-08-09", rev: "App Rev-995", type: "App", changes: ["REVIEW DATA ASKS WHAT TO REVIEW BEFORE IT SUMMARISES (Rev-995, embedded validation REV-260) \u2014 per Rich. Pressing \ud83d\udcca REVIEW used to dump every run ever stored for the operation into one summary; on OP-030 that is 110 runs and a Cpk that blends every machinist and every shift into one number, which is exactly how a real capability problem hides. A chooser now comes first. WHO: every machinist found in the stored runs, listed with how many pieces each ran, all ticked to start - untick to compare one against another. WHEN: ALL TIME, LAST DAY, 2 DAYS, 1 WEEK, 2 WEEKS or 1 MONTH, counted back from now against each run\u2019s completion date. Simulated runs have their own tick, off by default, exactly as in Reports. Each option shows the number of runs it would include, so an empty selection is visible BEFORE it is applied rather than as a blank table afterwards. The runs are read once when the panel opens; changing the selection after that is instant, and CHANGE SELECTION on the summary goes back without re-reading a thing. THE SUMMARY ITSELF IS UNCHANGED - same columns, same Cpk, same refusal under 5 pieces, same orange banner when simulated runs are in. WHAT TO TEST (rule 8): press \ud83d\udcca REVIEW on OP-030 - a chooser appears listing SIM with 110 pieces; tick simulated runs, pick 1 WEEK, and the summary should match what the full list showed. Payload verified in both repos before this entry."] },
@@ -3087,7 +3088,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-09";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:06 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "2:34 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -14500,12 +14501,16 @@ function cpCapStats(vals, lo, hi){
   out.cpk = Math.min(hi - out.mean, out.mean - lo) / (3 * out.sd);
   return out;
 }
+/* Rev-998: WHITE ROWS, BLACK TEXT, per Rich. The tinted rows washed the numbers out and
+   printed as grey mud. Colour survives ONLY on the Cpk figure and the out-of-tolerance
+   count, where the colour IS the information - a not-capable feature must not look the
+   same as a capable one at arm's length. It rides on the digits, never behind them. */
 function _cpCapColour(s){
-  if(s.oot > 0) return { bg:'#fdecea', fg:'#a5342a', note:'OUT OF TOLERANCE' };
-  if(s.cpk == null) return { bg:'#f4f1ec', fg:'#6b6257', note:'' };
-  if(s.cpk >= 1.33) return { bg:'#e8f3ea', fg:'#1d6b3f', note:'' };
-  if(s.cpk >= 1.00) return { bg:'#fdf3d5', fg:'#7a5a00', note:'MARGINAL' };
-  return { bg:'#fdecea', fg:'#a5342a', note:'NOT CAPABLE' };
+  if(s.oot > 0) return { bg:'#fff', fg:'#a5342a', note:'OUT OF TOLERANCE' };
+  if(s.cpk == null) return { bg:'#fff', fg:'#000', note:'' };
+  if(s.cpk >= 1.33) return { bg:'#fff', fg:'#1d6b3f', note:'' };
+  if(s.cpk >= 1.00) return { bg:'#fff', fg:'#7a5a00', note:'MARGINAL' };
+  return { bg:'#fff', fg:'#a5342a', note:'NOT CAPABLE' };
 }
 /* Rev-990: same speaking wrapper on Review Data. */
 async function cpReviewDataPanel(idx){
@@ -14712,14 +14717,16 @@ async function _cpReviewDataPanel(idx){
         +  '\u03c3 = sample standard deviation \u00b7 not computed under ' + CP_CAP_MIN_N + ' pieces</div>';
       h += '<div style="overflow:auto;"><table style="border-collapse:collapse; width:100%; font-size:13px;">'
         +  '<tr style="background:#9DC3E6; color:#1c1c1c; font-weight:800; font-size:11px; letter-spacing:.03em;">'
-        +  ['BUBBLE','FEATURE','LOW','HIGH','PIECES','MEAN','MIN','MAX','\u03c3','CPK','OUT OF TOL']   /* Rev-997: n meant nothing to anyone */
+        /* Rev-998: LOW and HIGH become one stacked LIMITS column, upper over lower, the way
+           the print reads and the way the Control Plan renders a pair (CP 0.14). */
+        +  ['BUBBLE','FEATURE','LIMITS','PIECES','MEAN','MIN','MAX','\u03c3','CPK','OUT OF TOL']
              .map(t => '<th style="border:1px solid #7fa9cc; padding:7px 6px; text-align:center;">' + t + '</th>').join('')
         +  '</tr>';
       groups.forEach((g, gi) => {
         if(g.lo === null){
-          h += '<tr><td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:800;">' + esc(g.bubble) + '</td>'
-            +  '<td style="border:1px solid #d8d3ca; padding:7px;">' + esc(g.desc) + '</td>'
-            +  '<td colspan="9" style="border:1px solid #d8d3ca; padding:7px; text-align:center; color:#6b6257;">'
+          h += '<tr><td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff; text-align:center; font-weight:800;">' + esc(g.bubble) + '</td>'
+            +  '<td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff;">' + esc(g.desc) + '</td>'
+            +  '<td colspan="8" style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff; text-align:center; color:#6b6257;">'
             +  'no numeric limits \u2014 ' + g.attrPass + ' of ' + g.attr + ' recorded as a pass</td></tr>';
           return;
         }
@@ -14727,25 +14734,26 @@ async function _cpReviewDataPanel(idx){
         const s = cpCapStats(g.vals, g.lo, g.hi);
         const col = _cpCapColour(s);
         h += '<tr style="cursor:pointer; background:' + col.bg + ';" onclick="cpCapToggle(' + gi + ')">'
-          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:800;">' + esc(g.bubble) + '</td>'
-          +  '<td style="border:1px solid #d8d3ca; padding:7px;">' + esc(g.desc)
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff; text-align:center; font-weight:800;">' + esc(g.bubble) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff;">' + esc(g.desc)
           +    (g.instr ? ('<div style="font-size:10.5px; color:#6b6257;">' + esc(g.instr) + '</div>') : '')
           /* Rev-997: SAY that the readings are here. They have been one click away since
              Rev-987 with nothing on screen announcing it. */
           +    '<div id="capLbl' + gi + '" style="margin-top:4px; font-size:10.5px; font-weight:800;'
           +      ' letter-spacing:.04em; color:#1a5276;">\u25b8 SHOW THE ' + s.n + ' READINGS</div>' + '</td>'
-          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(g.lo, dp) + '</td>'
-          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(g.hi, dp) + '</td>'
-          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:700;">' + s.n + '</td>'
-          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.mean, dp + 1) + '</td>'
-          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.min, dp) + '</td>'
-          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.max, dp) + '</td>'
-          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center;">' + num(s.sd, dp + 2) + '</td>'
-          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:900; font-size:15px; color:' + col.fg + ';">'
+          /* Rev-998: upper on top, lower beneath - one cell, not two columns. */
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff; text-align:center; line-height:1.35;">'
+          +    num(g.hi, dp) + '<br>' + num(g.lo, dp) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff; text-align:center; font-weight:700;">' + s.n + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff; text-align:center;">' + num(s.mean, dp + 1) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff; text-align:center;">' + num(s.min, dp) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff; text-align:center;">' + num(s.max, dp) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; color:#000; background:#fff; text-align:center;">' + num(s.sd, dp + 2) + '</td>'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; background:#fff; text-align:center; font-weight:900; font-size:15px; color:' + col.fg + ';">'
           +    (s.cpk == null ? ('<span style="font-size:10.5px; font-weight:700;">' + esc(s.why || '\u2014') + '</span>') : s.cpk.toFixed(2)) + '</td>'
-          +  '<td style="border:1px solid #d8d3ca; padding:7px; text-align:center; font-weight:800; color:' + (s.oot ? '#a5342a' : '#1d6b3f') + ';">'
+          +  '<td style="border:1px solid #d8d3ca; padding:7px; background:#fff; text-align:center; font-weight:800; color:' + (s.oot ? '#a5342a' : '#1d6b3f') + ';">'
           +    s.oot + (col.note ? ('<div style="font-size:9.5px;">' + col.note + '</div>') : '') + '</td></tr>';
-        h += '<tr id="capDet' + gi + '" style="display:none;"><td colspan="11" style="border:1px solid #d8d3ca; padding:8px 10px; background:#fbfaf8;">'
+        h += '<tr id="capDet' + gi + '" style="display:none;"><td colspan="10" style="border:1px solid #d8d3ca; padding:8px 10px; background:#fbfaf8;">'
           +  '<div style="display:flex; flex-wrap:wrap; gap:6px;">'
           +  g.rows.slice().sort((a, b) => (a.t || 0) - (b.t || 0)).map(r => {
                /* Rev-997: piece, value, who ran it, what day - oldest first. */
