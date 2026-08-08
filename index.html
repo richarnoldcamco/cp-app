@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1003</title>
+<title>CONTROL PLAN GENERATOR - Rev-1004</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1003 · 2026-08-08 9:16 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1004 · 2026-08-08 11:12 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1003 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 9:16 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1004 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 11:12 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1003 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1004 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1685,7 +1685,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1003";
+const APP_REV = "Rev-1004";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2213,6 +2213,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1004", type: "App", changes: ["REVIEW DATA CHOOSES BEFORE IT DOWNLOADS (Rev-1004, embedded validation REV-260) — per Rich, who is looking a year ahead rather than at today. Rev-987 read EVERY run file for the operation before it drew the chooser. At 170 files that is merely slow; a year of production is thousands, and the whole wait landed BEFORE he could say he only wanted last week. Now the panel opens on a DOWNLOAD SCREEN and nothing is fetched until it is chosen. Listing the files costs one call and was already being made, so the screen is free. It is built from the FILE NAMES alone: a run is named PART_OP-nnn_SHOPORDER_YYYYMMDD_SERIAL_RUNID.json, so the shop order, the day and whether it is simulated are all readable without opening anything. The screen offers HOW FAR BACK with true counts (now out to 3 MONTHS and 1 YEAR), the simulated tick, and a TABLE OF EVERY SHOP ORDER in the repository — runs, first day, last day, REAL or SIMULATED — each tickable, with how many of its runs fall inside the chosen window. The button states the exact cost before it is paid: Download 34 run(s), and it counts them down as they come. THE MACHINIST IS NOT ON THIS SCREEN, and that is a fact about the data rather than a choice: the operator’s name is INSIDE each run file, on the run record, not in its name. Listing machinists up front would mean downloading everything to find out — the exact cost this removes. So WHO RAN THEM appears on the next screen, built from what actually came down, and a ↩ Change what is downloaded button on that screen returns here without closing the panel. Simulated files are no longer dropped from the listing behind the scenes; they are counted and ticked here instead, so the number on screen always matches what is really in the repository. NOTHING ABOUT THE MATHS OR THE SUMMARY CHANGED. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — it should open instantly on the download screen with no wait at all, listing the shop orders; press 1 WEEK, then Download, and only that week’s files should come down, after which the machinist chooser lists only the machinists inside them."] },
   { ts: "2026-08-08", rev: "App Rev-1003", type: "App", changes: ["EVERY REVIEW ROW CAN PUT ITS OWN INSPECTION CROP ON THE PANEL (Rev-1003, embedded validation REV-260) — per Rich. Each row of 📊 REVIEW DATA now carries a small INSPECTION CROP button under the feature name. Press it and the right-hand panel swaps from the whole ODS print to the cropped reference picture saved for THAT bubble — the same picture the machinist looks at when measuring it. The button then reads FULL DRAWING and turns solid; press it again, or press another row’s button, and the panel follows. Only one crop is on screen at a time and every button re-labels itself on each swap, so what is showing and what the buttons say cannot drift apart. The panel heading changes with it, reading INSPECTION CROP · BUBBLE 7 instead of ODS DRAWING · OP-030, because a zoomed crop and a zoomed print look alike and an unlabelled panel would leave you guessing which you were reading. CLICKING THE PICTURE NOW OPENS WHAT IS ACTUALLY SHOWING: at Rev-1001 full screen always reopened the whole print, which after a swap was the wrong picture. THE BUTTON IS ON EVERY ROW ON PURPOSE, including the attribute rows with no limits. Where no crop has been saved for a feature it sits greyed and disabled and its tooltip says why — a missing button would read as a bug, and hunting for one that was never there is the kind of trip this app exists to save. The crops come from the plan’s saved reference images, the same ones the inspection uses; the automatic balloon crop is built on the fly at inspection time and never stored, so showing it here would have meant inventing a second version of the picture. NOTHING ELSE MOVED — same maths, same columns, same chooser, readings still open on a row click. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030, summarise, and press INSPECTION CROP on BUBBLE 7 — the panel should show that feature’s crop with the heading naming bubble 7, the button should read FULL DRAWING, and clicking the picture should open the CROP full screen, not the whole print."] },
   { ts: "2026-08-08", rev: "App Rev-1002", type: "App", changes: ["REVIEW DATA TAKES THE WHOLE SCREEN, THE PRINT GROWS BY HALF, AND NO MACHINIST IS PRE-TICKED (Rev-1002, embedded validation REV-260) — three things from Rich, all in the 📊 REVIEW panel. FIRST, WIDTH. The box was capped at 1780px, so on a wide monitor it sat in the middle with screen going spare either side; it now takes 98% of the window whenever a drawing is showing. The no-drawing case widens too, from a fixed 1180px to 1400px or 96% of the window, whichever is smaller. SECOND, THE DRAWING IS HALF AGAIN AS BIG: the panel goes from 620px to 930px wide, exactly 1.5x, and its share of a narrow window from 38% to 46%. The image was running out of WIDTH rather than height, so widening the panel is what actually enlarges the print; its height ceiling was also lifted 40px to let the taller image through instead of capping it. THIRD, WHO RAN THEM NOW STARTS EMPTY. Every machinist used to be ticked, which made the blended all-hands summary the path of least resistance — and that is precisely the summary that buries one operator’s problem inside four operators’ average. Nothing is ticked now, the count reads 0 run(s) selected and Summarise stays greyed out until a name is chosen. Picking is a deliberate act. The HOW FAR BACK buttons, the simulated tick and the maths are untouched. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 — no machinist should be ticked and Summarise should be grey; tick one, press Summarise, and the panel should fill the screen with a noticeably larger OP-030 print down the right."] },
   { ts: "2026-08-08", rev: "App Rev-1001", type: "App", changes: ["THE ODS DRAWING SITS BESIDE THE NUMBERS IN REVIEW DATA (Rev-1001, embedded validation REV-260) — per Rich. Reading a capability table meant knowing from memory which feature BUBBLE 7 is, or closing the panel to go and look. The operation’s own ODS drawing now fills a panel down the RIGHT-HAND side of 📊 REVIEW DATA, so the bubble numbers in the first column and the balloons on the print are read together. The drawing STAYS PUT while the table scrolls, and clicking it opens the same full-screen viewer the operations list uses — deliberately the existing viewer rather than a second one, so zooming behaves the way it already does everywhere else. The panel takes its image from cpOpOdsImage, the same getter Step 2 and the operations list use, which means a drawing deleted for this operation stays deleted here and no stale part-level print can leak in (the Rev-721 and Rev-929 traps). WHEN THERE IS NO DRAWING the panel does not appear at all and the box keeps its old width — no empty grey rectangle. With a drawing the box widens to 1780px or 98% of the window, whichever is smaller, and the drawing takes 620px or 38% of the window, whichever is smaller, so a narrow screen gives the numbers the room. NOTHING ABOUT THE MATHS, THE COLUMNS OR THE CHOOSER CHANGED — same Cpk, same white rows, same readings on a click. WHAT TO TEST (rule 8): open 📊 REVIEW on 1000237620 OP-030 and summarise — the OP-030 print should fill the right side, hold still while the table scrolls, and go full screen on a click. Then try an operation with no drawing loaded: no panel, old width."] },
@@ -3093,7 +3094,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:16 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:12 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -14607,7 +14608,9 @@ async function _cpReviewDataPanel(idx){
       const t = nm.replace(/\.json$/, '').split('_');
       if(String(t[0] || '') !== part) return false;
       if(String(t[1] || '') !== op) return false;
-      if(String(t[2] || '').toUpperCase().indexOf('SIM-') === 0 && !showSim) return false;
+      /* Rev-1004: simulated files STAY in the list. They are counted and ticked on the
+         download screen instead of being silently dropped here, so the run count on screen
+         always matches what is actually in the repository. */
       return true;
     });
     if(!mine.length){
@@ -14620,21 +14623,30 @@ async function _cpReviewDataPanel(idx){
       return;
     }
     /* Parallel in small batches, with a progress line - a thousand serial fetches would look frozen. */
+    /* ===== Rev-1004: NOTHING IS DOWNLOADED UNTIL IT IS CHOSEN =====================
+       Rev-987 read every run file for the operation before it drew the chooser. At 170 files
+       that is merely slow; a year of production is thousands, and the wait would land BEFORE
+       Rich had told it he only wanted last week. Listing the files costs ONE call and is
+       already done above; downloading them is the expensive part, so downloading now waits
+       for the choice. */
     const runs = [];
-    for(let i = 0; i < mine.length; i += 8){
-      const chunk = mine.slice(i, i + 8);
-      say('Reading stored runs\u2026 ' + Math.min(i + chunk.length, mine.length) + ' of ' + mine.length);
-      const got = await Promise.all(chunk.map(async nm => {
-        try{
-          const r = await fetch('https://api.github.com/repos/' + cfg.user + '/' + cfg.repo + '/contents/runs/' + encodeURIComponent(nm),
-                                { headers: { 'Authorization': 'Bearer ' + cfg.token, 'Accept': 'application/vnd.github.raw' }, cache: 'no-store' });
-          return r.ok ? await r.json() : null;
-        }catch(e){ console.warn('Rev-987 run read failed', nm, e); return null; }
-      }));
-      got.forEach(g => { if(g) runs.push(g); });
-    }
-    if(!runs.length){ say('<div style="padding:20px 0; color:#a5342a;">Found ' + mine.length
-      + ' run file(s) but none could be read.</div>'); return; }
+    const fetchRuns = async (list) => {
+      const out = [];
+      for(let i = 0; i < list.length; i += 8){
+        const chunk = list.slice(i, i + 8);
+        say('<div style="padding:26px 0; font-size:14px; color:#3a352e;">Downloading runs\u2026 <b>'
+          + Math.min(i + chunk.length, list.length) + ' of ' + list.length + '</b></div>');
+        const got = await Promise.all(chunk.map(async nm => {
+          try{
+            const r = await fetch('https://api.github.com/repos/' + cfg.user + '/' + cfg.repo + '/contents/runs/' + encodeURIComponent(nm),
+                                  { headers: { 'Authorization': 'Bearer ' + cfg.token, 'Accept': 'application/vnd.github.raw' }, cache: 'no-store' });
+            return r.ok ? await r.json() : null;
+          }catch(e){ console.warn('Rev-987 run read failed', nm, e); return null; }
+        }));
+        got.forEach(g => { if(g) out.push(g); });
+      }
+      return out;
+    };
 
     /* ===== Rev-995: CHOOSE WHAT TO REVIEW FIRST ==========================
        Every run in one summary blends machinists and shifts into a single Cpk, which is how a
@@ -14648,9 +14660,14 @@ async function _cpReviewDataPanel(idx){
     const _rSim = rn => !!(rn.simulated || (rn.run && rn.run.simulated));
     const WINDOWS = [ ['all','ALL TIME',0], ['d1','LAST DAY',1], ['d2','2 DAYS',2],
                       ['w1','1 WEEK',7], ['w2','2 WEEKS',14], ['m1','1 MONTH',30] ];
-    const whoCount = {};
-    runs.forEach(rn => { const w = _rWho(rn); whoCount[w] = (whoCount[w] || 0) + 1; });
-    const whoList = Object.keys(whoCount).sort();
+    /* Rev-1004: the machinist lives INSIDE each run file, so this list cannot exist until
+       the chosen files are down. It is rebuilt from whatever was downloaded. */
+    let whoCount = {}, whoList = [];
+    const recomputeWho = () => {
+      whoCount = {};
+      runs.forEach(rn => { const w = _rWho(rn); whoCount[w] = (whoCount[w] || 0) + 1; });
+      whoList = Object.keys(whoCount).sort();
+    };
     /* Rev-1002: NOBODY is ticked to start, per Rich. Pre-ticking everyone made the
        blended all-machinists summary the path of least resistance, which is exactly the
        summary that hides one operator's problem inside four operators' average. Choosing
@@ -14669,8 +14686,12 @@ async function _cpReviewDataPanel(idx){
     const esc0 = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 
     const showChooser = () => {
-      let c = '<div style="font-size:12px; color:#6b6257; margin-bottom:12px;">'
-        + runs.length + ' run(s) stored for this operation. Choose what to summarise.</div>';
+      let c = '<div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">'
+        + '<div style="font-size:12px; color:#6b6257;"><b>' + runs.length
+        +   '</b> run(s) downloaded. Choose what to summarise.</div>'
+        + '<button type="button" id="pvBack" style="margin-left:auto; padding:6px 12px; font-size:11.5px;'
+        +   ' font-weight:800; border:1px solid #c9c0b4; background:#fff; color:#3a352e;'
+        +   ' border-radius:7px; cursor:pointer;">\u21a9 Change what is downloaded</button></div>';
       c += '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">WHO RAN THEM</div>'
         +  '<div id="rvWho" style="display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 16px;">'
         +  whoList.map(w => '<label style="display:inline-flex; align-items:center; gap:6px; padding:7px 11px;'
@@ -14717,6 +14738,8 @@ async function _cpReviewDataPanel(idx){
       if(sc) sc.onchange = () => { pickSim = sc.checked;
         try{ localStorage.setItem('cpShowSimRuns', pickSim ? '1' : '0'); }catch(e){}
         showChooser(); };
+      const pb = document.getElementById('pvBack');
+      if(pb) pb.onclick = () => showPreload();
       const go = document.getElementById('rvGo');
       if(go) go.onclick = () => showSummary(runs.filter(passes));
     };
@@ -14847,7 +14870,142 @@ async function _cpReviewDataPanel(idx){
         }
       }catch(e){ console.warn('Rev-995 back button failed', e); }
     };
-    showChooser();
+    /* ===== Rev-1004: THE DOWNLOAD SCREEN =========================================
+       Built from the FILE NAMES alone, which cost nothing - one listing call already made.
+       A run file is named PART_OP-nnn_SHOPORDER_YYYYMMDD_SERIAL_RUNID.json, so the shop
+       order, the day and whether it is simulated are all readable without opening a single
+       file. The MACHINIST is not: it lives inside the file, on the run record. That is why
+       machinists are chosen on the NEXT screen and not this one - listing them here would
+       mean downloading everything first, which is the exact cost this screen removes. */
+    const _fTok  = nm => nm.replace(/\.json$/, '').split('_');
+    const _fSo   = nm => String(_fTok(nm)[2] || '') || '(NONE)';
+    const _fSim  = nm => _fSo(nm).toUpperCase().indexOf('SIM-') === 0;
+    const _fDtok = nm => { const t = _fTok(nm)[3] || ''; return /^\d{8}$/.test(t) ? t : ''; };
+    const _fTime = nm => { const d = _fDtok(nm);
+      return d ? Date.parse(d.slice(0,4) + '-' + d.slice(4,6) + '-' + d.slice(6,8) + 'T12:00:00Z') : 0; };
+    const _fDay  = t => t ? (new Date(t)).toLocaleDateString('en-US',
+                        { month:'2-digit', day:'2-digit', year:'2-digit' }) : '\u2014';
+    const PWIN = [ ['all','ALL TIME',0], ['d1','LAST DAY',1], ['d2','2 DAYS',2], ['w1','1 WEEK',7],
+                   ['w2','2 WEEKS',14], ['m1','1 MONTH',30], ['m3','3 MONTHS',90], ['y1','1 YEAR',365] ];
+    let preWin = 'all', preSim = showSim, preSo = [];
+    const preDays = () => (PWIN.find(w => w[0] === preWin) || PWIN[0])[2];
+    const preInWin = (nm, days) => { if(!days) return true; const t = _fTime(nm);
+      return !!t && t >= (Date.now() - days * 86400000); };
+    const preHit = nm => {
+      if(_fSim(nm) && !preSim) return false;
+      if(preSo.length && preSo.indexOf(_fSo(nm)) < 0) return false;
+      return preInWin(nm, preDays());
+    };
+    const soRows = (() => {
+      const m = {};
+      mine.forEach(nm => {
+        const so = _fSo(nm);
+        const r = m[so] = m[so] || { so: so, n: 0, first: 0, last: 0, sim: _fSim(nm) };
+        r.n++;
+        const t = _fTime(nm);
+        if(t){ if(!r.first || t < r.first) r.first = t; if(t > r.last) r.last = t; }
+      });
+      return Object.keys(m).map(k => m[k]).sort((a, b) => (b.last - a.last) || a.so.localeCompare(b.so));
+    })();
+    const showPreload = () => {
+      const chosen = mine.filter(preHit);
+      const simN = mine.filter(_fSim).length;
+      let h = '<div style="font-size:13px; color:#3a352e; margin-bottom:4px;"><b>' + mine.length
+        + '</b> run file(s) stored for this operation. <b style="color:#a5342a;">None have been '
+        + 'downloaded yet.</b></div>'
+        + '<div style="font-size:12px; color:#6b6257; margin-bottom:16px;">Choose what to bring down '
+        + '\u2014 only the files you pick are downloaded. Machinists are chosen after that, because '
+        + 'the machinist\u2019s name is inside each file rather than on it.</div>';
+      h += '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">HOW FAR BACK</div>'
+        +  '<div id="pvWin" style="display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 16px;">'
+        +  PWIN.map(([k, lab, days]) => {
+              const n = mine.filter(nm => (!_fSim(nm) || preSim) && preInWin(nm, days)).length;
+              return '<button type="button" data-win="' + k + '" style="padding:8px 13px; border-radius:8px;'
+                + ' font-size:12.5px; font-weight:800; cursor:pointer; border:1px solid '
+                + (preWin === k ? '#154360' : '#c9c0b4') + '; background:' + (preWin === k ? '#1a5276' : '#fff')
+                + '; color:' + (preWin === k ? '#fff' : '#3a352e') + ';">'
+                + lab + ' <span style="opacity:.75;">' + n + '</span></button>'; }).join('')
+        +  '</div>';
+      if(simN){
+        h += '<label style="display:inline-flex; align-items:center; gap:8px; padding:8px 12px; margin-bottom:16px;'
+          +  ' background:#fdf3d5; border:1px solid #d9b64a; border-radius:8px; font-size:12.5px;'
+          +  ' font-weight:700; color:#5c4708; cursor:pointer;">'
+          +  '<input type="checkbox" id="pvSim"' + (preSim ? ' checked' : '') + '>'
+          +  'INCLUDE SIMULATED RUNS (' + simN + ') \u2014 not measurement evidence</label>';
+      }
+      h += '<div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">'
+        +  '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
+        +    'SHOP ORDERS IN THE REPOSITORY</div>'
+        +  '<button type="button" id="pvAll" style="padding:5px 11px; font-size:11px; font-weight:800;'
+        +    ' border:1px solid #c9c0b4; background:#fff; color:#3a352e; border-radius:7px; cursor:pointer;">'
+        +    'Every shop order</button>'
+        +  '<div style="font-size:11.5px; color:#6b6257;">'
+        +    (preSo.length ? (preSo.length + ' ticked') : 'none ticked \u2014 every shop order included')
+        +  '</div></div>'
+        +  '<div style="max-height:290px; overflow:auto; border:1px solid #e2ddd4; border-radius:8px; margin-bottom:16px;">'
+        +  '<table id="pvSo" style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
+        +  '<thead><tr>'
+        +    ['', 'SHOP ORDER', 'RUNS', 'FIRST', 'LAST', 'TYPE'].map((th, i) =>
+              '<th style="border-bottom:1px solid #d8d3ca; padding:7px 9px; background:#f3efe8; color:#3a352e;'
+              + ' font-weight:800; font-size:11px; letter-spacing:.05em; text-align:'
+              + (i <= 1 ? 'left' : 'center') + '; position:sticky; top:0;">' + th + '</th>').join('')
+        +  '</tr></thead><tbody>'
+        +  soRows.filter(r => !r.sim || preSim).map(r => {
+              const on = preSo.indexOf(r.so) >= 0;
+              const inWin = mine.filter(nm => _fSo(nm) === r.so && preInWin(nm, preDays())).length;
+              return '<tr style="background:#fff;">'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px;">'
+                +   '<input type="checkbox" data-so="' + esc0(r.so) + '"' + (on ? ' checked' : '') + '></td>'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; font-weight:700; color:#000;">'
+                +   esc0(r.so) + '</td>'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; text-align:center; color:#000;">'
+                +   r.n + (inWin !== r.n ? ' <span style="color:#6b6257;">(' + inWin + ' in window)</span>' : '') + '</td>'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; text-align:center; color:#3a352e;">'
+                +   _fDay(r.first) + '</td>'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; text-align:center; color:#3a352e;">'
+                +   _fDay(r.last) + '</td>'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:6px 9px; text-align:center; font-weight:800; color:'
+                +   (r.sim ? '#a5342a' : '#1d6b3f') + ';">' + (r.sim ? 'SIMULATED' : 'REAL') + '</td>'
+                + '</tr>'; }).join('')
+        +  '</tbody></table></div>';
+      h += '<div style="display:flex; align-items:center; gap:14px; padding-top:6px; border-top:1px solid #e2ddd4;">'
+        +  '<div style="font-size:13px; font-weight:800; color:' + (chosen.length ? '#1d6b3f' : '#a5342a') + ';">'
+        +    chosen.length + ' of ' + mine.length + ' file(s) will be downloaded</div>'
+        +  '<button id="pvGo" ' + (chosen.length ? '' : 'disabled ') + 'style="margin-left:auto;'
+        +    ' padding:11px 22px; border:none; background:' + (chosen.length ? '#1a5276' : '#b9b3aa')
+        +    '; color:#fff; border-radius:8px; font-weight:800; font-size:14px; cursor:'
+        +    (chosen.length ? 'pointer' : 'not-allowed') + ';">\u2b07 Download ' + chosen.length
+        +    ' run(s)</button></div>';
+      say(h);
+      const b = body(); if(!b) return;
+      b.querySelectorAll('#pvWin button').forEach(bt => { bt.onclick = () => {
+        preWin = bt.getAttribute('data-win'); showPreload(); }; });
+      const ps = document.getElementById('pvSim');
+      if(ps) ps.onchange = () => { preSim = ps.checked;
+        try{ localStorage.setItem('cpShowSimRuns', preSim ? '1' : '0'); }catch(e){}
+        showPreload(); };
+      b.querySelectorAll('#pvSo input').forEach(cb => { cb.onchange = () => {
+        const so = cb.getAttribute('data-so');
+        if(cb.checked){ if(preSo.indexOf(so) < 0) preSo.push(so); }
+        else preSo = preSo.filter(x => x !== so);
+        showPreload(); }; });
+      const pa = document.getElementById('pvAll');
+      if(pa) pa.onclick = () => { preSo = []; showPreload(); };
+      const pg = document.getElementById('pvGo');
+      if(pg) pg.onclick = async () => {
+        const list = mine.filter(preHit);
+        if(!list.length) return;
+        try{ logAct('review-load', list.length + ' of ' + mine.length + ' run files'); }catch(_){ }
+        const got = await fetchRuns(list);
+        if(!got.length){ say('<div style="padding:20px 0; color:#a5342a;">Chose ' + list.length
+          + ' run file(s) but none of them could be read.</div>'); return; }
+        runs.length = 0; got.forEach(g => runs.push(g));
+        pickWho = []; pickWin = 'all'; pickSim = preSim;
+        recomputeWho();
+        showChooser();
+      };
+    };
+    showPreload();
   }catch(e){
     console.error('Rev-987 review data failed', e);
     say('<div style="padding:18px 0; color:#a5342a; font-weight:700;">Could not build the summary: '
