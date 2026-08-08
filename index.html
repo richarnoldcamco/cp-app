@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1011</title>
+<title>CONTROL PLAN GENERATOR - Rev-1012</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1011 · 2026-08-08 3:29 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1012 · 2026-08-08 3:34 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1011 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:29 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1012 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:34 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1011 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1012 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1011";
+const APP_REV = "Rev-1012";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1012", type: "App", changes: ["GAGES MOVES UNDER ASSIGN MEASUREMENT TYPES, IN WHITE (Rev-1012, embedded validation REV-260) — per Rich, and it belongs there. A gage exists only because the Special Gage / Fixture box was filled on a row in STEP 6, so the button now hangs directly beneath that step rather than standing in the numbered track. White background, and it turns red-edged with red text when any gage is still open, so an outstanding gage is visible from the list without opening anything. It stops being a numbered step for a reason worth keeping: in the track it read as one more thing to finish before the plan was done, and it never was — a gage that has not been made yet is a purchasing problem, not an unfinished Control Plan. LINE INSPECTION takes the freed number and is now STEP 8, so the track runs 1 to 8 with no gap. Nothing about what either button does has changed. WHAT TO TEST (rule 8): on 1000237620 OP-030 the GAGES button should sit under ASSIGN MEASUREMENT TYPES, white, reading GAGES · 2 OPEN / 2 in red, and still open the gage list on a click. LINE INSPECTION should now be labelled STEP 8, and OP-040 — which needs no gages — should show a plain white GAGES · NONE NEEDED."] },
   { ts: "2026-08-08", rev: "App Rev-1011", type: "App", changes: ["STEP 9 — LINE INSPECTION LEVELS (Rev-1011, embedded validation REV-260) — per Rich. A new tile beside GAGES, reading 0 / 14 SET or ALL 14 SET, opening a table of every feature row on the operation: BUBBLE, FEATURE DESCRIPTION, SPEC / TOLERANCE, MACHINIST CHECKS — the frequency already on the Control Plan, shown but never changed here — then LINE INSPECTION LEVEL and QUALITY PULLS A PART. The level is set per feature with three buttons, 1 2 3, plus NONE; the INTERVAL for each level is set once for the whole operation at the top, in yellow boxes because they are the numbers that matter, and the last column resolves the two into plain words: EVERY 25 PARTS, or NEVER where no level is set. A running count sits beside each level so an operation with everything on Level 1 is obvious before it becomes a workload. Features with no level are called out in a yellow bar, because no level means never pulled and that should be a decision rather than an oversight. Defaults are every 5, 25 and 100 parts — they are a starting point to change, not a recommendation. Levels ride on the plan and sync like everything else on it. Like STEP 8 this never locks and is worth nothing toward the percentage: it says how often quality re-checks a feature, not whether the plan is built. THE EMAIL IS NOT BUILT AND IS NOT CLAIMED TO BE. Nothing is sent — outbound mail is still waiting on the Office 365 sign-in fix that is holding up the nightly digest, and the panel says so on its face. Recording the intervals now means there is something to send the day it works. WHAT TO TEST (rule 8): on 1000237620 OP-030 press STEP 9, set a few features to 1, 2 and 3, change Level 2 to every 40 parts, and watch the last column follow. Close and reopen — it should all still be there, and the tile should count what is set."] },
   { ts: "2026-08-08", rev: "App Rev-1010", type: "App", changes: ["LINE INSPECTIONS CAN BE FILED AGAINST AN OPERATION (Rev-1010, embedded validation REV-260) — per Rich, who needs the LINE INSPECTION / FIRST ARTICLE INSPECTION forms out of CAMCO QUALITY and sitting with the operation they belong to. A LINE INSP button joins the action buttons; it carries the count, and turns RED the moment one of them is a FAIL, because a failed first article is not something to find by opening a panel. The panel lists what has been filed — date, result, shop order, inspector, file — with Download and Remove on each, and more than one can be filed, since there is one form per inspection rather than one per operation. THE FORM IS STORED EXACTLY AS EXPORTED, whatever the Export button gives — PDF, spreadsheet or picture — in the private data repository under lineinsp/PART/OPnnn/, the same road a CNC program travels. NOTHING PARSES THE FORM. The result, shop order and inspector are TYPED IN when it is filed, so nothing in here can quietly misread a form and put a PASS against a FAIL; three boxes is a fair price for that. Reading the findings out of the export — characteristic numbers, severity ranks, actions taken — and tying them back to bubble numbers is the obvious next step, and it needs a real exported file in hand first: what it parses depends entirely on what Export actually produces. WHAT TO TEST (rule 8): on 1000222892 OP-080, press LINE INSP, set the result, type the shop order and inspector, and pick an exported form — it should appear in the list with the button now reading LINE INSP 1. File a FAIL and the button should turn red."] },
   { ts: "2026-08-08", rev: "App Rev-1009", type: "App", changes: ["STEP 8 IS NOW GAGES, AND THE CNC PROGRAM MOVES TO THE ACTION BUTTONS (Rev-1009, embedded validation REV-260) — per Rich, and the swap is the right way round. A CNC program is a file to attach, not a stage of building a Control Plan, and it was holding the slot the gages deserve. CNC now sits with the other action buttons on the right and carries a tick when a program is stored. IN ITS PLACE, STEP 8 GAGES shows what the operation still needs to be inspectable: the tile reads NONE NEEDED, or 3 OPEN / 5, or ALL 5 COMPLETE, and clicking it lists every special gage with THE BUBBLE NUMBER IT IS FOR, the feature, the spec and tolerance, what the gage is, its status — TO BE MADE, DESIGNED, ORDERED, IN PROGRESS, COMPLETE, coloured so an open one cannot be mistaken for a finished one — and who it is assigned to. NOTHING HERE IS A SECOND COPY: every line comes from the gage register the app already keeps, which fills itself the moment the Special Gage / Fixture box is filled on a row in Step 6. That is also why the panel is read-only and carries one button to the full gage list — a gage is edited in ONE place, not in two that can disagree. Where no gage has been called for the panel says how to call for one rather than showing an empty grid. Like the CNC step before it, GAGES never locks and is worth nothing toward the percentage: a gage that has not been made yet is a purchasing problem, not a reason to call the Control Plan unfinished. WHAT TO TEST (rule 8): on 1000237620 OP-030 the STEP 8 tile should read GAGES with a count, and CNC should now be a button on the right beside Download. Press STEP 8 — with no special gages called for it should explain where they come from; fill the Special Gage / Fixture box on a row in Step 6 and it should appear here against that bubble number."] },
@@ -3109,7 +3110,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:29 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:34 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5073,8 +5074,7 @@ function renderProjects(){
           b.title = '\ud83d\udd12 LOCKED \u2014 finish ' + (_by || 'the step before this one') + ' first.'
             + '\n\nEvery step has to be completed in order.';
         }
-        if(n === 8) tag = _g8.text;   /* Rev-1009: gages count, not a done/todo word */
-        else if(n === 9) tag = _l9.text;   /* Rev-1011 */
+        if(n === 8) tag = _l9.text;   /* Rev-1012: LINE INSPECTION took the number */
         else if(state === 'done') tag = '\u2713 COMPLETED';
         else if(_R && _R.ready === false) tag = 'NEEDS EARLIER STEP';
         else if(_S && _S.total > 1 && _S.left < _S.total)
@@ -5190,7 +5190,7 @@ function renderProjects(){
                    : 'LOCKED \u2014 finish the bubble numbers first. A control type cannot be chosen for a balloon that does not exist yet.',
         () => openAt('2'));
 
-      mkStep(6, 'ASSIGN MEASUREMENT TYPES', stateOf(st.s5),
+      const _b6 = mkStep(6, 'ASSIGN MEASUREMENT TYPES', stateOf(st.s5),
         st.s5.open ? ('STEP 6 \u2014 review the measurement methods, set any special gage, confirm the reaction plan.\n' + prog.s3Note + '.' + stepNote)
                    : 'LOCKED \u2014 finish the control types first. The methods band is filled BY the control type.',
         () => openAt('3'));
@@ -5207,28 +5207,38 @@ function renderProjects(){
                 + 'asks whether to release the operation to production.'))),   /* Rev-870 */
         () => cpReviewInspection(i));
 
-      /* Rev-1009: STEP 8 is now GAGES. The CNC program moved to the ACTIONS buttons - it is
-         a file to attach, not a stage of building the plan, and it was taking the slot the
-         gages deserve. Like the CNC step before it this one never locks and is worth nothing
-         toward the percentage: a gage that has not been made yet is a purchasing problem, not
-         a reason to call the Control Plan unfinished. */
-      mkStep(8, 'GAGES', (_g8.done ? 'done' : 'todo'),
-        (!_g8.total
-          ? 'STEP 8 \u2014 no special gage or fixture has been called for on any row of this\n'
-            + 'operation. They appear here the moment the Special Gage / Fixture column is\n'
-            + 'filled in on a row in Step 6.'
-          : ('STEP 8 \u2014 ' + _g8.total + ' special gage(s) called for on this operation, '
-             + _g8.open + ' still open.\nClick to see which bubble each one is for and where it '
-             + 'has got to.')),
-        () => cpGagePanel(i));
+      /* Rev-1012: GAGES is no longer a numbered step. It hangs UNDER Step 6, in white,
+         because that is where gages come from - a gage exists only because the Special Gage /
+         Fixture box was filled on a row in Step 6. Sitting in the numbered track it read as
+         another thing to finish before the plan was done, which it never was: a gage that has
+         not been made yet is a purchasing problem, not an unfinished Control Plan. */
+      try{
+        const _w6 = _b6 && _b6.parentNode;
+        if(_w6){
+          const _gb = document.createElement('button');
+          _gb.type = 'button';
+          _gb.textContent = 'GAGES \u00b7 ' + String(_g8.text).replace(/^[\s\u2013]+/, '');
+          _gb.title = (!_g8.total
+            ? 'No special gage or fixture has been called for on any row of this operation.\n'
+              + 'They appear the moment the Special Gage / Fixture box is filled on a row here.'
+            : (_g8.total + ' special gage(s) called for on this operation, ' + _g8.open
+               + ' still open.\nClick to see which bubble each one is for and where it has got to.'));
+          _gb.style.cssText = 'display:block; width:100%; margin-top:6px; background:#fff;'
+            + ' border:1px solid ' + (_g8.open ? '#a5342a' : '#c9c0b4') + '; border-radius:8px;'
+            + ' padding:7px 6px; font-size:10.5px; font-weight:800; letter-spacing:.04em;'
+            + ' color:' + (_g8.open ? '#a5342a' : '#3a352e') + '; cursor:pointer; line-height:1.35;';
+          _gb.onclick = () => cpGagePanel(i);
+          _w6.appendChild(_gb);
+        }
+      }catch(e){ console.warn('Rev-1012 gages sub-button failed', e); }
 
       /* Rev-1011: STEP 9 - LINE INSPECTION LEVELS. Like 8, never locks, worth nothing
          toward the percentage: it says how OFTEN quality re-checks a feature, not whether
          the plan is built. */
-      mkStep(9, 'LINE INSPECTION', (_l9.done ? 'done' : 'todo'),
+      mkStep(8, 'LINE INSPECTION', (_l9.done ? 'done' : 'todo'),
         (!_l9.total
-          ? 'STEP 9 \u2014 give each feature its line-inspection level once the rows exist.'
-          : ('STEP 9 \u2014 ' + _l9.set + ' of ' + _l9.total + ' features have a line-inspection '
+          ? 'STEP 8 \u2014 give each feature its line-inspection level once the rows exist.'
+          : ('STEP 8 \u2014 ' + _l9.set + ' of ' + _l9.total + ' features have a line-inspection '
              + 'level.\nLevel 1, 2 or 3 sets how often the quality technician re-checks that '
              + 'feature.')),
         () => cpLineLevelPanel(i));
