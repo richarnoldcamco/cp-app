@@ -1685,7 +1685,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-995";
+const APP_REV = "Rev-996";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2213,6 +2213,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-996", type: "App", changes: ["INJECT SPREADS ITS PIECES ACROSS MACHINISTS AND DAYS (Rev-996, embedded validation REV-260) \u2014 per Rich, and it is the change that makes Rev-995\u2019s chooser worth having: every injected piece used to carry the same operator SIM and the same timestamp, so filtering by who ran them or how far back had exactly one answer. INJECT now asks two more questions - HOW MANY MACHINISTS (1, 2, 3 or 4, named SIM-A through SIM-D) and HOW MANY DAYS (1, 2, 7, 14 or 30) - and deals the pieces out across them: machinists round-robin so each gets a fair share, days spread evenly backwards from today with each piece landing at a believable hour of a working shift rather than all at midnight. Each machinist gets their own SHOP ORDER, since in the shop a job number belongs to a run rather than to a person, and each day\u2019s stamp is real enough that the 1 WEEK and 2 WEEKS windows in Review Data actually cut the set differently. THE CAPABILITY MATHS IS UNTOUCHED: the readings are generated exactly as before against each feature\u2019s own limits, so a Cpk 1.33 batch still measures back as 1.33 whether it is one machinist or four. Every safety stamp stands - simulated on the run and every reading, SIM- shop orders, hidden from Reports unless switched on. WHAT TO TEST (rule 8): inject 30 pieces across 3 machinists and 7 days, then press \ud83d\udcca REVIEW - the chooser should list SIM-A, SIM-B and SIM-C with ten each, and LAST DAY should select fewer than ALL TIME. Payload verified in both repos before this entry."] },
   { ts: "2026-08-09", rev: "App Rev-995", type: "App", changes: ["REVIEW DATA ASKS WHAT TO REVIEW BEFORE IT SUMMARISES (Rev-995, embedded validation REV-260) \u2014 per Rich. Pressing \ud83d\udcca REVIEW used to dump every run ever stored for the operation into one summary; on OP-030 that is 110 runs and a Cpk that blends every machinist and every shift into one number, which is exactly how a real capability problem hides. A chooser now comes first. WHO: every machinist found in the stored runs, listed with how many pieces each ran, all ticked to start - untick to compare one against another. WHEN: ALL TIME, LAST DAY, 2 DAYS, 1 WEEK, 2 WEEKS or 1 MONTH, counted back from now against each run\u2019s completion date. Simulated runs have their own tick, off by default, exactly as in Reports. Each option shows the number of runs it would include, so an empty selection is visible BEFORE it is applied rather than as a blank table afterwards. The runs are read once when the panel opens; changing the selection after that is instant, and CHANGE SELECTION on the summary goes back without re-reading a thing. THE SUMMARY ITSELF IS UNCHANGED - same columns, same Cpk, same refusal under 5 pieces, same orange banner when simulated runs are in. WHAT TO TEST (rule 8): press \ud83d\udcca REVIEW on OP-030 - a chooser appears listing SIM with 110 pieces; tick simulated runs, pick 1 WEEK, and the summary should match what the full list showed. Payload verified in both repos before this entry."] },
   { ts: "2026-08-09", rev: "App Rev-994", type: "App", changes: ["THE RELEASED-OPERATION REFUSAL BECOMES A CHOICE (Rev-994, embedded validation REV-260) \u2014 Rich pressed \ud83e\uddea INJECT and got no Cpk dialog. The whole generate-and-save path was run against his real OP-040 with a stubbed GitHub and it worked - built the panel, generated ten pieces, asked to write all ten files. So nothing was broken: he was pressing INJECT on OP-030, which is RELEASED, and Rev-986 refused outright on a released operation. That safeguard was mine and it was blocking the workflow he asked for, with a dialog that named the problem and offered no way forward. It is now a choice: the dialog explains that a released operation carries a production sign-off and offers \u21ba WITHDRAW RELEASE & INJECT, which does exactly what the Step 7 dialog\u2019s own Withdraw button does - clears the sign-off, drops the operation below 100 percent - and then opens the Cpk panel. THE RULE IS UNCHANGED: simulated readings are still never written against an operation that is currently released. The difference is that withdrawing is now one press instead of a hunt, and it is stated plainly rather than implied. Cancel leaves the release exactly as it was. WHAT TO TEST (rule 8): press \ud83e\uddea INJECT on OP-030 - the dialog should offer to withdraw and inject; take it, generate 10 pieces at Cpk 1.33, then press \ud83d\udcca REVIEW and tick include simulated runs. Payload verified in both repos before this entry."] },
   { ts: "2026-08-09", rev: "App Rev-993", type: "App", changes: ["THE PART DESCRIPTION RIDES BESIDE THE PART NUMBER (Rev-993, embedded validation REV-260) \u2014 per Rich, who circled the empty space in the beige part-header row. This is the right home for it and the two earlier attempts were not: Rev-991 put it on its own line under the heading where it repeated the part number, and Rev-992 removed it again. Here it adds a word to a line that already exists and repeats nothing - 1000237620 in its usual 33px, then a thinner grey AIR COIL beside it. Upper case, per Rev-974. A part with no description shows nothing extra, so the header is exactly as it was before for the parts that have none. WHAT TO TEST (rule 8): open 1000237620 - the beige row should read the part number then AIR COIL; open 912993, which has no description, and the row should look untouched. Payload verified in both repos before this entry."] },
@@ -3085,7 +3086,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-09";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "1:04 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "1:38 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -14788,9 +14789,16 @@ function _cpInjNormal(){
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
 }
 /* How many decimals do these limits imply? A .0005 band must not come back as .123. */
-function _cpInjDecimals(a, b){
+function _cpInjDecimals(a, b, tol){
   const d = s => { const m = String(s).match(/\.(\d+)/); return m ? m[1].length : 0; };
-  return Math.min(5, Math.max(3, d(a), d(b)));
+  let dp = Math.max(3, d(a), d(b));
+  /* Rev-996: ENOUGH RESOLUTION TO TELL THE SPREAD APART. Rounding to the limits' own decimals
+     is too coarse on a tight band: a .0005 band written to 4 places has six possible readings,
+     which quantises the scatter and pushed a Cpk 1.33 batch back as 1.19 in test. A real
+     Bowers gage on that band reads to five places. Give the tolerance at least ~50 steps. */
+  const t = Math.abs(Number(tol) || 0);
+  if(t > 0){ dp = Math.max(dp, Math.ceil(-Math.log10(t / 50))); }
+  return Math.min(6, Math.max(3, dp));
 }
 /* Generate the values for ONE feature across n pieces, aimed at the chosen scenario.
    Cpk = min(USL-mean, mean-LSL) / 3sigma. Centred, that is (USL-LSL)/(6*sigma). */
@@ -14819,7 +14827,7 @@ function cpInjValues(lo, hi, n, sc){
 }
 /* Build the run records. Shape copied from a real stored run so Reports reads them
    identically - runId, valDoc, operation, partNumber, shopOrder, serialNumber, readings[]. */
-function cpInjBuild(p, sc, pieces){
+function cpInjBuild(p, sc, pieces, machinists, days){   /* Rev-996 */
   const rows = (((p.builderState || {}).rows) || []).filter(r => String(r.bubble || '').trim());
   const feats = [];
   rows.forEach(r => {
@@ -14830,28 +14838,50 @@ function cpInjBuild(p, sc, pieces){
     }
     if(isFinite(lo) && isFinite(hi) && hi !== lo){
       if(hi < lo){ const t = hi; hi = lo; lo = t; }
-      feats.push({ row: r, lo: lo, hi: hi, dp: _cpInjDecimals(r.lowerLimit || lo, r.upperLimit || hi),
+      feats.push({ row: r, lo: lo, hi: hi, dp: _cpInjDecimals(r.lowerLimit || lo, r.upperLimit || hi, hi - lo),
                    vals: cpInjValues(lo, hi, pieces, sc) });
     } else {
       feats.push({ row: r, attribute: true });   // visual / attribute: a pass, never a made-up number
     }
   });
-  const so = 'SIM-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+  /* Rev-996: DEAL THE PIECES OUT ACROSS MACHINISTS AND DAYS, per Rich. Every piece used to
+     carry operator SIM and one timestamp, which made Rev-995's who/when chooser pointless -
+     one machinist, one instant. Machinists round-robin so each gets a fair share; days spread
+     evenly backwards from today, each piece landing at a believable hour of a shift rather
+     than all at midnight, so the 1 WEEK and 2 WEEKS windows genuinely cut the set. */
+  const who = [];
+  for(let m = 0; m < Math.max(1, Math.min(4, machinists || 1)); m++){
+    who.push('SIM-' + String.fromCharCode(65 + m));
+  }
+  const spanDays = Math.max(1, days || 1);
+  /* one shop order per machinist - in the shop a job number belongs to a run, not a person */
+  const soFor = {};
+  who.forEach(w => { soFor[w] = 'SIM-' + Math.random().toString(36).slice(2, 6).toUpperCase(); });
   const now = new Date();
-  const y = now.getUTCFullYear(), mo = String(now.getUTCMonth() + 1).padStart(2, '0'), da = String(now.getUTCDate()).padStart(2, '0');
-  const dtok = '' + y + mo + da;
   const runs = [];
+  const seq = {};
   for(let i = 0; i < pieces; i++){
+    const w = who[i % who.length];
+    seq[w] = (seq[w] || 0) + 1;
+    const so = soFor[w];
+    /* spread across the window: piece 0 oldest, last piece today */
+    const dayBack = (pieces > 1) ? Math.round((spanDays - 1) * (1 - (i / (pieces - 1)))) : 0;
+    const d = new Date(now.getTime() - dayBack * 86400000);
+    /* a believable hour: 6am to 6pm, walking through the shift */
+    d.setHours(6 + Math.floor((i % Math.max(1, Math.ceil(pieces / spanDays))) * 12
+      / Math.max(1, Math.ceil(pieces / spanDays))), (i * 17) % 60, 0, 0);
+    const stamp = d.toISOString();
+    const y = d.getUTCFullYear(), mo = String(d.getUTCMonth() + 1).padStart(2, '0'), da = String(d.getUTCDate()).padStart(2, '0');
+    const dtok = '' + y + mo + da;
     const sn = String(i + 1);
     const runId = 'R-' + so.slice(4) + String(i + 1).padStart(3, '0');
-    const stamp = new Date(now.getTime() + i * 60000).toISOString();
     const readings = feats.map(f => {
       const r = f.row;
       const base = {
         runId: runId, bubble: String(r.bubble || ''),
         characteristic: String(r.featureDesc || r.spec || ''),
         instrument: String(r.measMethod || ''), frequency: String(r.freqEvery || ''),
-        createdUtc: stamp, updatedUtc: stamp, createdBy: 'SIM', committed: true, photo: '',
+        createdUtc: stamp, updatedUtc: stamp, createdBy: w, committed: true, photo: '',
         simulated: true
       };
       if(f.attribute){
@@ -14873,7 +14903,7 @@ function cpInjBuild(p, sc, pieces){
         simulated: true, simulatedScenario: sc.k, simulatedLabel: sc.label,
         run: { runId: runId, valDoc: 'INSP-' + String(p.partNum || '') + '-' + String(p.rev || 'REV1'),
                operation: 'OP-' + String(p.opNum || ''), partNumber: String(p.partNum || ''),
-               shopOrder: so, serialNumber: sn, operatorInitials: 'SIM',
+               shopOrder: so, serialNumber: sn, operatorInitials: w,
                cycleMinutes: null, dateStartedUtc: stamp, dateCompletedUtc: stamp,
                createdUtc: stamp, cloudSavedUtc: stamp, freqSkipped: [],
                simulated: true, simulatedScenario: sc.k },
@@ -14881,8 +14911,10 @@ function cpInjBuild(p, sc, pieces){
       }
     });
   }
-  return { runs: runs, shopOrder: so, features: feats.length,
-           dims: feats.filter(f => !f.attribute).length };
+  const so = who.map(w => soFor[w]).join(', ');
+
+  return { runs: runs, shopOrder: so, features: feats.length, machinists: who,
+           spanDays: spanDays, dims: feats.filter(f => !f.attribute).length };   /* Rev-996 */
 }
 /* Rev-990: a SPEAKING wrapper. Rich pressed the button and nothing happened, which means a
    throw went to the console where he will never see it. Now it lands on screen and in the
@@ -14952,6 +14984,21 @@ function _cpInjectPanel(idx){
     +   '<div style="margin-top:14px; font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">HOW MANY PIECES</div>'
     +   '<select id="injN" style="width:100%; font-size:15px; padding:9px; margin-top:6px; border:1px solid #c9c0b4; border-radius:8px;">'
     +     '<option>5</option><option selected>10</option><option>30</option><option>50</option></select>'
+    +   '<div style="display:flex; gap:16px; margin-top:14px;">'
+    +     '<div style="flex:1;">'
+    +       '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">HOW MANY MACHINISTS</div>'
+    +       '<select id="injM" style="width:100%; font-size:15px; padding:9px; margin-top:6px; border:1px solid #c9c0b4; border-radius:8px;">'
+    +         '<option value="1">1 \u00b7 SIM-A</option><option value="2">2 \u00b7 SIM-A, SIM-B</option>'
+    +         '<option value="3" selected>3 \u00b7 SIM-A to SIM-C</option><option value="4">4 \u00b7 SIM-A to SIM-D</option></select>'
+    +     '</div>'
+    +     '<div style="flex:1;">'
+    +       '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">HOW MANY DAYS OF MACHINING</div>'
+    +       '<select id="injD" style="width:100%; font-size:15px; padding:9px; margin-top:6px; border:1px solid #c9c0b4; border-radius:8px;">'
+    +         '<option value="1">1 day \u00b7 today only</option><option value="2">2 days</option>'
+    +         '<option value="7" selected>1 week</option><option value="14">2 weeks</option>'
+    +         '<option value="30">1 month</option></select>'
+    +     '</div>'
+    +   '</div>'
     +   '<div id="injNote" style="margin-top:14px; font-size:12px; color:#6b6257;"></div>'
     + '</div>'
     + '<div style="display:flex; gap:12px; padding:14px 20px; border-top:1px solid #e2ddd4; background:#faf7f2;">'
@@ -14965,7 +15012,7 @@ function _cpInjectPanel(idx){
      refused the markup, getElementById returns null and the old code threw on this line -
      which is exactly what "the button does nothing" looks like from the outside. */
   const _q = id => document.getElementById(id);
-  if(!_q('injGo') || !_q('injSc') || !_q('injN')){
+  if(!_q('injGo') || !_q('injSc') || !_q('injN') || !_q('injM') || !_q('injD')){
     flash('\u26a0 The Inject panel did not build correctly \u2014 nothing was written. Send the Action Log.', true);
     try{ logAct('error', 'inject panel markup did not build'); }catch(_){ }
     return;
@@ -14984,7 +15031,9 @@ function _cpInjectPanel(idx){
       const n = parseInt(_q('injN').value, 10) || 10;
       if(!rows.length){ flash('This operation has no ballooned rows to generate against.', true); return; }
       if(!ghConfigured()){ flash('GitHub is not set up on this device, so runs cannot be saved.', true); return; }
-      const built = cpInjBuild(p, sc, n);
+      const nm = parseInt(_q('injM').value, 10) || 1;
+      const nd = parseInt(_q('injD').value, 10) || 1;
+      const built = cpInjBuild(p, sc, n, nm, nd);   /* Rev-996 */
       close();
       flash('\ud83e\uddea Generating ' + built.runs.length + ' simulated piece(s) \u2026');
       let ok = 0;
@@ -14999,9 +15048,10 @@ function _cpInjectPanel(idx){
       /* Rev-988: zero saved is a FAILURE, not a quiet count. */
       if(!ok){ flash('\u26a0 INJECTION SAVED NOTHING \u2014 0 of ' + built.runs.length
         + ' pieces were written. Check GitHub settings and the Action Log.', true); return; }
-      flash('\u2713 ' + ok + ' of ' + built.runs.length + ' simulated pieces saved as shop order '
-        + built.shopOrder + ' \u2014 ' + built.dims + ' measured feature(s). Reports hides them until '
-        + 'simulated runs are switched on.');
+      flash('\u2713 ' + ok + ' of ' + built.runs.length + ' simulated pieces saved \u2014 '
+        + built.machinists.length + ' machinist(s) (' + built.machinists.join(', ') + ') across '
+        + built.spanDays + ' day(s) \u00b7 ' + built.dims + ' measured feature(s). '
+        + 'Reports and Review hide them until simulated runs are switched on.');
     }catch(e){
       console.error('Rev-986 inject failed', e);
       flash('Could not inject: ' + (e && e.message || e), true);
