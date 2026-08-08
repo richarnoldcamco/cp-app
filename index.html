@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1013</title>
+<title>CONTROL PLAN GENERATOR - Rev-1014</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1013 · 2026-08-08 3:38 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1014 · 2026-08-08 3:40 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1013 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:38 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1014 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-08 3:40 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1013 · Built Aug 8, 2026</span>
+    <span id="revFooter">App Rev-1014 · Built Aug 8, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1013";
+const APP_REV = "Rev-1014";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-1014", type: "App", changes: ["EDIT AND DELETE ON EVERY GAGE ROW, AND FOUR BROKEN ICONS FIXED (Rev-1014, embedded validation REV-260) — per Rich. FIRST, THE ICONS, and this one is mine: four panel headings were written with a backslash-U escape, which JavaScript does not understand, so the GAGES heading read U0001F527 GAGES instead of showing a spanner. The same mistake was sitting unnoticed in LINE INSPECTION LEVELS, LINE INSPECTIONS and HARDWARE NEEDED. All four now carry the character itself, which is the standing rule in this file and was the rule before I broke it. SECOND, EDIT and DELETE on every row of the gage panel. Without them a wrong gage meant leaving for the full list and finding it again among every other part’s gages. EDIT walks the four fields that matter — what the gage is, its status, who has it, notes — and REFUSES a status that is not one of the five rather than writing a word the list cannot colour. DELETE asks first, and says the thing that is easy to get wrong: taking a gage off the list does NOT clear the Special Gage / Fixture box on the Control Plan row, so editing that row will put the gage back. Clear the box on the row if it should stay gone. Both write to the gage register itself, so this panel and the full gage list cannot end up showing different facts. WHAT TO TEST (rule 8): open GAGES on 1000237620 OP-030 — the heading should show a spanner, not U0001F527. Press EDIT on bubble 3, set the status to ORDERED and assign it to somebody; the row should redraw in orange and the under-Step-6 button should still read 2 OPEN / 2. Try a status of BANANA and it should refuse it."] },
   { ts: "2026-08-08", rev: "App Rev-1013", type: "App", changes: ["STEP 6 SITS BACK ON THE LINE WITH THE OTHERS (Rev-1013, embedded validation REV-260) — per Rich, and it is Rev-1012’s doing. The step row centres its columns vertically, which never showed while every column was the same height. Hanging the GAGES button under Step 6 made that one column taller, and centring then lifted the whole column — caption and tile together — above the line of the rest. The row now top-aligns its columns, so every caption and every tile starts at the same height and GAGES simply hangs below Step 6 without moving it. One line of layout; nothing else touched. WHAT TO TEST (rule 8): on 1000237620 OP-030 the STEP 6 caption and tile should line up with STEP 5 and STEP 7, with GAGES · 2 OPEN / 2 underneath it. Same on OP-040, where Step 6 is locked and greyed."] },
   { ts: "2026-08-08", rev: "App Rev-1012", type: "App", changes: ["GAGES MOVES UNDER ASSIGN MEASUREMENT TYPES, IN WHITE (Rev-1012, embedded validation REV-260) — per Rich, and it belongs there. A gage exists only because the Special Gage / Fixture box was filled on a row in STEP 6, so the button now hangs directly beneath that step rather than standing in the numbered track. White background, and it turns red-edged with red text when any gage is still open, so an outstanding gage is visible from the list without opening anything. It stops being a numbered step for a reason worth keeping: in the track it read as one more thing to finish before the plan was done, and it never was — a gage that has not been made yet is a purchasing problem, not an unfinished Control Plan. LINE INSPECTION takes the freed number and is now STEP 8, so the track runs 1 to 8 with no gap. Nothing about what either button does has changed. WHAT TO TEST (rule 8): on 1000237620 OP-030 the GAGES button should sit under ASSIGN MEASUREMENT TYPES, white, reading GAGES · 2 OPEN / 2 in red, and still open the gage list on a click. LINE INSPECTION should now be labelled STEP 8, and OP-040 — which needs no gages — should show a plain white GAGES · NONE NEEDED."] },
   { ts: "2026-08-08", rev: "App Rev-1011", type: "App", changes: ["STEP 9 — LINE INSPECTION LEVELS (Rev-1011, embedded validation REV-260) — per Rich. A new tile beside GAGES, reading 0 / 14 SET or ALL 14 SET, opening a table of every feature row on the operation: BUBBLE, FEATURE DESCRIPTION, SPEC / TOLERANCE, MACHINIST CHECKS — the frequency already on the Control Plan, shown but never changed here — then LINE INSPECTION LEVEL and QUALITY PULLS A PART. The level is set per feature with three buttons, 1 2 3, plus NONE; the INTERVAL for each level is set once for the whole operation at the top, in yellow boxes because they are the numbers that matter, and the last column resolves the two into plain words: EVERY 25 PARTS, or NEVER where no level is set. A running count sits beside each level so an operation with everything on Level 1 is obvious before it becomes a workload. Features with no level are called out in a yellow bar, because no level means never pulled and that should be a decision rather than an oversight. Defaults are every 5, 25 and 100 parts — they are a starting point to change, not a recommendation. Levels ride on the plan and sync like everything else on it. Like STEP 8 this never locks and is worth nothing toward the percentage: it says how often quality re-checks a feature, not whether the plan is built. THE EMAIL IS NOT BUILT AND IS NOT CLAIMED TO BE. Nothing is sent — outbound mail is still waiting on the Office 365 sign-in fix that is holding up the nightly digest, and the panel says so on its face. Recording the intervals now means there is something to send the day it works. WHAT TO TEST (rule 8): on 1000237620 OP-030 press STEP 9, set a few features to 1, 2 and 3, change Level 2 to every 40 parts, and watch the last column follow. Close and reopen — it should all still be there, and the tile should count what is set."] },
@@ -3111,7 +3112,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "3:38 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:40 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -11593,7 +11594,7 @@ function cpLineLevelPanel(idx){
       c.innerHTML = '<div style="background:#1a5276; color:#fff; padding:12px 20px; display:flex;'
           + ' align-items:center; gap:14px;">'
         +   '<div style="font-weight:800; letter-spacing:.04em; font-size:17px; flex:1 1 auto;">'
-        +     '\U0001F4D0 LINE INSPECTION LEVELS \u00b7 ' + esc(head) + '</div>'
+        +     '📐 LINE INSPECTION LEVELS \u00b7 ' + esc(head) + '</div>'
         +   '<button id="cpLlX" style="background:#a02020; color:#fff; border:2px solid #7a1414;'
         +     ' border-radius:8px; padding:8px 22px; font-weight:800; font-size:13px; cursor:pointer;">'
         +     '\u2715 Close</button>'
@@ -11682,10 +11683,10 @@ function cpGagePanel(idx){
     } else {
       rows = '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
         + '<thead><tr>'
-        + ['BUBBLE', 'FEATURE', 'SPEC / TOLERANCE', 'GAGE OR FIXTURE NEEDED', 'STATUS', 'ASSIGNED TO']
+        + ['BUBBLE', 'FEATURE', 'SPEC / TOLERANCE', 'GAGE OR FIXTURE NEEDED', 'STATUS', 'ASSIGNED TO', '']
             .map((th, ix) => '<th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8;'
               + ' color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:'
-              + (ix === 0 || ix === 4 || ix === 5 ? 'center' : 'left') + ';">' + th + '</th>').join('')
+              + (ix === 0 || ix >= 4 ? 'center' : 'left') + ';">' + th + '</th>').join('')
         + '</tr></thead><tbody>'
         + list.map(g => {
             const done = String(g.status || '').toUpperCase() === 'COMPLETE';
@@ -11709,6 +11710,16 @@ function cpGagePanel(idx){
               +   '</td>'
               + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center; color:#3a352e;">'
               +   (g.assignedTo ? esc(g.assignedTo) : '<span style="color:#b9b3aa;">\u2014</span>') + '</td>'
+              /* Rev-1014: edit and delete, per Rich - without them a wrong gage meant leaving for
+                 the full list and finding it again among every other part's gages. */
+              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+              +   ' white-space:nowrap;">'
+              +   '<button type="button" data-gedit="' + esc(g.key) + '" style="font-size:11px;'
+              +     ' font-weight:800; padding:5px 11px; margin-right:5px; border:1px solid #1a5276;'
+              +     ' background:#fff; color:#1a5276; border-radius:6px; cursor:pointer;">EDIT</button>'
+              +   '<button type="button" data-gdel="' + esc(g.key) + '" style="font-size:11px;'
+              +     ' font-weight:800; padding:5px 11px; border:1px solid #8a2a2a; background:#fff;'
+              +     ' color:#8a2a2a; border-radius:6px; cursor:pointer;">DELETE</button></td>'
               + '</tr>'; }).join('')
         + '</tbody></table>';
     }
@@ -11716,7 +11727,7 @@ function cpGagePanel(idx){
     c.innerHTML = '<div style="background:#1a5276; color:#fff; padding:12px 20px; display:flex;'
         + ' align-items:center; gap:14px;">'
       +   '<div style="font-weight:800; letter-spacing:.04em; font-size:17px; flex:1 1 auto;">'
-      +     '\U0001F527 GAGES \u00b7 ' + esc(part) + (opNum ? (' \u00b7 OP-' + esc(opNum)) : '') + '</div>'
+      +     '🔧 GAGES \u00b7 ' + esc(part) + (opNum ? (' \u00b7 OP-' + esc(opNum)) : '') + '</div>'
       +   '<button id="cpGgX" style="background:#a02020; color:#fff; border:2px solid #7a1414;'
       +     ' border-radius:8px; padding:8px 22px; font-weight:800; font-size:13px; cursor:pointer;">'
       +     '\u2715 Close</button>'
@@ -11748,6 +11759,58 @@ function cpGagePanel(idx){
       ov.remove(); return;
     }
     _x.onclick = () => ov.remove();
+    /* Rev-1014: edit in place. The register is the one store, so this writes there and
+       redraws - the full gage list and this panel can never show different facts. */
+    c.querySelectorAll('[data-gedit]').forEach(b => { b.onclick = () => {
+      try{
+        const map = cpGagesGet(); const g = map[b.getAttribute('data-gedit')];
+        if(!g){ flash('That gage is no longer on the list.', true); return; }
+        const desc = prompt('GAGE OR FIXTURE NEEDED \u2014 bubble ' + (g.bubble || ''), g.desc || '');
+        if(desc === null) return;
+        const stat = prompt('STATUS \u2014 one of: ' + CP_GAGE_STATUSES.join(', '),
+                            g.status || CP_GAGE_STATUSES[0]);
+        if(stat === null) return;
+        const su = String(stat || '').trim().toUpperCase();
+        if(CP_GAGE_STATUSES.indexOf(su) < 0){
+          flash('\u26a0 ' + su + ' is not one of the five statuses \u2014 nothing was changed.', true);
+          return;
+        }
+        const who = prompt('ASSIGNED TO (leave empty for nobody)', g.assignedTo || '');
+        if(who === null) return;
+        const note = prompt('NOTES (leave empty for none)', g.notes || '');
+        if(note === null) return;
+        g.desc = String(desc).trim(); g.status = su;
+        g.assignedTo = String(who).trim(); g.notes = String(note).trim();
+        g.ut = new Date().toISOString();
+        map[g.key] = g; cpGagesSet(map);
+        try{ logAct('gage', 'edited from the operation panel'); }catch(_){ }
+        flash('\u2714 Saved.');
+        ov.remove(); renderProjects(); cpGagePanel(idx);
+      }catch(e){
+        console.error('Rev-1014 gage edit failed', e);
+        flash('Could not save it: ' + (e && e.message || e), true);
+      }
+    }; });
+    c.querySelectorAll('[data-gdel]').forEach(b => { b.onclick = async () => {
+      try{
+        const key = b.getAttribute('data-gdel');
+        const map = cpGagesGet(); const g = map[key];
+        if(!g){ flash('That gage is no longer on the list.', true); return; }
+        const ok = await cpConfirmBox('REMOVE THIS GAGE?',
+          'This takes <b>' + String(g.desc || '').replace(/</g, '&lt;') + '</b> off the gage list '
+          + 'for bubble ' + (g.bubble || '') + '.<br><br>The Special Gage / Fixture box on the '
+          + 'Control Plan row is NOT cleared, so editing that row will put it back. Clear the box '
+          + 'on the row itself if it should stay gone.', '\ud83d\uddd1 Remove it');
+        if(!ok) return;
+        delete map[key]; cpGagesSet(map);
+        try{ logAct('gage', 'removed from the operation panel'); }catch(_){ }
+        flash('\u2714 Gage removed.');
+        ov.remove(); renderProjects(); cpGagePanel(idx);
+      }catch(e){
+        console.error('Rev-1014 gage delete failed', e);
+        flash('Could not remove it: ' + (e && e.message || e), true);
+      }
+    }; });
     const _f = document.getElementById('cpGgFull');
     if(_f) _f.onclick = () => { ov.remove(); try{ showGages(); }
       catch(e){ console.warn('Rev-1009 could not open the gage list', e); } };
@@ -15613,7 +15676,7 @@ function cpHwOpen(){
     ov.innerHTML = '<div style="background:#1a5276; color:#fff; padding:14px 20px; display:flex;'
         + ' align-items:center; gap:14px;">'
       +   '<div style="font-weight:800; letter-spacing:.04em; font-size:17px; flex:1 1 auto;">'
-      +     '\U0001F5A5\uFE0F HARDWARE NEEDED</div>'
+      +     '🖥️ HARDWARE NEEDED</div>'
       +   '<button id="cpHwBack" style="background:#fff; color:#1a5276; border:none; border-radius:8px;'
       +     ' padding:8px 18px; font-weight:800; font-size:13px; cursor:pointer;">\u21a9 Back</button>'
       + '</div>'
@@ -16380,7 +16443,7 @@ function cpLineInspPanel(idx){
     c.innerHTML = '<div style="background:#1a5276; color:#fff; padding:12px 20px; display:flex;'
         + ' align-items:center; gap:14px;">'
       +   '<div style="font-weight:800; letter-spacing:.04em; font-size:17px; flex:1 1 auto;">'
-      +     '\U0001F4CB LINE INSPECTIONS \u00b7 ' + esc(head) + '</div>'
+      +     '📋 LINE INSPECTIONS \u00b7 ' + esc(head) + '</div>'
       +   '<button id="cpLiX" style="background:#a02020; color:#fff; border:2px solid #7a1414;'
       +     ' border-radius:8px; padding:8px 22px; font-weight:800; font-size:13px; cursor:pointer;">'
       +     '\u2715 Close</button>'
