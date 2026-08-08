@@ -1685,7 +1685,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-988";
+const APP_REV = "Rev-989";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2213,6 +2213,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-08", rev: "App Rev-989", type: "App", changes: ["THE THIRD BACKGROUND TIMER IS GATED TOO, AND THE CHASE STOPS AFTER ONE TRY (Rev-989, embedded validation REV-260) \u2014 Rich reported the blinking again, and the curtain he photographed named it: Publishing Rev-988, the site is catching up. That is ghAutoPublishPages, a THIRD background timer - and Rev-983 gated only two of them. My miss, stated plainly: the leader guard covered the update check and the app push and left the website publisher running in every copy. It is gated now. TWO MORE CHANGES THAT ATTACK THE BLINK ITSELF. (1) The reload chase drops from three attempts to ONE: the API reports a new revision the instant it is pushed, but GitHub Pages serves the old file for a while afterwards, so reloading to chase it lands back on the old copy and tries again - three times per revision, and every new revision reset the counter. One try, then the quiet one-tap banner, which is what should have happened all along. (2) The cooldown between self-updates goes from 45 seconds to THREE MINUTES, so a burst of revisions arriving minutes apart can no longer turn into a burst of reloads. HONESTLY: while revisions are being pushed every few minutes some updating is unavoidable - the app is doing its job. These changes stop it happening several times per revision and in several copies at once. WHAT TO TEST (rule 8): with one tab open, the app should update at most once per revision and show a banner rather than reloading again. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-988", type: "App", changes: ["THE ACTIONS ROW FITS THE SCREEN AGAIN (Rev-988, embedded validation REV-260) \u2014 per Rich: two new buttons in three revisions - \ud83e\uddea Inject Data at Rev-986 and \ud83d\udcca Review Data at Rev-987 - pushed the actions row past the window and put a horizontal scrollbar across the bottom of the whole app. Every action button is smaller: 32px tall to 26, 12px text to 10.5, padding 12 to 7, and each fixed width cut - the row went from about 970px of buttons to about 700, roughly 28 percent narrower, which is more than the two new buttons cost. The two new ones drop their words to \ud83e\uddea INJECT and \ud83d\udcca REVIEW, since the tooltips already carry the full explanation. The row also WRAPS now instead of forcing the page wider, so a narrower window stacks the buttons onto a second line rather than growing a scrollbar - the scrollbar can no longer come back on a smaller screen. AND A SILENT FAILURE CLOSED: if an injection saves nothing at all, it now says so in red instead of reporting 0 of 10 in a neutral tone, because a run of zeros read as success is exactly how Rich came to think Review Data was broken when the problem was upstream of it. WHAT TO TEST (rule 8): the Control Plans list should have no scrollbar along the bottom. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-987", type: "App", changes: ["\ud83d\udcca REVIEW DATA - CAPABILITY PER FEATURE (Rev-987, embedded validation REV-260) \u2014 per Rich: a button beside Inspect that reads every run stored for the operation and reports what the process is actually doing. One line per ballooned feature: pieces measured, mean, min, max, CPK and how many fell out of tolerance, with the Cpk coloured - 1.33 and above green, 1.00 to 1.33 amber, below 1.00 red, and any feature with a piece out of tolerance flagged regardless of what its Cpk says. Click a line to see every individual reading behind it with the out-of-tolerance ones marked. THE MATHS IS STATED, NOT ASSUMED: Cpk is min(USL-mean, mean-LSL) / 3 sigma with sigma the SAMPLE standard deviation (n-1), and it is refused outright on fewer than 5 pieces - a Cpk off three parts is a number with no meaning, and printing one would be worse than printing nothing. Features with no numeric limits are listed with their pass count rather than an invented capability. SIMULATED RUNS ARE EXCLUDED unless the same tick used in Reports is on, and when they are included the panel says so in orange across the top - a capability number off fabricated data must never be mistaken for evidence. Runs are fetched in parallel batches with a progress line, because the store already holds over a thousand files. WHAT TO TEST (rule 8): press \ud83d\udcca Review Data on 1000237620 OP-030 - with simulated runs off it should say there is nothing to summarise; tick them on and the injected batch should appear with a Cpk near what was asked for. Payload verified in both repos before this entry."] },
   { ts: "2026-08-08", rev: "App Rev-986", type: "App", changes: ["\ud83e\uddea INJECT DATA - SIMULATED RUNS AT A CHOSEN CPK (Rev-986, embedded validation REV-260) \u2014 per Rich: a button beside Inspect that fills an operation with believable measurement data so the reports, the capability maths and the whole inspection flow can be exercised without machining fifty parts. Eight scenarios - Cpk 2.00, 1.67, 1.33, 1.00, 0.67, SHIFTED (capable but off-centre), DRIFTING (walks across the run like tool wear) and ONE BAD PIECE - across 5, 10, 30 or 50 pieces. Readings are generated against EACH FEATURE\u2019S OWN limits read off the plan, rounded to the decimal places those limits imply, so a .0005 band gets four-place numbers and a .010 band gets three. Features with no numeric limits get a pass rather than an invented number. THE SAFETY, WHICH IS THE POINT: this writes fabricated readings into a quality-records system for ITAR parts, so a simulated run can never be mistaken for a real one. Every record carries simulated:true, the scenario that made it, and an appRev reading SIMULATED - NOT REAL MEASUREMENT DATA; the operator initials are SIM; the shop order is SIM-xxxx so the filename itself declares it; and Reports HIDES them unless \u2018include simulated runs\u2019 is ticked, saying how many it is hiding. Injection is REFUSED outright on any operation already marked ready for production - that is where the real damage would be - and the button is EXPERT USER only so it never sits in front of a machinist. WHAT TO TEST (rule 8): press \ud83e\uddea INJECT DATA on an unreleased operation, choose Cpk 1.33 and 30 pieces, then open Reports and confirm the batch is hidden until the tick is on. Payload verified in both repos before this entry."] },
@@ -3078,7 +3079,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:31 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "10:52 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -18610,6 +18611,8 @@ async function ghPublishPages(silent){
 let _autoPubBusy = false, _autoPubLast = 0;
 async function ghAutoPublishPages(){
   if(localStorage.getItem('ghPagesSync') !== '1') return;   // opt-in
+  /* Rev-989: belt and braces - publishing is the leader's job however it is reached. */
+  if(typeof cpTabIsLeader === 'function' && !cpTabIsLeader()) return;
   if(!ghConfigured() || _autoPubBusy) return;
   if(Date.now() - _autoPubLast < 60000) return;
   _autoPubBusy = true; _autoPubLast = Date.now();
@@ -18990,7 +18993,8 @@ async function ghAutoUpdateApp(){
   // reload chasing one target rev.
   try{
     const lastTs = parseInt(localStorage.getItem('cpAutoUpdLastTs') || '0');
-    if(lastTs && Date.now() - lastTs < 45000) return;
+    /* Rev-989: 45s let a burst of revisions become a burst of reloads. Three minutes. */
+    if(lastTs && Date.now() - lastTs < 180000) return;
   }catch(_){ }
   _autoUpdBusy = true; _autoUpdLast = Date.now();
   try {
@@ -19009,7 +19013,11 @@ async function ghAutoUpdateApp(){
     let _chase = { rev: null, n: 0 };
     try{ _chase = JSON.parse(localStorage.getItem('cpAutoUpdChase') || 'null') || { rev: null, n: 0 }; }catch(_){ }
     if(_chase.rev !== remoteRev) _chase = { rev: remoteRev, n: 0 };
-    if(_chase.n >= 3){
+    /* Rev-989: ONE try, not three. The API reports a new rev the instant it is pushed, but
+       Pages serves the old file for a while after - so a reload lands back on the old copy
+       and tries again. Three attempts per rev, with every new rev resetting the counter, is
+       what Rich was watching. One try, then the banner. */
+    if(_chase.n >= 1){
       if(typeof showAppUpdateAvailable === 'function') showAppUpdateAvailable(remoteRev);
       try{ logAct('nav', 'auto-update paused after 3 tries chasing ' + remoteRev); }catch(_){ }
       return;
@@ -22877,7 +22885,10 @@ report can be read instead of guessed at.
   // and safe: busy-flag, once-a-minute throttle, and never updating mid-task in an editor.
   document.addEventListener('click', () => ghAutoUpdateApp(), true);
   document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') ghAutoUpdateApp(); });
-  setInterval(ghAutoPublishPages, 60000);
+  /* Rev-989: LEADER ONLY. Rev-983 gated the update check and the app push and missed this
+     one - it is the "Publishing ... the site is catching up" curtain Rich photographed. */
+  setInterval(() => { if(typeof cpTabIsLeader === 'function' && !cpTabIsLeader()) return;
+                      ghAutoPublishPages(); }, 60000);
   cpRequestPersistentStorage();
   // Rev-420: safety net — when you leave/close/background the app, flush a silent data push so
   // the last edits can't sit only on the device. Cheap no-op when GitHub isn't configured.
