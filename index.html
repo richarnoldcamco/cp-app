@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1061</title>
+<title>CONTROL PLAN GENERATOR - Rev-1062</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1061 · 2026-08-09 5:22 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1062 · 2026-08-09 5:32 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1061 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 5:22 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1062 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 5:32 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -585,7 +585,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1061 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1062 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1708,7 +1708,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1061";
+const APP_REV = "Rev-1062";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2236,6 +2236,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1062", type: "App", changes: ["🔎 SENIOR QE GETS A COLUMN (Rev-1062, embedded validation REV-260) — per Rich, in the empty band he circled between the levels table and the drawing. The screen already read as two men doing two jobs; there is a third, and until now he appeared only at the very bottom of the page where a queue could grow unseen. His column carries one number — how many parts are waiting on him — with the first eight serials as buttons that open that part’s readings, and a count of any beyond. Green with a plain statement while nothing has failed, red the moment something has, so the state of the queue is visible from across the room rather than after a scroll. THE WORDING STAYS DELIBERATE: those parts are neither scrap nor good until he has measured them, which is the whole reason a queue exists rather than a count. The two working columns and the drawing give up a little width to make room, and the full list stays at the bottom — this is the tally and the way in, not a replacement. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 with the inspector’s gauge set poor — a SENIOR QE column should sit between LINE INSPECTOR and the ODS drawing, turn red as parts fail, and its buttons should open the comparison."] },
   { ts: "2026-08-09", rev: "App Rev-1061", type: "App", changes: ["A READING IS ROUNDED WHERE IT IS TAKEN, NOT WHERE IT IS PRINTED (Rev-1061, embedded validation REV-260) — per Rich, and it settles a thing that has come up three times today. Four decimal places were being applied to the DISPLAY while the arithmetic ran at full precision, so a difference that showed as .0004 could be judged as .00042 and fail against an allowance of .0004 — the screen arguing with itself, and no way for the reader to tell which was right. A gauge that resolves to a ten-thousandth reports .0004, not .00042. BOTH MEN’S READINGS ARE NOW ROUNDED TO FOUR PLACES AT THE MOMENT THEY ARE TAKEN, and the difference between them is rounded the same way, so the number on the screen IS the number every figure downstream is worked out from: the share of the band, the allowance comparison, the out-of-tolerance count, the scrap count and both capability figures. Nothing is hidden behind a digit nobody can measure. On the row that prompted this, LARGE OD now reads exactly .0004 against an allowance of .0004 and MATCHES, which is what the screen was already saying. WHAT TO TEST (rule 8): ⇄ COMPARE a critical inspection on 1000237620 OP-030 — every difference should be a whole number of ten-thousandths, and no row should read as being on the allowance while flagged as over it."] },
   { ts: "2026-08-09", rev: "App Rev-1060", type: "App", changes: ["THE SHARE AND THE ALLOWANCE ARE NOW BOTH SHARES (Rev-1060, embedded validation REV-260) — Rich looked at a row reading -0.0004 against an allowance of 0.0004, flagged as a fail, and asked why. Fair question: the two numbers on screen were identical. The reading is really about .00042, which is 21% of a .0020 band and genuinely over the line, but FOUR DECIMAL PLACES ROUND IT TO .0004 and the row then argues with itself. This is the third time rounding has hidden a margin, so the fix is to stop mixing units rather than to add a digit back. Each comparison line now prints its share of the band against THE ALLOWANCE AS A SHARE TOO: 21% of band · allowed 20% reads as the fail it is, and on a tight feature where the .0002 floor governs, 28% of band · allowed 40% reads as the pass it is. The small print turns red on a flagged line so the two figures are read together. Nothing about the rule or the arithmetic changed — only the unit they are shown in. WHAT TO TEST (rule 8): ⇄ COMPARE a critical inspection on 1000237620 OP-030 — LARGE OD should read 21% of band, allowed 20%, and SMALL ID 28% of band, allowed 40%."] },
   { ts: "2026-08-09", rev: "App Rev-1059", type: "App", changes: ["A FLOOR OF .0002 UNDER THE 20% RULE (Rev-1059, embedded validation REV-260) — per Rich, and it is the right correction to a rule that was half right. Twenty per cent of a .0005 band is .0001, and asking two men with two gauges to agree to a ten-thousandth is asking more than the gauges can give: at that point the disagreement is in the measuring, not the part, and flagging it teaches people to ignore flags. THE ALLOWANCE IS NOW 20% OF THE BAND OR .0002, WHICHEVER IS LARGER. A .0005 feature is judged at .0002 — so the LARGE OD reading -0.0004 still fails, while the SMALL ID reading -0.0001 at 28% of its band now MATCHES, which is the honest answer. A .010 feature is still judged at .0020, unchanged. The tile and column are renamed OVER THE ALLOWANCE because the number is no longer a flat percentage, and each line of the comparison now prints the allowance it was judged against beside its share of the band, so a row that reads 28% and passes says why on its face. Both constants live at the top: CP_SIM_PCT and CP_SIM_FLOOR. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, ⇄ COMPARE a critical inspection — SMALL ID should show allowed .0002 and pass at a .0001 difference; LARGE OD should still fail at .0004."] },
@@ -3174,7 +3175,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "5:22 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "5:32 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16293,11 +16294,13 @@ function cpSimCritResults(key, rows, marks, every, made, pcpk, icpk, mgcpk,
       const bb = String(r.bubble).trim(), lim = cpSimLimits(r.spec);
       const m = cpSimRead(key, x.serial, bb, lim, pcpk, mgcpk);
       const i = cpSimReadLI(key, x.serial, bb, lim, icpk, pcpk);
-      const dv = i - m;
+      /* Rev-1062 fix: Rev-1061 declared this const and then reassigned it two lines
+         later. node --check passes that; the browser throws the moment the results
+         section is drawn. Rounded once, where it is created. */
+      const dv = cpSimTo4(i - m);
       diffs.push(dv);
       if(cpSimTolFlag(lim, dv)) overCount++;   /* Rev-1053: each against its own band */
       const bandW = lim.hi - lim.lo;
-      dv = cpSimTo4(dv);   /* Rev-1061: the difference of two four-place readings */
       return { bubble: bb, desc: r.featureDesc || '', diff: dv, over: cpSimTolFlag(lim, dv),
                pct: bandW ? (Math.abs(dv) / bandW * 100) : 0,
                band: lim.hi - lim.lo };
@@ -16570,8 +16573,10 @@ function cpSimPanel(wantIdx){
          third column is not created at all and they keep it. */
       let simOds = '';
       try{ simOds = cpOpOdsImage(pl.p) || ''; }catch(e){ console.warn('Rev-1049 ODS lookup failed', e); }
+      /* Rev-1062: a third man gets a column. */
       h += '<div style="display:grid; grid-template-columns:' + (simOds
-             ? 'minmax(0,0.85fr) minmax(0,1fr) minmax(340px,480px)' : 'minmax(0,1fr) minmax(0,1fr)')
+             ? 'minmax(0,0.8fr) minmax(0,1fr) minmax(200px,250px) minmax(300px,430px)'
+             : 'minmax(0,0.9fr) minmax(0,1fr) minmax(200px,250px)')
         +   '; gap:16px; align-items:start; margin-bottom:20px;">'
         + '<div style="grid-column:1; font-size:13px; font-weight:800; letter-spacing:.08em;'
         +   ' color:#1a5276; border-bottom:3px solid #1a5276; padding-bottom:6px;">'
@@ -16579,7 +16584,10 @@ function cpSimPanel(wantIdx){
         + '<div style="grid-column:2; font-size:13px; font-weight:800; letter-spacing:.08em;'
         +   ' color:#8a3a12; border-bottom:3px solid #8a3a12; padding-bottom:6px;">'
         +   '\ud83d\udccb LINE INSPECTOR</div>'
-        + (simOds ? ('<div style="grid-column:3; font-size:13px; font-weight:800; letter-spacing:.08em;'
+        + '<div style="grid-column:3; font-size:13px; font-weight:800; letter-spacing:.08em;'
+        +   ' color:#5b2a86; border-bottom:3px solid #5b2a86; padding-bottom:6px;">'
+        +   '\ud83d\udd0e SENIOR QE</div>'
+        + (simOds ? ('<div style="grid-column:4; font-size:13px; font-weight:800; letter-spacing:.08em;'
                      + ' color:#3a352e; border-bottom:3px solid #c9c0b4; padding-bottom:6px;">'
                      + '\ud83d\udcd0 ODS \u00b7 OP-' + esc(String(pl.p.opNum || '')) + '</div>')
                   : '')
@@ -16749,7 +16757,37 @@ function cpSimPanel(wantIdx){
         + '</tbody></table></div></div>'
         + liTilesHtml
         + '</div>'
-        + (simOds ? ('<div style="grid-column:3; grid-row:2 / span 2;">'
+        /* ----- Rev-1062: the senior QE's own column ----- */
+        + (function(){
+            const crT = cpSimCritResults(key, rows, marks, every, made, st.pcpk, st.icpk,
+                                         st.mgcpk, elapsedSec, st.gapSec, st.baseSn);
+            const q = crT ? crT.lines.filter(l => l.over > 0) : [];
+            return '<div style="grid-column:3; grid-row:2 / span 2;">'
+              + '<div style="border:2px solid ' + (q.length ? '#a5342a' : '#cfe3d4')
+              +   '; border-radius:12px; padding:14px; background:'
+              +   (q.length ? '#fff5f4' : '#f2f8f3') + ';">'
+              + '<div style="font-size:10.5px; font-weight:800; letter-spacing:.06em;'
+              +   ' color:#6b6257;">WAITING ON A SENIOR QE</div>'
+              + '<div style="font-size:34px; font-weight:800; line-height:1.15; color:'
+              +   (q.length ? '#a5342a' : '#1d6b3f') + ';">' + q.length + '</div>'
+              + '<div style="font-size:11px; color:#6b6257; margin-bottom:10px;">'
+              +   (q.length ? 'part(s) neither scrap nor good until he has measured them'
+                            : 'every inspection so far matched') + '</div>'
+              + (q.length
+                  ? ('<div style="display:flex; flex-direction:column; gap:6px;">'
+                     + q.slice(0, 8).map(l => '<button data-simrow="' + l.level + '|' + l.serial + '"'
+                         + ' style="border:1px solid #a5342a; background:#fff; color:#a5342a;'
+                         + ' border-radius:7px; padding:6px 9px; font-weight:800; font-size:12px;'
+                         + ' cursor:pointer; text-align:left;">S/N ' + l.serial
+                         + ' <span style="font-weight:600; font-size:10.5px;">\u00b7 '
+                         + Math.round(l.worstPct) + '% of band</span></button>').join('')
+                     + (q.length > 8 ? ('<div style="font-size:10.5px; color:#6b6257;">'
+                                        + '\u2026 and ' + (q.length - 8) + ' more below</div>') : '')
+                     + '</div>')
+                  : '')
+              + '</div></div>';
+          })()
+        + (simOds ? ('<div style="grid-column:4; grid-row:2 / span 2;">'
                      + '<img id="cpSimOds" src="' + simOds + '" alt="ODS drawing"'
                      + ' title="Click to open the drawing full screen"'
                      + ' style="width:100%; height:auto; max-height:calc(100vh - 190px);'
