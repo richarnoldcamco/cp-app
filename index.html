@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1052</title>
+<title>CONTROL PLAN GENERATOR - Rev-1053</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1052 · 2026-08-09 2:23 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1053 · 2026-08-09 2:29 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1052 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 2:23 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1053 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 2:29 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -585,7 +585,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1052 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1053 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1708,7 +1708,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1052";
+const APP_REV = "Rev-1053";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2236,6 +2236,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1053", type: "App", changes: ["THE DISAGREEMENT THRESHOLD BECOMES A SHARE OF THE TOLERANCE (Rev-1053, embedded validation REV-260) — per Rich, and it is the more honest rule. A flat .0002 treated a feature held to .0005 exactly the same as one held to .010: on the tight one it is forty per cent of everything you have and worth stopping for, on the loose one it is two per cent and nobody would look twice. The two men are now called out when they disagree by more than 20% OF THAT FEATURE’S OWN TOLERANCE BAND — .0001 on a .0005 feature, .0020 on a .010 one — and the panel says so in those words. ONE RULE EVERYWHERE. The side-by-side comparison was using .0004 and the critical-features summary .0002, two different fixed numbers for the same idea; both now use the share. The OVER column and its tile are relabelled OVER 20% OF BAND, and the count behind them is worked out feature by feature rather than against one number. The WORST DEVIATION figure is coloured by whether THAT reading broke its own feature’s threshold, not by comparing a raw thousandth against a fixed one, and MEASUREMENT VARIATION and BIAS are judged against the average band the same way. The percentage lives in one constant, CP_SIM_PCT, so 20 becomes 10 in a single line. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — the blurb should read 20% of tolerance, and a small deviation on a tight feature should now flag where the same number on a loose feature does not."] },
   { ts: "2026-08-09", rev: "App Rev-1052", type: "App", changes: ["THE DISAGREEMENTS COME FIRST (Rev-1052, embedded validation REV-260) — per Rich. The comparison listed features in drawing order, so on a seven-feature inspection the three that disagreed could sit at the bottom and the reader had to go past four that agreed to find them. The reason anybody opens that panel is to see what went wrong. Flagged rows now sort to the top, worst first among them, and the ones that agree keep their own order underneath — nothing is hidden, it is only ordered by what is worth looking at. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 with the inspector’s gauge set poor, then ⇄ COMPARE a row with several flags — the CHECK THE GAUGES lines should be the first rows in the table, biggest difference at the top."] },
   { ts: "2026-08-09", rev: "App Rev-1051", type: "App", changes: ["THE COMPARISON BECOMES A REAL OVERLAY, WITH THE DRAWING BESIDE IT (Rev-1051, embedded validation REV-260) — per Rich. It was a block wedged into the middle of the page, which is not what it is: it is a thing you open, look at, and close. It now takes 80% of the screen over a dimmed backdrop, and clicking the dim closes it the way every other overlay in this app does. THE ODS PRINT STANDS BESIDE THE READINGS, taking 38% of the panel and staying put while the readings scroll, so a flagged bubble can be found on the drawing without leaving the comparison — which is the whole reason anybody opens it. On an operation with no drawing loaded the readings simply take the full width. Nothing about the numbers, the flags or the .0004 threshold changed. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, press ⇄ COMPARE on any row — the comparison should fill most of the screen with the OP-030 print down its right side, and clicking the dimmed area outside should close it."] },
   { ts: "2026-08-09", rev: "App Rev-1050", type: "App", changes: ["THE DRAWING GETS REAL WIDTH, AND THE INSPECTOR STARTS ON THE MACHINIST’S ROW (Rev-1050, embedded validation REV-260) — two from Rich, and the second was a fault rather than a preference. The inspector’s block was being dropped BELOW the machinist’s metrics strip, leaving a band of empty screen beside his big serial number, because the grid was told which COLUMN each block belonged to and never which ROW — so it placed them in the order they were written. Every block is now told its row: the machinist’s number on row two with his metrics under it, and the inspector’s block and the drawing each spanning both rows from the top. The empty band is gone and the whole screen is shorter. THE ODS COLUMN GROWS from 240-300px to 340-480px, taking the width off the two working columns, which is the right trade: the tables were already comfortable and a print you cannot read is a print you open full screen every time. It is also 20px taller. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — NEXT SERIAL TO LINE INSPECT should sit level with LAST SERIAL MADE AND MEASURED, with no empty band between them, and the OP-030 print should be noticeably bigger down the right."] },
@@ -3165,7 +3166,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:23 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "2:29 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16163,7 +16164,17 @@ function cpSimMetrics(key, rows, made, win, pcpk, icpk, useLI, mgcpk){
    offset of its own - a different seed, so the two are independent, and a spread that can
    be dialled. CP_SIM_FLAG is the disagreement that matters: more than four ten-thousandths
    between them and the pair is flagged. */
-const CP_SIM_FLAG = 0.0004;
+/* ===== Rev-1053: THE THRESHOLD IS A SHARE OF THE TOLERANCE, NOT A FIXED NUMBER =====
+   A flat .0002 treated a feature held to .0005 the same as one held to .010, which is
+   backwards: on the tight one it is 40% of everything you have, on the loose one it is 2%
+   and nobody would look twice. The two men are now called out when they disagree by more
+   than 20% OF THAT FEATURE'S OWN TOLERANCE BAND. One rule everywhere - the comparison
+   panel and the critical-features summary used to carry two different fixed numbers. */
+const CP_SIM_PCT = 0.20;
+function cpSimTolFlag(lim, diff){
+  return Math.abs(diff) > CP_SIM_PCT * (lim.hi - lim.lo);
+}
+const CP_SIM_FLAG = 0.0004;   /* kept for anything still referring to it */
 /* The inspector measures the SAME part with his own gauge, and the accuracy of that gauge
    is its own Cpk. A poor one does not change the part - it makes his DATA read worse, which
    is the whole reason to watch his figure next to the machinist's. */
@@ -16185,7 +16196,7 @@ function cpSimCompare(key, rows, marks, level, sn, icpk, pcpk, mgcpk){
     const m = cpSimRead(key, sn, b, lim, pcpk, mgcpk), l = cpSimReadLI(key, sn, b, lim, icpk, pcpk);
     const d = l - m;
     return { bubble: b, desc: r.featureDesc || '', lim: lim, mach: m, insp: l, diff: d,
-             flag: Math.abs(d) > CP_SIM_FLAG,
+             flag: cpSimTolFlag(lim, d),
              machOut: (m > lim.hi || m < lim.lo), inspOut: (l > lim.hi || l < lim.lo) };
   });
 }
@@ -16221,6 +16232,7 @@ function cpSimCritResults(key, rows, marks, every, made, pcpk, icpk, mgcpk){
   });
   insp.sort((a, b) => b.serial - a.serial);
   const diffs = [];
+  let overCount = 0;
   const lines = insp.slice(0, 250).map(x => {
     const feats = use.filter(r => x.level === 1 ? true
                     : (marks[String(r.bubble).trim()] === x.level));
@@ -16230,12 +16242,15 @@ function cpSimCritResults(key, rows, marks, every, made, pcpk, icpk, mgcpk){
       const i = cpSimReadLI(key, x.serial, bb, lim, icpk, pcpk);
       const dv = i - m;
       diffs.push(dv);
-      return { bubble: bb, desc: r.featureDesc || '', diff: dv, over: Math.abs(dv) > CP_SIM_CRIT,
+      if(cpSimTolFlag(lim, dv)) overCount++;   /* Rev-1053: each against its own band */
+      return { bubble: bb, desc: r.featureDesc || '', diff: dv, over: cpSimTolFlag(lim, dv),
                band: lim.hi - lim.lo };
     });
-    const worst = rowsOut.reduce((a, r) => Math.abs(r.diff) > Math.abs(a) ? r.diff : a, 0);
+    let worst = 0, worstOver = false;
+    rowsOut.forEach(r => { if(Math.abs(r.diff) > Math.abs(worst)){ worst = r.diff; worstOver = r.over; } });
     return { serial: x.serial, level: x.level, n: rowsOut.length,
-             over: rowsOut.filter(r => r.over).length, worst: worst, feats: rowsOut };
+             over: rowsOut.filter(r => r.over).length, worst: worst,
+             worstOver: worstOver, feats: rowsOut };
   });
   if(!diffs.length) return null;
   const n = diffs.length;
@@ -16243,9 +16258,11 @@ function cpSimCritResults(key, rows, marks, every, made, pcpk, icpk, mgcpk){
   const sd = n > 1 ? Math.sqrt(diffs.reduce((a, b) => a + (b - mean) * (b - mean), 0) / (n - 1)) : 0;
   const absMax = diffs.reduce((a, b) => Math.max(a, Math.abs(b)), 0);
   const meanAbs = diffs.reduce((a, b) => a + Math.abs(b), 0) / n;
-  const over = diffs.filter(d => Math.abs(d) > CP_SIM_CRIT).length;
+  const over = overCount;
   const bandAvg = use.reduce((a, r) => { const L = cpSimLimits(r.spec); return a + (L.hi - L.lo); }, 0) / use.length;
+  const worstOver = lines.some(l => l.worstOver && Math.abs(l.worst) === absMax);
   return { lines: lines, n: n, mean: mean, sd: sd, absMax: absMax, meanAbs: meanAbs,
+           bandAvg: bandAvg, worstOver: worstOver,
            over: over, pct: over / n * 100, gagePct: bandAvg ? (6 * sd / bandAvg * 100) : 0,
            critNamed: critNamed, critCount: use.length, inspections: insp.length };
 }
@@ -16700,8 +16717,10 @@ function cpSimPanel(wantIdx){
               +   '<div style="font-size:15px; font-weight:800; color:#000;">LINE INSPECTION OF S/N '
               +     cm.serial + ' \u00b7 LEVEL ' + cm.level + ' \u00b7 ' + LN[cm.level] + '</div>'
               +   '<div style="font-size:13px; font-weight:800; color:' + (flags ? '#a5342a' : '#1d6b3f') + ';">'
-              +     (flags ? ('\u2691 ' + flags + ' of ' + cmp.length + ' disagree by more than .0004')
-                           : ('\u2714 all ' + cmp.length + ' agree within .0004')) + '</div>'
+              +     (flags ? ('\u2691 ' + flags + ' of ' + cmp.length + ' disagree by more than '
+                                  + Math.round(CP_SIM_PCT * 100) + '% of tolerance')
+                           : ('\u2714 all ' + cmp.length + ' agree within '
+                              + Math.round(CP_SIM_PCT * 100) + '% of tolerance')) + '</div>'
               +   '<button id="cpSimCmpX" style="margin-left:auto; padding:10px 16px; border:1px solid #c9c0b4;'
               +     ' background:#fff; color:#3a352e; border-radius:8px; font-weight:800; font-size:12.5px;'
               +     ' cursor:pointer;">CLOSE</button>'
@@ -16738,7 +16757,8 @@ function cpSimPanel(wantIdx){
                   + '</tr>').join('')
               + '</tbody></table>'
               + '<div style="font-size:11.5px; color:#6b6257; margin-top:12px; line-height:1.6;">'
-              +   'A flag is not a bad part \u2014 it is the two of them not agreeing. Either gauge '
+              +   'A flag is a disagreement of more than ' + Math.round(CP_SIM_PCT * 100)
+              +   '% of that feature\u2019s tolerance. It is not a bad part \u2014 it is the two of them not agreeing. Either gauge '
               +   'could be the wrong one, and that is the point of looking: a part reading in '
               +   'tolerance to one man and out to the other is how a bad part leaves the building.'
               + '</div></div>'
@@ -16775,25 +16795,29 @@ function cpSimPanel(wantIdx){
                     ? ('The ' + cr.critCount + ' feature(s) marked LEVEL 2 \u00b7 CRITICAL ONLY on Step 8.')
                     : ('No feature has been marked CRITICAL ONLY on Step 8, so every dimensional '
                        + 'feature is treated as critical here \u2014 ' + cr.critCount + ' of them.'))
-              +   ' A deviation over <b>' + CP_SIM_CRIT.toFixed(4) + '</b> between the two men is '
-              +   'called out.</div>'
+              +   ' The two men are called out when they disagree by more than <b>'
+              +   Math.round(CP_SIM_PCT * 100) + '% of that feature\u2019s own tolerance band</b> '
+              +   '\u2014 which on a .0005 feature is .0001, and on a .010 feature is .0020.</div>'
               + '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr));'
               +   ' gap:12px; margin-bottom:16px;">'
-              + t2('MEASUREMENT VARIATION', cr.sd.toFixed(4), cr.sd > CP_SIM_CRIT ? '#a5342a' : '#1d6b3f',
+              + t2('MEASUREMENT VARIATION', cr.sd.toFixed(4),
+                   (cr.sd > CP_SIM_PCT * (cr.bandAvg || 1)) ? '#a5342a' : '#1d6b3f',
                    'sd of the differences \u00b7 ' + cr.gagePct.toFixed(1) + '% of the tolerance band')
               + t2('AVERAGE DEVIATION', cr.meanAbs.toFixed(4), '#3a352e',
                    'how far apart they typically read')
               + t2('BIAS', cpSimDev(cr.mean),
-                   Math.abs(cr.mean) > CP_SIM_CRIT / 2 ? '#a35400' : '#1d6b3f',
+                   Math.abs(cr.mean) > (CP_SIM_PCT / 2) * (cr.bandAvg || 1) ? '#a35400' : '#1d6b3f',
                    cr.mean >= 0 ? 'inspector reads high on average' : 'inspector reads low on average')
-              + t2('WORST DEVIATION', cr.absMax.toFixed(4), cr.absMax > CP_SIM_CRIT ? '#a5342a' : '#1d6b3f',
+              + t2('WORST DEVIATION', cr.absMax.toFixed(4), cr.worstOver ? '#a5342a' : '#1d6b3f',
                    'largest single disagreement')
-              + t2('OVER ' + CP_SIM_CRIT.toFixed(4), cr.over, cr.over ? '#a5342a' : '#1d6b3f',
+              + t2('OVER ' + Math.round(CP_SIM_PCT * 100) + '% OF BAND', cr.over,
+                   cr.over ? '#a5342a' : '#1d6b3f',
                    cr.pct.toFixed(1) + '% of ' + cr.n + ' critical reading(s)')
               + '</div>'
               + '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
               + '<thead><tr>'
-              + ['S/N','INSPECTION','CRITICAL FEATURES CHECKED','OVER ' + CP_SIM_CRIT.toFixed(4),
+              + ['S/N','INSPECTION','CRITICAL FEATURES CHECKED',
+                 'OVER ' + Math.round(CP_SIM_PCT * 100) + '% OF BAND',
                  'WORST DEVIATION','']
                   .map((th, ix) => '<th style="border-bottom:1px solid #d8d3ca; padding:7px 9px;'
                     + ' background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px;'
@@ -16814,7 +16838,7 @@ function cpSimPanel(wantIdx){
                   +   ' font-weight:800; color:' + (x.over ? '#a5342a' : '#6b6257') + ';">'
                   +   (x.over || '\u2014') + '</td>'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
-                  +   ' font-weight:700; color:' + (Math.abs(x.worst) > CP_SIM_CRIT ? '#a5342a' : '#3a352e')
+                  +   ' font-weight:700; color:' + (x.worstOver ? '#a5342a' : '#3a352e')
                   +   ';">' + cpSimDev(x.worst) + '</td>'
                   /* Rev-1047: the list of every offending bubble is gone. The row now carries
                      the MAX difference and nothing else, with a small button to open the full
