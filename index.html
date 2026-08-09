@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1063</title>
+<title>CONTROL PLAN GENERATOR - Rev-1064</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1063 · 2026-08-09 5:44 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1064 · 2026-08-09 5:54 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1063 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 5:44 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1064 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 5:54 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -585,7 +585,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1063 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1064 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1708,7 +1708,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1063";
+const APP_REV = "Rev-1064";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2236,6 +2236,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1064", type: "App", changes: ["A SMALLER DRAWING AND A HALF-HEIGHT CONTROL ROW (Rev-1064, embedded validation REV-260) — per Rich. The ODS column was taking 26% of a wide screen and running the full height of the window; it now takes 17% and stops at 44% of the window height, which still reads at a glance and gives the three working sections the room. Click it and it still opens full screen, which is where a print is actually read. THE CONTROL ROW is cut to about half its height — the dropdowns from 10px padding to 5, the two buttons from 13 to 7, the gap between a label and its box from 5 to 2 — without shrinking the text so far it cannot be read on the floor. Nothing was removed; it simply stops taking a fifth of the screen to set up a run that gets set up once. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — the row of dropdowns should be about half as tall, the print smaller down the right, and clicking the print should still open it full screen."] },
   { ts: "2026-08-09", rev: "App Rev-1063", type: "App", changes: ["THE WHOLE SCREEN, IN THREE SECTIONS (Rev-1063, embedded validation REV-260) — per Rich. The panel was capped at 2200px and centred, so on a wide monitor it left a margin either side while the tables inside were cramped. It now takes the full width of the window. The layout is read as THREE SECTIONS, one per man — what the MACHINIST measures, what the LINE INSPECTOR finds, and what is owed to the SENIOR QE — with the drawing in a fourth column beside them. The middle section is given the most room because it carries the levels table and the queue state; the senior QE column stays narrow because it carries a count and a short list. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — the screen should fill the window edge to edge with three headed sections and the print on the right."] },
   { ts: "2026-08-09", rev: "App Rev-1062", type: "App", changes: ["🔎 SENIOR QE GETS A COLUMN (Rev-1062, embedded validation REV-260) — per Rich, in the empty band he circled between the levels table and the drawing. The screen already read as two men doing two jobs; there is a third, and until now he appeared only at the very bottom of the page where a queue could grow unseen. His column carries one number — how many parts are waiting on him — with the first eight serials as buttons that open that part’s readings, and a count of any beyond. Green with a plain statement while nothing has failed, red the moment something has, so the state of the queue is visible from across the room rather than after a scroll. THE WORDING STAYS DELIBERATE: those parts are neither scrap nor good until he has measured them, which is the whole reason a queue exists rather than a count. The two working columns and the drawing give up a little width to make room, and the full list stays at the bottom — this is the tally and the way in, not a replacement. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 with the inspector’s gauge set poor — a SENIOR QE column should sit between LINE INSPECTOR and the ODS drawing, turn red as parts fail, and its buttons should open the comparison."] },
   { ts: "2026-08-09", rev: "App Rev-1061", type: "App", changes: ["A READING IS ROUNDED WHERE IT IS TAKEN, NOT WHERE IT IS PRINTED (Rev-1061, embedded validation REV-260) — per Rich, and it settles a thing that has come up three times today. Four decimal places were being applied to the DISPLAY while the arithmetic ran at full precision, so a difference that showed as .0004 could be judged as .00042 and fail against an allowance of .0004 — the screen arguing with itself, and no way for the reader to tell which was right. A gauge that resolves to a ten-thousandth reports .0004, not .00042. BOTH MEN’S READINGS ARE NOW ROUNDED TO FOUR PLACES AT THE MOMENT THEY ARE TAKEN, and the difference between them is rounded the same way, so the number on the screen IS the number every figure downstream is worked out from: the share of the band, the allowance comparison, the out-of-tolerance count, the scrap count and both capability figures. Nothing is hidden behind a digit nobody can measure. On the row that prompted this, LARGE OD now reads exactly .0004 against an allowance of .0004 and MATCHES, which is what the screen was already saying. WHAT TO TEST (rule 8): ⇄ COMPARE a critical inspection on 1000237620 OP-030 — every difference should be a whole number of ten-thousandths, and no row should read as being on the allowance while flagged as over it."] },
@@ -3176,7 +3177,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "5:44 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "5:54 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16527,13 +16528,13 @@ function cpSimPanel(wantIdx){
 
       let h = '<div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-bottom:18px;">'
         + '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">OPERATION'
-        +   '<select id="cpSimSel" style="display:block; margin-top:5px; padding:10px; font-size:14px;'
+        +   '<select id="cpSimSel" style="display:block; margin-top:2px; padding:5px 8px; font-size:13px;'
         +   ' font-weight:700; border:1px solid #c9c0b4; border-radius:8px; min-width:250px;">'
         +   plans.map((x, i) => '<option value="' + i + '"' + (i === sel ? ' selected' : '') + '>'
               + esc(x.label) + '</option>').join('')
         +   '</select></label>'
         + '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">A PART EVERY'
-        +   '<select id="cpSimGap" style="display:block; margin-top:5px; padding:10px; font-size:14px;'
+        +   '<select id="cpSimGap" style="display:block; margin-top:2px; padding:5px 8px; font-size:13px;'
         +   ' font-weight:700; border:1px solid #c9c0b4; border-radius:8px; background:#fafa96;">'
         /* Rev-1031: 1 and 2 seconds added, per Rich - a block of 30 parts takes half a minute
            at 1 second, so a whole cycle of due-fetch-inspect can be watched end to end. */
@@ -16547,18 +16548,18 @@ function cpSimPanel(wantIdx){
            ['cpSimIcpk','INSPECTOR GAUGE', st.icpk || CP_SIM_ICPK]].map(c =>
             '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
             + c[1]
-            + '<select id="' + c[0] + '" style="display:block; margin-top:5px; padding:10px;'
-            + ' font-size:14px; font-weight:700; border:1px solid #c9c0b4; border-radius:8px;">'
+            + '<select id="' + c[0] + '" style="display:block; margin-top:2px; padding:5px 8px;'
+            + ' font-size:13px; font-weight:700; border:1px solid #c9c0b4; border-radius:7px;">'
             + [0.67, 1.00, 1.33, 1.67, 2.00].map(v =>
                 '<option value="' + v + '"' + (c[2] === v ? ' selected' : '') + '>'
                 + v.toFixed(2) + '</option>').join('')
             + '</select></label>').join('')
-        + '<button id="cpSimToggle" style="padding:13px 26px; border:none; border-radius:9px;'
+        + '<button id="cpSimToggle" style="padding:7px 18px; border:none; border-radius:8px;'
         +   ' font-size:14px; font-weight:800; cursor:pointer; color:#fff; background:'
         +   (st.on ? '#a02020' : '#1d6b3f') + ';">' + (st.on ? '\u25A0 STOP THE MACHINIST'
                                                              : '\u25B6 START THE MACHINIST') + '</button>'
-        + '<button id="cpSimSetup" style="padding:13px 18px; border:1px solid #c9c0b4; background:#fff;'
-        +   ' color:#3a352e; border-radius:9px; font-size:12.5px; font-weight:800; cursor:pointer;">'
+        + '<button id="cpSimSetup" style="padding:7px 14px; border:1px solid #c9c0b4; background:#fff;'
+        +   ' color:#3a352e; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;">'
         +   '\u2699 SET UP AGAIN</button>'
         + '</div>';
 
@@ -16582,7 +16583,7 @@ function cpSimPanel(wantIdx){
          find a job before it reads a number. The drawing sits in the fourth column beside
          them where there is room for it. */
       h += '<div style="display:grid; grid-template-columns:' + (simOds
-             ? 'minmax(0,1fr) minmax(0,1.35fr) minmax(230px,300px) minmax(280px,26vw)'
+             ? 'minmax(0,1fr) minmax(0,1.35fr) minmax(230px,300px) minmax(220px,17vw)'
              : 'minmax(0,1fr) minmax(0,1.35fr) minmax(230px,300px)')
         +   '; gap:14px; align-items:start; margin-bottom:20px;">'
         + '<div style="grid-column:1; font-size:13px; font-weight:800; letter-spacing:.08em;'
@@ -16797,7 +16798,7 @@ function cpSimPanel(wantIdx){
         + (simOds ? ('<div style="grid-column:4; grid-row:2 / span 2;">'
                      + '<img id="cpSimOds" src="' + simOds + '" alt="ODS drawing"'
                      + ' title="Click to open the drawing full screen"'
-                     + ' style="width:100%; height:auto; max-height:calc(100vh - 190px);'
+                     + ' style="width:100%; height:auto; max-height:44vh;'
                      + ' object-fit:contain; background:#fff; border:1px solid #d8d3ca;'
                      + ' border-radius:8px; cursor:zoom-in; display:block;">'
                      + '<div style="font-size:10.5px; color:#6b6257; margin-top:6px; text-align:center;">'
