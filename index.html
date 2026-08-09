@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1060</title>
+<title>CONTROL PLAN GENERATOR - Rev-1061</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1060 · 2026-08-09 5:12 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1061 · 2026-08-09 5:22 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1060 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 5:12 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1061 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 5:22 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -585,7 +585,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1060 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1061 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1708,7 +1708,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1060";
+const APP_REV = "Rev-1061";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2236,6 +2236,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1061", type: "App", changes: ["A READING IS ROUNDED WHERE IT IS TAKEN, NOT WHERE IT IS PRINTED (Rev-1061, embedded validation REV-260) — per Rich, and it settles a thing that has come up three times today. Four decimal places were being applied to the DISPLAY while the arithmetic ran at full precision, so a difference that showed as .0004 could be judged as .00042 and fail against an allowance of .0004 — the screen arguing with itself, and no way for the reader to tell which was right. A gauge that resolves to a ten-thousandth reports .0004, not .00042. BOTH MEN’S READINGS ARE NOW ROUNDED TO FOUR PLACES AT THE MOMENT THEY ARE TAKEN, and the difference between them is rounded the same way, so the number on the screen IS the number every figure downstream is worked out from: the share of the band, the allowance comparison, the out-of-tolerance count, the scrap count and both capability figures. Nothing is hidden behind a digit nobody can measure. On the row that prompted this, LARGE OD now reads exactly .0004 against an allowance of .0004 and MATCHES, which is what the screen was already saying. WHAT TO TEST (rule 8): ⇄ COMPARE a critical inspection on 1000237620 OP-030 — every difference should be a whole number of ten-thousandths, and no row should read as being on the allowance while flagged as over it."] },
   { ts: "2026-08-09", rev: "App Rev-1060", type: "App", changes: ["THE SHARE AND THE ALLOWANCE ARE NOW BOTH SHARES (Rev-1060, embedded validation REV-260) — Rich looked at a row reading -0.0004 against an allowance of 0.0004, flagged as a fail, and asked why. Fair question: the two numbers on screen were identical. The reading is really about .00042, which is 21% of a .0020 band and genuinely over the line, but FOUR DECIMAL PLACES ROUND IT TO .0004 and the row then argues with itself. This is the third time rounding has hidden a margin, so the fix is to stop mixing units rather than to add a digit back. Each comparison line now prints its share of the band against THE ALLOWANCE AS A SHARE TOO: 21% of band · allowed 20% reads as the fail it is, and on a tight feature where the .0002 floor governs, 28% of band · allowed 40% reads as the pass it is. The small print turns red on a flagged line so the two figures are read together. Nothing about the rule or the arithmetic changed — only the unit they are shown in. WHAT TO TEST (rule 8): ⇄ COMPARE a critical inspection on 1000237620 OP-030 — LARGE OD should read 21% of band, allowed 20%, and SMALL ID 28% of band, allowed 40%."] },
   { ts: "2026-08-09", rev: "App Rev-1059", type: "App", changes: ["A FLOOR OF .0002 UNDER THE 20% RULE (Rev-1059, embedded validation REV-260) — per Rich, and it is the right correction to a rule that was half right. Twenty per cent of a .0005 band is .0001, and asking two men with two gauges to agree to a ten-thousandth is asking more than the gauges can give: at that point the disagreement is in the measuring, not the part, and flagging it teaches people to ignore flags. THE ALLOWANCE IS NOW 20% OF THE BAND OR .0002, WHICHEVER IS LARGER. A .0005 feature is judged at .0002 — so the LARGE OD reading -0.0004 still fails, while the SMALL ID reading -0.0001 at 28% of its band now MATCHES, which is the honest answer. A .010 feature is still judged at .0020, unchanged. The tile and column are renamed OVER THE ALLOWANCE because the number is no longer a flat percentage, and each line of the comparison now prints the allowance it was judged against beside its share of the band, so a row that reads 28% and passes says why on its face. Both constants live at the top: CP_SIM_PCT and CP_SIM_FLOOR. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, ⇄ COMPARE a critical inspection — SMALL ID should show allowed .0002 and pass at a .0001 difference; LARGE OD should still fail at .0004."] },
   { ts: "2026-08-09", rev: "App Rev-1058", type: "App", changes: ["CRITICAL MEANS KC (Rev-1058, embedded validation REV-260) — per Rich. LEVEL 2 · CRITICAL ONLY was covering whatever had been ticked as level 2 on Step 8, which gave the simulator its own private idea of what a critical feature is. It now covers the features THE CONTROL PLAN ITSELF calls Key Characteristics — Class KC — and so does the MACHINIST vs LINE INSPECTOR section, which reads the same set. That is the right source: KC is decided on the plan under CP-6, where a total tolerance band under .0011 makes a feature key, so when a tolerance changes and the row re-classifies, the critical inspection follows it without anybody remembering to go back and re-tick a box. On 1000237620 OP-030 that is SMALL ID and LARGE OD, the two rows carrying KC, rather than the seven that were ticked. Level 1 is still the whole part and Level 3 still uses its Step 8 mark, so nothing else moves, and the FEAT column in the levels table now counts the same way the inspection does. Where a plan carries no KC row at all, every dimensional feature is treated as critical and the panel says so rather than reporting on nothing. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — CRITICAL ONLY should cover 2 features rather than 7, and the results section should say the features classed KC."] },
@@ -3173,7 +3174,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "5:12 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "5:22 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16145,9 +16146,16 @@ function cpSimSd(lim, cpk){ return (lim.hi - lim.lo) / (6 * Math.max(0.1, cpk ||
 function cpSimTrue(key, sn, bubble, lim, pcpk){
   return ((lim.hi + lim.lo) / 2) + cpSimGauss(key + '|T|' + bubble + '|' + sn) * cpSimSd(lim, pcpk);
 }
+/* Rev-1061: A READING IS ROUNDED TO FOUR PLACES AT THE MOMENT IT IS TAKEN, per Rich.
+   A gauge that resolves to a ten-thousandth reports .0004, not .00042. Rounding only the
+   display left the arithmetic arguing with the screen - a difference that showed as .0004
+   could be judged as .00042 and fail. Now the number the man writes down IS the number
+   everything downstream uses: the difference between two readings, its share of the band,
+   the out-of-tolerance count and the capability all follow from the same four places. */
+function cpSimTo4(v){ return Math.round(v * 10000) / 10000; }
 function cpSimRead(key, sn, bubble, lim, pcpk, mgcpk){
-  return cpSimTrue(key, sn, bubble, lim, pcpk)
-       + cpSimGauss(key + '|MG|' + bubble + '|' + sn) * cpSimSd(lim, mgcpk || CP_SIM_MGCPK);
+  return cpSimTo4(cpSimTrue(key, sn, bubble, lim, pcpk)
+       + cpSimGauss(key + '|MG|' + bubble + '|' + sn) * cpSimSd(lim, mgcpk || CP_SIM_MGCPK));
 }
 /* Rolling over the last WINDOW parts. The Cpk reported is the WORST feature's, because a
    plan is only as capable as the dimension most likely to fail - an average across
@@ -16209,8 +16217,8 @@ const CP_SIM_FLAG = 0.0004;   /* kept for anything still referring to it */
    is its own Cpk. A poor one does not change the part - it makes his DATA read worse, which
    is the whole reason to watch his figure next to the machinist's. */
 function cpSimReadLI(key, sn, bubble, lim, icpk, pcpk){
-  return cpSimTrue(key, sn, bubble, lim, pcpk)
-       + cpSimGauss(key + '|LI|' + bubble + '|' + sn) * cpSimSd(lim, icpk || CP_SIM_ICPK);
+  return cpSimTo4(cpSimTrue(key, sn, bubble, lim, pcpk)
+       + cpSimGauss(key + '|LI|' + bubble + '|' + sn) * cpSimSd(lim, icpk || CP_SIM_ICPK));
 }
 /* ===== Rev-1058: CRITICAL MEANS KC =========================================
    Level 2 no longer reads a hand-set mark on Step 8. It covers the features the
@@ -16237,9 +16245,10 @@ function cpSimCompare(key, rows, marks, level, sn, icpk, pcpk, mgcpk){
     /* Rev-1054 fix: the comparison rows carry their share of the band too. The first cut
        only added it to the summary rows, so every line of this table printed NaN%. */
     const bw = lim.hi - lim.lo;
-    return { bubble: b, desc: r.featureDesc || '', lim: lim, mach: m, insp: l, diff: d,
-             pct: bw ? (Math.abs(d) / bw * 100) : 0,
-             flag: cpSimTolFlag(lim, d),
+    const d4 = cpSimTo4(d);   /* Rev-1061 */
+    return { bubble: b, desc: r.featureDesc || '', lim: lim, mach: m, insp: l, diff: d4,
+             pct: bw ? (Math.abs(d4) / bw * 100) : 0,
+             flag: cpSimTolFlag(lim, d4),
              machOut: (m > lim.hi || m < lim.lo), inspOut: (l > lim.hi || l < lim.lo) };
   });
 }
@@ -16288,6 +16297,7 @@ function cpSimCritResults(key, rows, marks, every, made, pcpk, icpk, mgcpk,
       diffs.push(dv);
       if(cpSimTolFlag(lim, dv)) overCount++;   /* Rev-1053: each against its own band */
       const bandW = lim.hi - lim.lo;
+      dv = cpSimTo4(dv);   /* Rev-1061: the difference of two four-place readings */
       return { bubble: bb, desc: r.featureDesc || '', diff: dv, over: cpSimTolFlag(lim, dv),
                pct: bandW ? (Math.abs(dv) / bandW * 100) : 0,
                band: lim.hi - lim.lo };
