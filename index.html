@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1033</title>
+<title>CONTROL PLAN GENERATOR - Rev-1034</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1033 · 2026-08-09 11:56 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1034 · 2026-08-09 11:58 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1033 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:56 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1034 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:58 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1033 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1034 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1701,7 +1701,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1033";
+const APP_REV = "Rev-1034";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2229,6 +2229,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1034", type: "App", changes: ["THE SIMULATOR SPLITS INTO TWO COLUMNS — MACHINIST LEFT, LINE INSPECTOR RIGHT (Rev-1034, embedded validation REV-260) — per Rich, and it is the right way to read the screen because it is the way the floor actually works: two people doing two jobs. Down the LEFT, under a blue MACHINIST heading, everything belonging to the man making parts — the serial count and the whole HOW THE RUN IS GOING strip, rolling Cpk, out of tolerance, scrap and good parts. Down the RIGHT, under LINE INSPECTOR, everything belonging to the man pulling them — the next serial owed, its level, and the table of all three levels with their blocks and states. NOTHING MOVED BETWEEN THEM and no figure changed; the same numbers are simply standing where they belong, and a glance now tells you which job a number is about before you have read it. THE COMPARISON STAYS FULL WIDTH underneath, because it is the one thing on the screen that belongs to BOTH of them — putting it in either column would have said it was somebody’s business more than the other’s, and the whole point of a disagreement is that neither side owns it. The levels table headings are shortened to fit half a screen — COVERS, FEAT, SERIAL — and the metric tiles reflow to the narrower column. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — two headed columns, the count and capability on the left, the queue and levels on the right, and pressing INSPECT S/N should still open the comparison across the full width below."] },
   { ts: "2026-08-09", rev: "App Rev-1033", type: "App", changes: ["THE TWO MEASUREMENTS OF THE SAME PART, SIDE BY SIDE (Rev-1033, embedded validation REV-260) — per Rich. When a level comes due the row now offers INSPECT S/N 48, and pressing it opens the comparison: every feature that level covers, with the MACHINIST’s reading, the LINE INSPECTOR’s reading of the same part, and the DIFFERENCE. Anything over .0004 is flagged in red and the header counts them — 2 of 14 disagree by more than .0004. DONE — MARK INSPECTED closes it and moves the queue to the next block. THE INSPECTOR’S NUMBER IS NOT THE MACHINIST’S. Two people with two gauges never get the identical value, so it is the machinist’s reading plus an offset from a seed of its own, and a new GAUGE SPREAD control decides how far apart they sit: .0001 and they agree, .0002 is normal and about one part in sixteen trips the flag, .0004 and the gauges argue with a third of parts flagged. That is the dial for watching the mismatches unfold. A reading outside the tolerance is shown in red on whichever side saw it, so a part in tolerance to one man and out to the other is visible at a glance — which is how a bad part leaves the building, and the panel says so. A FLAG IS NOT A BAD PART, it is the two of them not agreeing, and either gauge could be the wrong one. Same rule as everywhere else on this screen: nothing is stored, the values come from the serial number, and none of it is measurement evidence. The one-second redraw leaves an open comparison alone. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, run to a due level, press INSPECT S/N — the table should list that level’s features with both readings and the difference; set GAUGE SPREAD to .0004 and reopen it, and far more should be flagged."] },
   { ts: "2026-08-09", rev: "App Rev-1032", type: "App", changes: ["HOW THE RUN IS GOING — CAPABILITY, SCRAP AND GOOD PARTS ON THE SIMULATOR (Rev-1032, embedded validation REV-260) — per Rich, and the screen widens to hold it: it was sitting in an 1100px column on a monitor twice that wide, and now takes 97% of the window. FIVE TILES across the top of the run: ROLLING CPK over the last 30 parts, QUALITY LEVEL in words, OUT OF TOLERANCE readings, SCRAP PARTS and GOOD PARTS with the percentage. THE CPK REPORTED IS THE WORST FEATURE’S, and the tile names which bubble it is — a plan is only as capable as the dimension most likely to fail, and an average across fourteen features would hide the one that matters. Under five parts it says so rather than drawing a number out of nothing. WHERE THE READINGS COME FROM, said plainly because it matters: they are DERIVED FROM THE SERIAL NUMBER as they are needed, not stored. The same part always gives the same value, so nothing grows and no figure changes under you between one second and the next; a normal spread centred in the tolerance band, a process sitting around Cpk 1.33. NONE OF IT IS WRITTEN ANYWHERE — nothing reaches the repository, nothing appears in Reports or Review, and none of it is measurement evidence. The footnote on the panel now says exactly that. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 at 1 second — under five parts the strip should say five are needed, then the five tiles should appear and settle around a Cpk of 1.3 with the worst bubble named. Stop and start again: the same serials should give the same figures."] },
   { ts: "2026-08-09", rev: "App Rev-1031", type: "App", changes: ["1 AND 2 SECONDS ON THE SIMULATOR PACE (Rev-1031, embedded validation REV-260) — per Rich. A PART EVERY now offers 1 second and 2 seconds alongside 10 seconds, 1 minute and the real ten minutes. It matters more than it sounds: at one second a block of 30 parts is over in half a minute, so a whole cycle — parts accumulating, a serial coming due, GO AND FETCH IT, MARK INSPECTED, the next block’s serial appearing — can be watched end to end without waiting. Two seconds was already there; one second is new. The count is still worked out from the clock rather than a timer, so the fast paces are as accurate as the slow ones. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, pick 1 second, press START THE MACHINIST — the left number should climb once a second and Level 2 should come due at S/N 5 within about five seconds."] },
@@ -3139,7 +3140,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:56 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:58 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16223,8 +16224,21 @@ function cpSimPanel(wantIdx){
         +   'RESET TO S/N 0</button>'
         + '</div>';
 
-      h += '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-bottom:20px;">'
-        + '<div style="border:2px solid #1a5276; border-radius:12px; padding:16px; background:#fff;">'
+      /* ===== Rev-1034: TWO COLUMNS. The floor is two people doing two jobs, and the screen
+         now reads that way - everything the MACHINIST does down the left, everything the LINE
+         INSPECTOR does down the right. Nothing moved between them: the counts, capability and
+         scrap belong to the man making parts, the queue and the levels belong to the man
+         pulling them. The comparison stays full width underneath, because it is the one thing
+         that belongs to BOTH of them. ===== */
+      h += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start;'
+        +   ' margin-bottom:20px;">'
+        + '<div style="grid-column:1; font-size:13px; font-weight:800; letter-spacing:.08em;'
+        +   ' color:#1a5276; border-bottom:3px solid #1a5276; padding-bottom:6px;">'
+        +   '\ud83d\udd27 MACHINIST</div>'
+        + '<div style="grid-column:2; font-size:13px; font-weight:800; letter-spacing:.08em;'
+        +   ' color:#8a3a12; border-bottom:3px solid #8a3a12; padding-bottom:6px;">'
+        +   '\ud83d\udccb LINE INSPECTOR</div>'
+        + '<div style="grid-column:1; border:2px solid #1a5276; border-radius:12px; padding:16px; background:#fff;">'
         +   '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
         +     'LAST SERIAL MADE AND MEASURED</div>'
         +   '<div style="font-size:46px; font-weight:800; color:#1a5276; line-height:1.1; margin-top:4px;">'
@@ -16233,8 +16247,8 @@ function cpSimPanel(wantIdx){
         +     (st.on ? ('running \u00b7 one part every ' + (st.gapSec >= 60
                         ? ((st.gapSec / 60) + ' min') : (st.gapSec + ' sec')))
                      : 'stopped') + '</div></div>'
-        + '<div style="border:2px solid ' + LC[next.level] + '; border-radius:12px; padding:16px;'
-        +   ' background:' + (next.state === 'DUE NOW' ? '#fff5f4' : '#fff') + ';">'
+        + '<div style="grid-column:2; border:2px solid ' + LC[next.level] + '; border-radius:12px;'
+        +   ' padding:16px; background:' + (next.state === 'DUE NOW' ? '#fff5f4' : '#fff') + ';">'
         +   '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
         +     'NEXT SERIAL TO LINE INSPECT</div>'
         +   '<div style="font-size:46px; font-weight:800; color:' + LC[next.level] + '; line-height:1.1; margin-top:4px;">'
@@ -16246,7 +16260,7 @@ function cpSimPanel(wantIdx){
         +     (next.state === 'DUE NOW'
                 ? ('\u2691 GO AND FETCH IT' + (next.late ? (' \u00b7 ' + next.late + ' parts late') : ''))
                 : ('waiting \u00b7 ' + (next.serial - made) + ' more part(s) to go')) + '</div></div>'
-        + '</div>';
+        + '';   /* Rev-1034: the grid stays open - the metrics and the levels go inside it */
 
       /* ----- Rev-1032: how the run is actually going ----- */
       const mx = cpSimMetrics(key, rows, made, 30);
@@ -16258,11 +16272,12 @@ function cpSimPanel(wantIdx){
         + '<div style="font-size:32px; font-weight:800; line-height:1.15; color:' + colour + ';">'
         +   value + '</div>'
         + '<div style="font-size:11px; color:#6b6257;">' + (sub2 || '') + '</div></div>';
-      h += '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;'
+      h += '<div style="grid-column:1;">'
+        + '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;'
         +   ' margin:4px 0 8px;">HOW THE RUN IS GOING'
         +   (mx ? (' \u00b7 LAST ' + mx.n + ' PARTS \u00b7 S/N ' + mx.from + '\u2013' + mx.to) : '')
         +   '</div>'
-        + '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));'
+        + '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));'
         +   ' gap:12px; margin-bottom:20px;">'
         + (!mx
             ? ('<div style="grid-column:1/-1; border:1px dashed #c9c0b4; border-radius:10px;'
@@ -16279,11 +16294,12 @@ function cpSimPanel(wantIdx){
                       'any part with a reading out')
                + tile('GOOD PARTS', mx.good, '#1d6b3f',
                       mx.n ? (Math.round(mx.good / mx.n * 100) + '% of the window') : '')))
-        + '</div>';
+        + '</div></div>';
 
-      h += '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
+      h += '<div style="grid-column:2;">'
+        + '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
         + '<thead><tr>'
-        + ['LEVEL', 'WHAT IT COVERS', 'FEATURES', 'EVERY', 'BLOCK', 'SERIAL WANTED', 'STATE', '']
+        + ['LEVEL', 'COVERS', 'FEAT', 'EVERY', 'BLOCK', 'SERIAL', 'STATE', '']
             .map((th, ix) => '<th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8;'
               + ' color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:'
               + (ix === 1 ? 'left' : 'center') + ';">' + th + '</th>').join('')
@@ -16312,7 +16328,8 @@ function cpSimPanel(wantIdx){
                      + ' border-radius:6px; cursor:pointer;">INSPECT S/N ' + d.serial + '</button>')
                   : '') + '</td>'
             + '</tr>').join('')
-        + '</tbody></table>'
+        + '</tbody></table></div>'
+        + '</div>'   /* Rev-1034: close the two columns; the comparison is full width */
         + (function(){
             /* ----- Rev-1033: the two measurements of the same part, side by side ----- */
             const cm = st.cmp;
