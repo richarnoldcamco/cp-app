@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1053</title>
+<title>CONTROL PLAN GENERATOR - Rev-1057</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1053 · 2026-08-09 2:29 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1057 · 2026-08-09 3:08 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1053 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 2:29 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1057 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 3:08 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -585,7 +585,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1053 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1057 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1708,7 +1708,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1053";
+const APP_REV = "Rev-1057";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2236,6 +2236,10 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1057", type: "App", changes: ["A RESULT COLUMN, A SENIOR QE QUEUE, AND TWO TIDY-UPS (Rev-1057, embedded validation REV-260) — three from Rich. FIRST, THE VERDICT IN WORDS. Every completed inspection now ends in either ✔ MATCHES in green or ⚑ FAILED — MISMATCH in red, rather than leaving it to be read out of a count. A mismatch is a pass or a fail, not a nuance. SECOND, A FAILED PART GOES INTO A QUEUE. Underneath the table, WAITING ON A SENIOR QUALITY ENGINEER lists every serial where the two men did not match, each a button that opens that part’s readings, with its level and its worst share of band on the face of it. The wording is deliberate: such a part is NOT SCRAP AND NOT GOOD until somebody senior has measured it, which is the whole reason a queue exists rather than a count. Where nothing has failed the panel says so in green instead of showing an empty box. THIRD, the two struck-out lines are gone — the “LAST 30 PARTS · S/N 70-99” on the strip heading and the WHOLE RUN line beneath it, both repeating what the tiles already say since the counts went whole-run at Rev-1055. And the levels table is compressed to stand level with the NEXT SERIAL card beside it rather than hanging below it. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 with the inspector’s gauge poor — failed rows should read FAILED — MISMATCH in red and their serials should appear as buttons in the queue below, each opening the comparison."] },
+  { ts: "2026-08-09", rev: "App Rev-1056", type: "App", changes: ["THE INSPECTOR TAKES 1 TO 5 SECONDS, NOT 0 TO 5 PARTS (Rev-1056, embedded validation REV-260) — per Rich, and it is the more sensible unit. The delay was counted in PARTS, which tied how long a man takes to walk across the shop to how fast the machine happens to be running: at ten minutes a part he was an hour late, at one second a part he was there almost immediately. The same walk takes the same time either way. Each block now carries its own delay of 1 to 5 SECONDS, fixed for that block and drawn the same deterministic way as the serial, counted from the moment the part he was sent for was finished. THE QUEUE IS STILL WORKED OUT FROM THE CLOCK and nothing is stored, so it survives the panel being closed and cannot disagree with itself — the elapsed time is read from the same clock the part count comes from, and where a run is stopped the maths falls back to the part count so a paused screen still reads sensibly. The screen says what it means now: THE INSPECTOR IS ON HIS WAY · 3 sec on the big card, and on his way · 2 of 4 sec in the levels table, instead of naming a serial he would finish at. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 at 1 second — a level coming due should sit as BEING INSPECTED for a few seconds and clear itself; switch to 10 seconds a part and the wait should still be a few seconds, not a few minutes."] },
+  { ts: "2026-08-09", rev: "App Rev-1055", type: "App", changes: ["SCRAP AND GOOD ARE WHOLE-RUN TOTALS, AND THE FIVE TILES SHARE ONE ROW (Rev-1055, embedded validation REV-260) — per Rich. He does not want to know how many of the last thirty were good; he wants to know how many the job has made and how many went in the bin. OUT OF TOLERANCE, SCRAP PARTS and GOOD PARTS now count the WHOLE RUN, each with its percentage of everything made, and they no longer read “n of 30”. CAPABILITY STAYS ROLLING and the heading says which is which — capability over the last 30, counts over the whole run — because a rolling Cpk is the one figure on that strip whose job is to show the process moving; the whole-run figure is on the line beneath it. That line drops the counts it was repeating and keeps the serial range and the run capability. The five tiles now sit in one row of five rather than wrapping to a second line, with the padding and the figures cut to suit — 23px rather than 32 — since five are now sharing the width three used to. The whole-run count is capped at the last 2,000 parts so a very long run cannot lock the screen up re-deriving every reading once a second. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, run past a few hundred parts — SCRAP and GOOD should be counting the whole run with their percentages, and all five tiles should sit on one line."] },
+  { ts: "2026-08-09", rev: "App Rev-1054", type: "App", changes: ["EVERY DEVIATION NOW SHOWS ITS SHARE OF THE BAND (Rev-1054, embedded validation REV-260) — Rich looked at a row reading -0.0019 with nothing flagged and asked, fairly, why that was not over 20%. It was not: that reading is on a .010 feature, and 20% of .010 is .0020, so −.0019 is 19% and just under. The number on screen could not say that, which is the fault. Every deviation now carries its share underneath it — the WORST column reads -0.0019 with “bubble 12 · 19% of its band” beneath, and each line of the side-by-side comparison carries its own percentage. A number that is judged against a rule should show the number the rule is judging. AND THE WORST LINE IS NOW THE WORST SHARE, NOT THE BIGGEST RAW FIGURE, which is the deeper version of the same mistake: a .0019 on a .010 feature is 19% and fine, while a .0003 on a .0005 feature is 60% and is the one that should be at the top of the row. The column is renamed WORST SHARE OF ITS BAND to say so. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — every worst-deviation figure should name its bubble and its percentage, a row showing under 20% should have a dash in the OVER column, and ⇄ COMPARE should show a percentage against every feature."] },
   { ts: "2026-08-09", rev: "App Rev-1053", type: "App", changes: ["THE DISAGREEMENT THRESHOLD BECOMES A SHARE OF THE TOLERANCE (Rev-1053, embedded validation REV-260) — per Rich, and it is the more honest rule. A flat .0002 treated a feature held to .0005 exactly the same as one held to .010: on the tight one it is forty per cent of everything you have and worth stopping for, on the loose one it is two per cent and nobody would look twice. The two men are now called out when they disagree by more than 20% OF THAT FEATURE’S OWN TOLERANCE BAND — .0001 on a .0005 feature, .0020 on a .010 one — and the panel says so in those words. ONE RULE EVERYWHERE. The side-by-side comparison was using .0004 and the critical-features summary .0002, two different fixed numbers for the same idea; both now use the share. The OVER column and its tile are relabelled OVER 20% OF BAND, and the count behind them is worked out feature by feature rather than against one number. The WORST DEVIATION figure is coloured by whether THAT reading broke its own feature’s threshold, not by comparing a raw thousandth against a fixed one, and MEASUREMENT VARIATION and BIAS are judged against the average band the same way. The percentage lives in one constant, CP_SIM_PCT, so 20 becomes 10 in a single line. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — the blurb should read 20% of tolerance, and a small deviation on a tight feature should now flag where the same number on a loose feature does not."] },
   { ts: "2026-08-09", rev: "App Rev-1052", type: "App", changes: ["THE DISAGREEMENTS COME FIRST (Rev-1052, embedded validation REV-260) — per Rich. The comparison listed features in drawing order, so on a seven-feature inspection the three that disagreed could sit at the bottom and the reader had to go past four that agreed to find them. The reason anybody opens that panel is to see what went wrong. Flagged rows now sort to the top, worst first among them, and the ones that agree keep their own order underneath — nothing is hidden, it is only ordered by what is worth looking at. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 with the inspector’s gauge set poor, then ⇄ COMPARE a row with several flags — the CHECK THE GAUGES lines should be the first rows in the table, biggest difference at the top."] },
   { ts: "2026-08-09", rev: "App Rev-1051", type: "App", changes: ["THE COMPARISON BECOMES A REAL OVERLAY, WITH THE DRAWING BESIDE IT (Rev-1051, embedded validation REV-260) — per Rich. It was a block wedged into the middle of the page, which is not what it is: it is a thing you open, look at, and close. It now takes 80% of the screen over a dimmed backdrop, and clicking the dim closes it the way every other overlay in this app does. THE ODS PRINT STANDS BESIDE THE READINGS, taking 38% of the panel and staying put while the readings scroll, so a flagged bubble can be found on the drawing without leaving the comparison — which is the whole reason anybody opens it. On an operation with no drawing loaded the readings simply take the full width. Nothing about the numbers, the flags or the .0004 threshold changed. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, press ⇄ COMPARE on any row — the comparison should fill most of the screen with the OP-030 print down its right side, and clicking the dimmed area outside should close it."] },
@@ -3166,7 +3170,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "2:29 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "3:08 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -11770,16 +11774,16 @@ function cpLineLevelPanel(idx){
               const b = String(r.bubble).trim();
               const l = levels[b];
               return '<tr>'
-                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;'
                 +   ' font-size:16px; font-weight:800; color:#000;">' + esc(b) + '</td>'
-                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#000;">'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; color:#000;">'
                 +   esc(r.featureDesc || '') + '</td>'
-                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#3a352e;'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; color:#3a352e;'
                 +   ' white-space:pre-line;">' + esc(r.spec || '') + '</td>'
-                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;'
                 +   ' color:#3a352e;">' + (r.freqEvery ? esc(r.freqEvery)
                       : '<span style="color:#b9b3aa;">\u2014</span>') + '</td>'
-                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;'
                 +   ' white-space:nowrap;">'
                 /* Rev-1020: LEVEL 1 IS ALWAYS ON. A Level 1 round covers every feature, so
                    this is a marker of fact rather than a choice - it is not a button and it
@@ -11802,7 +11806,7 @@ function cpLineLevelPanel(idx){
                 +     ' border:1px solid #c9c0b4; background:' + (l ? '#fff' : '#efeae1')
                 +     '; color:#6b6257;">L1 ONLY</button></td>'
                 /* Rev-1020: every round this feature is looked at on, Level 1 always first. */
-                + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;">'
+                + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;">'
                 +   [1].concat(l ? [l] : []).map(n =>
                       '<div style="font-weight:800; color:' + LCOL[n] + '; margin:1px 0;">'
                       + 'EVERY ' + (parseInt(every[n], 10) || 1) + ' PARTS'
@@ -12018,16 +12022,17 @@ function cpGagePanel(idx){
         + '<thead><tr>'
         + ['BUBBLE', 'FEATURE', 'ODS', 'SPEC / TOLERANCE', 'AUTHOR', 'GAGE OR FIXTURE NEEDED',
            'STATUS', 'ASSIGNED TO', '']
-            .map((th, ix) => '<th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8;'
+            /* Rev-1057: tighter, to stand level with the card beside it. */
+            .map((th, ix) => '<th style="border-bottom:1px solid #d8d3ca; padding:4px 8px; background:#f3efe8;'
               + ' color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:'
               + ([1, 3, 5].indexOf(ix) >= 0 ? 'left' : 'center') + ';">' + th + '</th>').join('')
         + '</tr></thead><tbody>'
         + list.map(g => {
             const done = String(g.status || '').toUpperCase() === 'COMPLETE';
             return '<tr style="background:' + (done ? '#f4faf5' : '#fff') + ';">'
-              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;'
               +   ' font-size:16px; font-weight:800; color:#000;">' + esc(g.bubble || '') + '</td>'
-              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#000;">'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; color:#000;">'
               +   esc(g.feature || '') + '</td>'
               /* Rev-1017: the feature's own inspection crop, small. A dash means no crop has
                  been cut for that bubble yet - the whole ODS print would say nothing at this size. */
@@ -12040,26 +12045,26 @@ function cpGagePanel(idx){
                        + ' border:1px solid #d8d3ca; border-radius:6px; cursor:zoom-in;'
                        + ' display:inline-block;">')
                     : '<span style="color:#b9b3aa;">\u2014</span>') + '</td>'
-              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#3a352e;">'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; color:#3a352e;">'
               +   esc(g.spec || '') + '</td>'
-              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;'
               +   ' color:#3a352e;">' + esc(g.author || CP_GAGE_AUTHOR) + '</td>'
-              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#000; font-weight:700;">'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; color:#000; font-weight:700;">'
               +   esc(g.desc || '')
               +   (g.notes ? '<div style="font-size:11px; font-weight:400; color:#6b6257; margin-top:4px;">\u270e '
                              + esc(g.notes) + '</div>' : '')
               +   '</td>'
-              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;">'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;">'
               +   '<b style="color:' + statusColour(g.status) + '; letter-spacing:.04em;">'
               +   esc(g.status || 'TO BE MADE') + '</b>'
               +   (g.ut ? ('<div style="font-size:10px; color:#6b6257; margin-top:3px;">'
                            + new Date(g.ut).toLocaleDateString() + '</div>') : '')
               +   '</td>'
-              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center; color:#3a352e;">'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">'
               +   (g.assignedTo ? esc(g.assignedTo) : '<span style="color:#b9b3aa;">\u2014</span>') + '</td>'
               /* Rev-1014: edit and delete, per Rich - without them a wrong gage meant leaving for
                  the full list and finding it again among every other part's gages. */
-              + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+              + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;'
               +   ' white-space:nowrap;">'
               +   '<button type="button" data-gedit="' + esc(g.key) + '" style="font-size:11px;'
               +     ' font-weight:800; padding:5px 11px; margin-right:5px; border:1px solid #1a5276;'
@@ -16064,18 +16069,31 @@ function cpSimMade(st){
    COMPLETE and the queue moves on by itself. Nothing is stored: which blocks are done is
    worked out by walking forward from the first, exactly as the count is worked out from
    the clock. */
-function cpSimLag(key, level, block){
-  return cpSimH32(key + '|LAG|' + level + '|' + block) % 6;   /* 0-5 parts late */
+/* ===== Rev-1056: THE INSPECTOR TAKES 1 TO 5 SECONDS TO GET THERE ===============
+   The delay used to be counted in PARTS, which tied how long he takes to how fast the
+   machine runs - at ten minutes a part he was an hour late, at one second almost instant.
+   A man walking across a shop takes the same time either way. Each block now carries its
+   own delay of 1 to 5 SECONDS, fixed for that block, counted from the moment the part it
+   wants was finished. Still nothing stored: worked out from the clock. */
+function cpSimLagSec(key, level, block){
+  return 1 + (cpSimH32(key + '|LAGSEC|' + level + '|' + block) % 5);   /* 1-5 seconds */
 }
-function cpSimDueAuto(key, level, size, made){
+function cpSimLag(key, level, block){ return cpSimLagSec(key, level, block); }
+function cpSimDueAuto(key, level, size, made, elapsedSec, gapSec, baseSn){
+  const gap = gapSec || 600, base = baseSn || 0;
+  const el = (typeof elapsedSec === 'number') ? elapsedSec : ((made - base) * gap);
+  const madeAt = sr => (sr - base) * gap;
   let b = 0, guard = 0;
   while(guard++ < 100000){
     const sr = b * size + cpSimPick(key, level, b, size);
-    if(sr + cpSimLag(key, level, b) <= made) b++; else break;
+    if(sr <= made && el >= madeAt(sr) + cpSimLagSec(key, level, b)) b++; else break;
   }
   const serial = b * size + cpSimPick(key, level, b, size);
-  const lag = cpSimLag(key, level, b);
-  return { block: b + 1, serial: serial, lag: lag, doneAt: serial + lag, doneCount: b,
+  const lagSec = cpSimLagSec(key, level, b);
+  const doneAtSec = madeAt(serial) + lagSec;
+  return { block: b + 1, serial: serial, lag: lagSec, lagSec: lagSec,
+           doneAt: serial, doneAtSec: doneAtSec,
+           waitSec: Math.max(0, Math.ceil(doneAtSec - el)), doneCount: b,
            state: made < serial ? 'WAITING' : 'BEING INSPECTED',
            late: made > serial ? (made - serial) : 0 };
 }
@@ -16195,7 +16213,11 @@ function cpSimCompare(key, rows, marks, level, sn, icpk, pcpk, mgcpk){
     const b = String(r.bubble).trim(), lim = cpSimLimits(r.spec);
     const m = cpSimRead(key, sn, b, lim, pcpk, mgcpk), l = cpSimReadLI(key, sn, b, lim, icpk, pcpk);
     const d = l - m;
+    /* Rev-1054 fix: the comparison rows carry their share of the band too. The first cut
+       only added it to the summary rows, so every line of this table printed NaN%. */
+    const bw = lim.hi - lim.lo;
     return { bubble: b, desc: r.featureDesc || '', lim: lim, mach: m, insp: l, diff: d,
+             pct: bw ? (Math.abs(d) / bw * 100) : 0,
              flag: cpSimTolFlag(lim, d),
              machOut: (m > lim.hi || m < lim.lo), inspOut: (l > lim.hi || l < lim.lo) };
   });
@@ -16216,7 +16238,8 @@ const CP_SIM_CRIT = 0.0002;
 function cpSimDev(v){
   return (Math.abs(v) < 0.00005) ? '0.0000' : ((v >= 0 ? '+' : '') + v.toFixed(4));
 }
-function cpSimCritResults(key, rows, marks, every, made, pcpk, icpk, mgcpk){
+function cpSimCritResults(key, rows, marks, every, made, pcpk, icpk, mgcpk,
+                          elapsedSec, gapSec, baseSn){
   const crit = rows.filter(r => cpSimLimits(r.spec)
                  && (marks[String(r.bubble).trim()] === 2));
   const use = crit.length ? crit : rows.filter(r => cpSimLimits(r.spec));
@@ -16224,7 +16247,7 @@ function cpSimCritResults(key, rows, marks, every, made, pcpk, icpk, mgcpk){
   const insp = [];
   [1,2,3].forEach(l => {
     const size = every[l];
-    const d = cpSimDueAuto(key, l, size, made);
+    const d = cpSimDueAuto(key, l, size, made, elapsedSec, gapSec, baseSn);
     for(let b = 0; b < d.doneCount && b < 400; b++){
       insp.push({ level: l, block: b + 1,
                   serial: b * size + cpSimPick(key, l, b, size) });
@@ -16243,14 +16266,21 @@ function cpSimCritResults(key, rows, marks, every, made, pcpk, icpk, mgcpk){
       const dv = i - m;
       diffs.push(dv);
       if(cpSimTolFlag(lim, dv)) overCount++;   /* Rev-1053: each against its own band */
+      const bandW = lim.hi - lim.lo;
       return { bubble: bb, desc: r.featureDesc || '', diff: dv, over: cpSimTolFlag(lim, dv),
+               pct: bandW ? (Math.abs(dv) / bandW * 100) : 0,
                band: lim.hi - lim.lo };
     });
-    let worst = 0, worstOver = false;
-    rowsOut.forEach(r => { if(Math.abs(r.diff) > Math.abs(worst)){ worst = r.diff; worstOver = r.over; } });
+    /* Rev-1054: the worst line is the worst SHARE OF ITS OWN BAND, not the biggest raw
+       number. A .0019 on a .010 feature is 19% and fine; a .0003 on a .0005 feature is 60%
+       and is the one that should be at the top of the row. */
+    let worst = 0, worstOver = false, worstPct = 0, worstBubble = '';
+    rowsOut.forEach(r => { if(r.pct > worstPct){
+      worstPct = r.pct; worst = r.diff; worstOver = r.over; worstBubble = r.bubble; } });
     return { serial: x.serial, level: x.level, n: rowsOut.length,
              over: rowsOut.filter(r => r.over).length, worst: worst,
-             worstOver: worstOver, feats: rowsOut };
+             worstOver: worstOver, worstPct: worstPct, worstBubble: worstBubble,
+             feats: rowsOut };
   });
   if(!diffs.length) return null;
   const n = diffs.length;
@@ -16452,7 +16482,10 @@ function cpSimPanel(wantIdx){
       const covered = { 1: rows.length,
                         2: rows.filter(r => marks[String(r.bubble).trim()] === 2).length,
                         3: rows.filter(r => marks[String(r.bubble).trim()] === 3).length };
-      const dues = [1,2,3].map(l => Object.assign({ level: l }, cpSimDueAuto(key, l, every[l], made)));
+      const elapsedSec = st.on ? Math.max(0, (Date.now() - (st.startedAt || Date.now())) / 1000)
+                              : ((made - (st.baseSn || 0)) * (st.gapSec || 600));
+      const dues = [1,2,3].map(l => Object.assign({ level: l },
+        cpSimDueAuto(key, l, every[l], made, elapsedSec, st.gapSec, st.baseSn)));
       const now = dues.filter(d => d.state === 'BEING INSPECTED').sort((a, b) => a.serial - b.serial);
       const next = now.length ? now[0] : dues.slice().sort((a, b) => a.serial - b.serial)[0];
 
@@ -16542,28 +16575,38 @@ function cpSimPanel(wantIdx){
         +   '<div style="font-size:11.5px; font-weight:700; color:'
         +     (next.state === 'DUE NOW' ? '#a5342a' : '#6b6257') + '; margin-top:3px;">'
         +     (next.state === 'BEING INSPECTED'
-                ? ('\u2691 THE INSPECTOR HAS IT \u00b7 done at S/N ' + next.doneAt)
+                ? ('\u2691 THE INSPECTOR IS ON HIS WAY \u00b7 ' + next.waitSec + ' sec')
                 : ('waiting \u00b7 ' + (next.serial - made) + ' more part(s) to go')) + '</div></div>';
       h += '';   /* Rev-1034: the grid stays open - the metrics and the levels go inside it */
 
       /* ----- Rev-1032: how the run is actually going ----- */
       const mx = cpSimMetrics(key, rows, made, 30, st.pcpk, st.icpk, false, st.mgcpk);
       const mli = cpSimMetrics(key, rows, made, 30, st.pcpk, st.icpk, true, st.mgcpk);
+      /* Rev-1055: the COUNTS are whole-run, per Rich - how many parts have been scrapped
+         since the job started is the question, not how many in the last thirty. Capability
+         stays rolling, because that is what a rolling figure is for: it shows the process
+         moving. Capped at 2,000 parts so a very long run cannot lock the screen re-deriving
+         every reading once a second. */
+      const runAll = cpSimMetrics(key, rows, made, Math.min(made, 2000),
+                                  st.pcpk, st.icpk, false, st.mgcpk);
       const bd = cpSimBand(mx ? mx.cpk : null);
+      /* Rev-1055: tighter, because five now share the width two used to. */
       const tile = (label, value, colour, sub2) =>
-        '<div style="border:1px solid #d8d3ca; border-radius:10px; padding:13px 15px; background:#fff;">'
-        + '<div style="font-size:10.5px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
+        '<div style="border:1px solid #d8d3ca; border-radius:10px; padding:9px 10px; background:#fff;">'
+        + '<div style="font-size:9.5px; font-weight:800; letter-spacing:.05em; color:#6b6257;">'
         +   label + '</div>'
-        + '<div style="font-size:32px; font-weight:800; line-height:1.15; color:' + colour + ';">'
+        + '<div style="font-size:23px; font-weight:800; line-height:1.15; color:' + colour + ';">'
         +   value + '</div>'
-        + '<div style="font-size:11px; color:#6b6257;">' + (sub2 || '') + '</div></div>';
+        + '<div style="font-size:10px; color:#6b6257;">' + (sub2 || '') + '</div></div>';
       h += '<div style="grid-column:1; grid-row:3;">'
         + '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;'
         +   ' margin:4px 0 8px;">HOW THE RUN IS GOING \u00b7 AS THE MACHINIST MEASURES IT'
-        +   (mx ? (' \u00b7 LAST ' + mx.n + ' PARTS \u00b7 S/N ' + mx.from + '\u2013' + mx.to) : '')
+        +   ' \u00b7 CAPABILITY OVER THE LAST 30, COUNTS OVER THE WHOLE RUN'
+        +   ''   /* Rev-1057: struck out by Rich - the tiles say it already */
         +   '</div>'
-        + '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));'
-        +   ' gap:12px; margin-bottom:20px;">'
+        /* Rev-1055: five across one row, per Rich. */
+        + '<div style="display:grid; grid-template-columns:repeat(5, minmax(0,1fr));'
+        +   ' gap:8px; margin-bottom:16px;">'
         + (!mx
             ? ('<div style="grid-column:1/-1; border:1px dashed #c9c0b4; border-radius:10px;'
                + ' padding:16px; font-size:12.5px; color:#6b6257;">Five parts are needed before '
@@ -16576,12 +16619,16 @@ function cpSimPanel(wantIdx){
                /* Rev-1041: every one of these is the LAST 30 PARTS, not the whole run, and
                   each now says so on its face. A bare 26 beside a serial count of 308 reads
                   as though 282 parts went in the bin. */
-               + tile('OUT OF TOLERANCE', mx.oot, mx.oot ? '#a5342a' : '#1d6b3f',
-                      'reading(s) outside limits, last ' + mx.n + ' parts')
-               + tile('SCRAP PARTS', mx.scrap + ' of ' + mx.n, mx.scrap ? '#a5342a' : '#1d6b3f',
-                      'parts with a reading out, last ' + mx.n)
-               + tile('GOOD PARTS', mx.good + ' of ' + mx.n, '#1d6b3f',
-                      mx.n ? (Math.round(mx.good / mx.n * 100) + '% of the last ' + mx.n + ' parts') : '')))
+               + tile('OUT OF TOLERANCE', (runAll ? runAll.oot : mx.oot),
+                      (runAll ? runAll.oot : mx.oot) ? '#a5342a' : '#1d6b3f',
+                      'reading(s) outside limits')
+               + tile('SCRAP PARTS', (runAll ? runAll.scrap : mx.scrap),
+                      (runAll ? runAll.scrap : mx.scrap) ? '#a5342a' : '#1d6b3f',
+                      runAll ? (Math.round(runAll.scrap / runAll.n * 100) + '% of '
+                                + runAll.n + ' parts') : '')
+               + tile('GOOD PARTS', (runAll ? runAll.good : mx.good), '#1d6b3f',
+                      runAll ? (Math.round(runAll.good / runAll.n * 100) + '% of '
+                                + runAll.n + ' parts') : '')))
         + '</div>'
         /* Rev-1041: the rolling window answers "how is it going NOW". The run total answers
            "how much have we actually made and scrapped", which is the other question and the
@@ -16593,15 +16640,9 @@ function cpSimPanel(wantIdx){
             if(span < 5) return '';
             const all = cpSimMetrics(key, rows, made, span, st.pcpk, st.icpk, false, st.mgcpk);
             if(!all) return '';
-            return '<div style="font-size:12px; color:#3a352e; margin:-8px 0 20px;">'
-              + '<b>WHOLE RUN</b> \u00b7 S/N ' + all.from + '\u2013' + all.to + ' \u00b7 '
-              + '<b style="color:#1d6b3f;">' + all.good + '</b> good \u00b7 '
-              + '<b style="color:' + (all.scrap ? '#a5342a' : '#1d6b3f') + ';">' + all.scrap
-              + '</b> scrap \u00b7 ' + all.oot + ' reading(s) out \u00b7 Cpk '
-              + all.cpk.toFixed(2)
-              + (made > CAP ? (' <span style="color:#6b6257;">(last ' + CAP + ' parts of '
-                               + made + ')</span>') : '')
-              + '</div>';
+            /* Rev-1055: the counts moved into the tiles, so this line keeps only what the
+               tiles do not say - the serial range and the capability across the whole run. */
+            return '';   /* Rev-1057: struck out by Rich */
           })()
         + '</div>';
 
@@ -16621,8 +16662,9 @@ function cpSimPanel(wantIdx){
       const liTilesHtml =
           '<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">'
         + liTile('INSPECTIONS COMPLETED', insDone, '#8a3a12', 'all three levels',
-                 'Across all three levels. The inspector finishes on his own, 0-5 parts after '
-                 + 'the one he was sent for.')
+                 'Across all three levels. He arrives 1 to 5 seconds after the part he was sent '
+                 + 'for was finished, and how long he takes does not depend on how fast the '
+                 + 'machine is running.')
         + (mli ? liTile('INSPECTOR\u2019S OWN CPK', mli.cpk.toFixed(2), cpSimBand(mli.cpk).c,
                         cpSimBand(mli.cpk).t + (mx ? (' \u00b7 machinist ' + mx.cpk.toFixed(2)) : ''),
                         'What the inspector MEASURES on these parts, beside what the machinist '
@@ -16636,7 +16678,7 @@ function cpSimPanel(wantIdx){
          both of his rows. Without the row being named, auto-placement dropped it below his
          metrics strip and left a band of empty screen beside his big number. */
       h += '<div style="grid-column:2; grid-row:2 / span 2;">'
-        + '<div style="display:flex; gap:14px; align-items:flex-start;">'
+        + '<div style="display:flex; gap:14px; align-items:stretch;">'
         + liCardHtml
         + '<div style="flex:1 1 auto; min-width:0;">'
         + '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
@@ -16647,26 +16689,26 @@ function cpSimPanel(wantIdx){
               + (ix === 1 ? 'left' : 'center') + ';">' + th + '</th>').join('')
         + '</tr></thead><tbody>'
         + dues.map(d => '<tr>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
-            +   ' font-size:18px; font-weight:800; color:' + LC[d.level] + ';">' + d.level + '</td>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; font-weight:700; color:#000;">'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;'
+            +   ' font-size:15px; font-weight:800; color:' + LC[d.level] + ';">' + d.level + '</td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; font-weight:700; color:#000;">'
             +   LN[d.level] + '</td>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center; color:#3a352e;">'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">'
             +   covered[d.level] + '</td>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center; color:#3a352e;">'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">'
             +   every[d.level] + ' parts</td>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center; color:#6b6257;">'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#6b6257;">'
             +   d.block + '</td>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
-            +   ' font-size:17px; font-weight:800; color:#000;">' + d.serial + '</td>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;'
+            +   ' font-size:15px; font-weight:800; color:#000;">' + d.serial + '</td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;'
             +   ' font-weight:800; color:' + (d.state === 'BEING INSPECTED' ? '#a5342a' : '#6b6257') + ';">'
             +   d.state
             +   '<div style="font-size:10px; font-weight:700; color:#6b6257;">'
             +     (d.state === 'BEING INSPECTED'
-                    ? ('done at S/N ' + d.doneAt + ' \u00b7 ' + d.lag + ' late')
+                    ? ('on his way \u00b7 ' + d.waitSec + ' of ' + d.lagSec + ' sec')
                     : (d.doneCount + ' done so far')) + '</div></td>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;">'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;">'
             +   (d.state === 'BEING INSPECTED'
                   ? ('<button data-simcmp="' + d.level + '" style="font-size:11px; font-weight:800;'
                      + ' padding:6px 12px; border:1px solid #1a5276; background:#fff; color:#1a5276;'
@@ -16751,7 +16793,9 @@ function cpSimPanel(wantIdx){
                   +   x.insp.toFixed(dp) + '</td>'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
                   +   ' font-weight:800; color:' + (x.flag ? '#a5342a' : '#6b6257') + ';">'
-                  +   cpSimDev(x.diff) + '</td>'
+                  +   cpSimDev(x.diff)
+                  +   '<div style="font-size:10px; font-weight:700; color:#6b6257;">'
+                  +     Math.round(x.pct) + '% of band</div></td>'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
                   +   ' font-weight:800; color:#a5342a;">' + (x.flag ? '\u2691 CHECK THE GAUGES' : '') + '</td>'
                   + '</tr>').join('')
@@ -16775,7 +16819,8 @@ function cpSimPanel(wantIdx){
           })()
         + (function(){
             /* ----- Rev-1038: what every completed line inspection actually found ----- */
-            const cr = cpSimCritResults(key, rows, marks, every, made, st.pcpk, st.icpk, st.mgcpk);
+            const cr = cpSimCritResults(key, rows, marks, every, made, st.pcpk, st.icpk, st.mgcpk,
+                                        elapsedSec, st.gapSec, st.baseSn);
             if(!cr) return '<div style="margin-top:22px; border:1px dashed #c9c0b4; border-radius:10px;'
               + ' padding:16px; font-size:12.5px; color:#6b6257;">No line inspection has finished yet '
               + '\u2014 results appear here as the inspector completes them.</div>';
@@ -16818,10 +16863,10 @@ function cpSimPanel(wantIdx){
               + '<thead><tr>'
               + ['S/N','INSPECTION','CRITICAL FEATURES CHECKED',
                  'OVER ' + Math.round(CP_SIM_PCT * 100) + '% OF BAND',
-                 'WORST DEVIATION','']
+                 'WORST SHARE OF ITS BAND','RESULT','']
                   .map((th, ix) => '<th style="border-bottom:1px solid #d8d3ca; padding:7px 9px;'
                     + ' background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px;'
-                    + ' letter-spacing:.05em; text-align:' + (ix === 5 ? 'left' : 'center') + ';">'
+                    + ' letter-spacing:.05em; text-align:' + (ix === 6 ? 'left' : 'center') + ';">'
                     + th + '</th>').join('')
               + '</tr></thead><tbody>'
               + cr.lines.slice(0, 15).map(x => '<tr style="background:' + (x.over ? '#fff5f4' : '#fff') + ';">'
@@ -16839,11 +16884,19 @@ function cpSimPanel(wantIdx){
                   +   (x.over || '\u2014') + '</td>'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
                   +   ' font-weight:700; color:' + (x.worstOver ? '#a5342a' : '#3a352e')
-                  +   ';">' + cpSimDev(x.worst) + '</td>'
+                  +   ';">' + cpSimDev(x.worst)
+                  + '<div style="font-size:10px; font-weight:700; color:#6b6257;">'
+                  +   (x.worstBubble ? ('bubble ' + esc(x.worstBubble) + ' \u00b7 ') : '')
+                  +   Math.round(x.worstPct) + '% of its band</div></td>'
                   /* Rev-1047: the list of every offending bubble is gone. The row now carries
                      the MAX difference and nothing else, with a small button to open the full
                      side-by-side comparison for that serial when it is wanted. A row that read
                      out five bubbles and their numbers was a table inside a table. */
+                  /* Rev-1057: the verdict in words. */
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
+                  +   ' font-weight:800; font-size:12px; white-space:nowrap; color:'
+                  +   (x.over ? '#a5342a' : '#1d6b3f') + ';">'
+                  +   (x.over ? '\u2691 FAILED \u2014 MISMATCH' : '\u2714 MATCHES') + '</td>'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;">'
                   +   '<button data-simrow="' + x.level + '|' + x.serial + '"'
                   +     ' title="Compare the machinist and the line inspector on S/N ' + x.serial + '"'
@@ -16852,6 +16905,31 @@ function cpSimPanel(wantIdx){
                   +     ' white-space:nowrap;">\u21c4 COMPARE</button>'
                   +   '</td></tr>').join('')
               + '</tbody></table>'
+              + (function(){
+                  const q = cr.lines.filter(l => l.over > 0);
+                  if(!q.length) return '<div style="margin-top:16px; border:1px solid #cfe3d4;'
+                    + ' border-radius:10px; background:#f2f8f3; padding:12px 14px; font-size:12.5px;'
+                    + ' color:#1d6b3f; font-weight:700;">\u2714 NOTHING WAITING ON A SENIOR '
+                    + 'QUALITY ENGINEER \u2014 every inspection so far matched.</div>';
+                  return '<div style="margin-top:16px; border:2px solid #a5342a; border-radius:10px;'
+                    + ' background:#fff5f4; padding:14px 16px;">'
+                    + '<div style="font-size:13px; font-weight:800; letter-spacing:.05em;'
+                    +   ' color:#a5342a; margin-bottom:4px;">'
+                    +   '\u2691 WAITING ON A SENIOR QUALITY ENGINEER \u00b7 ' + q.length + ' PART(S)</div>'
+                    + '<div style="font-size:11.5px; color:#6b6257; margin-bottom:10px;">'
+                    +   'Every part where the two men did not match. It is not scrap and it is not '
+                    +   'good until somebody senior has measured it \u2014 that is the point of '
+                    +   'the queue.</div>'
+                    + '<div style="display:flex; flex-wrap:wrap; gap:8px;">'
+                    + q.map(l => '<button data-simrow="' + l.level + '|' + l.serial + '"'
+                        + ' title="Open the readings for S/N ' + l.serial + '"'
+                        + ' style="border:1px solid #a5342a; background:#fff; color:#a5342a;'
+                        + ' border-radius:8px; padding:7px 12px; font-weight:800; font-size:12.5px;'
+                        + ' cursor:pointer; white-space:nowrap;">S/N ' + l.serial
+                        + ' <span style="font-weight:600; font-size:11px;">\u00b7 '
+                        + LN[l.level] + ' \u00b7 ' + Math.round(l.worstPct) + '%</span></button>').join('')
+                    + '</div></div>';
+                })()
               + '<div style="font-size:11.5px; color:#6b6257; margin-top:12px; line-height:1.6;">'
               +   'MEASUREMENT VARIATION is the standard deviation of the differences \u2014 how '
               +   'consistently the two agree, which is what a gauge study measures. BIAS is which '
@@ -16906,9 +16984,12 @@ function cpSimPanel(wantIdx){
       b.querySelectorAll('[data-simcmp]').forEach(btn => { btn.onclick = () => {
         const st2 = stOf(plans[sel]);
         const l = parseInt(btn.getAttribute('data-simcmp'), 10);
+        const el2 = st2.on ? Math.max(0, (Date.now() - (st2.startedAt || Date.now())) / 1000)
+                           : ((cpSimMade(st2) - (st2.baseSn || 0)) * (st2.gapSec || 600));
         const d = cpSimDueAuto(keyOf(plans[sel]), l,
                            (parseInt((plans[sel].p.lineLevelSet || {})[l], 10)
-                            || ({1:30,2:15,3:100})[l]), cpSimMade(st2));
+                            || ({1:30,2:15,3:100})[l]), cpSimMade(st2),
+                           el2, st2.gapSec, st2.baseSn);
         st2.cmp = { level: l, serial: d.serial };
         cpSimSave(all);
         try{ logAct('sim', 'compared level ' + l); }catch(_){ }
@@ -17777,18 +17858,18 @@ function cpLineInspPanel(idx){
         + '</tr></thead><tbody>'
         + list.map((x, n) =>
             '<tr>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#3a352e; white-space:nowrap;">'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; color:#3a352e; white-space:nowrap;">'
             +   day(x.when) + '</td>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;">'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;">'
             +   '<b style="color:' + resColour(x.result) + '; letter-spacing:.04em;">'
             +   esc(x.result || '\u2014') + '</b></td>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#000; font-weight:700;">'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; color:#000; font-weight:700;">'
             +   (x.shopOrder ? esc(x.shopOrder) : '<span style="color:#b9b3aa;">\u2014</span>') + '</td>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#3a352e;">'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; color:#3a352e;">'
             +   (x.inspector ? esc(x.inspector) : '<span style="color:#b9b3aa;">\u2014</span>') + '</td>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; color:#3a352e;'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; color:#3a352e;'
             +   ' word-break:break-all;">' + esc(x.name || '') + '</td>'
-            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; white-space:nowrap;">'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:4px 8px; white-space:nowrap;">'
             +   '<button data-lidl="' + n + '" style="font-size:11px; font-weight:800; padding:5px 11px;'
             +     ' margin-right:5px; border:1px solid #1a5276; background:#fff; color:#1a5276;'
             +     ' border-radius:6px; cursor:pointer;">Download</button>'
