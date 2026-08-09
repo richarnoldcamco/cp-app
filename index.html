@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1062</title>
+<title>CONTROL PLAN GENERATOR - Rev-1063</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1062 · 2026-08-09 5:32 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1063 · 2026-08-09 5:44 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1062 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 5:32 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1063 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 5:44 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -585,7 +585,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1062 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1063 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1708,7 +1708,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1062";
+const APP_REV = "Rev-1063";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2236,6 +2236,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1063", type: "App", changes: ["THE WHOLE SCREEN, IN THREE SECTIONS (Rev-1063, embedded validation REV-260) — per Rich. The panel was capped at 2200px and centred, so on a wide monitor it left a margin either side while the tables inside were cramped. It now takes the full width of the window. The layout is read as THREE SECTIONS, one per man — what the MACHINIST measures, what the LINE INSPECTOR finds, and what is owed to the SENIOR QE — with the drawing in a fourth column beside them. The middle section is given the most room because it carries the levels table and the queue state; the senior QE column stays narrow because it carries a count and a short list. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — the screen should fill the window edge to edge with three headed sections and the print on the right."] },
   { ts: "2026-08-09", rev: "App Rev-1062", type: "App", changes: ["🔎 SENIOR QE GETS A COLUMN (Rev-1062, embedded validation REV-260) — per Rich, in the empty band he circled between the levels table and the drawing. The screen already read as two men doing two jobs; there is a third, and until now he appeared only at the very bottom of the page where a queue could grow unseen. His column carries one number — how many parts are waiting on him — with the first eight serials as buttons that open that part’s readings, and a count of any beyond. Green with a plain statement while nothing has failed, red the moment something has, so the state of the queue is visible from across the room rather than after a scroll. THE WORDING STAYS DELIBERATE: those parts are neither scrap nor good until he has measured them, which is the whole reason a queue exists rather than a count. The two working columns and the drawing give up a little width to make room, and the full list stays at the bottom — this is the tally and the way in, not a replacement. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 with the inspector’s gauge set poor — a SENIOR QE column should sit between LINE INSPECTOR and the ODS drawing, turn red as parts fail, and its buttons should open the comparison."] },
   { ts: "2026-08-09", rev: "App Rev-1061", type: "App", changes: ["A READING IS ROUNDED WHERE IT IS TAKEN, NOT WHERE IT IS PRINTED (Rev-1061, embedded validation REV-260) — per Rich, and it settles a thing that has come up three times today. Four decimal places were being applied to the DISPLAY while the arithmetic ran at full precision, so a difference that showed as .0004 could be judged as .00042 and fail against an allowance of .0004 — the screen arguing with itself, and no way for the reader to tell which was right. A gauge that resolves to a ten-thousandth reports .0004, not .00042. BOTH MEN’S READINGS ARE NOW ROUNDED TO FOUR PLACES AT THE MOMENT THEY ARE TAKEN, and the difference between them is rounded the same way, so the number on the screen IS the number every figure downstream is worked out from: the share of the band, the allowance comparison, the out-of-tolerance count, the scrap count and both capability figures. Nothing is hidden behind a digit nobody can measure. On the row that prompted this, LARGE OD now reads exactly .0004 against an allowance of .0004 and MATCHES, which is what the screen was already saying. WHAT TO TEST (rule 8): ⇄ COMPARE a critical inspection on 1000237620 OP-030 — every difference should be a whole number of ten-thousandths, and no row should read as being on the allowance while flagged as over it."] },
   { ts: "2026-08-09", rev: "App Rev-1060", type: "App", changes: ["THE SHARE AND THE ALLOWANCE ARE NOW BOTH SHARES (Rev-1060, embedded validation REV-260) — Rich looked at a row reading -0.0004 against an allowance of 0.0004, flagged as a fail, and asked why. Fair question: the two numbers on screen were identical. The reading is really about .00042, which is 21% of a .0020 band and genuinely over the line, but FOUR DECIMAL PLACES ROUND IT TO .0004 and the row then argues with itself. This is the third time rounding has hidden a margin, so the fix is to stop mixing units rather than to add a digit back. Each comparison line now prints its share of the band against THE ALLOWANCE AS A SHARE TOO: 21% of band · allowed 20% reads as the fail it is, and on a tight feature where the .0002 floor governs, 28% of band · allowed 40% reads as the pass it is. The small print turns red on a flagged line so the two figures are read together. Nothing about the rule or the arithmetic changed — only the unit they are shown in. WHAT TO TEST (rule 8): ⇄ COMPARE a critical inspection on 1000237620 OP-030 — LARGE OD should read 21% of band, allowed 20%, and SMALL ID 28% of band, allowed 40%."] },
@@ -3175,7 +3176,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "5:32 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "5:44 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16368,7 +16369,8 @@ function cpSimPanel(wantIdx){
       +     ' border-radius:8px; padding:8px 22px; font-weight:800; font-size:13px; cursor:pointer;">'
       +     '\u2715 Close</button></div>'
       /* Rev-1032: the panel was sitting in a 1100px column on a monitor twice that wide. */
-      + '<div id="cpSimBody" style="max-width:min(2200px, 97vw); margin:0 auto; padding:20px 22px 60px;"></div>';
+      /* Rev-1063: the whole screen, per Rich - no column, no cap. */
+      + '<div id="cpSimBody" style="width:100%; margin:0; padding:16px 18px 60px;"></div>';
     document.body.appendChild(ov);
     const xb = document.getElementById('cpSimX');
     if(!xb || !document.getElementById('cpSimBody')){
@@ -16574,10 +16576,15 @@ function cpSimPanel(wantIdx){
       let simOds = '';
       try{ simOds = cpOpOdsImage(pl.p) || ''; }catch(e){ console.warn('Rev-1049 ODS lookup failed', e); }
       /* Rev-1062: a third man gets a column. */
+      /* ===== Rev-1063: THREE SECTIONS ACROSS THE WHOLE SCREEN =====================
+         One panel per man - what the MACHINIST measures, what the LINE INSPECTOR finds,
+         and what is owed to the SENIOR QE - each tinted in its own colour so the eye can
+         find a job before it reads a number. The drawing sits in the fourth column beside
+         them where there is room for it. */
       h += '<div style="display:grid; grid-template-columns:' + (simOds
-             ? 'minmax(0,0.8fr) minmax(0,1fr) minmax(200px,250px) minmax(300px,430px)'
-             : 'minmax(0,0.9fr) minmax(0,1fr) minmax(200px,250px)')
-        +   '; gap:16px; align-items:start; margin-bottom:20px;">'
+             ? 'minmax(0,1fr) minmax(0,1.35fr) minmax(230px,300px) minmax(280px,26vw)'
+             : 'minmax(0,1fr) minmax(0,1.35fr) minmax(230px,300px)')
+        +   '; gap:14px; align-items:start; margin-bottom:20px;">'
         + '<div style="grid-column:1; font-size:13px; font-weight:800; letter-spacing:.08em;'
         +   ' color:#1a5276; border-bottom:3px solid #1a5276; padding-bottom:6px;">'
         +   '\ud83d\udd27 MACHINIST</div>'
