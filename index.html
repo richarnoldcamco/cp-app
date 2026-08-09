@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1030</title>
+<title>CONTROL PLAN GENERATOR - Rev-1031</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1030 · 2026-08-09 11:47 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1031 · 2026-08-09 11:50 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1030 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:47 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1031 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:50 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1030 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1031 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1701,7 +1701,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1030";
+const APP_REV = "Rev-1031";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2229,6 +2229,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1031", type: "App", changes: ["1 AND 2 SECONDS ON THE SIMULATOR PACE (Rev-1031, embedded validation REV-260) — per Rich. A PART EVERY now offers 1 second and 2 seconds alongside 10 seconds, 1 minute and the real ten minutes. It matters more than it sounds: at one second a block of 30 parts is over in half a minute, so a whole cycle — parts accumulating, a serial coming due, GO AND FETCH IT, MARK INSPECTED, the next block’s serial appearing — can be watched end to end without waiting. Two seconds was already there; one second is new. The count is still worked out from the clock rather than a timer, so the fast paces are as accurate as the slow ones. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, pick 1 second, press START THE MACHINIST — the left number should climb once a second and Level 2 should come due at S/N 5 within about five seconds."] },
   { ts: "2026-08-09", rev: "App Rev-1030", type: "App", changes: ["THE SIMULATOR’S DROPDOWNS WOULD NOT OPEN (Rev-1030, embedded validation REV-260) — Rich could not pick a pace from A PART EVERY, and the cause was mine from Rev-1028. The panel redrew itself every second to keep the counters live, and a redraw replaces the whole body — so a dropdown opened at, say, half past the second was destroyed half a second later and the list vanished before anything could be chosen. It looked like a dead control; it was a control being demolished under the user’s finger. TWO GUARDS, and both earn their place. The panel never redraws while the focus is inside one of its own controls, which covers an open select, a select being scrolled, and a number being typed. And it does not redraw AT ALL while the machinist is stopped — nothing is changing then, so a redraw can only do harm. The counters still tick once a second while a run is going, which is the only time they need to. WHAT TO TEST (rule 8): Admin → Line Simulator, or ▶ INSPECT SIM on 1000237620 OP-030 — open A PART EVERY, the list should stay open, and picking 10 seconds should stick. Then press START THE MACHINIST and the count should climb every ten seconds; open the dropdown again mid-run and it should still stay open."] },
   { ts: "2026-08-09", rev: "App Rev-1029", type: "App", changes: ["▶ INSPECT SIM ON EVERY OPERATION, AND THE VALIDATION BUTTON IS GONE (Rev-1029, embedded validation REV-260) — per Rich. INSPECT SIM sits immediately before Inspect and opens the Line Simulator ALREADY POINTED AT THAT OPERATION, so a simulated machinist can be set running from the row itself rather than opening Admin and hunting for the plan in a dropdown. Opened from Admin it still lands on the Air Coil as before. Its tooltip says the thing that is easy to assume otherwise: it counts parts, it writes no readings. THE VALIDATION BUTTON IS REMOVED. It opened the machinist app’s editing screens, which the eight construction steps now cover between them — bubbles, tolerances, control types, measurement methods and the inspection review each have their own step, and every one of them writes to the same place Validation did. A button that duplicates five steps is a way to do the same job by a route nobody documents. The function behind it is untouched, so nothing that already exists is disturbed and it can be put back in one line if it turns out to be missed. WHAT TO TEST (rule 8): on 1000237620 OP-030 there should be no Validation button, and ▶ INSPECT SIM should open the simulator with OP-030 already chosen rather than whatever was last looked at."] },
   { ts: "2026-08-09", rev: "App Rev-1028", type: "App", changes: ["▶ THE LINE SIMULATOR — A STANDING CONTROL PANEL (Rev-1028, embedded validation REV-260) — per Rich. Admin → Simulation → Line Simulator. Switch on a machinist making parts on any operation, and watch the two numbers that matter, both in 46px: LAST SERIAL MADE AND MEASURED, and NEXT SERIAL TO LINE INSPECT with its level and what that level covers. Pace runs from the real ten minutes a part down to two seconds for a demonstration. NO BACKGROUND TIMER: the switch records the moment it was thrown and the count is worked out from the clock whenever the panel is looked at. That is what makes it permanent — close it, close the app, come back tomorrow, and the count is right; a timer would have died with the tab. HOW THE PART IS CHOSEN, which is the rule Rich described: each level takes its interval from STEP 8, serials are cut into blocks of that size, and ONE serial inside each block is chosen before the part exists. It cannot be predicted from the bench, and the inspector is only ever sent for a part ALREADY MADE AND BAGGED — never one still on the machine. THE QUEUE WAITS: the block owed is the one after the last one INSPECTED, never the one the count happens to be sitting in, so a part that came due while nobody was on the floor is still owed and the panel says how many parts late it has become. MARK INSPECTED moves the queue on. A table under the headline carries all three levels at once with their intervals, feature counts and states, so a level that is quietly falling behind is visible. SAID PLAINLY ON THE PANEL: this counts parts, it does not measure them — no readings are written and nothing is pushed to the repository; INJECT is still what makes measured runs. WHAT TO TEST (rule 8): Admin → Line Simulator, pick 1000237620 OP-030, set the pace to 2 seconds and press START THE MACHINIST — the left number should climb, and when it reaches the serial on the right that card should turn and say GO AND FETCH IT. Press MARK INSPECTED and the next block’s serial should appear. Close the panel, wait, reopen it: the count should have carried on."] },
@@ -3136,7 +3137,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:47 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:50 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16104,8 +16105,10 @@ function cpSimPanel(wantIdx){
         + '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">A PART EVERY'
         +   '<select id="cpSimGap" style="display:block; margin-top:5px; padding:10px; font-size:14px;'
         +   ' font-weight:700; border:1px solid #c9c0b4; border-radius:8px; background:#fafa96;">'
+        /* Rev-1031: 1 and 2 seconds added, per Rich - a block of 30 parts takes half a minute
+           at 1 second, so a whole cycle of due-fetch-inspect can be watched end to end. */
         +   [[600,'10 minutes \u00b7 real pace'],[60,'1 minute'],[10,'10 seconds \u00b7 demo'],
-             [2,'2 seconds \u00b7 fast demo']].map(g =>
+             [2,'2 seconds \u00b7 fast demo'],[1,'1 second \u00b7 fastest']].map(g =>
               '<option value="' + g[0] + '"' + ((st.gapSec || 600) === g[0] ? ' selected' : '') + '>'
               + g[1] + '</option>').join('')
         +   '</select></label>'
