@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1025</title>
+<title>CONTROL PLAN GENERATOR - Rev-1026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1025 · 2026-08-09 11:19 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1026 · 2026-08-09 11:23 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1025 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:19 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1026 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:23 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1025 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1026 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1025";
+const APP_REV = "Rev-1026";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1026", type: "App", changes: ["THE SETUP SCREEN KNOWS IT IS A LINE INSPECTION (Rev-1026, embedded validation REV-260) — per Rich, two of his three. The heading read INSPECTION RUN whichever button had opened it; arriving from PERFORM LINE INSPECTION it now reads LINE INSPECTION, so the inspector is never in doubt which job they are doing. OPERATOR INITIALS arrive filled in with the line inspector rather than empty — ECTOR for now, held in one constant, CP_LINE_INSPECTOR, which is the single line that changes the day this app has a sign-in of its own. A name already typed is never overwritten. Both marks are set for ONE launch and cleared as soon as the app is handed them, so pressing Inspect afterwards is not dressed up as a line run. The setup screen is drawn later, when a shop order is chosen, so the dressing watches for it rather than running once and hoping, and gives up after two minutes so nothing is left spinning. THE THIRD THING IS NOT BUILT AND IS NOT PRETENDED TO BE: the serial number is still typed. Having the app decide WHICH part is due needs a rule nobody has written down yet — where the running count of parts lives, whether the part is picked on a fixed interval or genuinely at random inside it, and what happens when the inspector is not on the floor at the moment it comes due. Guessing would put a number on screen that looks authoritative and is wrong. WHAT TO TEST (rule 8): press PERFORM LINE INSPECTION on 1000237620 OP-030 and pick shop order 52546 — the heading should read LINE INSPECTION and OPERATOR INITIALS should already say ECTOR. Then press Inspect on the same operation: it should still read Inspection Run with the initials empty."] },
   { ts: "2026-08-09", rev: "App Rev-1025", type: "App", changes: ["THE STALE MENU BEHIND THE SHOP-ORDER QUESTION IS GONE (Rev-1025, embedded validation REV-260) — Rich again, and the other half of Rev-1023. That revision stopped the machinist app’s home menu being where you LANDED when the question was cancelled; it was still sitting BEHIND the question the whole time, showing through the dim. Same cause: the boot chain paints that menu and then navigates on top of it, so anything that does not cover the full screen lets it show. Every screen is now hidden the moment the operation is opened, so the question sits on a plain background. Whichever way it is answered the next screen is drawn over the top — choosing a shop order goes to the setup screen, cancelling closes the panel per Rev-1023 — so the blank is never seen for longer than the question is open. It is hidden twice, once immediately and once alongside the close-button wiring a moment later, because the modal is opened by code that may run after the first call. WHAT TO TEST (rule 8): press PERFORM LINE INSPECTION on 1000237620 OP-030 — behind the shop-order question there should be nothing at all, no MACHINIST VALIDATING APP heading and no Resume S/N banner. Pick the existing shop order and the setup screen should appear as normal."] },
   { ts: "2026-08-09", rev: "App Rev-1024", type: "App", changes: ["THE WAITING SCREEN SAYS WHAT IT IS WAITING FOR, AND COUNTS (Rev-1024, embedded validation REV-260) — per Rich. The curtain read Opening editing screens whatever had brought you there, which was simply wrong from PERFORM LINE INSPECTION: nobody pressing that is going editing. The caller now names its own wait — PREPARING FOR LINE INSPECTION from Step 8, Preparing the inspection from the Inspect button, and the old wording only where something really is opening the editing screens. The words are set for ONE use and cleared as the curtain goes up, so a name can never be left behind to mislabel the next journey. The message is now 30px rather than 17px and the spinner is bigger with it, because this is read across a shop floor rather than at a desk. AND THERE IS A TIMER, counting tenths from the moment the curtain appears. A wait with a number moving on it is a wait; a wait with nothing moving is a hang, and the difference matters most to the person who cannot tell whether to press it again. The counter is stopped when the curtain drops, including on the 3.5 second failsafe, so nothing is left ticking behind a closed screen. WHAT TO TEST (rule 8): press PERFORM LINE INSPECTION on 1000237620 OP-030 — the wait should read PREPARING FOR LINE INSPECTION in large type with a counter running underneath, and pressing Inspect on the same operation should say Preparing the inspection instead."] },
   { ts: "2026-08-09", rev: "App Rev-1023", type: "App", changes: ["CANCELLING THE SHOP-ORDER QUESTION COMES BACK TO CONTROL PLANS (Rev-1023, embedded validation REV-260) — Rich pressed PERFORM LINE INSPECTION, got the shop-order question, closed it, and landed on the MACHINIST VALIDATING APP home menu. That screen is not part of this journey at all: it is the standalone app’s own front door, and the only reason it was visible is that the boot sequence renders it and then navigates on top of it, so cancelling the modal simply uncovered what was underneath. It has always done this — Inspect behaves the same way — it was just never pressed at that exact moment before. The two close controls on that modal now also tell the shell to shut the panel, and the shell listens and leaves by THE SAME PATH the back button uses, so going out always tidies up identically. Their own handlers still run first, so nothing about how the modal closes itself changed. The listener is taken off when the panel closes rather than piling up one per inspection. Leaving that way is written to the Action Log, so a run abandoned at the shop-order question is visible rather than looking like an inspection that never started. WHAT TO TEST (rule 8): on 1000237620 OP-030 press PERFORM LINE INSPECTION, then close the shop-order box — you should be back on the Control Plans list, not the machinist app menu. The same should now be true from the Inspect button. Then start an inspection properly and check the back button still works as it did."] },
@@ -3123,7 +3124,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:19 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:23 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5301,6 +5302,8 @@ function renderProjects(){
             try{ logAct('line-insp', 'started from Step 8'); }catch(_){ }
             /* Rev-1024: this journey is a line inspection, so the curtain says so. */
             try{ window._cpMvCurtainText = 'Preparing for Line Inspection\u2026'; }catch(e){}
+            /* Rev-1026: mark the journey and name the inspector. */
+            try{ window._cpLineInspRun = true; window._cpLineInspWho = CP_LINE_INSPECTOR; }catch(e){}
             inspectMachinistValidation(i);
           };
           _w8.appendChild(_lb);
@@ -5952,6 +5955,15 @@ async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpe
   const cpAutoOpenFn =
     'var __cpAutoOpenPart = ' + JSON.stringify(autoOpenPart || null) + ';\n' +
     'var __cpAutoOpenMode = ' + JSON.stringify(autoOpenMode || 'edit') + ';\n' +
+    /* Rev-1026: a line inspection is not the machinist's run and the setup screen should not
+       claim it is. The shell passes the flag and the inspector's name in. */
+    'var __cpLineInsp = ' + JSON.stringify(!!window._cpLineInspRun) + ';\n' +
+    'var __cpLineWho  = ' + JSON.stringify(String(window._cpLineInspWho || '')) + ';\n' +
+    'function cpLineDress(){ try{ if(!__cpLineInsp) return; ' +
+      'var h = document.querySelector("#setup h1"); if(h) h.textContent = "LINE INSPECTION"; ' +
+      'var op = document.getElementById("inOp"); ' +
+      'if(op && !String(op.value||"").trim() && __cpLineWho){ op.value = __cpLineWho; } ' +
+    '}catch(e){ console.warn("cpLineDress failed", e); } }\n' +
     'function cpAutoOpen(){ try{ if(!__cpAutoOpenPart) return; ' +
       'var idx = PARTS.findIndex(function(p){ return p.partNumber === __cpAutoOpenPart; }); ' +
       'if(idx<0) return; var __pt = PARTS[idx]; ' +
@@ -5982,6 +5994,12 @@ async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpe
         '}); ' +
       '}catch(e){ console.warn("cpWireSOClose failed", e); } }, 60); ' +
       'try{ parent.postMessage({type:"cpValLanded"},"*"); }catch(e){} ' +
+      /* Rev-1026: the setup screen is drawn later, when a shop order is chosen, so watch for
+         it rather than dressing it once and hoping. Gives up after two minutes. */
+      'try{ var __n = 0; var __t = setInterval(function(){ __n++; ' +
+        'var sc = document.getElementById("setup"); ' +
+        'if(sc && !sc.classList.contains("hidden")){ cpLineDress(); } ' +
+        'if(__n > 600) clearInterval(__t); }, 200); }catch(e){} ' +
       'return; ' +
     '} ' +
     'if(__pt && __pt.ops && __pt.ops.length===1){ ' +
@@ -6270,6 +6288,9 @@ function openMachinistValidationPanel(html, part, rev, featCount, hadImage, part
     try{ window._cpMvCurtainText = ''; }catch(e){}   /* Rev-1024: one use only */
   }
   document.body.appendChild(panel);
+  /* Rev-1026: the line-inspection marks are for ONE launch. Cleared once the app has been
+     handed the flag, so pressing Inspect afterwards is not dressed as a line run. */
+  try{ window._cpLineInspRun = false; window._cpLineInspWho = ''; }catch(e){}
 
   // Write the app into the iframe. A src-less iframe is same-origin as this page,
   // so the validation app's IndexedDB/localStorage work and nothing is downloaded.
@@ -16658,6 +16679,10 @@ function cpCncBytes(n){
    the form, so nothing here can quietly get it wrong. More than one form can be filed
    against an operation - there is one per inspection, not one per operation. */
 const CP_LI_RESULTS = ['PASS', 'FAIL', 'N/A PROCESS PROVE OUT ONLY'];
+/* Rev-1026: the line inspector's initials, filled in for them on the setup screen. A
+   stand-in until this app has a sign-in of its own - when it does, this is the one line
+   that changes. */
+const CP_LINE_INSPECTOR = 'ECTOR';
 function cpLiPath(part, op, name){
   const clean = t => String(t || '').replace(/[^A-Za-z0-9._-]/g, '-');
   return 'lineinsp/' + clean(part) + '/OP' + clean(op) + '/'
