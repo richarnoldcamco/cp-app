@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1022</title>
+<title>CONTROL PLAN GENERATOR - Rev-1023</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1022 · 2026-08-09 8:31 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1023 · 2026-08-09 8:34 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1022 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 8:31 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1023 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 8:34 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1022 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1023 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1022";
+const APP_REV = "Rev-1023";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1023", type: "App", changes: ["CANCELLING THE SHOP-ORDER QUESTION COMES BACK TO CONTROL PLANS (Rev-1023, embedded validation REV-260) — Rich pressed PERFORM LINE INSPECTION, got the shop-order question, closed it, and landed on the MACHINIST VALIDATING APP home menu. That screen is not part of this journey at all: it is the standalone app’s own front door, and the only reason it was visible is that the boot sequence renders it and then navigates on top of it, so cancelling the modal simply uncovered what was underneath. It has always done this — Inspect behaves the same way — it was just never pressed at that exact moment before. The two close controls on that modal now also tell the shell to shut the panel, and the shell listens and leaves by THE SAME PATH the back button uses, so going out always tidies up identically. Their own handlers still run first, so nothing about how the modal closes itself changed. The listener is taken off when the panel closes rather than piling up one per inspection. Leaving that way is written to the Action Log, so a run abandoned at the shop-order question is visible rather than looking like an inspection that never started. WHAT TO TEST (rule 8): on 1000237620 OP-030 press PERFORM LINE INSPECTION, then close the shop-order box — you should be back on the Control Plans list, not the machinist app menu. The same should now be true from the Inspect button. Then start an inspection properly and check the back button still works as it did."] },
   { ts: "2026-08-09", rev: "App Rev-1022", type: "App", changes: ["THE STEP TILES GET ICONS, AND A SUB-BUTTON MATCHES THE TILE ABOVE IT (Rev-1022, embedded validation REV-260) — per Rich, two things. WIDTH FIRST: GAGES under Step 6 and PERFORM LINE INSPECTION under Step 8 were each setting their own width, so whichever of the two — tile or button — had the longer words made the column and the other sat short inside it, which looked like a mistake because it was one. Each column is now a stretching stack and the tile fills it, so a step and anything hung beneath it are exactly the same width. THEN ICONS, one per step and each tied to what the step does: a pencil for editing the op number, a sheet for uploading the ODS, a ring for the balloons, a rule for tolerances, a label for control types, a set square for measurement methods, a magnifier for reviewing the inspection, a clipboard for the line inspection. They sit in front of the words and are read faster than the words are, which is the point on a row eight tiles wide. A LOCKED STEP STILL SHOWS ITS PADLOCK INSTEAD — the padlock is the more important fact about that step, and two symbols in front of the same short label would fight each other. They are written as real characters rather than backslash escapes, which is the rule that bit at Rev-1014. WHAT TO TEST (rule 8): on 1000237620 the GAGES button should now be exactly as wide as ASSIGN MEASUREMENT TYPES above it, PERFORM LINE INSPECTION exactly as wide as LINE INSPECTION, every step should carry an icon, and OP-040\u2019s locked Step 6 should still show a padlock rather than a set square."] },
   { ts: "2026-08-08", rev: "App Rev-1021", type: "App", changes: ["▶ PERFORM LINE INSPECTION, UNDER STEP 8 (Rev-1021, embedded validation REV-260) — per Rich. The button hangs under the LINE INSPECTION tile the way GAGES hangs under Step 6, and it opens THE SAME inspection the machinist runs. Not a copy of it — the same call, so the two cannot drift: a feature added to the machinist’s program is in the quality technician’s the same moment, with the same reference crops, the same limits and the same order. It is greyed out on an operation with no plan data to inspect, and says so. ONE THING IT DOES NOT YET DO, and it should be said plainly rather than discovered later: the run it saves is indistinguishable in the data from a machinist run. It carries whoever types their name in at the start and nothing marks it as a LINE inspection, so Review Data cannot yet separate the quality technician’s rounds from the machinist’s. Marking them apart means a change inside the embedded machinist app, which is its own revision and its own testing. WHAT TO TEST (rule 8): on 1000237620 OP-030 the button should sit under STEP 8 and open the inspection exactly as the Inspect button does; on an operation with no rows it should be greyed."] },
   { ts: "2026-08-08", rev: "App Rev-1020", type: "App", changes: ["EVERY FEATURE IS ON THE LEVEL 1 ROUND, AND THE SCREEN NOW SHOWS IT (Rev-1020, embedded validation REV-260) — per Rich, and it is the honest reading of what he has been saying for three revisions. A Level 1 check is the quality technician going over the WHOLE part, so every feature is on it — including the ones marked 2 or 3. The screen was showing those rows with an empty 1, which read as though they were skipped. THE 1 IS NOW ALWAYS ON, on every row, and it is not a button: it is a statement of fact and cannot be turned off. 2 and 3 became what they always meant — the EXTRA rounds a feature also gets looked at on — and each toggles, so pressing the level a feature already carries takes it back off with the same button that put it on. NONE became L1 ONLY, which is what it actually means: still inspected, just not on an extra round. THE LAST COLUMN NOW LISTS EVERY ROUND a feature is on, Level 1 first, so a critical feature reads EVERY 30 PARTS · COMPLETE CHECK above EVERY 15 PARTS · CRITICAL ONLY instead of pretending the complete check does not touch it. The Level 1 card counts the whole list, and the old yellow no-level-yet warning is gone — nothing is unset any more, so it was warning about a state that cannot exist. It is replaced by a quiet blue note saying how many features are on the Level 1 round only. The AI is asked the new question too: every feature is already on the complete check, choose which ALSO need an extra round. WHAT TO TEST (rule 8): open STEP 8 on 1000237620 OP-030 — every row should show a solid red 1, the rows marked 2 should list both rounds down the right, and pressing 2 on a row that already has it should take it back to L1 ONLY."] },
@@ -3120,7 +3121,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:31 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:34 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5956,6 +5957,19 @@ async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpe
       'if(typeof manageMode!=="undefined") manageMode=false; ' +
       'if(__pt && __pt.ops && __pt.ops.length===1 && typeof selectOp==="function"){ selectOp(idx, 0); } ' +
       'else if(typeof showOpPicker==="function"){ showOpPicker(idx); } ' +
+      /* Rev-1023: cancelling the shop-order question used to reveal the app's own home menu,
+         which is a screen that does not belong to this journey at all - the user came from
+         Control Plans and expects to land back there. The two close controls on that modal
+         now also tell the shell to shut the panel. Their own handlers still run first, so
+         nothing about how the modal closes itself has changed. */
+      'setTimeout(function(){ try{ ' +
+        '["soCancel","soModalClose"].forEach(function(id){ ' +
+          'var el = document.getElementById(id); if(!el || el.__cpBackWired) return; ' +
+          'var prev = el.onclick; el.__cpBackWired = true; ' +
+          'el.onclick = function(ev){ try{ if(prev) prev.call(this, ev); }catch(e){} ' +
+            'try{ parent.postMessage({type:"cpValBack"},"*"); }catch(e){} }; ' +
+        '}); ' +
+      '}catch(e){ console.warn("cpWireSOClose failed", e); } }, 60); ' +
       'try{ parent.postMessage({type:"cpValLanded"},"*"); }catch(e){} ' +
       'return; ' +
     '} ' +
@@ -6188,11 +6202,23 @@ function openMachinistValidationPanel(html, part, rev, featCount, hadImage, part
   const back = document.createElement('button');
   back.textContent = '\u2190 Control Plans';
   back.style.cssText = 'position:fixed; top:7px; left:10px; z-index:100002; background:#7a1414; color:#fff; border:none; border-radius:6px; font-weight:800; padding:7px 12px; cursor:pointer; font-size:13px; box-shadow:0 2px 6px rgba(0,0,0,.3);';
-  back.onclick = () => { panel.remove();
+  const leave = () => { panel.remove();
     // Rev-771: leaving the walk now goes STRAIGHT back to the steps screen. The release
     // question moved onto the Step 6 tile itself - see cpReviewInspection.
     try{ window._cpStep6Walk = null; }catch(e){ console.warn(e); }
+    try{ window.removeEventListener('message', onBack); }catch(e){}
   };
+  back.onclick = leave;
+  /* Rev-1023: the embedded app asks to be closed when the shop-order question is cancelled.
+     ONE path out, the same one the back button uses, so leaving always tidies up the same
+     way. The listener is removed with the panel rather than piling up per inspection. */
+  const onBack = (ev) => { try{
+    if(ev && ev.data && ev.data.type === 'cpValBack'){
+      try{ logAct('inspect', 'left at the shop order question'); }catch(_){ }
+      leave();
+    }
+  }catch(e){ console.warn('Rev-1023 back message failed', e); } };
+  try{ window.addEventListener('message', onBack); }catch(e){ console.warn(e); }
 
   panel.appendChild(frame); panel.appendChild(back);
   // Rev-533: while the app boots and auto-navigates to its destination screen, cover the
