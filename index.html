@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1049</title>
+<title>CONTROL PLAN GENERATOR - Rev-1052</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1049 · 2026-08-09 1:53 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1052 · 2026-08-09 2:23 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1049 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 1:53 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1052 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 2:23 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -585,7 +585,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1049 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1052 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1708,7 +1708,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1049";
+const APP_REV = "Rev-1052";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2236,6 +2236,9 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1052", type: "App", changes: ["THE DISAGREEMENTS COME FIRST (Rev-1052, embedded validation REV-260) — per Rich. The comparison listed features in drawing order, so on a seven-feature inspection the three that disagreed could sit at the bottom and the reader had to go past four that agreed to find them. The reason anybody opens that panel is to see what went wrong. Flagged rows now sort to the top, worst first among them, and the ones that agree keep their own order underneath — nothing is hidden, it is only ordered by what is worth looking at. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 with the inspector’s gauge set poor, then ⇄ COMPARE a row with several flags — the CHECK THE GAUGES lines should be the first rows in the table, biggest difference at the top."] },
+  { ts: "2026-08-09", rev: "App Rev-1051", type: "App", changes: ["THE COMPARISON BECOMES A REAL OVERLAY, WITH THE DRAWING BESIDE IT (Rev-1051, embedded validation REV-260) — per Rich. It was a block wedged into the middle of the page, which is not what it is: it is a thing you open, look at, and close. It now takes 80% of the screen over a dimmed backdrop, and clicking the dim closes it the way every other overlay in this app does. THE ODS PRINT STANDS BESIDE THE READINGS, taking 38% of the panel and staying put while the readings scroll, so a flagged bubble can be found on the drawing without leaving the comparison — which is the whole reason anybody opens it. On an operation with no drawing loaded the readings simply take the full width. Nothing about the numbers, the flags or the .0004 threshold changed. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, press ⇄ COMPARE on any row — the comparison should fill most of the screen with the OP-030 print down its right side, and clicking the dimmed area outside should close it."] },
+  { ts: "2026-08-09", rev: "App Rev-1050", type: "App", changes: ["THE DRAWING GETS REAL WIDTH, AND THE INSPECTOR STARTS ON THE MACHINIST’S ROW (Rev-1050, embedded validation REV-260) — two from Rich, and the second was a fault rather than a preference. The inspector’s block was being dropped BELOW the machinist’s metrics strip, leaving a band of empty screen beside his big serial number, because the grid was told which COLUMN each block belonged to and never which ROW — so it placed them in the order they were written. Every block is now told its row: the machinist’s number on row two with his metrics under it, and the inspector’s block and the drawing each spanning both rows from the top. The empty band is gone and the whole screen is shorter. THE ODS COLUMN GROWS from 240-300px to 340-480px, taking the width off the two working columns, which is the right trade: the tables were already comfortable and a print you cannot read is a print you open full screen every time. It is also 20px taller. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — NEXT SERIAL TO LINE INSPECT should sit level with LAST SERIAL MADE AND MEASURED, with no empty band between them, and the OP-030 print should be noticeably bigger down the right."] },
   { ts: "2026-08-09", rev: "App Rev-1049", type: "App", changes: ["THE ODS PRINT STANDS DOWN THE RIGHT, AND A NEW SIMULATION ALWAYS STARTS AT ZERO (Rev-1049, embedded validation REV-260) — two from Rich. FIRST, START AT SERIAL now offers 0 whenever the setup sheet opens, not only when SET UP AGAIN was the way in. A NEW simulation starts at the beginning — that is what the word means — and typing a different number is still there for anyone picking up mid-run. Rev-1045 only zeroed it on one route in, which left 297 sitting in the box for every other route. SECOND, THE OPERATION’S OWN ODS DRAWING gets a third column on the running screen, so the bubble numbers in the levels table and in every deviation line can be read against the print without leaving the page. It comes from the same getter Step 2 and the review panel use, so a drawing deleted for the operation is gone here too and no stale part-level print can leak in. Clicking it opens the drawing full screen. THE TWO WORKING COLUMNS GIVE UP THE WIDTH for it, and only when there is something to show: with no drawing loaded the third column is never created and the machinist and inspector keep the whole screen between them, rather than staring at an empty panel. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — the setup sheet should read START AT SERIAL 0, and after starting, the OP-030 print should fill a column down the right and open full screen on a click. OP-040 should behave the same with its own drawing."] },
   { ts: "2026-08-09", rev: "App Rev-1048", type: "App", changes: ["NO MORE MINUS ZERO (Rev-1048, embedded validation REV-260) — four decimal places went in at Rev-1043 and brought a small nonsense with them, found while checking Rich’s latest screenshot rather than reported. A difference of four hundred-thousandths rounds to 0.0000 and the code still put the sign in front of it: “-0.0000”, which reads as no difference at all AND carries a minus sign in front of nothing. Every signed deviation now goes through one formatter — anything that rounds to zero prints as a plain 0.0000 with no sign, everything else keeps its + or -. It covers the WORST DEVIATION column, the DIFFERENCE column in the side-by-side comparison, and the BIAS tile, which is where it mattered most: a bias of minus nothing is exactly the sort of reading somebody acts on. The underlying numbers are untouched; only the printing changed. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 with the two gauges set well apart, then ⇄ COMPARE a row — no figure anywhere should read -0.0000."] },
   { ts: "2026-08-09", rev: "App Rev-1047", type: "App", changes: ["THE RESULTS ROW SHOWS THE MAX DIFFERENCE, AND A ⇄ COMPARE BUTTON OPENS THE REST (Rev-1047, embedded validation REV-260) — per Rich. Each line was reading out every bubble that broke .0002 and its number — five or six of them, a table inside a table, and the one figure that matters buried among them. The row now carries the WORST DEVIATION and nothing else, which is what a line inspection is judged on. WHAT WAS REMOVED IS NOT LOST: a small ⇄ COMPARE button on every row opens the full side-by-side for that serial — every critical feature, the machinist’s reading, the inspector’s reading, the difference and the flag — in the same panel that already existed for the inspection currently due. The only thing that changed there is which serial it opens on, so the maths and the layout are the ones already tested. It works on any completed inspection in the list, not just the newest. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, let a few inspections finish — each row should end with a small ⇄ COMPARE button, and pressing one on an older serial should open that part’s readings side by side."] },
@@ -3162,7 +3165,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "1:53 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "2:23 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16487,7 +16490,7 @@ function cpSimPanel(wantIdx){
       let simOds = '';
       try{ simOds = cpOpOdsImage(pl.p) || ''; }catch(e){ console.warn('Rev-1049 ODS lookup failed', e); }
       h += '<div style="display:grid; grid-template-columns:' + (simOds
-             ? 'minmax(0,1fr) minmax(0,1.15fr) minmax(240px,300px)' : 'minmax(0,1fr) minmax(0,1fr)')
+             ? 'minmax(0,0.85fr) minmax(0,1fr) minmax(340px,480px)' : 'minmax(0,1fr) minmax(0,1fr)')
         +   '; gap:16px; align-items:start; margin-bottom:20px;">'
         + '<div style="grid-column:1; font-size:13px; font-weight:800; letter-spacing:.08em;'
         +   ' color:#1a5276; border-bottom:3px solid #1a5276; padding-bottom:6px;">'
@@ -16499,7 +16502,7 @@ function cpSimPanel(wantIdx){
                      + ' color:#3a352e; border-bottom:3px solid #c9c0b4; padding-bottom:6px;">'
                      + '\ud83d\udcd0 ODS \u00b7 OP-' + esc(String(pl.p.opNum || '')) + '</div>')
                   : '')
-        + '<div style="grid-column:1; border:2px solid #1a5276; border-radius:12px; padding:16px; background:#fff;">'
+        + '<div style="grid-column:1; grid-row:2; border:2px solid #1a5276; border-radius:12px; padding:16px; background:#fff;">'
         +   '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
         +     'LAST SERIAL MADE AND MEASURED</div>'
         +   '<div style="font-size:46px; font-weight:800; color:#1a5276; line-height:1.1; margin-top:4px;">'
@@ -16537,7 +16540,7 @@ function cpSimPanel(wantIdx){
         + '<div style="font-size:32px; font-weight:800; line-height:1.15; color:' + colour + ';">'
         +   value + '</div>'
         + '<div style="font-size:11px; color:#6b6257;">' + (sub2 || '') + '</div></div>';
-      h += '<div style="grid-column:1;">'
+      h += '<div style="grid-column:1; grid-row:3;">'
         + '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;'
         +   ' margin:4px 0 8px;">HOW THE RUN IS GOING \u00b7 AS THE MACHINIST MEASURES IT'
         +   (mx ? (' \u00b7 LAST ' + mx.n + ' PARTS \u00b7 S/N ' + mx.from + '\u2013' + mx.to) : '')
@@ -16612,7 +16615,10 @@ function cpSimPanel(wantIdx){
                : liTile('INSPECTOR\u2019S OWN CPK', '\u2014', '#b9b3aa', 'not enough parts yet',
                         'Five parts are needed before a capability figure means anything.'))
         + '</div>';
-      h += '<div style="grid-column:2;">'
+      /* Rev-1050: the inspector's block starts on the SAME ROW as the machinist's, spanning
+         both of his rows. Without the row being named, auto-placement dropped it below his
+         metrics strip and left a band of empty screen beside his big number. */
+      h += '<div style="grid-column:2; grid-row:2 / span 2;">'
         + '<div style="display:flex; gap:14px; align-items:flex-start;">'
         + liCardHtml
         + '<div style="flex:1 1 auto; min-width:0;">'
@@ -16653,10 +16659,10 @@ function cpSimPanel(wantIdx){
         + '</tbody></table></div></div>'
         + liTilesHtml
         + '</div>'
-        + (simOds ? ('<div style="grid-column:3;">'
+        + (simOds ? ('<div style="grid-column:3; grid-row:2 / span 2;">'
                      + '<img id="cpSimOds" src="' + simOds + '" alt="ODS drawing"'
                      + ' title="Click to open the drawing full screen"'
-                     + ' style="width:100%; height:auto; max-height:calc(100vh - 210px);'
+                     + ' style="width:100%; height:auto; max-height:calc(100vh - 190px);'
                      + ' object-fit:contain; background:#fff; border:1px solid #d8d3ca;'
                      + ' border-radius:8px; cursor:zoom-in; display:block;">'
                      + '<div style="font-size:10.5px; color:#6b6257; margin-top:6px; text-align:center;">'
@@ -16669,13 +16675,27 @@ function cpSimPanel(wantIdx){
             if(!cm) return '';
             const cmp = cpSimCompare(key, rows, marks, cm.level, cm.serial, st.icpk, st.pcpk, st.mgcpk);
             if(!cmp.length) return '';
+            /* Rev-1052: the ones that disagree come first, worst first within them. The reason
+               anybody opens this panel is to see what went wrong; making them read past four
+               features that agree to find it is the wrong way round. Features that agree keep
+               their own order underneath. */
+            cmp.sort((a, b) => (b.flag ? 1 : 0) - (a.flag ? 1 : 0)
+                            || Math.abs(b.diff) - Math.abs(a.diff));
             const flags = cmp.filter(x => x.flag).length;
             /* Rev-1043: FOUR PLACES. The prints are held to four - .6040/.6035 - and the gauges on
        the floor read to four. A fifth digit is a number nobody can measure, and putting
        one on screen invites an argument about a difference that does not exist. */
             const dp = 4;
-            return '<div style="margin-top:22px; border:2px solid ' + (flags ? '#a5342a' : '#1d6b3f')
-              + '; border-radius:12px; background:#fff; padding:16px;">'
+            /* Rev-1051: the comparison stops being a block wedged into the page and becomes
+               what it always was in the reading - a thing you open, look at, and close. It
+               takes 80% of the screen over a dimmed backdrop, and the ODS print stands beside
+               the readings so a flagged bubble can be found on the drawing without leaving. */
+            return '<div id="cpSimCmpBg" style="position:fixed; inset:0; z-index:10694;'
+              + ' background:rgba(20,15,12,.55);"></div>'
+              + '<div style="position:fixed; top:10vh; left:10vw; width:80vw; height:80vh;'
+              + ' z-index:10695; overflow:auto; border:2px solid ' + (flags ? '#a5342a' : '#1d6b3f')
+              + '; border-radius:14px; background:#fff; padding:18px;'
+              + ' box-shadow:0 18px 60px rgba(0,0,0,.45);">'
               + '<div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:12px;">'
               +   '<div style="font-size:15px; font-weight:800; color:#000;">LINE INSPECTION OF S/N '
               +     cm.serial + ' \u00b7 LEVEL ' + cm.level + ' \u00b7 ' + LN[cm.level] + '</div>'
@@ -16686,6 +16706,9 @@ function cpSimPanel(wantIdx){
               +     ' background:#fff; color:#3a352e; border-radius:8px; font-weight:800; font-size:12.5px;'
               +     ' cursor:pointer;">CLOSE</button>'
               + '</div>'
+              /* Rev-1051: readings on the left, the print on the right. */
+              + '<div style="display:flex; gap:18px; align-items:flex-start;">'
+              + '<div style="flex:1 1 auto; min-width:0;">'
               + '<table style="border-collapse:collapse; width:100%; font-size:12.5px;">'
               + '<thead><tr>'
               + ['BUBBLE','FEATURE','LIMITS','MACHINIST','LINE INSPECTOR','DIFFERENCE','']
@@ -16718,6 +16741,16 @@ function cpSimPanel(wantIdx){
               +   'A flag is not a bad part \u2014 it is the two of them not agreeing. Either gauge '
               +   'could be the wrong one, and that is the point of looking: a part reading in '
               +   'tolerance to one man and out to the other is how a bad part leaves the building.'
+              + '</div></div>'
+              + (simOds ? ('<div style="flex:0 0 38%; position:sticky; top:0;">'
+                           + '<div style="font-size:10.5px; font-weight:800; letter-spacing:.06em;'
+                           +   ' color:#6b6257; margin-bottom:6px;">ODS \u00b7 OP-'
+                           +   esc(String(pl.p.opNum || '')) + '</div>'
+                           + '<img src="' + simOds + '" alt="ODS drawing"'
+                           + ' style="width:100%; height:auto; max-height:66vh; object-fit:contain;'
+                           + ' background:#fff; border:1px solid #d8d3ca; border-radius:8px;'
+                           + ' display:block;"></div>')
+                        : '')
               + '</div></div>';
           })()
         + (function(){
@@ -16890,8 +16923,12 @@ function cpSimPanel(wantIdx){
           v.onclick = e => { if(e.target === v) v.remove(); };
         }catch(e){ console.warn('Rev-1049 ODS full view failed', e); }
       };
+      const closeCmp = () => { const st2 = stOf(plans[sel]); st2.cmp = null; cpSimSave(all); render(); };
       const cx = document.getElementById('cpSimCmpX');
-      if(cx) cx.onclick = () => { const st2 = stOf(plans[sel]); st2.cmp = null; cpSimSave(all); render(); };
+      if(cx) cx.onclick = closeCmp;
+      /* Rev-1051: clicking the dim behind it closes it, the way every other overlay here does. */
+      const cbg = document.getElementById('cpSimCmpBg');
+      if(cbg) cbg.onclick = closeCmp;
       /* Rev-1036: no manual completion any more - the simulated inspector finishes on his
          own, 0 to 5 parts after the one he was sent for. */
     };
