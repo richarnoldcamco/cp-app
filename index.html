@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1028</title>
+<title>CONTROL PLAN GENERATOR - Rev-1029</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1028 · 2026-08-09 11:37 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1029 · 2026-08-09 11:42 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1028 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:37 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1029 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:42 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1028 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1029 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1701,7 +1701,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1028";
+const APP_REV = "Rev-1029";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2229,6 +2229,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1029", type: "App", changes: ["▶ INSPECT SIM ON EVERY OPERATION, AND THE VALIDATION BUTTON IS GONE (Rev-1029, embedded validation REV-260) — per Rich. INSPECT SIM sits immediately before Inspect and opens the Line Simulator ALREADY POINTED AT THAT OPERATION, so a simulated machinist can be set running from the row itself rather than opening Admin and hunting for the plan in a dropdown. Opened from Admin it still lands on the Air Coil as before. Its tooltip says the thing that is easy to assume otherwise: it counts parts, it writes no readings. THE VALIDATION BUTTON IS REMOVED. It opened the machinist app’s editing screens, which the eight construction steps now cover between them — bubbles, tolerances, control types, measurement methods and the inspection review each have their own step, and every one of them writes to the same place Validation did. A button that duplicates five steps is a way to do the same job by a route nobody documents. The function behind it is untouched, so nothing that already exists is disturbed and it can be put back in one line if it turns out to be missed. WHAT TO TEST (rule 8): on 1000237620 OP-030 there should be no Validation button, and ▶ INSPECT SIM should open the simulator with OP-030 already chosen rather than whatever was last looked at."] },
   { ts: "2026-08-09", rev: "App Rev-1028", type: "App", changes: ["▶ THE LINE SIMULATOR — A STANDING CONTROL PANEL (Rev-1028, embedded validation REV-260) — per Rich. Admin → Simulation → Line Simulator. Switch on a machinist making parts on any operation, and watch the two numbers that matter, both in 46px: LAST SERIAL MADE AND MEASURED, and NEXT SERIAL TO LINE INSPECT with its level and what that level covers. Pace runs from the real ten minutes a part down to two seconds for a demonstration. NO BACKGROUND TIMER: the switch records the moment it was thrown and the count is worked out from the clock whenever the panel is looked at. That is what makes it permanent — close it, close the app, come back tomorrow, and the count is right; a timer would have died with the tab. HOW THE PART IS CHOSEN, which is the rule Rich described: each level takes its interval from STEP 8, serials are cut into blocks of that size, and ONE serial inside each block is chosen before the part exists. It cannot be predicted from the bench, and the inspector is only ever sent for a part ALREADY MADE AND BAGGED — never one still on the machine. THE QUEUE WAITS: the block owed is the one after the last one INSPECTED, never the one the count happens to be sitting in, so a part that came due while nobody was on the floor is still owed and the panel says how many parts late it has become. MARK INSPECTED moves the queue on. A table under the headline carries all three levels at once with their intervals, feature counts and states, so a level that is quietly falling behind is visible. SAID PLAINLY ON THE PANEL: this counts parts, it does not measure them — no readings are written and nothing is pushed to the repository; INJECT is still what makes measured runs. WHAT TO TEST (rule 8): Admin → Line Simulator, pick 1000237620 OP-030, set the pace to 2 seconds and press START THE MACHINIST — the left number should climb, and when it reaches the serial on the right that card should turn and say GO AND FETCH IT. Press MARK INSPECTED and the next block’s serial should appear. Close the panel, wait, reopen it: the count should have carried on."] },
   { ts: "2026-08-09", rev: "App Rev-1027", type: "App", changes: ["SIMULATED PARTS NOW COME OFF AT THE SHOP’S RHYTHM — ONE EVERY TEN MINUTES (Rev-1027, embedded validation REV-260) — per Rich, and it is the groundwork for the serial picker rather than a cosmetic change. The old simulation scattered pieces across whole days at invented hours between 6am and 6pm. That was fine for producing a Cpk figure and useless for anything that depends on ORDER AND SPACING — which is precisely what choosing a part for a line inspection depends on. Parts now march at a steady cadence: serial 1 oldest, each one ten minutes after the last, the final serial finishing a moment ago. It mirrors what actually happens on the floor — a machinist finishes a part, measures it, bags it, writes the serial on the bag, drops it in the basket — so a simulated basket now has the same shape as a real one. HOW MANY DAYS OF MACHINING became MINUTES BETWEEN PARTS, defaulting to 10, with 5 up to 60 available; the span is then whatever the cadence and the piece count make it, and the summary states it plainly — 50 parts at 10 minutes is 8.2 hours of running, which is a shift. A control that sets the rhythm is worth having; a control that scattered parts at invented hours was not. NOTHING ELSE ABOUT INJECT CHANGED — same scenarios, same Cpk targets, same safety stamps on every simulated run. WHAT TO TEST (rule 8): inject 50 pieces into 1000237620 OP-030 and open REVIEW — the readings should run in serial order ten minutes apart, ending now, and the dialog should have said one part every 10 min · 8.2 hours of running."] },
   { ts: "2026-08-09", rev: "App Rev-1026", type: "App", changes: ["THE SETUP SCREEN KNOWS IT IS A LINE INSPECTION (Rev-1026, embedded validation REV-260) — per Rich, two of his three. The heading read INSPECTION RUN whichever button had opened it; arriving from PERFORM LINE INSPECTION it now reads LINE INSPECTION, so the inspector is never in doubt which job they are doing. OPERATOR INITIALS arrive filled in with the line inspector rather than empty — ECTOR for now, held in one constant, CP_LINE_INSPECTOR, which is the single line that changes the day this app has a sign-in of its own. A name already typed is never overwritten. Both marks are set for ONE launch and cleared as soon as the app is handed them, so pressing Inspect afterwards is not dressed up as a line run. The setup screen is drawn later, when a shop order is chosen, so the dressing watches for it rather than running once and hoping, and gives up after two minutes so nothing is left spinning. THE THIRD THING IS NOT BUILT AND IS NOT PRETENDED TO BE: the serial number is still typed. Having the app decide WHICH part is due needs a rule nobody has written down yet — where the running count of parts lives, whether the part is picked on a fixed interval or genuinely at random inside it, and what happens when the inspector is not on the floor at the moment it comes due. Guessing would put a number on screen that looks authoritative and is wrong. WHAT TO TEST (rule 8): press PERFORM LINE INSPECTION on 1000237620 OP-030 and pick shop order 52546 — the heading should read LINE INSPECTION and OPERATOR INITIALS should already say ECTOR. Then press Inspect on the same operation: it should still read Inspection Run with the initials empty."] },
@@ -3134,7 +3135,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:37 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:42 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5352,12 +5353,17 @@ function renderProjects(){
         + 'out-of-tolerance pieces, one line per feature. Simulated runs are excluded\n'
         + 'unless they are switched on in Reports.',
         () => cpReviewDataPanel(i), has);
+      /* Rev-1029: INSPECT SIM opens the Line Simulator already pointed at THIS operation,
+         so a simulated machinist can be set running without hunting for the plan in Admin. */
+      mkBtn('\u25B6 INSPECT SIM', 'quiet', 96,
+        'Simulate a machinist making and measuring parts on this operation,\n'
+        + 'and watch which serial the line inspector is told to fetch.\n'
+        + 'Counts parts only \u2014 it writes no readings.',
+        () => cpSimPanel(i), has);
       mkBtn('Inspect', 'go', 62, 'Machinist: start a real inspection run for this plan (readings are saved)'
         + (has ? '' : ' \u2014 no plan data to inspect'), () => inspectMachinistValidation(i), has);
-      mkBtn('Validation', 'quiet', 70, (mvIsCreated(p)
-        ? 'Open / edit the Machinist Validation for this Control Plan'
-        : 'Create a Machinist Validation inspection from this Control Plan')
-        + (has ? '' : ' \u2014 no plan data to build a validation from'), () => createMachinistValidation(i), has);
+      /* Rev-1029: the Validation button is gone, per Rich. It opened the editing screens of
+         the machinist app, which the eight construction steps now cover between them. */
       mkBtn('Excel CP', 'quiet', 66, 'Build the L3Harris-format Control Plan xlsx for THIS operation'
         + (has ? '' : ' \u2014 no plan data to export'), () => cpCustomerExport(i), has);
       /* Rev-1010: line inspections / first articles filed against this operation. */
@@ -16027,7 +16033,7 @@ function cpSimDue(key, level, size, made, done){
   return { serial: serial, block: block + 1, inBlk: inBlk,
            state: serial <= made ? 'DUE NOW' : 'WAITING', late: late > 0 ? late : 0 };
 }
-function cpSimPanel(){
+function cpSimPanel(wantIdx){
   try{
     const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
     const plans = projects.map((p, i) => ({ i: i, label: String(p.partNum || '?')
@@ -16035,8 +16041,11 @@ function cpSimPanel(){
       .filter(x => (((x.p.builderState || {}).rows) || []).some(r => String(r.bubble || '').trim()));
     if(!plans.length){ flash('No plan with feature rows to simulate yet.', true); return; }
     let all = cpSimLoad();
-    /* the Air Coil first if it is there, since that is the one being demonstrated */
-    let sel = plans.findIndex(x => String(x.p.partNum || '').indexOf('1000237620') === 0);
+    /* Rev-1029: opened from an operation's own button, show THAT operation. Otherwise the
+       Air Coil, which is the one being demonstrated, and failing that the first plan. */
+    let sel = -1;
+    if(wantIdx != null) sel = plans.findIndex(x => x.i === wantIdx);
+    if(sel < 0) sel = plans.findIndex(x => String(x.p.partNum || '').indexOf('1000237620') === 0);
     if(sel < 0) sel = 0;
     const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g,
       ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
