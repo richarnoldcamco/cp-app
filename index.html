@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1037</title>
+<title>CONTROL PLAN GENERATOR - Rev-1038</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1037 · 2026-08-09 12:11 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1038 · 2026-08-09 12:14 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1037 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 12:11 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1038 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 12:14 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1037 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1038 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1701,7 +1701,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1037";
+const APP_REV = "Rev-1038";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2229,6 +2229,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1038", type: "App", changes: ["⚖ MACHINIST vs LINE INSPECTOR · CRITICAL FEATURES (Rev-1038, embedded validation REV-260) — per Rich. Every completed line inspection is now reported: the panel walks the blocks each level has finished, re-measures the critical features on those serials both ways, and shows what the two men actually found. A deviation over .0002 on a critical dimension is called out — a tighter bar than the .0004 used on the general comparison, because that is what critical means. FIVE FIGURES ACROSS THE TOP. MEASUREMENT VARIATION is the STANDARD DEVIATION OF THE DIFFERENCES, and it is the one that matters: it is what a gauge study measures — how consistently the two agree, not how big the parts are — and it is also given as a percentage of the tolerance band, which is the number a Gauge R&R would put in front of a customer. BIAS is which way it leans, and reading it against the variation is the whole diagnosis: a steady offset with small scatter points at one gauge being out of calibration, while a large scatter with no bias points at how the part is being held. AVERAGE and WORST DEVIATION and a count over the limit finish the strip. Underneath, the last fifteen inspections one per line — serial, level, how many critical features were checked, how many broke .0002, the worst single disagreement, and the offending bubbles named with their numbers. CRITICAL MEANS MARKED LEVEL 2 · CRITICAL ONLY on Step 8. Where nothing has been marked, every dimensional feature is treated as critical and the panel says so, rather than reporting nothing at all and looking broken. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 at 1 second until a few inspections have completed — the section should fill in; then set LINE INSPECTOR CPK to 0.67 and the variation, the worst deviation and the count over .0002 should all climb together."] },
   { ts: "2026-08-09", rev: "App Rev-1037", type: "App", changes: ["TWO CPK TARGETS DRIVE THE SIMULATION — ONE FOR THE MACHINIST, ONE FOR THE INSPECTOR (Rev-1037, embedded validation REV-260) — per Rich, and it is a better handle than the one it replaces. GAUGE SPREAD is gone, in both the setup sheet and the running screen. In its place MACHINIST CPK sets how capable the process is — how tightly the parts are actually held — from 0.67 not capable up to 2.00 excellent; ask for 1.33 and the numbers come out around 1.33, because Cpk on a centred process is band divided by six standard deviations and the spread is simply worked backwards from the target. LINE INSPECTOR CPK sets how accurate HIS GAUGE is, and this is the one worth understanding: a poor gauge does not change the part, it makes his DATA read worse. Set the machinist to 1.33 and the inspector to 2.00 and the two figures sit close together. Drop the inspector to 0.67 and his readings of the very same parts come out near 0.60 while the machinist still reads 1.24 — the process did not move, the measuring did. A NEW TILE down the LINE INSPECTOR column carries CPK FROM THE INSPECTOR’S OWN READINGS beside what the machinist reads on the same parts, and says in as many words that a gap between the two is his gauge and not the process. The comparison table and the .0004 flag now follow both targets. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, set MACHINIST CPK 1.33 and LINE INSPECTOR CPK 2.00, run it, then change the inspector to 0.67 — the left-hand Cpk should barely move and the inspector’s should fall away."] },
   { ts: "2026-08-09", rev: "App Rev-1036", type: "App", changes: ["THE LINE INSPECTOR IS SIMULATED TOO, AND FINISHES ON HIS OWN (Rev-1036, embedded validation REV-260) — per Rich. Until now a simulated machinist made parts and a real person had to press MARK INSPECTED, which is not a simulation of anything. The inspector is now part of the run: he does not appear the instant a part comes due, because he is on the floor doing something else, so EACH BLOCK CARRIES ITS OWN LAG OF 0 TO 5 PARTS, fixed for that block and drawn the same deterministic way as the serial itself. When the count passes that point the inspection is COMPLETE and the queue moves to the next block by itself. The state column now reads WAITING with how many inspections are done so far, or BEING INSPECTED with the serial it lands on and how late he was, and a LINE INSPECTIONS COMPLETED tile counts them across all three levels. MARK INSPECTED IS GONE from both the table and the comparison, because there is nothing left for a person to press — INSPECT S/N still opens the two sets of readings side by side, but it is now a window onto what the simulation is doing rather than a step in it. NOTHING IS STORED for any of this: which blocks are done is worked out by walking forward from the first, exactly as the part count is worked out from the clock, so it survives the panel being closed and can never disagree with itself. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 at 1 second — Level 2 should reach BEING INSPECTED, then clear itself a few parts later without anything being pressed, and LINE INSPECTIONS COMPLETED should climb on its own."] },
   { ts: "2026-08-09", rev: "App Rev-1035", type: "App", changes: ["A SETUP SHEET IN FRONT OF THE SIMULATION (Rev-1035, embedded validation REV-260) — per Rich. ▶ INSPECT SIM used to drop straight into whatever was already running. It now opens SET UP A SIMULATION with the last settings used on that operation ALREADY FILLED IN — operation, a part every, gauge spread and the serial to start at — so a new run is a matter of changing what needs changing rather than remembering what it was set to last time. The Step 8 intervals are shown beside them, read-only, with a line saying they are changed on the operation’s own tile and not here: this sheet decides how the SIMULATION behaves, not what the plan requires, and blurring those two would be a way to change a real Control Plan by accident. NOTHING IS LOST BY LOOKING. If a run is already going the sheet offers CARRY ON — 93 part(s) already made, which changes nothing at all; the count is only reset when START A NEW SIMULATION is actually pressed, and the sheet says so in as many words. RESET TO S/N 0 on the running screen becomes ⚙ SET UP AGAIN, which is the same journey backwards and no longer throws a run away with one press of a button sitting next to STOP. WHAT TO TEST (rule 8): press ▶ INSPECT SIM on 1000237620 OP-030 — the setup sheet should appear with 1 second and .0002 already chosen if that is what was last used; press CARRY ON and the count should be where you left it; press SET UP AGAIN, change the serial to 500 and start, and the run should begin from 501."] },
@@ -3143,7 +3144,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:11 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:14 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16156,6 +16157,59 @@ function cpSimCompare(key, rows, marks, level, sn, icpk, mcpk){
              machOut: (m > lim.hi || m < lim.lo), inspOut: (l > lim.hi || l < lim.lo) };
   });
 }
+/* ===== Rev-1038: THE RESULTS OF EVERY COMPLETED LINE INSPECTION ===============
+   Walks the blocks each level has finished, re-measures the CRITICAL features on those
+   serials both ways, and reports the deviation between the two men. Critical means a
+   feature marked LEVEL 2 - CRITICAL ONLY on Step 8; if none has been marked, every
+   dimensional feature is treated as critical rather than reporting nothing.
+   CP_SIM_CRIT is the deviation that matters on a critical dimension: two ten-thousandths.
+   The variation metric is the STANDARD DEVIATION OF THE DIFFERENCES, which is what a
+   gauge study measures - how consistently the two agree, not how big the parts are. */
+const CP_SIM_CRIT = 0.0002;
+function cpSimCritResults(key, rows, marks, every, made, mcpk, icpk){
+  const crit = rows.filter(r => cpSimLimits(r.spec)
+                 && (marks[String(r.bubble).trim()] === 2));
+  const use = crit.length ? crit : rows.filter(r => cpSimLimits(r.spec));
+  const critNamed = crit.length > 0;
+  const insp = [];
+  [1,2,3].forEach(l => {
+    const size = every[l];
+    const d = cpSimDueAuto(key, l, size, made);
+    for(let b = 0; b < d.doneCount && b < 400; b++){
+      insp.push({ level: l, block: b + 1,
+                  serial: b * size + cpSimPick(key, l, b, size) });
+    }
+  });
+  insp.sort((a, b) => b.serial - a.serial);
+  const diffs = [];
+  const lines = insp.slice(0, 250).map(x => {
+    const feats = use.filter(r => x.level === 1 ? true
+                    : (marks[String(r.bubble).trim()] === x.level));
+    const rowsOut = feats.map(r => {
+      const bb = String(r.bubble).trim(), lim = cpSimLimits(r.spec);
+      const m = cpSimRead(key, x.serial, bb, lim, mcpk);
+      const i = cpSimReadLI(key, x.serial, bb, lim, icpk, mcpk);
+      const dv = i - m;
+      diffs.push(dv);
+      return { bubble: bb, desc: r.featureDesc || '', diff: dv, over: Math.abs(dv) > CP_SIM_CRIT,
+               band: lim.hi - lim.lo };
+    });
+    const worst = rowsOut.reduce((a, r) => Math.abs(r.diff) > Math.abs(a) ? r.diff : a, 0);
+    return { serial: x.serial, level: x.level, n: rowsOut.length,
+             over: rowsOut.filter(r => r.over).length, worst: worst, feats: rowsOut };
+  });
+  if(!diffs.length) return null;
+  const n = diffs.length;
+  const mean = diffs.reduce((a, b) => a + b, 0) / n;
+  const sd = n > 1 ? Math.sqrt(diffs.reduce((a, b) => a + (b - mean) * (b - mean), 0) / (n - 1)) : 0;
+  const absMax = diffs.reduce((a, b) => Math.max(a, Math.abs(b)), 0);
+  const meanAbs = diffs.reduce((a, b) => a + Math.abs(b), 0) / n;
+  const over = diffs.filter(d => Math.abs(d) > CP_SIM_CRIT).length;
+  const bandAvg = use.reduce((a, r) => { const L = cpSimLimits(r.spec); return a + (L.hi - L.lo); }, 0) / use.length;
+  return { lines: lines, n: n, mean: mean, sd: sd, absMax: absMax, meanAbs: meanAbs,
+           over: over, pct: over / n * 100, gagePct: bandAvg ? (6 * sd / bandAvg * 100) : 0,
+           critNamed: critNamed, critCount: use.length, inspections: insp.length };
+}
 function cpSimBand(c){
   if(c == null) return { t: '\u2014', c: '#b9b3aa' };
   if(c >= 1.67) return { t: 'EXCELLENT',   c: '#1d6b3f' };
@@ -16546,6 +16600,81 @@ function cpSimPanel(wantIdx){
               +   'could be the wrong one, and that is the point of looking: a part reading in '
               +   'tolerance to one man and out to the other is how a bad part leaves the building.'
               + '</div></div>';
+          })()
+        + (function(){
+            /* ----- Rev-1038: what every completed line inspection actually found ----- */
+            const cr = cpSimCritResults(key, rows, marks, every, made, st.mcpk, st.icpk);
+            if(!cr) return '<div style="margin-top:22px; border:1px dashed #c9c0b4; border-radius:10px;'
+              + ' padding:16px; font-size:12.5px; color:#6b6257;">No line inspection has finished yet '
+              + '\u2014 results appear here as the inspector completes them.</div>';
+            const t2 = (label, value, colour, note) =>
+              '<div style="border:1px solid #d8d3ca; border-radius:10px; padding:12px 15px; background:#fff;">'
+              + '<div style="font-size:10.5px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
+              +   label + '</div>'
+              + '<div style="font-size:26px; font-weight:800; line-height:1.2; color:' + colour + ';">'
+              +   value + '</div>'
+              + '<div style="font-size:11px; color:#6b6257;">' + note + '</div></div>';
+            return '<div style="margin-top:24px;">'
+              + '<div style="font-size:13px; font-weight:800; letter-spacing:.08em; color:#5b2a86;'
+              +   ' border-bottom:3px solid #5b2a86; padding-bottom:6px; margin-bottom:12px;">'
+              +   '\u2696 MACHINIST vs LINE INSPECTOR \u00b7 CRITICAL FEATURES</div>'
+              + '<div style="font-size:12px; color:#6b6257; margin-bottom:12px;">'
+              +   (cr.critNamed
+                    ? ('The ' + cr.critCount + ' feature(s) marked LEVEL 2 \u00b7 CRITICAL ONLY on Step 8.')
+                    : ('No feature has been marked CRITICAL ONLY on Step 8, so every dimensional '
+                       + 'feature is treated as critical here \u2014 ' + cr.critCount + ' of them.'))
+              +   ' A deviation over <b>' + CP_SIM_CRIT.toFixed(4) + '</b> between the two men is '
+              +   'called out.</div>'
+              + '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr));'
+              +   ' gap:12px; margin-bottom:16px;">'
+              + t2('MEASUREMENT VARIATION', cr.sd.toFixed(5), cr.sd > CP_SIM_CRIT ? '#a5342a' : '#1d6b3f',
+                   'sd of the differences \u00b7 ' + cr.gagePct.toFixed(1) + '% of the tolerance band')
+              + t2('AVERAGE DEVIATION', cr.meanAbs.toFixed(5), '#3a352e',
+                   'how far apart they typically read')
+              + t2('BIAS', (cr.mean >= 0 ? '+' : '') + cr.mean.toFixed(5),
+                   Math.abs(cr.mean) > CP_SIM_CRIT / 2 ? '#a35400' : '#1d6b3f',
+                   cr.mean >= 0 ? 'inspector reads high on average' : 'inspector reads low on average')
+              + t2('WORST DEVIATION', cr.absMax.toFixed(5), cr.absMax > CP_SIM_CRIT ? '#a5342a' : '#1d6b3f',
+                   'largest single disagreement')
+              + t2('OVER ' + CP_SIM_CRIT.toFixed(4), cr.over, cr.over ? '#a5342a' : '#1d6b3f',
+                   cr.pct.toFixed(1) + '% of ' + cr.n + ' critical reading(s)')
+              + '</div>'
+              + '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
+              + '<thead><tr>'
+              + ['S/N','LEVEL','CRITICAL FEATURES CHECKED','OVER ' + CP_SIM_CRIT.toFixed(4),
+                 'WORST DEVIATION','']
+                  .map((th, ix) => '<th style="border-bottom:1px solid #d8d3ca; padding:7px 9px;'
+                    + ' background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px;'
+                    + ' letter-spacing:.05em; text-align:' + (ix === 5 ? 'left' : 'center') + ';">'
+                    + th + '</th>').join('')
+              + '</tr></thead><tbody>'
+              + cr.lines.slice(0, 15).map(x => '<tr style="background:' + (x.over ? '#fff5f4' : '#fff') + ';">'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
+                  +   ' font-size:15px; font-weight:800; color:#000;">' + x.serial + '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
+                  +   ' font-weight:800; color:' + LC[x.level] + ';">' + x.level + '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
+                  +   ' color:#3a352e;">' + x.n + '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
+                  +   ' font-weight:800; color:' + (x.over ? '#a5342a' : '#6b6257') + ';">'
+                  +   (x.over || '\u2014') + '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
+                  +   ' font-weight:700; color:' + (Math.abs(x.worst) > CP_SIM_CRIT ? '#a5342a' : '#3a352e')
+                  +   ';">' + (x.worst >= 0 ? '+' : '') + x.worst.toFixed(5) + '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; font-size:11px;'
+                  +   ' color:#6b6257;">'
+                  +   x.feats.filter(f => f.over).map(f => 'bubble ' + f.bubble + ' '
+                        + (f.diff >= 0 ? '+' : '') + f.diff.toFixed(5)).join(' \u00b7 ')
+                  +   '</td></tr>').join('')
+              + '</tbody></table>'
+              + '<div style="font-size:11.5px; color:#6b6257; margin-top:12px; line-height:1.6;">'
+              +   'MEASUREMENT VARIATION is the standard deviation of the differences \u2014 how '
+              +   'consistently the two agree, which is what a gauge study measures. BIAS is which '
+              +   'way it leans: a steady offset points at one gauge being out of calibration, while '
+              +   'a big variation with no bias points at how the part is being held. Showing the '
+              +   'most recent ' + Math.min(15, cr.lines.length) + ' of ' + cr.inspections
+              +   ' completed inspection(s).</div>'
+              + '</div>';
           })()
         + '<div style="font-size:11.5px; color:#6b6257; margin-top:14px; line-height:1.6;">'
         +   'The intervals come from <b>STEP 8 \u00b7 LINE INSPECTION</b> on this operation and are '
