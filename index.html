@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1034</title>
+<title>CONTROL PLAN GENERATOR - Rev-1035</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1034 · 2026-08-09 11:58 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1035 · 2026-08-09 12:00 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1034 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:58 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1035 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 12:00 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1034 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1035 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1701,7 +1701,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1034";
+const APP_REV = "Rev-1035";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2229,6 +2229,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1035", type: "App", changes: ["A SETUP SHEET IN FRONT OF THE SIMULATION (Rev-1035, embedded validation REV-260) — per Rich. ▶ INSPECT SIM used to drop straight into whatever was already running. It now opens SET UP A SIMULATION with the last settings used on that operation ALREADY FILLED IN — operation, a part every, gauge spread and the serial to start at — so a new run is a matter of changing what needs changing rather than remembering what it was set to last time. The Step 8 intervals are shown beside them, read-only, with a line saying they are changed on the operation’s own tile and not here: this sheet decides how the SIMULATION behaves, not what the plan requires, and blurring those two would be a way to change a real Control Plan by accident. NOTHING IS LOST BY LOOKING. If a run is already going the sheet offers CARRY ON — 93 part(s) already made, which changes nothing at all; the count is only reset when START A NEW SIMULATION is actually pressed, and the sheet says so in as many words. RESET TO S/N 0 on the running screen becomes ⚙ SET UP AGAIN, which is the same journey backwards and no longer throws a run away with one press of a button sitting next to STOP. WHAT TO TEST (rule 8): press ▶ INSPECT SIM on 1000237620 OP-030 — the setup sheet should appear with 1 second and .0002 already chosen if that is what was last used; press CARRY ON and the count should be where you left it; press SET UP AGAIN, change the serial to 500 and start, and the run should begin from 501."] },
   { ts: "2026-08-09", rev: "App Rev-1034", type: "App", changes: ["THE SIMULATOR SPLITS INTO TWO COLUMNS — MACHINIST LEFT, LINE INSPECTOR RIGHT (Rev-1034, embedded validation REV-260) — per Rich, and it is the right way to read the screen because it is the way the floor actually works: two people doing two jobs. Down the LEFT, under a blue MACHINIST heading, everything belonging to the man making parts — the serial count and the whole HOW THE RUN IS GOING strip, rolling Cpk, out of tolerance, scrap and good parts. Down the RIGHT, under LINE INSPECTOR, everything belonging to the man pulling them — the next serial owed, its level, and the table of all three levels with their blocks and states. NOTHING MOVED BETWEEN THEM and no figure changed; the same numbers are simply standing where they belong, and a glance now tells you which job a number is about before you have read it. THE COMPARISON STAYS FULL WIDTH underneath, because it is the one thing on the screen that belongs to BOTH of them — putting it in either column would have said it was somebody’s business more than the other’s, and the whole point of a disagreement is that neither side owns it. The levels table headings are shortened to fit half a screen — COVERS, FEAT, SERIAL — and the metric tiles reflow to the narrower column. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — two headed columns, the count and capability on the left, the queue and levels on the right, and pressing INSPECT S/N should still open the comparison across the full width below."] },
   { ts: "2026-08-09", rev: "App Rev-1033", type: "App", changes: ["THE TWO MEASUREMENTS OF THE SAME PART, SIDE BY SIDE (Rev-1033, embedded validation REV-260) — per Rich. When a level comes due the row now offers INSPECT S/N 48, and pressing it opens the comparison: every feature that level covers, with the MACHINIST’s reading, the LINE INSPECTOR’s reading of the same part, and the DIFFERENCE. Anything over .0004 is flagged in red and the header counts them — 2 of 14 disagree by more than .0004. DONE — MARK INSPECTED closes it and moves the queue to the next block. THE INSPECTOR’S NUMBER IS NOT THE MACHINIST’S. Two people with two gauges never get the identical value, so it is the machinist’s reading plus an offset from a seed of its own, and a new GAUGE SPREAD control decides how far apart they sit: .0001 and they agree, .0002 is normal and about one part in sixteen trips the flag, .0004 and the gauges argue with a third of parts flagged. That is the dial for watching the mismatches unfold. A reading outside the tolerance is shown in red on whichever side saw it, so a part in tolerance to one man and out to the other is visible at a glance — which is how a bad part leaves the building, and the panel says so. A FLAG IS NOT A BAD PART, it is the two of them not agreeing, and either gauge could be the wrong one. Same rule as everywhere else on this screen: nothing is stored, the values come from the serial number, and none of it is measurement evidence. The one-second redraw leaves an open comparison alone. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, run to a due level, press INSPECT S/N — the table should list that level’s features with both readings and the difference; set GAUGE SPREAD to .0004 and reopen it, and far more should be flagged."] },
   { ts: "2026-08-09", rev: "App Rev-1032", type: "App", changes: ["HOW THE RUN IS GOING — CAPABILITY, SCRAP AND GOOD PARTS ON THE SIMULATOR (Rev-1032, embedded validation REV-260) — per Rich, and the screen widens to hold it: it was sitting in an 1100px column on a monitor twice that wide, and now takes 97% of the window. FIVE TILES across the top of the run: ROLLING CPK over the last 30 parts, QUALITY LEVEL in words, OUT OF TOLERANCE readings, SCRAP PARTS and GOOD PARTS with the percentage. THE CPK REPORTED IS THE WORST FEATURE’S, and the tile names which bubble it is — a plan is only as capable as the dimension most likely to fail, and an average across fourteen features would hide the one that matters. Under five parts it says so rather than drawing a number out of nothing. WHERE THE READINGS COME FROM, said plainly because it matters: they are DERIVED FROM THE SERIAL NUMBER as they are needed, not stored. The same part always gives the same value, so nothing grows and no figure changes under you between one second and the next; a normal spread centred in the tolerance band, a process sitting around Cpk 1.33. NONE OF IT IS WRITTEN ANYWHERE — nothing reaches the repository, nothing appears in Reports or Review, and none of it is measurement evidence. The footnote on the panel now says exactly that. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 at 1 second — under five parts the strip should say five are needed, then the five tiles should appear and settle around a Cpk of 1.3 with the worst bubble named. Stop and start again: the same serials should give the same figures."] },
@@ -3140,7 +3141,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:58 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:00 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16174,7 +16175,100 @@ function cpSimPanel(wantIdx){
     const stOf = pl => { const k = keyOf(pl); all[k] = all[k] || { on:false, startedAt:0, gapSec:600,
                                                                   baseSn:0, done:{} }; return all[k]; };
 
-    const render = () => {
+    /* ===== Rev-1035: A SETUP SCREEN IN FRONT OF THE RUN. Pressing INSPECT SIM used to drop
+       straight into whatever was already running. It now opens a setup sheet with the last
+       settings used on that operation ALREADY FILLED IN - change what you like and start a
+       fresh run, or carry on with the one in progress. Nothing is lost by looking: the
+       running count is only reset if START A NEW SIMULATION is actually pressed. ===== */
+    let view = 'setup';
+    const renderSetup = () => {
+      const b = document.getElementById('cpSimBody'); if(!b) return;
+      const pl = plans[sel], st = stOf(pl);
+      const LN2 = { 1:'COMPLETE CHECK', 2:'CRITICAL ONLY', 3:'ODD CHECKS' };
+      const LC2 = { 1:'#a5342a', 2:'#a35400', 3:'#1d6b3f' };
+      const lv = pl.p.lineLevelSet || {};
+      const every = { 1: parseInt(lv[1], 10) || 30, 2: parseInt(lv[2], 10) || 15, 3: parseInt(lv[3], 10) || 100 };
+      const made = cpSimMade(st);
+      const fld = (label, inner, note) =>
+        '<label style="display:block;"><div style="font-size:11px; font-weight:800;'
+        + ' letter-spacing:.06em; color:#6b6257;">' + label + '</div>' + inner
+        + (note ? ('<div style="font-size:11px; color:#6b6257; margin-top:4px;">' + note + '</div>') : '')
+        + '</label>';
+      const selCss = ' style="width:100%; margin-top:5px; padding:11px; font-size:15px;'
+        + ' font-weight:700; border:1px solid #c9c0b4; border-radius:8px; background:#fafa96;"';
+      b.innerHTML =
+        '<div style="max-width:860px;">'
+        + '<div style="font-size:20px; font-weight:800; color:#000; margin-bottom:4px;">'
+        +   'SET UP A SIMULATION</div>'
+        + '<div style="font-size:12.5px; color:#6b6257; margin-bottom:20px; line-height:1.6;">'
+        +   'These are the settings last used on this operation. Change what you like and start '
+        +   'again, or carry on with the run already going.</div>'
+        + '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px;">'
+        +   fld('OPERATION', '<select id="cpSimSel"' + selCss + '>'
+              + plans.map((x, i) => '<option value="' + i + '"' + (i === sel ? ' selected' : '') + '>'
+                  + esc(x.label) + '</option>').join('') + '</select>')
+        +   fld('A PART EVERY', '<select id="cpSimGap"' + selCss + '>'
+              + [[600,'10 minutes \u00b7 real pace'],[60,'1 minute'],[10,'10 seconds \u00b7 demo'],
+                 [2,'2 seconds \u00b7 fast demo'],[1,'1 second \u00b7 fastest']].map(g =>
+                  '<option value="' + g[0] + '"' + ((st.gapSec || 600) === g[0] ? ' selected' : '')
+                  + '>' + g[1] + '</option>').join('') + '</select>',
+              'How fast the machinist finishes parts.')
+        +   fld('GAUGE SPREAD', '<select id="cpSimSd"' + selCss + '>'
+              + [[0.0001,'.0001 \u00b7 gauges agree'],[0.0002,'.0002 \u00b7 normal'],
+                 [0.0004,'.0004 \u00b7 gauges argue']].map(g =>
+                  '<option value="' + g[0] + '"' + ((st.sd || 0.0002) === g[0] ? ' selected' : '')
+                  + '>' + g[1] + '</option>').join('') + '</select>',
+              'How far apart the machinist and the inspector read the same part.')
+        +   fld('START AT SERIAL', '<input id="cpSimBase" type="number" min="0" value="'
+              + (parseInt(st.baseSn, 10) || 0) + '"' + selCss + '>',
+              'The first part will be this number plus one.')
+        + '</div>'
+        + '<div style="margin-top:20px; border:1px solid #e2ddd4; border-radius:10px; padding:14px;'
+        +   ' background:#fff;">'
+        +   '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;'
+        +     ' margin-bottom:8px;">LINE INSPECTION INTERVALS \u00b7 FROM STEP 8</div>'
+        +   '<div style="display:flex; gap:22px; flex-wrap:wrap; font-size:13px;">'
+        +   [1,2,3].map(l => '<div><b style="color:' + LC2[l] + ';">LEVEL ' + l + '</b> \u00b7 '
+              + LN2[l] + ' \u00b7 every <b>' + every[l] + '</b> parts</div>').join('')
+        +   '</div>'
+        +   '<div style="font-size:11px; color:#6b6257; margin-top:8px;">Changed on the '
+        +     'operation\u2019s STEP 8 tile, not here.</div>'
+        + '</div>'
+        + '<div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:22px;">'
+        +   '<button id="cpSimGo" style="padding:14px 26px; border:none; background:#1d6b3f;'
+        +     ' color:#fff; border-radius:9px; font-size:14px; font-weight:800; cursor:pointer;">'
+        +     '\u25B6 START A NEW SIMULATION</button>'
+        +   (st.on || made
+              ? ('<button id="cpSimCont" style="padding:14px 22px; border:1px solid #1a5276;'
+                 + ' background:#fff; color:#1a5276; border-radius:9px; font-size:13.5px;'
+                 + ' font-weight:800; cursor:pointer;">CARRY ON \u2014 ' + made
+                 + ' part(s) already made</button>')
+              : '')
+        + '</div>'
+        + '<div style="font-size:11.5px; color:#6b6257; margin-top:16px; line-height:1.6;">'
+        +   'Starting a new simulation sets the count back to the serial above and clears which '
+        +   'blocks have been inspected. Carrying on changes nothing.</div>'
+        + '</div>';
+
+      const sl = document.getElementById('cpSimSel');
+      if(sl) sl.onchange = () => { sel = parseInt(sl.value, 10) || 0; renderSetup(); };
+      const go = document.getElementById('cpSimGo');
+      if(go) go.onclick = () => {
+        const st2 = stOf(plans[sel]);
+        const g = document.getElementById('cpSimGap'), d = document.getElementById('cpSimSd');
+        const bs = document.getElementById('cpSimBase');
+        st2.gapSec = parseInt(g && g.value, 10) || 600;
+        st2.sd = parseFloat(d && d.value) || 0.0002;
+        st2.baseSn = Math.max(0, parseInt(bs && bs.value, 10) || 0);
+        st2.done = {}; st2.cmp = null; st2.on = true; st2.startedAt = Date.now();
+        cpSimSave(all);
+        try{ logAct('sim', 'new simulation started'); }catch(_){ }
+        view = 'run'; render();
+      };
+      const co = document.getElementById('cpSimCont');
+      if(co) co.onclick = () => { view = 'run'; render(); };
+    };
+    const renderRun = () => {
       const b = document.getElementById('cpSimBody'); if(!b) return;
       const pl = plans[sel], st = stOf(pl), key = keyOf(pl);
       const lv = pl.p.lineLevelSet || {};
@@ -16219,9 +16313,9 @@ function cpSimPanel(wantIdx){
         +   ' font-size:14px; font-weight:800; cursor:pointer; color:#fff; background:'
         +   (st.on ? '#a02020' : '#1d6b3f') + ';">' + (st.on ? '\u25A0 STOP THE MACHINIST'
                                                              : '\u25B6 START THE MACHINIST') + '</button>'
-        + '<button id="cpSimReset" style="padding:13px 18px; border:1px solid #c9c0b4; background:#fff;'
+        + '<button id="cpSimSetup" style="padding:13px 18px; border:1px solid #c9c0b4; background:#fff;'
         +   ' color:#3a352e; border-radius:9px; font-size:12.5px; font-weight:800; cursor:pointer;">'
-        +   'RESET TO S/N 0</button>'
+        +   '\u2699 SET UP AGAIN</button>'
         + '</div>';
 
       /* ===== Rev-1034: TWO COLUMNS. The floor is two people doing two jobs, and the screen
@@ -16422,12 +16516,8 @@ function cpSimPanel(wantIdx){
         try{ logAct('sim', st2.on ? 'machinist started' : 'machinist stopped'); }catch(_){ }
         render();
       };
-      const rs = document.getElementById('cpSimReset');
-      if(rs) rs.onclick = () => {
-        const st2 = stOf(plans[sel]);
-        st2.baseSn = 0; st2.done = {}; if(st2.on) st2.startedAt = Date.now();
-        cpSimSave(all); render();
-      };
+      const rs = document.getElementById('cpSimSetup');
+      if(rs) rs.onclick = () => { view = 'setup'; render(); };
       const sd = document.getElementById('cpSimSd');
       if(sd) sd.onchange = () => { stOf(plans[sel]).sd = parseFloat(sd.value) || 0.0002;
         cpSimSave(all); render(); };
@@ -16469,6 +16559,7 @@ function cpSimPanel(wantIdx){
         render();
       }; });
     };
+    const render = () => { if(view === 'setup') renderSetup(); else renderRun(); };
     render();
     /* Rev-1030: THE ONE-SECOND REDRAW WAS EATING THE DROPDOWNS. render() replaces the whole
        body, so a select the user had just opened was destroyed a fraction of a second later and
@@ -16484,6 +16575,7 @@ function cpSimPanel(wantIdx){
         const a = document.activeElement;
         if(a && body.contains(a) && /^(SELECT|INPUT|TEXTAREA|OPTION)$/.test(a.tagName || '')) return;
         const pl = plans[sel]; const st = pl ? stOf(pl) : null;
+        if(view !== 'run') return;   /* Rev-1035: the setup sheet is never redrawn under you */
         if(!st || !st.on) return;
         if(st.cmp) return;   /* Rev-1033: never redraw a comparison out from under the reader */
         render();
