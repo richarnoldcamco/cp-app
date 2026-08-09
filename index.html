@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1023</title>
+<title>CONTROL PLAN GENERATOR - Rev-1024</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1023 · 2026-08-09 8:34 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1024 · 2026-08-09 8:35 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1023 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 8:34 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1024 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 8:35 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1023 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1024 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1023";
+const APP_REV = "Rev-1024";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1024", type: "App", changes: ["THE WAITING SCREEN SAYS WHAT IT IS WAITING FOR, AND COUNTS (Rev-1024, embedded validation REV-260) — per Rich. The curtain read Opening editing screens whatever had brought you there, which was simply wrong from PERFORM LINE INSPECTION: nobody pressing that is going editing. The caller now names its own wait — PREPARING FOR LINE INSPECTION from Step 8, Preparing the inspection from the Inspect button, and the old wording only where something really is opening the editing screens. The words are set for ONE use and cleared as the curtain goes up, so a name can never be left behind to mislabel the next journey. The message is now 30px rather than 17px and the spinner is bigger with it, because this is read across a shop floor rather than at a desk. AND THERE IS A TIMER, counting tenths from the moment the curtain appears. A wait with a number moving on it is a wait; a wait with nothing moving is a hang, and the difference matters most to the person who cannot tell whether to press it again. The counter is stopped when the curtain drops, including on the 3.5 second failsafe, so nothing is left ticking behind a closed screen. WHAT TO TEST (rule 8): press PERFORM LINE INSPECTION on 1000237620 OP-030 — the wait should read PREPARING FOR LINE INSPECTION in large type with a counter running underneath, and pressing Inspect on the same operation should say Preparing the inspection instead."] },
   { ts: "2026-08-09", rev: "App Rev-1023", type: "App", changes: ["CANCELLING THE SHOP-ORDER QUESTION COMES BACK TO CONTROL PLANS (Rev-1023, embedded validation REV-260) — Rich pressed PERFORM LINE INSPECTION, got the shop-order question, closed it, and landed on the MACHINIST VALIDATING APP home menu. That screen is not part of this journey at all: it is the standalone app’s own front door, and the only reason it was visible is that the boot sequence renders it and then navigates on top of it, so cancelling the modal simply uncovered what was underneath. It has always done this — Inspect behaves the same way — it was just never pressed at that exact moment before. The two close controls on that modal now also tell the shell to shut the panel, and the shell listens and leaves by THE SAME PATH the back button uses, so going out always tidies up identically. Their own handlers still run first, so nothing about how the modal closes itself changed. The listener is taken off when the panel closes rather than piling up one per inspection. Leaving that way is written to the Action Log, so a run abandoned at the shop-order question is visible rather than looking like an inspection that never started. WHAT TO TEST (rule 8): on 1000237620 OP-030 press PERFORM LINE INSPECTION, then close the shop-order box — you should be back on the Control Plans list, not the machinist app menu. The same should now be true from the Inspect button. Then start an inspection properly and check the back button still works as it did."] },
   { ts: "2026-08-09", rev: "App Rev-1022", type: "App", changes: ["THE STEP TILES GET ICONS, AND A SUB-BUTTON MATCHES THE TILE ABOVE IT (Rev-1022, embedded validation REV-260) — per Rich, two things. WIDTH FIRST: GAGES under Step 6 and PERFORM LINE INSPECTION under Step 8 were each setting their own width, so whichever of the two — tile or button — had the longer words made the column and the other sat short inside it, which looked like a mistake because it was one. Each column is now a stretching stack and the tile fills it, so a step and anything hung beneath it are exactly the same width. THEN ICONS, one per step and each tied to what the step does: a pencil for editing the op number, a sheet for uploading the ODS, a ring for the balloons, a rule for tolerances, a label for control types, a set square for measurement methods, a magnifier for reviewing the inspection, a clipboard for the line inspection. They sit in front of the words and are read faster than the words are, which is the point on a row eight tiles wide. A LOCKED STEP STILL SHOWS ITS PADLOCK INSTEAD — the padlock is the more important fact about that step, and two symbols in front of the same short label would fight each other. They are written as real characters rather than backslash escapes, which is the rule that bit at Rev-1014. WHAT TO TEST (rule 8): on 1000237620 the GAGES button should now be exactly as wide as ASSIGN MEASUREMENT TYPES above it, PERFORM LINE INSPECTION exactly as wide as LINE INSPECTION, every step should carry an icon, and OP-040\u2019s locked Step 6 should still show a padlock rather than a set square."] },
   { ts: "2026-08-08", rev: "App Rev-1021", type: "App", changes: ["▶ PERFORM LINE INSPECTION, UNDER STEP 8 (Rev-1021, embedded validation REV-260) — per Rich. The button hangs under the LINE INSPECTION tile the way GAGES hangs under Step 6, and it opens THE SAME inspection the machinist runs. Not a copy of it — the same call, so the two cannot drift: a feature added to the machinist’s program is in the quality technician’s the same moment, with the same reference crops, the same limits and the same order. It is greyed out on an operation with no plan data to inspect, and says so. ONE THING IT DOES NOT YET DO, and it should be said plainly rather than discovered later: the run it saves is indistinguishable in the data from a machinist run. It carries whoever types their name in at the start and nothing marks it as a LINE inspection, so Review Data cannot yet separate the quality technician’s rounds from the machinist’s. Marking them apart means a change inside the embedded machinist app, which is its own revision and its own testing. WHAT TO TEST (rule 8): on 1000237620 OP-030 the button should sit under STEP 8 and open the inspection exactly as the Inspect button does; on an operation with no rows it should be greyed."] },
@@ -3121,7 +3122,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "8:34 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "8:35 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5297,6 +5298,8 @@ function renderProjects(){
             + (has ? 'pointer' : 'not-allowed') + ';';
           if(has) _lb.onclick = () => {
             try{ logAct('line-insp', 'started from Step 8'); }catch(_){ }
+            /* Rev-1024: this journey is a line inspection, so the curtain says so. */
+            try{ window._cpMvCurtainText = 'Preparing for Line Inspection\u2026'; }catch(e){}
             inspectMachinistValidation(i);
           };
           _w8.appendChild(_lb);
@@ -6137,6 +6140,8 @@ async function inspectMachinistValidation(idx){
   if(!built){ flash('This plan has no features to inspect.', true); return; }
   mvMarkCreated(p);
   window._cpMvWantCurtain = true;
+  /* Rev-1024: an inspection is not editing. If the caller has not named the wait, name it. */
+  try{ if(!window._cpMvCurtainText) window._cpMvCurtainText = 'Preparing the inspection\u2026'; }catch(e){}
   await mvOpenPanelWithParts([built.partBlock], cpMvKey(p) + (p.rev ? ' ' + p.rev : ''), built.partBlock.partNumber, 'inspect');
 }
 
@@ -6229,14 +6234,32 @@ function openMachinistValidationPanel(html, part, rev, featCount, hadImage, part
     cur.style.cssText = 'position:absolute; inset:0; z-index:100001; background:#e9e6df; display:flex; flex-direction:column; gap:18px; align-items:center; justify-content:center; transition:opacity .28s ease;';
     cur.innerHTML =
       '<style>@keyframes mvSpin{to{transform:rotate(360deg)}}@keyframes mvPulse{0%,100%{opacity:.5}50%{opacity:1}}@keyframes mvPop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}</style>' +
-      '<div style="width:58px;height:58px;border-radius:50%;border:5px solid rgba(122,26,28,.18);border-top-color:#7a1a1c;animation:mvSpin .8s linear infinite, mvPop .3s ease;"></div>' +
-      '<div style="font:800 17px system-ui;color:#7a1a1c;letter-spacing:.05em;animation:mvPulse 1.4s ease infinite, mvPop .3s ease;">Opening editing screens\u2026</div>';
+      '<div style="width:78px;height:78px;border-radius:50%;border:6px solid rgba(122,26,28,.18);border-top-color:#7a1a1c;animation:mvSpin .8s linear infinite, mvPop .3s ease;"></div>' +
+      /* Rev-1024: the curtain says what is ACTUALLY happening. It read "Opening editing
+         screens" whatever brought you here, which was wrong from the line-inspection button
+         - nobody pressing PERFORM LINE INSPECTION is going editing. The caller sets the
+         words; the timer is there because a wait with a number on it is a wait, and a wait
+         with nothing moving is a hang. */
+      '<div id="mvCurtainMsg" style="font:800 30px system-ui;color:#7a1a1c;letter-spacing:.03em;text-align:center;padding:0 20px;animation:mvPulse 1.4s ease infinite, mvPop .3s ease;">'
+        + (window._cpMvCurtainText || 'Opening editing screens\u2026') + '</div>' +
+      '<div id="mvCurtainClock" style="font:700 18px system-ui;color:#9a8f83;letter-spacing:.06em;">0.0s</div>';
     panel.appendChild(cur);
-    const drop = () => { const c = document.getElementById('mvCurtain'); if(c){ c.style.opacity = '0'; setTimeout(() => c.remove(), 200); } window.removeEventListener('message', onMsg); };
+    const t0 = Date.now();
+    const tick = setInterval(() => {
+      try{
+        const el = document.getElementById('mvCurtainClock');
+        if(!el){ clearInterval(tick); return; }
+        el.textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's';
+      }catch(e){ clearInterval(tick); }
+    }, 100);
+    const drop = () => { const c = document.getElementById('mvCurtain'); if(c){ c.style.opacity = '0'; setTimeout(() => c.remove(), 200); }
+      try{ clearInterval(tick); }catch(e){}
+      window.removeEventListener('message', onMsg); };
     const onMsg = (ev) => { if(ev && ev.data && ev.data.type === 'cpValLanded') drop(); };
     window.addEventListener('message', onMsg);
     setTimeout(drop, 3500);   // failsafe: never trap the user behind the curtain
     window._cpMvWantCurtain = false;
+    try{ window._cpMvCurtainText = ''; }catch(e){}   /* Rev-1024: one use only */
   }
   document.body.appendChild(panel);
 
