@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1059</title>
+<title>CONTROL PLAN GENERATOR - Rev-1060</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1059 · 2026-08-09 5:02 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1060 · 2026-08-09 5:12 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1059 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 5:02 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1060 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 5:12 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -585,7 +585,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1059 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1060 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1708,7 +1708,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1059";
+const APP_REV = "Rev-1060";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2236,6 +2236,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1060", type: "App", changes: ["THE SHARE AND THE ALLOWANCE ARE NOW BOTH SHARES (Rev-1060, embedded validation REV-260) — Rich looked at a row reading -0.0004 against an allowance of 0.0004, flagged as a fail, and asked why. Fair question: the two numbers on screen were identical. The reading is really about .00042, which is 21% of a .0020 band and genuinely over the line, but FOUR DECIMAL PLACES ROUND IT TO .0004 and the row then argues with itself. This is the third time rounding has hidden a margin, so the fix is to stop mixing units rather than to add a digit back. Each comparison line now prints its share of the band against THE ALLOWANCE AS A SHARE TOO: 21% of band · allowed 20% reads as the fail it is, and on a tight feature where the .0002 floor governs, 28% of band · allowed 40% reads as the pass it is. The small print turns red on a flagged line so the two figures are read together. Nothing about the rule or the arithmetic changed — only the unit they are shown in. WHAT TO TEST (rule 8): ⇄ COMPARE a critical inspection on 1000237620 OP-030 — LARGE OD should read 21% of band, allowed 20%, and SMALL ID 28% of band, allowed 40%."] },
   { ts: "2026-08-09", rev: "App Rev-1059", type: "App", changes: ["A FLOOR OF .0002 UNDER THE 20% RULE (Rev-1059, embedded validation REV-260) — per Rich, and it is the right correction to a rule that was half right. Twenty per cent of a .0005 band is .0001, and asking two men with two gauges to agree to a ten-thousandth is asking more than the gauges can give: at that point the disagreement is in the measuring, not the part, and flagging it teaches people to ignore flags. THE ALLOWANCE IS NOW 20% OF THE BAND OR .0002, WHICHEVER IS LARGER. A .0005 feature is judged at .0002 — so the LARGE OD reading -0.0004 still fails, while the SMALL ID reading -0.0001 at 28% of its band now MATCHES, which is the honest answer. A .010 feature is still judged at .0020, unchanged. The tile and column are renamed OVER THE ALLOWANCE because the number is no longer a flat percentage, and each line of the comparison now prints the allowance it was judged against beside its share of the band, so a row that reads 28% and passes says why on its face. Both constants live at the top: CP_SIM_PCT and CP_SIM_FLOOR. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, ⇄ COMPARE a critical inspection — SMALL ID should show allowed .0002 and pass at a .0001 difference; LARGE OD should still fail at .0004."] },
   { ts: "2026-08-09", rev: "App Rev-1058", type: "App", changes: ["CRITICAL MEANS KC (Rev-1058, embedded validation REV-260) — per Rich. LEVEL 2 · CRITICAL ONLY was covering whatever had been ticked as level 2 on Step 8, which gave the simulator its own private idea of what a critical feature is. It now covers the features THE CONTROL PLAN ITSELF calls Key Characteristics — Class KC — and so does the MACHINIST vs LINE INSPECTOR section, which reads the same set. That is the right source: KC is decided on the plan under CP-6, where a total tolerance band under .0011 makes a feature key, so when a tolerance changes and the row re-classifies, the critical inspection follows it without anybody remembering to go back and re-tick a box. On 1000237620 OP-030 that is SMALL ID and LARGE OD, the two rows carrying KC, rather than the seven that were ticked. Level 1 is still the whole part and Level 3 still uses its Step 8 mark, so nothing else moves, and the FEAT column in the levels table now counts the same way the inspection does. Where a plan carries no KC row at all, every dimensional feature is treated as critical and the panel says so rather than reporting on nothing. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — CRITICAL ONLY should cover 2 features rather than 7, and the results section should say the features classed KC."] },
   { ts: "2026-08-09", rev: "App Rev-1057", type: "App", changes: ["A RESULT COLUMN, A SENIOR QE QUEUE, AND TWO TIDY-UPS (Rev-1057, embedded validation REV-260) — three from Rich. FIRST, THE VERDICT IN WORDS. Every completed inspection now ends in either ✔ MATCHES in green or ⚑ FAILED — MISMATCH in red, rather than leaving it to be read out of a count. A mismatch is a pass or a fail, not a nuance. SECOND, A FAILED PART GOES INTO A QUEUE. Underneath the table, WAITING ON A SENIOR QUALITY ENGINEER lists every serial where the two men did not match, each a button that opens that part’s readings, with its level and its worst share of band on the face of it. The wording is deliberate: such a part is NOT SCRAP AND NOT GOOD until somebody senior has measured it, which is the whole reason a queue exists rather than a count. Where nothing has failed the panel says so in green instead of showing an empty box. THIRD, the two struck-out lines are gone — the “LAST 30 PARTS · S/N 70-99” on the strip heading and the WHOLE RUN line beneath it, both repeating what the tiles already say since the counts went whole-run at Rev-1055. And the levels table is compressed to stand level with the NEXT SERIAL card beside it rather than hanging below it. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 with the inspector’s gauge poor — failed rows should read FAILED — MISMATCH in red and their serials should appear as buttons in the queue below, each opening the comparison."] },
@@ -3172,7 +3173,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "5:02 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "5:12 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16813,9 +16814,16 @@ function cpSimPanel(wantIdx){
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
                   +   ' font-weight:800; color:' + (x.flag ? '#a5342a' : '#6b6257') + ';">'
                   +   cpSimDev(x.diff)
-                  +   '<div style="font-size:10px; font-weight:700; color:#6b6257;">'
+                  /* Rev-1060: BOTH FIGURES IN THE SAME UNIT. Printing "-0.0004 vs allowed
+                     0.0004" made a row that is genuinely over the line look exactly on it,
+                     because a true .00042 rounds to .0004 at four places. The share and the
+                     allowance are now both shares, so 21% against 20% reads as the fail it is,
+                     and a floor-governed feature reads 28% against 40% as the pass it is. */
+                  +   '<div style="font-size:10px; font-weight:700; color:'
+                  +     (x.flag ? '#a5342a' : '#6b6257') + ';">'
                   +     Math.round(x.pct) + '% of band \u00b7 allowed '
-                  +     cpSimTolLimit(x.lim).toFixed(4) + '</div></td>'
+                  +     Math.round(cpSimTolLimit(x.lim) / (x.lim.hi - x.lim.lo) * 100)
+                  +     '%</div></td>'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
                   +   ' font-weight:800; color:#a5342a;">' + (x.flag ? '\u2691 CHECK THE GAUGES' : '') + '</td>'
                   + '</tr>').join('')
