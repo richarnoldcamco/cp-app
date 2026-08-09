@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1026</title>
+<title>CONTROL PLAN GENERATOR - Rev-1027</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1026 · 2026-08-09 11:23 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1027 · 2026-08-09 11:32 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1026 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:23 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1027 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:32 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1026 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1027 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1026";
+const APP_REV = "Rev-1027";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2221,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1027", type: "App", changes: ["SIMULATED PARTS NOW COME OFF AT THE SHOP’S RHYTHM — ONE EVERY TEN MINUTES (Rev-1027, embedded validation REV-260) — per Rich, and it is the groundwork for the serial picker rather than a cosmetic change. The old simulation scattered pieces across whole days at invented hours between 6am and 6pm. That was fine for producing a Cpk figure and useless for anything that depends on ORDER AND SPACING — which is precisely what choosing a part for a line inspection depends on. Parts now march at a steady cadence: serial 1 oldest, each one ten minutes after the last, the final serial finishing a moment ago. It mirrors what actually happens on the floor — a machinist finishes a part, measures it, bags it, writes the serial on the bag, drops it in the basket — so a simulated basket now has the same shape as a real one. HOW MANY DAYS OF MACHINING became MINUTES BETWEEN PARTS, defaulting to 10, with 5 up to 60 available; the span is then whatever the cadence and the piece count make it, and the summary states it plainly — 50 parts at 10 minutes is 8.2 hours of running, which is a shift. A control that sets the rhythm is worth having; a control that scattered parts at invented hours was not. NOTHING ELSE ABOUT INJECT CHANGED — same scenarios, same Cpk targets, same safety stamps on every simulated run. WHAT TO TEST (rule 8): inject 50 pieces into 1000237620 OP-030 and open REVIEW — the readings should run in serial order ten minutes apart, ending now, and the dialog should have said one part every 10 min · 8.2 hours of running."] },
   { ts: "2026-08-09", rev: "App Rev-1026", type: "App", changes: ["THE SETUP SCREEN KNOWS IT IS A LINE INSPECTION (Rev-1026, embedded validation REV-260) — per Rich, two of his three. The heading read INSPECTION RUN whichever button had opened it; arriving from PERFORM LINE INSPECTION it now reads LINE INSPECTION, so the inspector is never in doubt which job they are doing. OPERATOR INITIALS arrive filled in with the line inspector rather than empty — ECTOR for now, held in one constant, CP_LINE_INSPECTOR, which is the single line that changes the day this app has a sign-in of its own. A name already typed is never overwritten. Both marks are set for ONE launch and cleared as soon as the app is handed them, so pressing Inspect afterwards is not dressed up as a line run. The setup screen is drawn later, when a shop order is chosen, so the dressing watches for it rather than running once and hoping, and gives up after two minutes so nothing is left spinning. THE THIRD THING IS NOT BUILT AND IS NOT PRETENDED TO BE: the serial number is still typed. Having the app decide WHICH part is due needs a rule nobody has written down yet — where the running count of parts lives, whether the part is picked on a fixed interval or genuinely at random inside it, and what happens when the inspector is not on the floor at the moment it comes due. Guessing would put a number on screen that looks authoritative and is wrong. WHAT TO TEST (rule 8): press PERFORM LINE INSPECTION on 1000237620 OP-030 and pick shop order 52546 — the heading should read LINE INSPECTION and OPERATOR INITIALS should already say ECTOR. Then press Inspect on the same operation: it should still read Inspection Run with the initials empty."] },
   { ts: "2026-08-09", rev: "App Rev-1025", type: "App", changes: ["THE STALE MENU BEHIND THE SHOP-ORDER QUESTION IS GONE (Rev-1025, embedded validation REV-260) — Rich again, and the other half of Rev-1023. That revision stopped the machinist app’s home menu being where you LANDED when the question was cancelled; it was still sitting BEHIND the question the whole time, showing through the dim. Same cause: the boot chain paints that menu and then navigates on top of it, so anything that does not cover the full screen lets it show. Every screen is now hidden the moment the operation is opened, so the question sits on a plain background. Whichever way it is answered the next screen is drawn over the top — choosing a shop order goes to the setup screen, cancelling closes the panel per Rev-1023 — so the blank is never seen for longer than the question is open. It is hidden twice, once immediately and once alongside the close-button wiring a moment later, because the modal is opened by code that may run after the first call. WHAT TO TEST (rule 8): press PERFORM LINE INSPECTION on 1000237620 OP-030 — behind the shop-order question there should be nothing at all, no MACHINIST VALIDATING APP heading and no Resume S/N banner. Pick the existing shop order and the setup screen should appear as normal."] },
   { ts: "2026-08-09", rev: "App Rev-1024", type: "App", changes: ["THE WAITING SCREEN SAYS WHAT IT IS WAITING FOR, AND COUNTS (Rev-1024, embedded validation REV-260) — per Rich. The curtain read Opening editing screens whatever had brought you there, which was simply wrong from PERFORM LINE INSPECTION: nobody pressing that is going editing. The caller now names its own wait — PREPARING FOR LINE INSPECTION from Step 8, Preparing the inspection from the Inspect button, and the old wording only where something really is opening the editing screens. The words are set for ONE use and cleared as the curtain goes up, so a name can never be left behind to mislabel the next journey. The message is now 30px rather than 17px and the spinner is bigger with it, because this is read across a shop floor rather than at a desk. AND THERE IS A TIMER, counting tenths from the moment the curtain appears. A wait with a number moving on it is a wait; a wait with nothing moving is a hang, and the difference matters most to the person who cannot tell whether to press it again. The counter is stopped when the curtain drops, including on the 3.5 second failsafe, so nothing is left ticking behind a closed screen. WHAT TO TEST (rule 8): press PERFORM LINE INSPECTION on 1000237620 OP-030 — the wait should read PREPARING FOR LINE INSPECTION in large type with a counter running underneath, and pressing Inspect on the same operation should say Preparing the inspection instead."] },
@@ -3124,7 +3125,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:23 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:32 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16315,7 +16316,15 @@ function cpInjBuild(p, sc, pieces, machinists, days){   /* Rev-996 */
   for(let m = 0; m < Math.max(1, Math.min(CP_INJ_WHO.length, machinists || 1)); m++){
     who.push(CP_INJ_WHO[m] || ('SIM-' + String.fromCharCode(65 + m)));
   }
-  const spanDays = Math.max(1, days || 1);
+  /* Rev-1027: THE SHOP'S ACTUAL RHYTHM. A machinist finishes a part, measures it, bags it,
+     writes the serial on the bag and drops it in the basket - one part every ten minutes or
+     so. The old simulation scattered pieces across whole days at invented hours, which was
+     fine for a Cpk figure and useless for anything that depends on ORDER and SPACING - which
+     is exactly what choosing a part for a line inspection depends on. Parts now march at a
+     steady cadence, serial 1 oldest, last serial finishing now. */
+  const gapMin = Math.max(1, days || 10);   /* the control now carries minutes, not days */
+  const spanMin = Math.max(1, (pieces - 1)) * gapMin;
+  const spanDays = Math.max(1, Math.ceil(spanMin / 1440));
   /* one shop order per machinist - in the shop a job number belongs to a run, not a person */
   const soFor = {};
   who.forEach(w => { soFor[w] = 'SIM-' + Math.random().toString(36).slice(2, 6).toUpperCase(); });
@@ -16326,12 +16335,8 @@ function cpInjBuild(p, sc, pieces, machinists, days){   /* Rev-996 */
     const w = who[i % who.length];
     seq[w] = (seq[w] || 0) + 1;
     const so = soFor[w];
-    /* spread across the window: piece 0 oldest, last piece today */
-    const dayBack = (pieces > 1) ? Math.round((spanDays - 1) * (1 - (i / (pieces - 1)))) : 0;
-    const d = new Date(now.getTime() - dayBack * 86400000);
-    /* a believable hour: 6am to 6pm, walking through the shift */
-    d.setHours(6 + Math.floor((i % Math.max(1, Math.ceil(pieces / spanDays))) * 12
-      / Math.max(1, Math.ceil(pieces / spanDays))), (i * 17) % 60, 0, 0);
+    /* Rev-1027: piece 0 is the oldest, the last piece finished a moment ago. */
+    const d = new Date(now.getTime() - ((pieces - 1 - i) * gapMin * 60000));
     const stamp = d.toISOString();
     const y = d.getUTCFullYear(), mo = String(d.getUTCMonth() + 1).padStart(2, '0'), da = String(d.getUTCDate()).padStart(2, '0');
     const dtok = '' + y + mo + da;
@@ -16376,7 +16381,8 @@ function cpInjBuild(p, sc, pieces, machinists, days){   /* Rev-996 */
   const so = who.map(w => soFor[w]).join(', ');
 
   return { runs: runs, shopOrder: so, features: feats.length, machinists: who,
-           spanDays: spanDays, dims: feats.filter(f => !f.attribute).length };   /* Rev-996 */
+           spanDays: spanDays, gapMin: gapMin, spanMin: spanMin,
+           dims: feats.filter(f => !f.attribute).length };   /* Rev-996, Rev-1027 */
 }
 /* Rev-990: a SPEAKING wrapper. Rich pressed the button and nothing happened, which means a
    throw went to the console where he will never see it. Now it lands on screen and in the
@@ -16455,11 +16461,12 @@ function _cpInjectPanel(idx){
     +         '</select>'
     +     '</div>'
     +     '<div style="flex:1;">'
-    +       '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">HOW MANY DAYS OF MACHINING</div>'
+    +       '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">MINUTES BETWEEN PARTS</div>'
     +       '<select id="injD" style="width:100%; font-size:15px; padding:9px; margin-top:6px; border:1px solid #c9c0b4; border-radius:8px;">'
-    +         '<option value="1">1 day \u00b7 today only</option><option value="2">2 days</option>'
-    +         '<option value="7" selected>1 week</option><option value="14">2 weeks</option>'
-    +         '<option value="30">1 month</option></select>'
+    +         '<option value="5">5 minutes</option>'
+    +         '<option value="10" selected>10 minutes \u00b7 the shop\u2019s pace</option>'
+    +         '<option value="15">15 minutes</option><option value="20">20 minutes</option>'
+    +         '<option value="30">30 minutes</option><option value="60">1 hour</option></select>'
     +     '</div>'
     +   '</div>'
     +   '<div id="injNote" style="margin-top:14px; font-size:12px; color:#6b6257;"></div>'
@@ -16513,7 +16520,11 @@ function _cpInjectPanel(idx){
         + ' pieces were written. Check GitHub settings and the Action Log.', true); return; }
       flash('\u2713 ' + ok + ' of ' + built.runs.length + ' simulated pieces saved \u2014 '
         + built.machinists.length + ' machinist(s) (' + built.machinists.join(', ') + ') across '
-        + built.spanDays + ' day(s) \u00b7 ' + built.dims + ' measured feature(s). '
+        + 'one part every ' + built.gapMin + ' min \u00b7 '
+        + (built.spanMin < 120 ? (built.spanMin + ' min')
+           : (built.spanMin < 2880 ? ((built.spanMin / 60).toFixed(1) + ' hours')
+                                   : (Math.round(built.spanMin / 1440) + ' days'))) + ' of running \u00b7 '
+        + built.dims + ' measured feature(s). '
         + 'Reports and Review hide them until simulated runs are switched on.');
     }catch(e){
       console.error('Rev-986 inject failed', e);
