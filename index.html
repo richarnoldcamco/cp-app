@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1032</title>
+<title>CONTROL PLAN GENERATOR - Rev-1033</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1032 · 2026-08-09 11:54 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1033 · 2026-08-09 11:56 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1032 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:54 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1033 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:56 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1032 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1033 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1701,7 +1701,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1032";
+const APP_REV = "Rev-1033";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2229,6 +2229,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1033", type: "App", changes: ["THE TWO MEASUREMENTS OF THE SAME PART, SIDE BY SIDE (Rev-1033, embedded validation REV-260) — per Rich. When a level comes due the row now offers INSPECT S/N 48, and pressing it opens the comparison: every feature that level covers, with the MACHINIST’s reading, the LINE INSPECTOR’s reading of the same part, and the DIFFERENCE. Anything over .0004 is flagged in red and the header counts them — 2 of 14 disagree by more than .0004. DONE — MARK INSPECTED closes it and moves the queue to the next block. THE INSPECTOR’S NUMBER IS NOT THE MACHINIST’S. Two people with two gauges never get the identical value, so it is the machinist’s reading plus an offset from a seed of its own, and a new GAUGE SPREAD control decides how far apart they sit: .0001 and they agree, .0002 is normal and about one part in sixteen trips the flag, .0004 and the gauges argue with a third of parts flagged. That is the dial for watching the mismatches unfold. A reading outside the tolerance is shown in red on whichever side saw it, so a part in tolerance to one man and out to the other is visible at a glance — which is how a bad part leaves the building, and the panel says so. A FLAG IS NOT A BAD PART, it is the two of them not agreeing, and either gauge could be the wrong one. Same rule as everywhere else on this screen: nothing is stored, the values come from the serial number, and none of it is measurement evidence. The one-second redraw leaves an open comparison alone. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, run to a due level, press INSPECT S/N — the table should list that level’s features with both readings and the difference; set GAUGE SPREAD to .0004 and reopen it, and far more should be flagged."] },
   { ts: "2026-08-09", rev: "App Rev-1032", type: "App", changes: ["HOW THE RUN IS GOING — CAPABILITY, SCRAP AND GOOD PARTS ON THE SIMULATOR (Rev-1032, embedded validation REV-260) — per Rich, and the screen widens to hold it: it was sitting in an 1100px column on a monitor twice that wide, and now takes 97% of the window. FIVE TILES across the top of the run: ROLLING CPK over the last 30 parts, QUALITY LEVEL in words, OUT OF TOLERANCE readings, SCRAP PARTS and GOOD PARTS with the percentage. THE CPK REPORTED IS THE WORST FEATURE’S, and the tile names which bubble it is — a plan is only as capable as the dimension most likely to fail, and an average across fourteen features would hide the one that matters. Under five parts it says so rather than drawing a number out of nothing. WHERE THE READINGS COME FROM, said plainly because it matters: they are DERIVED FROM THE SERIAL NUMBER as they are needed, not stored. The same part always gives the same value, so nothing grows and no figure changes under you between one second and the next; a normal spread centred in the tolerance band, a process sitting around Cpk 1.33. NONE OF IT IS WRITTEN ANYWHERE — nothing reaches the repository, nothing appears in Reports or Review, and none of it is measurement evidence. The footnote on the panel now says exactly that. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 at 1 second — under five parts the strip should say five are needed, then the five tiles should appear and settle around a Cpk of 1.3 with the worst bubble named. Stop and start again: the same serials should give the same figures."] },
   { ts: "2026-08-09", rev: "App Rev-1031", type: "App", changes: ["1 AND 2 SECONDS ON THE SIMULATOR PACE (Rev-1031, embedded validation REV-260) — per Rich. A PART EVERY now offers 1 second and 2 seconds alongside 10 seconds, 1 minute and the real ten minutes. It matters more than it sounds: at one second a block of 30 parts is over in half a minute, so a whole cycle — parts accumulating, a serial coming due, GO AND FETCH IT, MARK INSPECTED, the next block’s serial appearing — can be watched end to end without waiting. Two seconds was already there; one second is new. The count is still worked out from the clock rather than a timer, so the fast paces are as accurate as the slow ones. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, pick 1 second, press START THE MACHINIST — the left number should climb once a second and Level 2 should come due at S/N 5 within about five seconds."] },
   { ts: "2026-08-09", rev: "App Rev-1030", type: "App", changes: ["THE SIMULATOR’S DROPDOWNS WOULD NOT OPEN (Rev-1030, embedded validation REV-260) — Rich could not pick a pace from A PART EVERY, and the cause was mine from Rev-1028. The panel redrew itself every second to keep the counters live, and a redraw replaces the whole body — so a dropdown opened at, say, half past the second was destroyed half a second later and the list vanished before anything could be chosen. It looked like a dead control; it was a control being demolished under the user’s finger. TWO GUARDS, and both earn their place. The panel never redraws while the focus is inside one of its own controls, which covers an open select, a select being scrolled, and a number being typed. And it does not redraw AT ALL while the machinist is stopped — nothing is changing then, so a redraw can only do harm. The counters still tick once a second while a run is going, which is the only time they need to. WHAT TO TEST (rule 8): Admin → Line Simulator, or ▶ INSPECT SIM on 1000237620 OP-030 — open A PART EVERY, the list should stay open, and picking 10 seconds should stick. Then press START THE MACHINIST and the count should climb every ten seconds; open the dropdown again mid-run and it should still stay open."] },
@@ -3138,7 +3139,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:54 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:56 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16092,6 +16093,33 @@ function cpSimMetrics(key, rows, made, win){
            worst: worst ? worst.b : null, oot: oot, scrap: scrap,
            good: use - scrap, dims: feats.length };
 }
+/* Rev-1033: THE LINE INSPECTOR'S READING OF THE SAME PART. Two people with two gauges
+   never get the identical number, so the inspector's value is the machinist's plus an
+   offset of its own - a different seed, so the two are independent, and a spread that can
+   be dialled. CP_SIM_FLAG is the disagreement that matters: more than four ten-thousandths
+   between them and the pair is flagged. */
+const CP_SIM_FLAG = 0.0004;
+function cpSimReadLI(key, sn, bubble, lim, sd){
+  return cpSimRead(key, sn, bubble, lim) + cpSimGauss(key + '|LI|' + bubble + '|' + sn) * (sd || 0.0002);
+}
+/* Every feature a level covers: Level 1 is the whole part, 2 and 3 only what is marked. */
+function cpSimLevelFeats(rows, marks, level){
+  return rows.filter(r => {
+    if(!cpSimLimits(r.spec)) return false;
+    if(level === 1) return true;
+    return (marks || {})[String(r.bubble).trim()] === level;
+  });
+}
+function cpSimCompare(key, rows, marks, level, sn, sd){
+  return cpSimLevelFeats(rows, marks, level).map(r => {
+    const b = String(r.bubble).trim(), lim = cpSimLimits(r.spec);
+    const m = cpSimRead(key, sn, b, lim), l = cpSimReadLI(key, sn, b, lim, sd);
+    const d = l - m;
+    return { bubble: b, desc: r.featureDesc || '', lim: lim, mach: m, insp: l, diff: d,
+             flag: Math.abs(d) > CP_SIM_FLAG,
+             machOut: (m > lim.hi || m < lim.lo), inspOut: (l > lim.hi || l < lim.lo) };
+  });
+}
 function cpSimBand(c){
   if(c == null) return { t: '\u2014', c: '#b9b3aa' };
   if(c >= 1.67) return { t: 'EXCELLENT',   c: '#1d6b3f' };
@@ -16175,6 +16203,15 @@ function cpSimPanel(wantIdx){
         +   [[600,'10 minutes \u00b7 real pace'],[60,'1 minute'],[10,'10 seconds \u00b7 demo'],
              [2,'2 seconds \u00b7 fast demo'],[1,'1 second \u00b7 fastest']].map(g =>
               '<option value="' + g[0] + '"' + ((st.gapSec || 600) === g[0] ? ' selected' : '') + '>'
+              + g[1] + '</option>').join('')
+        +   '</select></label>'
+        + '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
+        +   'GAUGE SPREAD'
+        +   '<select id="cpSimSd" style="display:block; margin-top:5px; padding:10px; font-size:14px;'
+        +   ' font-weight:700; border:1px solid #c9c0b4; border-radius:8px;">'
+        +   [[0.0001,'.0001 \u00b7 gauges agree'],[0.0002,'.0002 \u00b7 normal'],
+             [0.0004,'.0004 \u00b7 gauges argue']].map(g =>
+              '<option value="' + g[0] + '"' + ((st.sd || 0.0002) === g[0] ? ' selected' : '') + '>'
               + g[1] + '</option>').join('')
         +   '</select></label>'
         + '<button id="cpSimToggle" style="padding:13px 26px; border:none; border-radius:9px;'
@@ -16270,12 +16307,69 @@ function cpSimPanel(wantIdx){
                                      + ' parts late</div>') : '') + '</td>'
             + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;">'
             +   (d.state === 'DUE NOW'
-                  ? ('<button data-simdone="' + d.level + '" style="font-size:11px; font-weight:800;'
-                     + ' padding:6px 12px; border:1px solid #1d6b3f; background:#fff; color:#1d6b3f;'
-                     + ' border-radius:6px; cursor:pointer;">MARK INSPECTED</button>')
+                  ? ('<button data-simcmp="' + d.level + '" style="font-size:11px; font-weight:800;'
+                     + ' padding:6px 12px; border:1px solid #1a5276; background:#fff; color:#1a5276;'
+                     + ' border-radius:6px; cursor:pointer;">INSPECT S/N ' + d.serial + '</button>')
                   : '') + '</td>'
             + '</tr>').join('')
         + '</tbody></table>'
+        + (function(){
+            /* ----- Rev-1033: the two measurements of the same part, side by side ----- */
+            const cm = st.cmp;
+            if(!cm) return '';
+            const cmp = cpSimCompare(key, rows, marks, cm.level, cm.serial, st.sd || 0.0002);
+            if(!cmp.length) return '';
+            const flags = cmp.filter(x => x.flag).length;
+            const dp = 5;
+            return '<div style="margin-top:22px; border:2px solid ' + (flags ? '#a5342a' : '#1d6b3f')
+              + '; border-radius:12px; background:#fff; padding:16px;">'
+              + '<div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:12px;">'
+              +   '<div style="font-size:15px; font-weight:800; color:#000;">LINE INSPECTION OF S/N '
+              +     cm.serial + ' \u00b7 LEVEL ' + cm.level + ' \u00b7 ' + LN[cm.level] + '</div>'
+              +   '<div style="font-size:13px; font-weight:800; color:' + (flags ? '#a5342a' : '#1d6b3f') + ';">'
+              +     (flags ? ('\u2691 ' + flags + ' of ' + cmp.length + ' disagree by more than .0004')
+                           : ('\u2714 all ' + cmp.length + ' agree within .0004')) + '</div>'
+              +   '<button id="cpSimCmpDone" style="margin-left:auto; padding:10px 18px; border:none;'
+              +     ' background:#1d6b3f; color:#fff; border-radius:8px; font-weight:800; font-size:13px;'
+              +     ' cursor:pointer;">\u2714 DONE \u2014 MARK INSPECTED</button>'
+              +   '<button id="cpSimCmpX" style="padding:10px 16px; border:1px solid #c9c0b4;'
+              +     ' background:#fff; color:#3a352e; border-radius:8px; font-weight:800; font-size:12.5px;'
+              +     ' cursor:pointer;">CLOSE</button>'
+              + '</div>'
+              + '<table style="border-collapse:collapse; width:100%; font-size:12.5px;">'
+              + '<thead><tr>'
+              + ['BUBBLE','FEATURE','LIMITS','MACHINIST','LINE INSPECTOR','DIFFERENCE','']
+                  .map((th, ix) => '<th style="border-bottom:1px solid #d8d3ca; padding:7px 9px;'
+                    + ' background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px;'
+                    + ' letter-spacing:.05em; text-align:' + (ix === 1 ? 'left' : 'center') + ';">'
+                    + th + '</th>').join('')
+              + '</tr></thead><tbody>'
+              + cmp.map(x => '<tr style="background:' + (x.flag ? '#fff5f4' : '#fff') + ';">'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
+                  +   ' font-size:15px; font-weight:800; color:#000;">' + esc(x.bubble) + '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; color:#000;">'
+                  +   esc(x.desc) + '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
+                  +   ' color:#6b6257;">' + x.lim.hi.toFixed(4) + ' / ' + x.lim.lo.toFixed(4) + '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
+                  +   ' font-weight:700; color:' + (x.machOut ? '#a5342a' : '#000') + ';">'
+                  +   x.mach.toFixed(dp) + '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
+                  +   ' font-weight:700; color:' + (x.inspOut ? '#a5342a' : '#000') + ';">'
+                  +   x.insp.toFixed(dp) + '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
+                  +   ' font-weight:800; color:' + (x.flag ? '#a5342a' : '#6b6257') + ';">'
+                  +   (x.diff >= 0 ? '+' : '') + x.diff.toFixed(dp) + '</td>'
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
+                  +   ' font-weight:800; color:#a5342a;">' + (x.flag ? '\u2691 CHECK THE GAUGES' : '') + '</td>'
+                  + '</tr>').join('')
+              + '</tbody></table>'
+              + '<div style="font-size:11.5px; color:#6b6257; margin-top:12px; line-height:1.6;">'
+              +   'A flag is not a bad part \u2014 it is the two of them not agreeing. Either gauge '
+              +   'could be the wrong one, and that is the point of looking: a part reading in '
+              +   'tolerance to one man and out to the other is how a bad part leaves the building.'
+              + '</div></div>';
+          })()
         + '<div style="font-size:11.5px; color:#6b6257; margin-top:14px; line-height:1.6;">'
         +   'The intervals come from <b>STEP 8 \u00b7 LINE INSPECTION</b> on this operation and are '
         +   'changed there, not here. One serial inside each block is chosen before the part exists '
@@ -16317,6 +16411,35 @@ function cpSimPanel(wantIdx){
         st2.baseSn = 0; st2.done = {}; if(st2.on) st2.startedAt = Date.now();
         cpSimSave(all); render();
       };
+      const sd = document.getElementById('cpSimSd');
+      if(sd) sd.onchange = () => { stOf(plans[sel]).sd = parseFloat(sd.value) || 0.0002;
+        cpSimSave(all); render(); };
+      b.querySelectorAll('[data-simcmp]').forEach(btn => { btn.onclick = () => {
+        const st2 = stOf(plans[sel]);
+        const l = parseInt(btn.getAttribute('data-simcmp'), 10);
+        const d = cpSimDue(keyOf(plans[sel]), l,
+                           (parseInt((plans[sel].p.lineLevelSet || {})[l], 10)
+                            || ({1:30,2:15,3:100})[l]), cpSimMade(st2), st2.done || {});
+        st2.cmp = { level: l, serial: d.serial };
+        cpSimSave(all);
+        try{ logAct('sim', 'compared level ' + l); }catch(_){ }
+        render();
+      }; });
+      const cx = document.getElementById('cpSimCmpX');
+      if(cx) cx.onclick = () => { const st2 = stOf(plans[sel]); st2.cmp = null; cpSimSave(all); render(); };
+      const cd = document.getElementById('cpSimCmpDone');
+      if(cd) cd.onclick = () => {
+        const st2 = stOf(plans[sel]);
+        const cm = st2.cmp; if(!cm) return;
+        const l = cm.level;
+        const d = cpSimDue(keyOf(plans[sel]), l,
+                           (parseInt((plans[sel].p.lineLevelSet || {})[l], 10)
+                            || ({1:30,2:15,3:100})[l]), cpSimMade(st2), st2.done || {});
+        st2.done = st2.done || {}; st2.done[l] = d.block - 1;
+        st2.cmp = null; cpSimSave(all);
+        try{ logAct('sim', 'level ' + l + ' inspected'); }catch(_){ }
+        render();
+      };
       b.querySelectorAll('[data-simdone]').forEach(btn => { btn.onclick = () => {
         const st2 = stOf(plans[sel]);
         const l = btn.getAttribute('data-simdone');
@@ -16345,6 +16468,7 @@ function cpSimPanel(wantIdx){
         if(a && body.contains(a) && /^(SELECT|INPUT|TEXTAREA|OPTION)$/.test(a.tagName || '')) return;
         const pl = plans[sel]; const st = pl ? stOf(pl) : null;
         if(!st || !st.on) return;
+        if(st.cmp) return;   /* Rev-1033: never redraw a comparison out from under the reader */
         render();
       }catch(e){ clearInterval(tick); }
     }, 1000);
