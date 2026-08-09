@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1039</title>
+<title>CONTROL PLAN GENERATOR - Rev-1040</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1039 · 2026-08-09 12:22 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1040 · 2026-08-09 12:30 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1039 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 12:22 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1040 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 12:30 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1039 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1040 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1701,7 +1701,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1039";
+const APP_REV = "Rev-1040";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2229,6 +2229,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1040", type: "App", changes: ["THE TWO INSPECTOR FIGURES SHARE ONE LINE, AT HALF THE HEIGHT (Rev-1040, embedded validation REV-260) — per Rich. INSPECTIONS COMPLETED and the INSPECTOR’S OWN CPK sat one above the other, each carrying a paragraph of explanation, and between them they pushed the levels table most of the way down the screen. They now sit side by side in a two-up grid with the padding and the figures cut down — 22px instead of 32, tighter labels — which is about half the height the pair used to take. THE EXPLANATIONS ARE NOT DELETED, they move to the tooltips: a sentence about how the inspector finishes on his own, or about a gap between the two figures being the gauges rather than the process, is worth reading once and then only when it is asked for. Hover either tile and it is there. The figures themselves lose nothing — the Cpk still carries its band in words and the machinist’s figure beside it for comparison, just in fewer characters. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — the two tiles should be side by side above the levels table, and hovering the right-hand one should explain what the gap between the two capability figures means."] },
   { ts: "2026-08-09", rev: "App Rev-1039", type: "App", changes: ["THE PART NOW EXISTS ON ITS OWN, AND BOTH MEN MEASURE IT (Rev-1039, embedded validation REV-260) — Rich asked how the simulation worked, and answering it showed up a flaw worth fixing. The machinist’s reading WAS the part and the inspector deviated from it, which quietly made the machinist perfect: he had no gauge error at all, so every disagreement was the inspector’s fault by construction. In a shop the machinist has a gauge too. A part now has a TRUE VALUE set by the process, and EACH MAN ADDS HIS OWN INDEPENDENT GAUGE ERROR on top of it. Neither is the reference, and when the two disagree the screen no longer implies whose fault it is. Two settings become three: PROCESS CPK, how tightly the PARTS are held and nothing to do with measuring; MACHINIST GAUGE CPK; and LINE INSPECTOR GAUGE CPK. THE CONSEQUENCE IS WORTH SEEING: hold the process at 1.33 and give the MACHINIST the poor gauge, and now HE is the one whose numbers read badly — 0.48 against the inspector’s 1.14 on the very same parts — which was impossible before this rev and is exactly the case a real gauge study exists to catch. Both capability figures are labelled as what each man MEASURES, and the inspector’s tile names the process Cpk the parts are actually held to, so three numbers that used to be two are never confused for each other. WHAT TO TEST (rule 8): set PROCESS 1.33, MACHINIST GAUGE 0.67, INSPECTOR GAUGE 2.00 on 1000237620 OP-030 and the machinist’s Cpk should be the poor one; swap the two gauge settings and the poor figure should swap sides with them."] },
   { ts: "2026-08-09", rev: "App Rev-1038", type: "App", changes: ["⚖ MACHINIST vs LINE INSPECTOR · CRITICAL FEATURES (Rev-1038, embedded validation REV-260) — per Rich. Every completed line inspection is now reported: the panel walks the blocks each level has finished, re-measures the critical features on those serials both ways, and shows what the two men actually found. A deviation over .0002 on a critical dimension is called out — a tighter bar than the .0004 used on the general comparison, because that is what critical means. FIVE FIGURES ACROSS THE TOP. MEASUREMENT VARIATION is the STANDARD DEVIATION OF THE DIFFERENCES, and it is the one that matters: it is what a gauge study measures — how consistently the two agree, not how big the parts are — and it is also given as a percentage of the tolerance band, which is the number a Gauge R&R would put in front of a customer. BIAS is which way it leans, and reading it against the variation is the whole diagnosis: a steady offset with small scatter points at one gauge being out of calibration, while a large scatter with no bias points at how the part is being held. AVERAGE and WORST DEVIATION and a count over the limit finish the strip. Underneath, the last fifteen inspections one per line — serial, level, how many critical features were checked, how many broke .0002, the worst single disagreement, and the offending bubbles named with their numbers. CRITICAL MEANS MARKED LEVEL 2 · CRITICAL ONLY on Step 8. Where nothing has been marked, every dimensional feature is treated as critical and the panel says so, rather than reporting nothing at all and looking broken. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 at 1 second until a few inspections have completed — the section should fill in; then set LINE INSPECTOR CPK to 0.67 and the variation, the worst deviation and the count over .0002 should all climb together."] },
   { ts: "2026-08-09", rev: "App Rev-1037", type: "App", changes: ["TWO CPK TARGETS DRIVE THE SIMULATION — ONE FOR THE MACHINIST, ONE FOR THE INSPECTOR (Rev-1037, embedded validation REV-260) — per Rich, and it is a better handle than the one it replaces. GAUGE SPREAD is gone, in both the setup sheet and the running screen. In its place MACHINIST CPK sets how capable the process is — how tightly the parts are actually held — from 0.67 not capable up to 2.00 excellent; ask for 1.33 and the numbers come out around 1.33, because Cpk on a centred process is band divided by six standard deviations and the spread is simply worked backwards from the target. LINE INSPECTOR CPK sets how accurate HIS GAUGE is, and this is the one worth understanding: a poor gauge does not change the part, it makes his DATA read worse. Set the machinist to 1.33 and the inspector to 2.00 and the two figures sit close together. Drop the inspector to 0.67 and his readings of the very same parts come out near 0.60 while the machinist still reads 1.24 — the process did not move, the measuring did. A NEW TILE down the LINE INSPECTOR column carries CPK FROM THE INSPECTOR’S OWN READINGS beside what the machinist reads on the same parts, and says in as many words that a gap between the two is his gauge and not the process. The comparison table and the .0004 flag now follow both targets. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, set MACHINIST CPK 1.33 and LINE INSPECTOR CPK 2.00, run it, then change the inspector to 0.67 — the left-hand Cpk should barely move and the inspector’s should fall away."] },
@@ -3145,7 +3146,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:22 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:30 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16514,27 +16515,32 @@ function cpSimPanel(wantIdx){
         + '</div></div>';
 
       const insDone = dues.reduce((a, d) => a + d.doneCount, 0);
+      /* Rev-1040: the two inspector figures share one line and half the height. The long
+         explanations move to the tooltips - they were read once and then taken up room on
+         every glance afterwards. */
+      const liTile = (label, value, colour, note, tip) =>
+        '<div title="' + esc(tip || '') + '" style="border:1px solid #d8d3ca; border-radius:10px;'
+        + ' padding:7px 11px; background:#fff;">'
+        + '<div style="font-size:9.5px; font-weight:800; letter-spacing:.05em; color:#6b6257;'
+        +   ' white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + label + '</div>'
+        + '<div style="font-size:22px; font-weight:800; line-height:1.1; color:' + colour + ';">'
+        +   value + '</div>'
+        + '<div style="font-size:10px; color:#6b6257; white-space:nowrap; overflow:hidden;'
+        +   ' text-overflow:ellipsis;">' + note + '</div></div>';
       h += '<div style="grid-column:2;">'
-        + '<div style="border:1px solid #d8d3ca; border-radius:10px; padding:12px 15px;'
-        +   ' background:#fff; margin-bottom:12px;">'
-        +   '<div style="font-size:10.5px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
-        +     'LINE INSPECTIONS COMPLETED</div>'
-        +   '<div style="font-size:32px; font-weight:800; line-height:1.15; color:#8a3a12;">'
-        +     insDone + '</div>'
-        +   '<div style="font-size:11px; color:#6b6257;">across all three levels \u00b7 the '
-        +     'inspector finishes on his own, 0\u20135 parts after the one he was sent for</div></div>'
-        + (mli ? ('<div style="border:1px solid #d8d3ca; border-radius:10px; padding:12px 15px;'
-                  + ' background:#fff; margin-bottom:12px;">'
-                  + '<div style="font-size:10.5px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
-                  +   'CPK FROM THE INSPECTOR\u2019S OWN READINGS</div>'
-                  + '<div style="font-size:32px; font-weight:800; line-height:1.15; color:'
-                  +   cpSimBand(mli.cpk).c + ';">' + mli.cpk.toFixed(2) + '</div>'
-                  + '<div style="font-size:11px; color:#6b6257;">' + cpSimBand(mli.cpk).t
-                  +   (mx ? (' \u00b7 the machinist reads ' + mx.cpk.toFixed(2)
-                             + ' on the same parts') : '')
-                  +   '. Both are what each man MEASURES \u2014 the parts themselves are held '
-                  +   'to ' + (st.pcpk || CP_SIM_PCPK).toFixed(2)
-                  +   '. A gap between the two figures is the gauges, not the process.</div></div>') : '')
+        + '<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">'
+        + liTile('INSPECTIONS COMPLETED', insDone, '#8a3a12', 'all three levels',
+                 'Across all three levels. The inspector finishes on his own, 0-5 parts after '
+                 + 'the one he was sent for.')
+        + (mli ? liTile('INSPECTOR\u2019S OWN CPK', mli.cpk.toFixed(2), cpSimBand(mli.cpk).c,
+                        cpSimBand(mli.cpk).t + (mx ? (' \u00b7 machinist ' + mx.cpk.toFixed(2)) : ''),
+                        'What the inspector MEASURES on these parts, beside what the machinist '
+                        + 'measures on the same ones. The parts themselves are held to '
+                        + (st.pcpk || CP_SIM_PCPK).toFixed(2)
+                        + '. A gap between the two figures is the gauges, not the process.')
+               : liTile('INSPECTOR\u2019S OWN CPK', '\u2014', '#b9b3aa', 'not enough parts yet',
+                        'Five parts are needed before a capability figure means anything.'))
+        + '</div>'
         + '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
         + '<thead><tr>'
         + ['LEVEL', 'COVERS', 'FEAT', 'EVERY', 'BLOCK', 'SERIAL', 'STATE', '']
