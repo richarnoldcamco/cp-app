@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1036</title>
+<title>CONTROL PLAN GENERATOR - Rev-1037</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1036 · 2026-08-09 12:07 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1037 · 2026-08-09 12:11 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1036 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 12:07 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1037 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 12:11 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1036 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1037 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1701,7 +1701,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1036";
+const APP_REV = "Rev-1037";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2229,6 +2229,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1037", type: "App", changes: ["TWO CPK TARGETS DRIVE THE SIMULATION — ONE FOR THE MACHINIST, ONE FOR THE INSPECTOR (Rev-1037, embedded validation REV-260) — per Rich, and it is a better handle than the one it replaces. GAUGE SPREAD is gone, in both the setup sheet and the running screen. In its place MACHINIST CPK sets how capable the process is — how tightly the parts are actually held — from 0.67 not capable up to 2.00 excellent; ask for 1.33 and the numbers come out around 1.33, because Cpk on a centred process is band divided by six standard deviations and the spread is simply worked backwards from the target. LINE INSPECTOR CPK sets how accurate HIS GAUGE is, and this is the one worth understanding: a poor gauge does not change the part, it makes his DATA read worse. Set the machinist to 1.33 and the inspector to 2.00 and the two figures sit close together. Drop the inspector to 0.67 and his readings of the very same parts come out near 0.60 while the machinist still reads 1.24 — the process did not move, the measuring did. A NEW TILE down the LINE INSPECTOR column carries CPK FROM THE INSPECTOR’S OWN READINGS beside what the machinist reads on the same parts, and says in as many words that a gap between the two is his gauge and not the process. The comparison table and the .0004 flag now follow both targets. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, set MACHINIST CPK 1.33 and LINE INSPECTOR CPK 2.00, run it, then change the inspector to 0.67 — the left-hand Cpk should barely move and the inspector’s should fall away."] },
   { ts: "2026-08-09", rev: "App Rev-1036", type: "App", changes: ["THE LINE INSPECTOR IS SIMULATED TOO, AND FINISHES ON HIS OWN (Rev-1036, embedded validation REV-260) — per Rich. Until now a simulated machinist made parts and a real person had to press MARK INSPECTED, which is not a simulation of anything. The inspector is now part of the run: he does not appear the instant a part comes due, because he is on the floor doing something else, so EACH BLOCK CARRIES ITS OWN LAG OF 0 TO 5 PARTS, fixed for that block and drawn the same deterministic way as the serial itself. When the count passes that point the inspection is COMPLETE and the queue moves to the next block by itself. The state column now reads WAITING with how many inspections are done so far, or BEING INSPECTED with the serial it lands on and how late he was, and a LINE INSPECTIONS COMPLETED tile counts them across all three levels. MARK INSPECTED IS GONE from both the table and the comparison, because there is nothing left for a person to press — INSPECT S/N still opens the two sets of readings side by side, but it is now a window onto what the simulation is doing rather than a step in it. NOTHING IS STORED for any of this: which blocks are done is worked out by walking forward from the first, exactly as the part count is worked out from the clock, so it survives the panel being closed and can never disagree with itself. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 at 1 second — Level 2 should reach BEING INSPECTED, then clear itself a few parts later without anything being pressed, and LINE INSPECTIONS COMPLETED should climb on its own."] },
   { ts: "2026-08-09", rev: "App Rev-1035", type: "App", changes: ["A SETUP SHEET IN FRONT OF THE SIMULATION (Rev-1035, embedded validation REV-260) — per Rich. ▶ INSPECT SIM used to drop straight into whatever was already running. It now opens SET UP A SIMULATION with the last settings used on that operation ALREADY FILLED IN — operation, a part every, gauge spread and the serial to start at — so a new run is a matter of changing what needs changing rather than remembering what it was set to last time. The Step 8 intervals are shown beside them, read-only, with a line saying they are changed on the operation’s own tile and not here: this sheet decides how the SIMULATION behaves, not what the plan requires, and blurring those two would be a way to change a real Control Plan by accident. NOTHING IS LOST BY LOOKING. If a run is already going the sheet offers CARRY ON — 93 part(s) already made, which changes nothing at all; the count is only reset when START A NEW SIMULATION is actually pressed, and the sheet says so in as many words. RESET TO S/N 0 on the running screen becomes ⚙ SET UP AGAIN, which is the same journey backwards and no longer throws a run away with one press of a button sitting next to STOP. WHAT TO TEST (rule 8): press ▶ INSPECT SIM on 1000237620 OP-030 — the setup sheet should appear with 1 second and .0002 already chosen if that is what was last used; press CARRY ON and the count should be where you left it; press SET UP AGAIN, change the serial to 500 and start, and the run should begin from 501."] },
   { ts: "2026-08-09", rev: "App Rev-1034", type: "App", changes: ["THE SIMULATOR SPLITS INTO TWO COLUMNS — MACHINIST LEFT, LINE INSPECTOR RIGHT (Rev-1034, embedded validation REV-260) — per Rich, and it is the right way to read the screen because it is the way the floor actually works: two people doing two jobs. Down the LEFT, under a blue MACHINIST heading, everything belonging to the man making parts — the serial count and the whole HOW THE RUN IS GOING strip, rolling Cpk, out of tolerance, scrap and good parts. Down the RIGHT, under LINE INSPECTOR, everything belonging to the man pulling them — the next serial owed, its level, and the table of all three levels with their blocks and states. NOTHING MOVED BETWEEN THEM and no figure changed; the same numbers are simply standing where they belong, and a glance now tells you which job a number is about before you have read it. THE COMPARISON STAYS FULL WIDTH underneath, because it is the one thing on the screen that belongs to BOTH of them — putting it in either column would have said it was somebody’s business more than the other’s, and the whole point of a disagreement is that neither side owns it. The levels table headings are shortened to fit half a screen — COVERS, FEAT, SERIAL — and the metric tiles reflow to the narrower column. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — two headed columns, the count and capability on the left, the queue and levels on the right, and pressing INSPECT S/N should still open the comparison across the full width below."] },
@@ -3142,7 +3143,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:07 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "12:11 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16085,14 +16086,18 @@ function cpSimLimits(spec){
   const hi = Math.max(n[0], n[1]), lo = Math.min(n[0], n[1]);
   return (hi > lo) ? { hi: hi, lo: lo } : null;
 }
-function cpSimRead(key, sn, bubble, lim){
-  const mid = (lim.hi + lim.lo) / 2, band = lim.hi - lim.lo;
-  return mid + cpSimGauss(key + '|' + bubble + '|' + sn) * (band / 8);
+/* Rev-1037: the machinist's process is set by a CPK TARGET rather than a fixed spread.
+   Cpk = (band/2) / (3 x sd) when the process is centred, so sd = band / (6 x Cpk). Ask for
+   1.33 and the numbers come out around 1.33; ask for 0.67 and they come out around 0.67. */
+const CP_SIM_MCPK = 1.33, CP_SIM_ICPK = 2.00;
+function cpSimSd(lim, cpk){ return (lim.hi - lim.lo) / (6 * Math.max(0.1, cpk || CP_SIM_MCPK)); }
+function cpSimRead(key, sn, bubble, lim, mcpk){
+  return ((lim.hi + lim.lo) / 2) + cpSimGauss(key + '|' + bubble + '|' + sn) * cpSimSd(lim, mcpk);
 }
 /* Rolling over the last WINDOW parts. The Cpk reported is the WORST feature's, because a
    plan is only as capable as the dimension most likely to fail - an average across
    fourteen features would hide the one that matters. */
-function cpSimMetrics(key, rows, made, win){
+function cpSimMetrics(key, rows, made, win, mcpk, icpk, useLI){
   const use = Math.min(made, win || 30);
   if(use < 5) return null;
   const first = made - use + 1;
@@ -16103,7 +16108,8 @@ function cpSimMetrics(key, rows, made, win){
   feats.forEach(f => {
     const vals = [];
     for(let sn = first; sn <= made; sn++){
-      const v = cpSimRead(key, sn, f.b, f.lim);
+      const v = useLI ? cpSimReadLI(key, sn, f.b, f.lim, icpk, mcpk)
+                      : cpSimRead(key, sn, f.b, f.lim, mcpk);
       vals.push(v);
       if(v > f.lim.hi || v < f.lim.lo){ oot++; bad[sn] = 1; }
     }
@@ -16125,8 +16131,12 @@ function cpSimMetrics(key, rows, made, win){
    be dialled. CP_SIM_FLAG is the disagreement that matters: more than four ten-thousandths
    between them and the pair is flagged. */
 const CP_SIM_FLAG = 0.0004;
-function cpSimReadLI(key, sn, bubble, lim, sd){
-  return cpSimRead(key, sn, bubble, lim) + cpSimGauss(key + '|LI|' + bubble + '|' + sn) * (sd || 0.0002);
+/* The inspector measures the SAME part with his own gauge, and the accuracy of that gauge
+   is its own Cpk. A poor one does not change the part - it makes his DATA read worse, which
+   is the whole reason to watch his figure next to the machinist's. */
+function cpSimReadLI(key, sn, bubble, lim, icpk, mcpk){
+  return cpSimRead(key, sn, bubble, lim, mcpk)
+       + cpSimGauss(key + '|LI|' + bubble + '|' + sn) * cpSimSd(lim, icpk || CP_SIM_ICPK);
 }
 /* Every feature a level covers: Level 1 is the whole part, 2 and 3 only what is marked. */
 function cpSimLevelFeats(rows, marks, level){
@@ -16136,10 +16146,10 @@ function cpSimLevelFeats(rows, marks, level){
     return (marks || {})[String(r.bubble).trim()] === level;
   });
 }
-function cpSimCompare(key, rows, marks, level, sn, sd){
+function cpSimCompare(key, rows, marks, level, sn, icpk, mcpk){
   return cpSimLevelFeats(rows, marks, level).map(r => {
     const b = String(r.bubble).trim(), lim = cpSimLimits(r.spec);
-    const m = cpSimRead(key, sn, b, lim), l = cpSimReadLI(key, sn, b, lim, sd);
+    const m = cpSimRead(key, sn, b, lim, mcpk), l = cpSimReadLI(key, sn, b, lim, icpk, mcpk);
     const d = l - m;
     return { bubble: b, desc: r.featureDesc || '', lim: lim, mach: m, insp: l, diff: d,
              flag: Math.abs(d) > CP_SIM_FLAG,
@@ -16237,12 +16247,21 @@ function cpSimPanel(wantIdx){
                   '<option value="' + g[0] + '"' + ((st.gapSec || 600) === g[0] ? ' selected' : '')
                   + '>' + g[1] + '</option>').join('') + '</select>',
               'How fast the machinist finishes parts.')
-        +   fld('GAUGE SPREAD', '<select id="cpSimSd"' + selCss + '>'
-              + [[0.0001,'.0001 \u00b7 gauges agree'],[0.0002,'.0002 \u00b7 normal'],
-                 [0.0004,'.0004 \u00b7 gauges argue']].map(g =>
-                  '<option value="' + g[0] + '"' + ((st.sd || 0.0002) === g[0] ? ' selected' : '')
+        +   fld('MACHINIST CPK', '<select id="cpSimMcpk"' + selCss + '>'
+              + [[0.67,'0.67 \u00b7 not capable'],[1.00,'1.00 \u00b7 marginal'],
+                 [1.33,'1.33 \u00b7 capable'],[1.67,'1.67 \u00b7 good'],
+                 [2.00,'2.00 \u00b7 excellent']].map(g =>
+                  '<option value="' + g[0] + '"' + ((st.mcpk || CP_SIM_MCPK) === g[0] ? ' selected' : '')
                   + '>' + g[1] + '</option>').join('') + '</select>',
-              'How far apart the machinist and the inspector read the same part.')
+              'How capable the process is \u2014 how tightly the parts are actually held.')
+        +   fld('LINE INSPECTOR CPK', '<select id="cpSimIcpk"' + selCss + '>'
+              + [[0.67,'0.67 \u00b7 poor gauge'],[1.00,'1.00 \u00b7 marginal'],
+                 [1.33,'1.33 \u00b7 capable'],[1.67,'1.67 \u00b7 good'],
+                 [2.00,'2.00 \u00b7 excellent']].map(g =>
+                  '<option value="' + g[0] + '"' + ((st.icpk || CP_SIM_ICPK) === g[0] ? ' selected' : '')
+                  + '>' + g[1] + '</option>').join('') + '</select>',
+              'How accurate his gauge is. A poor one does not change the part \u2014 it makes '
+              + 'his data read worse.')
         +   fld('START AT SERIAL', '<input id="cpSimBase" type="number" min="0" value="'
               + (parseInt(st.baseSn, 10) || 0) + '"' + selCss + '>',
               'The first part will be this number plus one.')
@@ -16279,10 +16298,12 @@ function cpSimPanel(wantIdx){
       const go = document.getElementById('cpSimGo');
       if(go) go.onclick = () => {
         const st2 = stOf(plans[sel]);
-        const g = document.getElementById('cpSimGap'), d = document.getElementById('cpSimSd');
+        const g = document.getElementById('cpSimGap');
+        const mc = document.getElementById('cpSimMcpk'), ic = document.getElementById('cpSimIcpk');
         const bs = document.getElementById('cpSimBase');
         st2.gapSec = parseInt(g && g.value, 10) || 600;
-        st2.sd = parseFloat(d && d.value) || 0.0002;
+        st2.mcpk = parseFloat(mc && mc.value) || CP_SIM_MCPK;
+        st2.icpk = parseFloat(ic && ic.value) || CP_SIM_ICPK;
         st2.baseSn = Math.max(0, parseInt(bs && bs.value, 10) || 0);
         st2.done = {}; st2.cmp = null; st2.on = true; st2.startedAt = Date.now();
         cpSimSave(all);
@@ -16324,15 +16345,16 @@ function cpSimPanel(wantIdx){
               '<option value="' + g[0] + '"' + ((st.gapSec || 600) === g[0] ? ' selected' : '') + '>'
               + g[1] + '</option>').join('')
         +   '</select></label>'
-        + '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
-        +   'GAUGE SPREAD'
-        +   '<select id="cpSimSd" style="display:block; margin-top:5px; padding:10px; font-size:14px;'
-        +   ' font-weight:700; border:1px solid #c9c0b4; border-radius:8px;">'
-        +   [[0.0001,'.0001 \u00b7 gauges agree'],[0.0002,'.0002 \u00b7 normal'],
-             [0.0004,'.0004 \u00b7 gauges argue']].map(g =>
-              '<option value="' + g[0] + '"' + ((st.sd || 0.0002) === g[0] ? ' selected' : '') + '>'
-              + g[1] + '</option>').join('')
-        +   '</select></label>'
+        + [['cpSimMcpk','MACHINIST CPK', st.mcpk || CP_SIM_MCPK],
+           ['cpSimIcpk','LINE INSPECTOR CPK', st.icpk || CP_SIM_ICPK]].map(c =>
+            '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
+            + c[1]
+            + '<select id="' + c[0] + '" style="display:block; margin-top:5px; padding:10px;'
+            + ' font-size:14px; font-weight:700; border:1px solid #c9c0b4; border-radius:8px;">'
+            + [0.67, 1.00, 1.33, 1.67, 2.00].map(v =>
+                '<option value="' + v + '"' + (c[2] === v ? ' selected' : '') + '>'
+                + v.toFixed(2) + '</option>').join('')
+            + '</select></label>').join('')
         + '<button id="cpSimToggle" style="padding:13px 26px; border:none; border-radius:9px;'
         +   ' font-size:14px; font-weight:800; cursor:pointer; color:#fff; background:'
         +   (st.on ? '#a02020' : '#1d6b3f') + ';">' + (st.on ? '\u25A0 STOP THE MACHINIST'
@@ -16381,7 +16403,8 @@ function cpSimPanel(wantIdx){
         + '';   /* Rev-1034: the grid stays open - the metrics and the levels go inside it */
 
       /* ----- Rev-1032: how the run is actually going ----- */
-      const mx = cpSimMetrics(key, rows, made, 30);
+      const mx = cpSimMetrics(key, rows, made, 30, st.mcpk, st.icpk, false);
+      const mli = cpSimMetrics(key, rows, made, 30, st.mcpk, st.icpk, true);
       const bd = cpSimBand(mx ? mx.cpk : null);
       const tile = (label, value, colour, sub2) =>
         '<div style="border:1px solid #d8d3ca; border-radius:10px; padding:13px 15px; background:#fff;">'
@@ -16424,6 +16447,16 @@ function cpSimPanel(wantIdx){
         +     insDone + '</div>'
         +   '<div style="font-size:11px; color:#6b6257;">across all three levels \u00b7 the '
         +     'inspector finishes on his own, 0\u20135 parts after the one he was sent for</div></div>'
+        + (mli ? ('<div style="border:1px solid #d8d3ca; border-radius:10px; padding:12px 15px;'
+                  + ' background:#fff; margin-bottom:12px;">'
+                  + '<div style="font-size:10.5px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
+                  +   'CPK FROM THE INSPECTOR\u2019S OWN READINGS</div>'
+                  + '<div style="font-size:32px; font-weight:800; line-height:1.15; color:'
+                  +   cpSimBand(mli.cpk).c + ';">' + mli.cpk.toFixed(2) + '</div>'
+                  + '<div style="font-size:11px; color:#6b6257;">' + cpSimBand(mli.cpk).t
+                  +   (mx ? (' \u00b7 the machinist reads ' + mx.cpk.toFixed(2)
+                             + ' on the same parts') : '')
+                  +   '. A gap between the two is his gauge, not the process.</div></div>') : '')
         + '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
         + '<thead><tr>'
         + ['LEVEL', 'COVERS', 'FEAT', 'EVERY', 'BLOCK', 'SERIAL', 'STATE', '']
@@ -16464,7 +16497,7 @@ function cpSimPanel(wantIdx){
             /* ----- Rev-1033: the two measurements of the same part, side by side ----- */
             const cm = st.cmp;
             if(!cm) return '';
-            const cmp = cpSimCompare(key, rows, marks, cm.level, cm.serial, st.sd || 0.0002);
+            const cmp = cpSimCompare(key, rows, marks, cm.level, cm.serial, st.icpk, st.mcpk);
             if(!cmp.length) return '';
             const flags = cmp.filter(x => x.flag).length;
             const dp = 5;
@@ -16551,9 +16584,11 @@ function cpSimPanel(wantIdx){
       };
       const rs = document.getElementById('cpSimSetup');
       if(rs) rs.onclick = () => { view = 'setup'; render(); };
-      const sd = document.getElementById('cpSimSd');
-      if(sd) sd.onchange = () => { stOf(plans[sel]).sd = parseFloat(sd.value) || 0.0002;
-        cpSimSave(all); render(); };
+      [['cpSimMcpk','mcpk'],['cpSimIcpk','icpk']].forEach(c => {
+        const el = document.getElementById(c[0]);
+        if(el) el.onchange = () => { stOf(plans[sel])[c[1]] = parseFloat(el.value) || CP_SIM_MCPK;
+          cpSimSave(all); render(); };
+      });
       b.querySelectorAll('[data-simcmp]').forEach(btn => { btn.onclick = () => {
         const st2 = stOf(plans[sel]);
         const l = parseInt(btn.getAttribute('data-simcmp'), 10);
