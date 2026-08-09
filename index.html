@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1040</title>
+<title>CONTROL PLAN GENERATOR - Rev-1043</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1040 · 2026-08-09 12:30 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1043 · 2026-08-09 1:02 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1040 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 12:30 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1043 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 1:02 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -555,6 +555,13 @@
         <b style="font-size:15px;">📚 MASTER LIST</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">CONTROL TYPES — THE SOURCE FOR EVERY METHODS BAND</small>
       </button>
+      <!-- Rev-1042: the Machinist Handbook, opened in the browser rather than shown inside
+           the app. It is somebody else's book on somebody else's site: framing it in here would
+           copy it, and it would break the day that site changes. A link stays a link. -->
+      <button class="menu-btn" id="mHandbook" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
+        <b style="font-size:15px;">📖 MACHINIST HANDBOOK</b><br>
+        <small style="font-size:11px; color:var(--ink-dim);">OPENS IN YOUR BROWSER — NEEDS AN INTERNET CONNECTION</small>
+      </button>
       <button class="menu-btn" id="mCustomers" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
         <b style="font-size:15px;">🏢 CUSTOMER LIST</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">CUSTOMERS &amp; QUALITY LEVELS</small>
@@ -578,7 +585,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1040 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1043 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1701,7 +1708,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1040";
+const APP_REV = "Rev-1043";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2229,6 +2236,9 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1043", type: "App", changes: ["FOUR DECIMAL PLACES, NOT FIVE (Rev-1043, embedded validation REV-260) — per Rich, and he is right on the engineering as well as the look. The prints are held to four places — .6040/.6035 — and the gauges on the floor read to four. A fifth digit is a number nobody can measure, and putting one on screen invites an argument about a difference that does not exist. Every measured figure in the simulator now shows four: the MEASUREMENT VARIATION, AVERAGE DEVIATION, BIAS and WORST DEVIATION tiles, the WORST DEVIATION column, the bubble list beside each inspection, and both men’s readings in the side-by-side comparison. The numbers behind them are untouched — the arithmetic still runs at full precision and only the display is rounded, so nothing shifts a flag from one side of .0002 to the other by way of rounding. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, let a few inspections complete — every figure in the MACHINIST vs LINE INSPECTOR section should read like .0027 rather than .00269."] },
+  { ts: "2026-08-09", rev: "App Rev-1042", type: "App", changes: ["📖 MACHINIST HANDBOOK ON THE MAIN MENU (Rev-1042, embedded validation REV-260) — per Rich. A button on the front screen, sitting with the other reference screens between MASTER LIST and CUSTOMER LIST, opening the handbook at the page he gave. IT OPENS IN THE BROWSER RATHER THAN INSIDE THE APP, and that is deliberate on two counts. It is somebody else’s book on somebody else’s site: framing it in here would be copying it rather than pointing at it. And a framed page breaks silently the day that site changes anything, whereas a link either works or plainly does not. The button says OPENS IN YOUR BROWSER — NEEDS AN INTERNET CONNECTION on its face, because the rest of this app works on a shop floor with no signal and this one button does not. The address lives in a single constant, CP_HANDBOOK_URL, so changing it later is one line. It opens with noopener, which means the page cannot reach back into this app, and if the browser blocks the new tab the app says so rather than appearing to do nothing. WHAT TO TEST (rule 8): from the main menu press 📖 MACHINIST HANDBOOK — it should open the handbook in a new browser tab and leave the app where it was."] },
+  { ts: "2026-08-09", rev: "App Rev-1041", type: "App", changes: ["THE TILES NOW SAY WHAT THEY ARE COUNTING, AND A WHOLE-RUN LINE SITS UNDER THEM (Rev-1041, embedded validation REV-260) — Rich saw GOOD PARTS 26 next to a serial count of 308 and asked, quite reasonably, where the other 282 had gone. Nowhere: every figure in that strip is the LAST 30 PARTS, which the heading said and the tiles did not. A bare 26 beside 308 reads as a scrap heap. GOOD PARTS and SCRAP PARTS now read 26 of 30, and OUT OF TOLERANCE says “last 30 parts” on its face, so no tile can be read as a running total by mistake. AND THE RUNNING TOTAL IS NOW THERE TOO, on one line beneath the strip: WHOLE RUN · S/N 1-308 · so many good, so many scrap, so many readings out, and the Cpk across the lot. The rolling window answers how it is going NOW; the run total answers how much has actually been made and scrapped, and a serial count in the hundreds makes anyone ask the second question. It is capped at the last 2,000 parts and says so when it caps, because re-deriving every reading of a very long run once a second would lock the screen up. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, let it run past 30 parts — GOOD PARTS should read “n of 30” and a WHOLE RUN line underneath should count every part made since the run started."] },
   { ts: "2026-08-09", rev: "App Rev-1040", type: "App", changes: ["THE TWO INSPECTOR FIGURES SHARE ONE LINE, AT HALF THE HEIGHT (Rev-1040, embedded validation REV-260) — per Rich. INSPECTIONS COMPLETED and the INSPECTOR’S OWN CPK sat one above the other, each carrying a paragraph of explanation, and between them they pushed the levels table most of the way down the screen. They now sit side by side in a two-up grid with the padding and the figures cut down — 22px instead of 32, tighter labels — which is about half the height the pair used to take. THE EXPLANATIONS ARE NOT DELETED, they move to the tooltips: a sentence about how the inspector finishes on his own, or about a gap between the two figures being the gauges rather than the process, is worth reading once and then only when it is asked for. Hover either tile and it is there. The figures themselves lose nothing — the Cpk still carries its band in words and the machinist’s figure beside it for comparison, just in fewer characters. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — the two tiles should be side by side above the levels table, and hovering the right-hand one should explain what the gap between the two capability figures means."] },
   { ts: "2026-08-09", rev: "App Rev-1039", type: "App", changes: ["THE PART NOW EXISTS ON ITS OWN, AND BOTH MEN MEASURE IT (Rev-1039, embedded validation REV-260) — Rich asked how the simulation worked, and answering it showed up a flaw worth fixing. The machinist’s reading WAS the part and the inspector deviated from it, which quietly made the machinist perfect: he had no gauge error at all, so every disagreement was the inspector’s fault by construction. In a shop the machinist has a gauge too. A part now has a TRUE VALUE set by the process, and EACH MAN ADDS HIS OWN INDEPENDENT GAUGE ERROR on top of it. Neither is the reference, and when the two disagree the screen no longer implies whose fault it is. Two settings become three: PROCESS CPK, how tightly the PARTS are held and nothing to do with measuring; MACHINIST GAUGE CPK; and LINE INSPECTOR GAUGE CPK. THE CONSEQUENCE IS WORTH SEEING: hold the process at 1.33 and give the MACHINIST the poor gauge, and now HE is the one whose numbers read badly — 0.48 against the inspector’s 1.14 on the very same parts — which was impossible before this rev and is exactly the case a real gauge study exists to catch. Both capability figures are labelled as what each man MEASURES, and the inspector’s tile names the process Cpk the parts are actually held to, so three numbers that used to be two are never confused for each other. WHAT TO TEST (rule 8): set PROCESS 1.33, MACHINIST GAUGE 0.67, INSPECTOR GAUGE 2.00 on 1000237620 OP-030 and the machinist’s Cpk should be the poor one; swap the two gauge settings and the poor figure should swap sides with them."] },
   { ts: "2026-08-09", rev: "App Rev-1038", type: "App", changes: ["⚖ MACHINIST vs LINE INSPECTOR · CRITICAL FEATURES (Rev-1038, embedded validation REV-260) — per Rich. Every completed line inspection is now reported: the panel walks the blocks each level has finished, re-measures the critical features on those serials both ways, and shows what the two men actually found. A deviation over .0002 on a critical dimension is called out — a tighter bar than the .0004 used on the general comparison, because that is what critical means. FIVE FIGURES ACROSS THE TOP. MEASUREMENT VARIATION is the STANDARD DEVIATION OF THE DIFFERENCES, and it is the one that matters: it is what a gauge study measures — how consistently the two agree, not how big the parts are — and it is also given as a percentage of the tolerance band, which is the number a Gauge R&R would put in front of a customer. BIAS is which way it leans, and reading it against the variation is the whole diagnosis: a steady offset with small scatter points at one gauge being out of calibration, while a large scatter with no bias points at how the part is being held. AVERAGE and WORST DEVIATION and a count over the limit finish the strip. Underneath, the last fifteen inspections one per line — serial, level, how many critical features were checked, how many broke .0002, the worst single disagreement, and the offending bubbles named with their numbers. CRITICAL MEANS MARKED LEVEL 2 · CRITICAL ONLY on Step 8. Where nothing has been marked, every dimensional feature is treated as critical and the panel says so, rather than reporting nothing at all and looking broken. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 at 1 second until a few inspections have completed — the section should fill in; then set LINE INSPECTOR CPK to 0.67 and the variation, the worst deviation and the count over .0002 should all climb together."] },
@@ -3146,7 +3156,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:30 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "1:02 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16506,13 +16516,37 @@ function cpSimPanel(wantIdx){
                     bd.t + (mx.worst ? (' \u00b7 worst is bubble ' + mx.worst) : ''))
                + tile('QUALITY LEVEL', bd.t, bd.c,
                       'from the worst feature of ' + mx.dims)
+               /* Rev-1041: every one of these is the LAST 30 PARTS, not the whole run, and
+                  each now says so on its face. A bare 26 beside a serial count of 308 reads
+                  as though 282 parts went in the bin. */
                + tile('OUT OF TOLERANCE', mx.oot, mx.oot ? '#a5342a' : '#1d6b3f',
-                      'dimension reading(s) outside limits')
-               + tile('SCRAP PARTS', mx.scrap, mx.scrap ? '#a5342a' : '#1d6b3f',
-                      'any part with a reading out')
-               + tile('GOOD PARTS', mx.good, '#1d6b3f',
-                      mx.n ? (Math.round(mx.good / mx.n * 100) + '% of the window') : '')))
-        + '</div></div>';
+                      'reading(s) outside limits, last ' + mx.n + ' parts')
+               + tile('SCRAP PARTS', mx.scrap + ' of ' + mx.n, mx.scrap ? '#a5342a' : '#1d6b3f',
+                      'parts with a reading out, last ' + mx.n)
+               + tile('GOOD PARTS', mx.good + ' of ' + mx.n, '#1d6b3f',
+                      mx.n ? (Math.round(mx.good / mx.n * 100) + '% of the last ' + mx.n + ' parts') : '')))
+        + '</div>'
+        /* Rev-1041: the rolling window answers "how is it going NOW". The run total answers
+           "how much have we actually made and scrapped", which is the other question and the
+           one a serial count of 308 makes you ask. Capped so a long run cannot lock the
+           screen up re-deriving thousands of readings every second. */
+        + (function(){
+            const CAP = 2000;
+            const span = Math.min(made, CAP);
+            if(span < 5) return '';
+            const all = cpSimMetrics(key, rows, made, span, st.pcpk, st.icpk, false, st.mgcpk);
+            if(!all) return '';
+            return '<div style="font-size:12px; color:#3a352e; margin:-8px 0 20px;">'
+              + '<b>WHOLE RUN</b> \u00b7 S/N ' + all.from + '\u2013' + all.to + ' \u00b7 '
+              + '<b style="color:#1d6b3f;">' + all.good + '</b> good \u00b7 '
+              + '<b style="color:' + (all.scrap ? '#a5342a' : '#1d6b3f') + ';">' + all.scrap
+              + '</b> scrap \u00b7 ' + all.oot + ' reading(s) out \u00b7 Cpk '
+              + all.cpk.toFixed(2)
+              + (made > CAP ? (' <span style="color:#6b6257;">(last ' + CAP + ' parts of '
+                               + made + ')</span>') : '')
+              + '</div>';
+          })()
+        + '</div>';
 
       const insDone = dues.reduce((a, d) => a + d.doneCount, 0);
       /* Rev-1040: the two inspector figures share one line and half the height. The long
@@ -16584,7 +16618,10 @@ function cpSimPanel(wantIdx){
             const cmp = cpSimCompare(key, rows, marks, cm.level, cm.serial, st.icpk, st.pcpk, st.mgcpk);
             if(!cmp.length) return '';
             const flags = cmp.filter(x => x.flag).length;
-            const dp = 5;
+            /* Rev-1043: FOUR PLACES. The prints are held to four - .6040/.6035 - and the gauges on
+       the floor read to four. A fifth digit is a number nobody can measure, and putting
+       one on screen invites an argument about a difference that does not exist. */
+            const dp = 4;
             return '<div style="margin-top:22px; border:2px solid ' + (flags ? '#a5342a' : '#1d6b3f')
               + '; border-radius:12px; background:#fff; padding:16px;">'
               + '<div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:12px;">'
@@ -16657,14 +16694,14 @@ function cpSimPanel(wantIdx){
               +   'called out.</div>'
               + '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr));'
               +   ' gap:12px; margin-bottom:16px;">'
-              + t2('MEASUREMENT VARIATION', cr.sd.toFixed(5), cr.sd > CP_SIM_CRIT ? '#a5342a' : '#1d6b3f',
+              + t2('MEASUREMENT VARIATION', cr.sd.toFixed(4), cr.sd > CP_SIM_CRIT ? '#a5342a' : '#1d6b3f',
                    'sd of the differences \u00b7 ' + cr.gagePct.toFixed(1) + '% of the tolerance band')
-              + t2('AVERAGE DEVIATION', cr.meanAbs.toFixed(5), '#3a352e',
+              + t2('AVERAGE DEVIATION', cr.meanAbs.toFixed(4), '#3a352e',
                    'how far apart they typically read')
-              + t2('BIAS', (cr.mean >= 0 ? '+' : '') + cr.mean.toFixed(5),
+              + t2('BIAS', (cr.mean >= 0 ? '+' : '') + cr.mean.toFixed(4),
                    Math.abs(cr.mean) > CP_SIM_CRIT / 2 ? '#a35400' : '#1d6b3f',
                    cr.mean >= 0 ? 'inspector reads high on average' : 'inspector reads low on average')
-              + t2('WORST DEVIATION', cr.absMax.toFixed(5), cr.absMax > CP_SIM_CRIT ? '#a5342a' : '#1d6b3f',
+              + t2('WORST DEVIATION', cr.absMax.toFixed(4), cr.absMax > CP_SIM_CRIT ? '#a5342a' : '#1d6b3f',
                    'largest single disagreement')
               + t2('OVER ' + CP_SIM_CRIT.toFixed(4), cr.over, cr.over ? '#a5342a' : '#1d6b3f',
                    cr.pct.toFixed(1) + '% of ' + cr.n + ' critical reading(s)')
@@ -16690,11 +16727,11 @@ function cpSimPanel(wantIdx){
                   +   (x.over || '\u2014') + '</td>'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
                   +   ' font-weight:700; color:' + (Math.abs(x.worst) > CP_SIM_CRIT ? '#a5342a' : '#3a352e')
-                  +   ';">' + (x.worst >= 0 ? '+' : '') + x.worst.toFixed(5) + '</td>'
+                  +   ';">' + (x.worst >= 0 ? '+' : '') + x.worst.toFixed(4) + '</td>'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; font-size:11px;'
                   +   ' color:#6b6257;">'
                   +   x.feats.filter(f => f.over).map(f => 'bubble ' + f.bubble + ' '
-                        + (f.diff >= 0 ? '+' : '') + f.diff.toFixed(5)).join(' \u00b7 ')
+                        + (f.diff >= 0 ? '+' : '') + f.diff.toFixed(4)).join(' \u00b7 ')
                   +   '</td></tr>').join('')
               + '</tbody></table>'
               + '<div style="font-size:11.5px; color:#6b6257; margin-top:12px; line-height:1.6;">'
@@ -24744,6 +24781,22 @@ if($('reportsEmailBtn')) $('reportsEmailBtn').onclick = () => {
   const body = 'CAMCO daily inspection results \u2014 generated ' + new Date().toLocaleString() + '\n\n' + lines.join('\n');
   location.href = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent('CAMCO Daily Inspection Results') + '&body=' + encodeURIComponent(body);
 };
+/* Rev-1042: the Machinist Handbook. One constant, so the day the link changes it is one
+   line. Opened with noopener so the page it opens cannot reach back into this app. */
+const CP_HANDBOOK_URL = 'https://online.flippingbook.com/view/954046886/681/';
+try{
+  const _hb = $('mHandbook');
+  if(_hb) _hb.onclick = () => {
+    try{ logAct('nav', 'machinist handbook'); }catch(_){ }
+    try{
+      const w = window.open(CP_HANDBOOK_URL, '_blank', 'noopener');
+      if(!w) flash('The browser blocked the new tab \u2014 allow pop-ups for this app.', true);
+    }catch(e){
+      console.warn('Rev-1042 handbook open failed', e);
+      flash('Could not open it: ' + (e && e.message || e), true);
+    }
+  };
+}catch(e){ console.warn('Rev-1042 handbook wiring failed', e); }
 $('mAdmin').onclick = showAdmin;
 $('historyBack').onclick = cpNavBack;
 $('historyFilter').onchange = renderHistory;
