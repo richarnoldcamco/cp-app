@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1027</title>
+<title>CONTROL PLAN GENERATOR - Rev-1028</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1027 · 2026-08-09 11:32 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1028 · 2026-08-09 11:37 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1027 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:32 AM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1028 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 11:37 AM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -578,7 +578,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1027 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1028 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1320,6 +1320,14 @@
     </button>
   </div>
 
+  <!-- Rev-1028: LINE SIMULATOR -->
+  <div style="margin-bottom: 24px; padding-top: 24px; border-top: 1px solid var(--line);">
+    <h3 style="font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px;">Simulation</h3>
+    <button class="btn-secondary" id="mLineSim" onclick="cpSimPanel()" style="width:100%;">▶ Line Simulator</button>
+    <p style="font-size:11px; color:var(--ink-dim); margin:8px 0 0;">
+      Run a machinist making parts, and watch which serial the line inspector is told to pull.</p>
+  </div>
+
   <!-- Rev-1005: HARDWARE NEEDED -->
   <div style="margin-bottom: 24px; padding-top: 24px; border-top: 1px solid var(--line);">
     <h3 style="font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px;">Hardware</h3>
@@ -1693,7 +1701,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1027";
+const APP_REV = "Rev-1028";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2221,6 +2229,7 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1028", type: "App", changes: ["▶ THE LINE SIMULATOR — A STANDING CONTROL PANEL (Rev-1028, embedded validation REV-260) — per Rich. Admin → Simulation → Line Simulator. Switch on a machinist making parts on any operation, and watch the two numbers that matter, both in 46px: LAST SERIAL MADE AND MEASURED, and NEXT SERIAL TO LINE INSPECT with its level and what that level covers. Pace runs from the real ten minutes a part down to two seconds for a demonstration. NO BACKGROUND TIMER: the switch records the moment it was thrown and the count is worked out from the clock whenever the panel is looked at. That is what makes it permanent — close it, close the app, come back tomorrow, and the count is right; a timer would have died with the tab. HOW THE PART IS CHOSEN, which is the rule Rich described: each level takes its interval from STEP 8, serials are cut into blocks of that size, and ONE serial inside each block is chosen before the part exists. It cannot be predicted from the bench, and the inspector is only ever sent for a part ALREADY MADE AND BAGGED — never one still on the machine. THE QUEUE WAITS: the block owed is the one after the last one INSPECTED, never the one the count happens to be sitting in, so a part that came due while nobody was on the floor is still owed and the panel says how many parts late it has become. MARK INSPECTED moves the queue on. A table under the headline carries all three levels at once with their intervals, feature counts and states, so a level that is quietly falling behind is visible. SAID PLAINLY ON THE PANEL: this counts parts, it does not measure them — no readings are written and nothing is pushed to the repository; INJECT is still what makes measured runs. WHAT TO TEST (rule 8): Admin → Line Simulator, pick 1000237620 OP-030, set the pace to 2 seconds and press START THE MACHINIST — the left number should climb, and when it reaches the serial on the right that card should turn and say GO AND FETCH IT. Press MARK INSPECTED and the next block’s serial should appear. Close the panel, wait, reopen it: the count should have carried on."] },
   { ts: "2026-08-09", rev: "App Rev-1027", type: "App", changes: ["SIMULATED PARTS NOW COME OFF AT THE SHOP’S RHYTHM — ONE EVERY TEN MINUTES (Rev-1027, embedded validation REV-260) — per Rich, and it is the groundwork for the serial picker rather than a cosmetic change. The old simulation scattered pieces across whole days at invented hours between 6am and 6pm. That was fine for producing a Cpk figure and useless for anything that depends on ORDER AND SPACING — which is precisely what choosing a part for a line inspection depends on. Parts now march at a steady cadence: serial 1 oldest, each one ten minutes after the last, the final serial finishing a moment ago. It mirrors what actually happens on the floor — a machinist finishes a part, measures it, bags it, writes the serial on the bag, drops it in the basket — so a simulated basket now has the same shape as a real one. HOW MANY DAYS OF MACHINING became MINUTES BETWEEN PARTS, defaulting to 10, with 5 up to 60 available; the span is then whatever the cadence and the piece count make it, and the summary states it plainly — 50 parts at 10 minutes is 8.2 hours of running, which is a shift. A control that sets the rhythm is worth having; a control that scattered parts at invented hours was not. NOTHING ELSE ABOUT INJECT CHANGED — same scenarios, same Cpk targets, same safety stamps on every simulated run. WHAT TO TEST (rule 8): inject 50 pieces into 1000237620 OP-030 and open REVIEW — the readings should run in serial order ten minutes apart, ending now, and the dialog should have said one part every 10 min · 8.2 hours of running."] },
   { ts: "2026-08-09", rev: "App Rev-1026", type: "App", changes: ["THE SETUP SCREEN KNOWS IT IS A LINE INSPECTION (Rev-1026, embedded validation REV-260) — per Rich, two of his three. The heading read INSPECTION RUN whichever button had opened it; arriving from PERFORM LINE INSPECTION it now reads LINE INSPECTION, so the inspector is never in doubt which job they are doing. OPERATOR INITIALS arrive filled in with the line inspector rather than empty — ECTOR for now, held in one constant, CP_LINE_INSPECTOR, which is the single line that changes the day this app has a sign-in of its own. A name already typed is never overwritten. Both marks are set for ONE launch and cleared as soon as the app is handed them, so pressing Inspect afterwards is not dressed up as a line run. The setup screen is drawn later, when a shop order is chosen, so the dressing watches for it rather than running once and hoping, and gives up after two minutes so nothing is left spinning. THE THIRD THING IS NOT BUILT AND IS NOT PRETENDED TO BE: the serial number is still typed. Having the app decide WHICH part is due needs a rule nobody has written down yet — where the running count of parts lives, whether the part is picked on a fixed interval or genuinely at random inside it, and what happens when the inspector is not on the floor at the moment it comes due. Guessing would put a number on screen that looks authoritative and is wrong. WHAT TO TEST (rule 8): press PERFORM LINE INSPECTION on 1000237620 OP-030 and pick shop order 52546 — the heading should read LINE INSPECTION and OPERATOR INITIALS should already say ECTOR. Then press Inspect on the same operation: it should still read Inspection Run with the initials empty."] },
   { ts: "2026-08-09", rev: "App Rev-1025", type: "App", changes: ["THE STALE MENU BEHIND THE SHOP-ORDER QUESTION IS GONE (Rev-1025, embedded validation REV-260) — Rich again, and the other half of Rev-1023. That revision stopped the machinist app’s home menu being where you LANDED when the question was cancelled; it was still sitting BEHIND the question the whole time, showing through the dim. Same cause: the boot chain paints that menu and then navigates on top of it, so anything that does not cover the full screen lets it show. Every screen is now hidden the moment the operation is opened, so the question sits on a plain background. Whichever way it is answered the next screen is drawn over the top — choosing a shop order goes to the setup screen, cancelling closes the panel per Rev-1023 — so the blank is never seen for longer than the question is open. It is hidden twice, once immediately and once alongside the close-button wiring a moment later, because the modal is opened by code that may run after the first call. WHAT TO TEST (rule 8): press PERFORM LINE INSPECTION on 1000237620 OP-030 — behind the shop-order question there should be nothing at all, no MACHINIST VALIDATING APP heading and no Resume S/N banner. Pick the existing shop order and the setup screen should appear as normal."] },
@@ -3125,7 +3134,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "11:32 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:37 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -15967,6 +15976,256 @@ async function _cpReviewDataPanel(idx){
    show* functions and the one that gets missed is a screen that will not close.
    Four items are seeded on first open: monitor, monitor hanger, keyboard/keypad,
    cameras. Anything else is added here. */
+/* ===== Rev-1028: THE LINE SIMULATOR ===========================================
+   A standing control panel: switch on a machinist making parts, and watch which serial
+   the line inspector gets told to fetch, and on which level.
+
+   NO BACKGROUND TIMER. The switch records the moment it was thrown; the count of parts
+   made is worked out from the clock whenever the panel is looked at. That is what makes
+   it permanent - close the panel, close the app, come back tomorrow, and the count is
+   right. A timer would have stopped the moment the tab did.
+
+   HOW A PART IS CHOSEN. Each level has an interval from STEP 8 - Level 1 every 30 parts,
+   say. Serials are cut into blocks of that size, and ONE serial inside each block is
+   chosen: fixed for that block, unpredictable to the machinist, and known to the app
+   before the part exists. The inspector is told to fetch it once the part has actually
+   been made and bagged - never a part still on the machine.
+
+   THE QUEUE WAITS. The block owed is the one AFTER the last one inspected, never the one
+   the count happens to be sitting in. A part that came due while the inspector was off
+   the floor is still owed, and the panel says how many parts late it has become. */
+const CP_SIM_KEY = 'cpLineSim';
+function cpSimHash(str){
+  let h = 2166136261;
+  for(let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0);
+}
+function cpSimPick(key, level, block, size){
+  return (cpSimHash(key + '|' + level + '|' + block) % Math.max(1, size)) + 1;
+}
+function cpSimLoad(){
+  try{ const raw = localStorage.getItem(CP_SIM_KEY); if(raw) return JSON.parse(raw) || {}; }
+  catch(e){ console.warn('Rev-1028 simulator state unreadable, starting fresh', e); }
+  return {};
+}
+function cpSimSave(st){
+  try{ localStorage.setItem(CP_SIM_KEY, JSON.stringify(st)); return true; }
+  catch(e){ console.error('Rev-1028 simulator save failed', e);
+    try{ flash('\u26a0 Could not save the simulator \u2014 ' + (e && e.message || e), true); }catch(_){ }
+    return false; }
+}
+function cpSimMade(st){
+  if(!st || !st.on || !st.startedAt) return (st && st.baseSn) || 0;
+  const gap = Math.max(1, st.gapSec || 600);
+  return ((st.baseSn || 0) + Math.floor((Date.now() - st.startedAt) / (gap * 1000)));
+}
+function cpSimDue(key, level, size, made, done){
+  const block = ((done && done[level] != null) ? done[level] : -1) + 1;
+  const inBlk = cpSimPick(key, level, block, size);
+  const serial = block * size + inBlk;
+  const late = made - serial;
+  return { serial: serial, block: block + 1, inBlk: inBlk,
+           state: serial <= made ? 'DUE NOW' : 'WAITING', late: late > 0 ? late : 0 };
+}
+function cpSimPanel(){
+  try{
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
+    const plans = projects.map((p, i) => ({ i: i, label: String(p.partNum || '?')
+      + (p.opNum ? (' \u00b7 OP-' + p.opNum) : ''), p: p }))
+      .filter(x => (((x.p.builderState || {}).rows) || []).some(r => String(r.bubble || '').trim()));
+    if(!plans.length){ flash('No plan with feature rows to simulate yet.', true); return; }
+    let all = cpSimLoad();
+    /* the Air Coil first if it is there, since that is the one being demonstrated */
+    let sel = plans.findIndex(x => String(x.p.partNum || '').indexOf('1000237620') === 0);
+    if(sel < 0) sel = 0;
+    const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g,
+      ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+    const LN = { 1:'COMPLETE CHECK', 2:'CRITICAL ONLY', 3:'ODD CHECKS' };
+    const LC = { 1:'#a5342a', 2:'#a35400', 3:'#1d6b3f' };
+
+    const old = document.getElementById('cpSimScreen'); if(old) old.remove();
+    const ov = document.createElement('div');
+    ov.id = 'cpSimScreen';
+    ov.style.cssText = 'position:fixed; inset:0; z-index:10690; background:#f7f4ef; overflow:auto;';
+    ov.innerHTML = '<div style="background:#1a5276; color:#fff; padding:12px 20px; display:flex;'
+        + ' align-items:center; gap:14px;">'
+      +   '<div style="font-weight:800; letter-spacing:.04em; font-size:17px; flex:1 1 auto;">'
+      +     '\u25B6 LINE SIMULATOR</div>'
+      +   '<button id="cpSimX" style="background:#a02020; color:#fff; border:2px solid #7a1414;'
+      +     ' border-radius:8px; padding:8px 22px; font-weight:800; font-size:13px; cursor:pointer;">'
+      +     '\u2715 Close</button></div>'
+      + '<div id="cpSimBody" style="max-width:1100px; margin:0 auto; padding:20px 18px 60px;"></div>';
+    document.body.appendChild(ov);
+    const xb = document.getElementById('cpSimX');
+    if(!xb || !document.getElementById('cpSimBody')){
+      try{ flash('\u26a0 The simulator did not build correctly. Send the Action Log.', true); }catch(_){ }
+      ov.remove(); return;
+    }
+    let tick = null;
+    xb.onclick = () => { try{ clearInterval(tick); }catch(e){} ov.remove(); };
+    try{ logAct('nav', 'line simulator'); }catch(_){ }
+
+    const keyOf = pl => String(pl.p.partNum || '') + '|OP-' + String(pl.p.opNum || '');
+    const stOf = pl => { const k = keyOf(pl); all[k] = all[k] || { on:false, startedAt:0, gapSec:600,
+                                                                  baseSn:0, done:{} }; return all[k]; };
+
+    const render = () => {
+      const b = document.getElementById('cpSimBody'); if(!b) return;
+      const pl = plans[sel], st = stOf(pl), key = keyOf(pl);
+      const lv = pl.p.lineLevelSet || {};
+      const every = { 1: parseInt(lv[1], 10) || 30, 2: parseInt(lv[2], 10) || 15, 3: parseInt(lv[3], 10) || 100 };
+      const made = cpSimMade(st);
+      const rows = (((pl.p.builderState || {}).rows) || []).filter(r => String(r.bubble || '').trim());
+      const marks = pl.p.lineLevels || {};
+      const covered = { 1: rows.length,
+                        2: rows.filter(r => marks[String(r.bubble).trim()] === 2).length,
+                        3: rows.filter(r => marks[String(r.bubble).trim()] === 3).length };
+      const dues = [1,2,3].map(l => Object.assign({ level: l }, cpSimDue(key, l, every[l], made, st.done || {})));
+      const now = dues.filter(d => d.state === 'DUE NOW').sort((a, b) => a.serial - b.serial);
+      const next = now.length ? now[0] : dues.slice().sort((a, b) => a.serial - b.serial)[0];
+
+      let h = '<div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-bottom:18px;">'
+        + '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">OPERATION'
+        +   '<select id="cpSimSel" style="display:block; margin-top:5px; padding:10px; font-size:14px;'
+        +   ' font-weight:700; border:1px solid #c9c0b4; border-radius:8px; min-width:250px;">'
+        +   plans.map((x, i) => '<option value="' + i + '"' + (i === sel ? ' selected' : '') + '>'
+              + esc(x.label) + '</option>').join('')
+        +   '</select></label>'
+        + '<label style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">A PART EVERY'
+        +   '<select id="cpSimGap" style="display:block; margin-top:5px; padding:10px; font-size:14px;'
+        +   ' font-weight:700; border:1px solid #c9c0b4; border-radius:8px; background:#fafa96;">'
+        +   [[600,'10 minutes \u00b7 real pace'],[60,'1 minute'],[10,'10 seconds \u00b7 demo'],
+             [2,'2 seconds \u00b7 fast demo']].map(g =>
+              '<option value="' + g[0] + '"' + ((st.gapSec || 600) === g[0] ? ' selected' : '') + '>'
+              + g[1] + '</option>').join('')
+        +   '</select></label>'
+        + '<button id="cpSimToggle" style="padding:13px 26px; border:none; border-radius:9px;'
+        +   ' font-size:14px; font-weight:800; cursor:pointer; color:#fff; background:'
+        +   (st.on ? '#a02020' : '#1d6b3f') + ';">' + (st.on ? '\u25A0 STOP THE MACHINIST'
+                                                             : '\u25B6 START THE MACHINIST') + '</button>'
+        + '<button id="cpSimReset" style="padding:13px 18px; border:1px solid #c9c0b4; background:#fff;'
+        +   ' color:#3a352e; border-radius:9px; font-size:12.5px; font-weight:800; cursor:pointer;">'
+        +   'RESET TO S/N 0</button>'
+        + '</div>';
+
+      h += '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-bottom:20px;">'
+        + '<div style="border:2px solid #1a5276; border-radius:12px; padding:16px; background:#fff;">'
+        +   '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
+        +     'LAST SERIAL MADE AND MEASURED</div>'
+        +   '<div style="font-size:46px; font-weight:800; color:#1a5276; line-height:1.1; margin-top:4px;">'
+        +     (made || '\u2014') + '</div>'
+        +   '<div style="font-size:11.5px; color:#6b6257;">'
+        +     (st.on ? ('running \u00b7 one part every ' + (st.gapSec >= 60
+                        ? ((st.gapSec / 60) + ' min') : (st.gapSec + ' sec')))
+                     : 'stopped') + '</div></div>'
+        + '<div style="border:2px solid ' + LC[next.level] + '; border-radius:12px; padding:16px;'
+        +   ' background:' + (next.state === 'DUE NOW' ? '#fff5f4' : '#fff') + ';">'
+        +   '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
+        +     'NEXT SERIAL TO LINE INSPECT</div>'
+        +   '<div style="font-size:46px; font-weight:800; color:' + LC[next.level] + '; line-height:1.1; margin-top:4px;">'
+        +     next.serial + '</div>'
+        +   '<div style="font-size:12.5px; font-weight:800; color:' + LC[next.level] + ';">'
+        +     'LEVEL ' + next.level + ' \u00b7 ' + LN[next.level] + '</div>'
+        +   '<div style="font-size:11.5px; font-weight:700; color:'
+        +     (next.state === 'DUE NOW' ? '#a5342a' : '#6b6257') + '; margin-top:3px;">'
+        +     (next.state === 'DUE NOW'
+                ? ('\u2691 GO AND FETCH IT' + (next.late ? (' \u00b7 ' + next.late + ' parts late') : ''))
+                : ('waiting \u00b7 ' + (next.serial - made) + ' more part(s) to go')) + '</div></div>'
+        + '</div>';
+
+      h += '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
+        + '<thead><tr>'
+        + ['LEVEL', 'WHAT IT COVERS', 'FEATURES', 'EVERY', 'BLOCK', 'SERIAL WANTED', 'STATE', '']
+            .map((th, ix) => '<th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8;'
+              + ' color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:'
+              + (ix === 1 ? 'left' : 'center') + ';">' + th + '</th>').join('')
+        + '</tr></thead><tbody>'
+        + dues.map(d => '<tr>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+            +   ' font-size:18px; font-weight:800; color:' + LC[d.level] + ';">' + d.level + '</td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; font-weight:700; color:#000;">'
+            +   LN[d.level] + '</td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center; color:#3a352e;">'
+            +   covered[d.level] + '</td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center; color:#3a352e;">'
+            +   every[d.level] + ' parts</td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center; color:#6b6257;">'
+            +   d.block + '</td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+            +   ' font-size:17px; font-weight:800; color:#000;">' + d.serial + '</td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;'
+            +   ' font-weight:800; color:' + (d.state === 'DUE NOW' ? '#a5342a' : '#6b6257') + ';">'
+            +   d.state + (d.late ? ('<div style="font-size:10px; font-weight:700;">' + d.late
+                                     + ' parts late</div>') : '') + '</td>'
+            + '<td style="border-bottom:1px solid #eee7dc; padding:8px 9px; text-align:center;">'
+            +   (d.state === 'DUE NOW'
+                  ? ('<button data-simdone="' + d.level + '" style="font-size:11px; font-weight:800;'
+                     + ' padding:6px 12px; border:1px solid #1d6b3f; background:#fff; color:#1d6b3f;'
+                     + ' border-radius:6px; cursor:pointer;">MARK INSPECTED</button>')
+                  : '') + '</td>'
+            + '</tr>').join('')
+        + '</tbody></table>'
+        + '<div style="font-size:11.5px; color:#6b6257; margin-top:14px; line-height:1.6;">'
+        +   'The intervals come from <b>STEP 8 \u00b7 LINE INSPECTION</b> on this operation and are '
+        +   'changed there, not here. One serial inside each block is chosen before the part exists '
+        +   'and cannot be predicted from the bench, and the inspector is only ever sent for a part '
+        +   'that has already been made and bagged. A part that came due while nobody was there '
+        +   'stays owed \u2014 the queue does not skip it.</div>'
+        + '<div style="font-size:11.5px; color:#8a6d1f; margin-top:10px; line-height:1.6;">'
+        +   '<b>This counts parts, it does not measure them.</b> No readings are written and nothing '
+        +   'is pushed to the repository \u2014 use \ud83e\uddea INJECT for measured runs. The count '
+        +   'is worked out from the clock, so it keeps running whether this screen is open or not.</div>';
+
+      b.innerHTML = h;
+
+      const sl = document.getElementById('cpSimSel');
+      if(sl) sl.onchange = () => { sel = parseInt(sl.value, 10) || 0; render(); };
+      const gp = document.getElementById('cpSimGap');
+      if(gp) gp.onchange = () => {
+        const st2 = stOf(plans[sel]);
+        /* keep the parts already made when the pace changes, and re-time from now */
+        st2.baseSn = cpSimMade(st2); st2.gapSec = parseInt(gp.value, 10) || 600;
+        if(st2.on) st2.startedAt = Date.now();
+        cpSimSave(all); render();
+      };
+      const tg = document.getElementById('cpSimToggle');
+      if(tg) tg.onclick = () => {
+        const st2 = stOf(plans[sel]);
+        if(st2.on){ st2.baseSn = cpSimMade(st2); st2.on = false; st2.startedAt = 0; }
+        else { st2.on = true; st2.startedAt = Date.now(); }
+        cpSimSave(all);
+        try{ logAct('sim', st2.on ? 'machinist started' : 'machinist stopped'); }catch(_){ }
+        render();
+      };
+      const rs = document.getElementById('cpSimReset');
+      if(rs) rs.onclick = () => {
+        const st2 = stOf(plans[sel]);
+        st2.baseSn = 0; st2.done = {}; if(st2.on) st2.startedAt = Date.now();
+        cpSimSave(all); render();
+      };
+      b.querySelectorAll('[data-simdone]').forEach(btn => { btn.onclick = () => {
+        const st2 = stOf(plans[sel]);
+        const l = btn.getAttribute('data-simdone');
+        const d = cpSimDue(keyOf(plans[sel]), parseInt(l, 10),
+                           (parseInt((plans[sel].p.lineLevelSet || {})[l], 10)
+                            || ({1:30,2:15,3:100})[l]), cpSimMade(st2), st2.done || {});
+        st2.done = st2.done || {}; st2.done[l] = d.block - 1;
+        cpSimSave(all);
+        try{ logAct('sim', 'level ' + l + ' marked inspected'); }catch(_){ }
+        render();
+      }; });
+    };
+    render();
+    tick = setInterval(() => {
+      try{ if(!document.getElementById('cpSimBody')){ clearInterval(tick); return; } render(); }
+      catch(e){ clearInterval(tick); }
+    }, 1000);
+  }catch(e){
+    console.error('Rev-1028 line simulator failed', e);
+    try{ logAct('error', 'line simulator: ' + (e && e.message || e)); }catch(_){ }
+    try{ flash('\u26a0 LINE SIMULATOR failed to open \u2014 ' + (e && e.message || e), true); }catch(_){ }
+  }
+}
 const CP_HW_KEY = 'cpHardwareNeeded';
 const CP_HW_SEED = ['MONITOR', 'MONITOR HANGER', 'KEYBOARD / KEYPAD', 'CAMERAS'];
 function cpHwLoad(){
