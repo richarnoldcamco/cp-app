@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1043</title>
+<title>CONTROL PLAN GENERATOR - Rev-1049</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1043 · 2026-08-09 1:02 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1049 · 2026-08-09 1:53 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -515,7 +515,7 @@
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator</div>
-        <div class="brand-sub" id="brandRev">REV-1043 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 1:02 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1049 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 1:53 PM ET</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -585,7 +585,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1043 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1049 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1708,7 +1708,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1043";
+const APP_REV = "Rev-1049";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2236,6 +2236,12 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+  { ts: "2026-08-09", rev: "App Rev-1049", type: "App", changes: ["THE ODS PRINT STANDS DOWN THE RIGHT, AND A NEW SIMULATION ALWAYS STARTS AT ZERO (Rev-1049, embedded validation REV-260) — two from Rich. FIRST, START AT SERIAL now offers 0 whenever the setup sheet opens, not only when SET UP AGAIN was the way in. A NEW simulation starts at the beginning — that is what the word means — and typing a different number is still there for anyone picking up mid-run. Rev-1045 only zeroed it on one route in, which left 297 sitting in the box for every other route. SECOND, THE OPERATION’S OWN ODS DRAWING gets a third column on the running screen, so the bubble numbers in the levels table and in every deviation line can be read against the print without leaving the page. It comes from the same getter Step 2 and the review panel use, so a drawing deleted for the operation is gone here too and no stale part-level print can leak in. Clicking it opens the drawing full screen. THE TWO WORKING COLUMNS GIVE UP THE WIDTH for it, and only when there is something to show: with no drawing loaded the third column is never created and the machinist and inspector keep the whole screen between them, rather than staring at an empty panel. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — the setup sheet should read START AT SERIAL 0, and after starting, the OP-030 print should fill a column down the right and open full screen on a click. OP-040 should behave the same with its own drawing."] },
+  { ts: "2026-08-09", rev: "App Rev-1048", type: "App", changes: ["NO MORE MINUS ZERO (Rev-1048, embedded validation REV-260) — four decimal places went in at Rev-1043 and brought a small nonsense with them, found while checking Rich’s latest screenshot rather than reported. A difference of four hundred-thousandths rounds to 0.0000 and the code still put the sign in front of it: “-0.0000”, which reads as no difference at all AND carries a minus sign in front of nothing. Every signed deviation now goes through one formatter — anything that rounds to zero prints as a plain 0.0000 with no sign, everything else keeps its + or -. It covers the WORST DEVIATION column, the DIFFERENCE column in the side-by-side comparison, and the BIAS tile, which is where it mattered most: a bias of minus nothing is exactly the sort of reading somebody acts on. The underlying numbers are untouched; only the printing changed. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 with the two gauges set well apart, then ⇄ COMPARE a row — no figure anywhere should read -0.0000."] },
+  { ts: "2026-08-09", rev: "App Rev-1047", type: "App", changes: ["THE RESULTS ROW SHOWS THE MAX DIFFERENCE, AND A ⇄ COMPARE BUTTON OPENS THE REST (Rev-1047, embedded validation REV-260) — per Rich. Each line was reading out every bubble that broke .0002 and its number — five or six of them, a table inside a table, and the one figure that matters buried among them. The row now carries the WORST DEVIATION and nothing else, which is what a line inspection is judged on. WHAT WAS REMOVED IS NOT LOST: a small ⇄ COMPARE button on every row opens the full side-by-side for that serial — every critical feature, the machinist’s reading, the inspector’s reading, the difference and the flag — in the same panel that already existed for the inspection currently due. The only thing that changed there is which serial it opens on, so the maths and the layout are the ones already tested. It works on any completed inspection in the list, not just the newest. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, let a few inspections finish — each row should end with a small ⇄ COMPARE button, and pressing one on an older serial should open that part’s readings side by side."] },
+  { ts: "2026-08-09", rev: "App Rev-1046", type: "App", changes: ["THE NEXT SERIAL AND THE LEVELS TABLE SHARE A ROW (Rev-1046, embedded validation REV-260) — per Rich. The NEXT SERIAL TO LINE INSPECT card ran the whole width of the right-hand column with three quarters of it empty, and the table it belongs with sat two blocks further down past the tiles. They answer the same question — what is owed, and when — so they now stand side by side: the card narrow on the left at 260px, the levels table filling the rest of the row. INSPECTIONS COMPLETED and the INSPECTOR’S OWN CPK move underneath the pair. Nothing about what any of it says has changed, and the right-hand column is shorter for it, which pulls the MACHINIST vs LINE INSPECTOR results up the page where they can be read without scrolling. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — the big serial number and the three-level table should sit on one line, with the two smaller tiles below."] },
+  { ts: "2026-08-09", rev: "App Rev-1045", type: "App", changes: ["⚙ SET UP AGAIN NOW MEANS START OVER (Rev-1045, embedded validation REV-260) — per Rich. The button took him back to the setup sheet but left START AT SERIAL sitting at whatever the last run began from, so pressing START A NEW SIMULATION after 2,642 parts did not obviously begin again at one. Arriving by that button now opens the sheet with the serial back at ZERO, so the next run starts at S/N 1. NOTHING IS DESTROYED ON THE WAY IN, which is the part worth keeping: the running count is only reset when START A NEW SIMULATION is actually pressed, so CARRY ON is still honest and still resumes exactly where the run was. A button that threw a 2,642-part run away on a single press, sitting where this one sits next to STOP THE MACHINIST, is the reason RESET TO S/N 0 was removed in the first place. Reaching the sheet any other way — opening the simulator fresh, or INSPECT SIM from an operation row — still shows the serial the run last used. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, let it run past a few hundred parts, press ⚙ SET UP AGAIN — START AT SERIAL should read 0, and CARRY ON should still offer the full count. Press START A NEW SIMULATION and the count should begin at 1."] },
+  { ts: "2026-08-09", rev: "App Rev-1044", type: "App", changes: ["THE RESULTS TABLE NAMES THE INSPECTION INSTEAD OF NUMBERING IT (Rev-1044, embedded validation REV-260) — per Rich. The LEVEL column carried a bare 1, 2 or 3, which means nothing without looking back up at the table above to see what a 2 stands for. It now reads COMPLETE CHECK, CRITICAL ONLY or ODD CHECKS, in that level’s own colour, and the heading changes from LEVEL to INSPECTION because that is what the column now says: what the inspection was, not which slot it came from. It matters most on the rows that look odd at first glance — an ODD CHECKS line showing nought critical features checked reads as an obvious fact rather than a fault the moment the words are there, because odd checks cover the loose features and the critical ones are not among them. Nothing else about the table moved. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 with a few inspections finished — the second column of the results table should read the level names rather than 1, 2 and 3."] },
   { ts: "2026-08-09", rev: "App Rev-1043", type: "App", changes: ["FOUR DECIMAL PLACES, NOT FIVE (Rev-1043, embedded validation REV-260) — per Rich, and he is right on the engineering as well as the look. The prints are held to four places — .6040/.6035 — and the gauges on the floor read to four. A fifth digit is a number nobody can measure, and putting one on screen invites an argument about a difference that does not exist. Every measured figure in the simulator now shows four: the MEASUREMENT VARIATION, AVERAGE DEVIATION, BIAS and WORST DEVIATION tiles, the WORST DEVIATION column, the bubble list beside each inspection, and both men’s readings in the side-by-side comparison. The numbers behind them are untouched — the arithmetic still runs at full precision and only the display is rounded, so nothing shifts a flag from one side of .0002 to the other by way of rounding. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, let a few inspections complete — every figure in the MACHINIST vs LINE INSPECTOR section should read like .0027 rather than .00269."] },
   { ts: "2026-08-09", rev: "App Rev-1042", type: "App", changes: ["📖 MACHINIST HANDBOOK ON THE MAIN MENU (Rev-1042, embedded validation REV-260) — per Rich. A button on the front screen, sitting with the other reference screens between MASTER LIST and CUSTOMER LIST, opening the handbook at the page he gave. IT OPENS IN THE BROWSER RATHER THAN INSIDE THE APP, and that is deliberate on two counts. It is somebody else’s book on somebody else’s site: framing it in here would be copying it rather than pointing at it. And a framed page breaks silently the day that site changes anything, whereas a link either works or plainly does not. The button says OPENS IN YOUR BROWSER — NEEDS AN INTERNET CONNECTION on its face, because the rest of this app works on a shop floor with no signal and this one button does not. The address lives in a single constant, CP_HANDBOOK_URL, so changing it later is one line. It opens with noopener, which means the page cannot reach back into this app, and if the browser blocks the new tab the app says so rather than appearing to do nothing. WHAT TO TEST (rule 8): from the main menu press 📖 MACHINIST HANDBOOK — it should open the handbook in a new browser tab and leave the app where it was."] },
   { ts: "2026-08-09", rev: "App Rev-1041", type: "App", changes: ["THE TILES NOW SAY WHAT THEY ARE COUNTING, AND A WHOLE-RUN LINE SITS UNDER THEM (Rev-1041, embedded validation REV-260) — Rich saw GOOD PARTS 26 next to a serial count of 308 and asked, quite reasonably, where the other 282 had gone. Nowhere: every figure in that strip is the LAST 30 PARTS, which the heading said and the tiles did not. A bare 26 beside 308 reads as a scrap heap. GOOD PARTS and SCRAP PARTS now read 26 of 30, and OUT OF TOLERANCE says “last 30 parts” on its face, so no tile can be read as a running total by mistake. AND THE RUNNING TOTAL IS NOW THERE TOO, on one line beneath the strip: WHOLE RUN · S/N 1-308 · so many good, so many scrap, so many readings out, and the Cpk across the lot. The rolling window answers how it is going NOW; the run total answers how much has actually been made and scrapped, and a serial count in the hundreds makes anyone ask the second question. It is capped at the last 2,000 parts and says so when it caps, because re-deriving every reading of a very long run once a second would lock the screen up. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, let it run past 30 parts — GOOD PARTS should read “n of 30” and a WHOLE RUN line underneath should count every part made since the run started."] },
@@ -3156,7 +3162,7 @@ const VALIDATION_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+
 // Live changelog - merged from GitHub on boot; falls back to CHANGE_LOG if not configured
 let LIVE_CHANGE_LOG = null;
 const BUILD_DATE = "2026-08-08";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "1:02 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "1:53 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -16189,6 +16195,13 @@ function cpSimCompare(key, rows, marks, level, sn, icpk, pcpk, mgcpk){
    The variation metric is the STANDARD DEVIATION OF THE DIFFERENCES, which is what a
    gauge study measures - how consistently the two agree, not how big the parts are. */
 const CP_SIM_CRIT = 0.0002;
+/* Rev-1048: a signed deviation at four places. Rounding to four brought a nonsense of its
+   own - a difference of four hundred-thousandths came out as "-0.0000", which reads as no
+   difference at all AND carries a minus sign in front of nothing. Anything that rounds to
+   zero now prints as a plain 0.0000 with no sign. */
+function cpSimDev(v){
+  return (Math.abs(v) < 0.00005) ? '0.0000' : ((v >= 0 ? '+' : '') + v.toFixed(4));
+}
 function cpSimCritResults(key, rows, marks, every, made, pcpk, icpk, mgcpk){
   const crit = rows.filter(r => cpSimLimits(r.spec)
                  && (marks[String(r.bubble).trim()] === 2));
@@ -16292,6 +16305,15 @@ function cpSimPanel(wantIdx){
        fresh run, or carry on with the one in progress. Nothing is lost by looking: the
        running count is only reset if START A NEW SIMULATION is actually pressed. ===== */
     let view = 'setup';
+    /* Rev-1045: SET UP AGAIN means "start over", so the setup sheet opens with the serial
+       back at zero rather than wherever the last run began. Arriving any other way keeps
+       what was there. Nothing is destroyed on the way in - the running count is only reset
+       when START A NEW SIMULATION is actually pressed, so CARRY ON is still honest. */
+    /* Rev-1049: the setup sheet ALWAYS offers zero. A NEW simulation starts at the
+       beginning - that is what the word new means - and typing a different number is still
+       there for anyone who wants to pick up mid-run. Rev-1045 only zeroed it when SET UP
+       AGAIN was pressed, which left the number at 297 for anyone arriving any other way. */
+    let wantZero = true;
     const renderSetup = () => {
       const b = document.getElementById('cpSimBody'); if(!b) return;
       const pl = plans[sel], st = stOf(pl);
@@ -16347,7 +16369,7 @@ function cpSimPanel(wantIdx){
               'How accurate the inspector\u2019s gauge is. A poor gauge does not change the '
               + 'part \u2014 it makes that man\u2019s data read worse.')
         +   fld('START AT SERIAL', '<input id="cpSimBase" type="number" min="0" value="'
-              + (parseInt(st.baseSn, 10) || 0) + '"' + selCss + '>',
+              + (wantZero ? 0 : (parseInt(st.baseSn, 10) || 0)) + '"' + selCss + '>',
               'The first part will be this number plus one.')
         + '</div>'
         + '<div style="margin-top:20px; border:1px solid #e2ddd4; border-radius:10px; padding:14px;'
@@ -16394,10 +16416,10 @@ function cpSimPanel(wantIdx){
         st2.done = {}; st2.cmp = null; st2.on = true; st2.startedAt = Date.now();
         cpSimSave(all);
         try{ logAct('sim', 'new simulation started'); }catch(_){ }
-        view = 'run'; render();
+        wantZero = false; view = 'run'; render();
       };
       const co = document.getElementById('cpSimCont');
-      if(co) co.onclick = () => { view = 'run'; render(); };
+      if(co) co.onclick = () => { wantZero = false; view = 'run'; render(); };
     };
     const renderRun = () => {
       const b = document.getElementById('cpSimBody'); if(!b) return;
@@ -16457,14 +16479,26 @@ function cpSimPanel(wantIdx){
          scrap belong to the man making parts, the queue and the levels belong to the man
          pulling them. The comparison stays full width underneath, because it is the one thing
          that belongs to BOTH of them. ===== */
-      h += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start;'
-        +   ' margin-bottom:20px;">'
+      /* Rev-1049: the operation's own ODS print stands down the right, so the bubble
+         numbers in every table can be read against the drawing without leaving the screen.
+         Same getter Step 2 and the review panel use - a deleted drawing is gone here too.
+         The two working columns give up width to make room; where there is no drawing the
+         third column is not created at all and they keep it. */
+      let simOds = '';
+      try{ simOds = cpOpOdsImage(pl.p) || ''; }catch(e){ console.warn('Rev-1049 ODS lookup failed', e); }
+      h += '<div style="display:grid; grid-template-columns:' + (simOds
+             ? 'minmax(0,1fr) minmax(0,1.15fr) minmax(240px,300px)' : 'minmax(0,1fr) minmax(0,1fr)')
+        +   '; gap:16px; align-items:start; margin-bottom:20px;">'
         + '<div style="grid-column:1; font-size:13px; font-weight:800; letter-spacing:.08em;'
         +   ' color:#1a5276; border-bottom:3px solid #1a5276; padding-bottom:6px;">'
         +   '\ud83d\udd27 MACHINIST</div>'
         + '<div style="grid-column:2; font-size:13px; font-weight:800; letter-spacing:.08em;'
         +   ' color:#8a3a12; border-bottom:3px solid #8a3a12; padding-bottom:6px;">'
         +   '\ud83d\udccb LINE INSPECTOR</div>'
+        + (simOds ? ('<div style="grid-column:3; font-size:13px; font-weight:800; letter-spacing:.08em;'
+                     + ' color:#3a352e; border-bottom:3px solid #c9c0b4; padding-bottom:6px;">'
+                     + '\ud83d\udcd0 ODS \u00b7 OP-' + esc(String(pl.p.opNum || '')) + '</div>')
+                  : '')
         + '<div style="grid-column:1; border:2px solid #1a5276; border-radius:12px; padding:16px; background:#fff;">'
         +   '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
         +     'LAST SERIAL MADE AND MEASURED</div>'
@@ -16474,7 +16508,10 @@ function cpSimPanel(wantIdx){
         +     (st.on ? ('running \u00b7 one part every ' + (st.gapSec >= 60
                         ? ((st.gapSec / 60) + ' min') : (st.gapSec + ' sec')))
                      : 'stopped') + '</div></div>'
-        + '<div style="grid-column:2; border:2px solid ' + LC[next.level] + '; border-radius:12px;'
+        + '';
+      /* ===== Rev-1046: the next serial and the levels table share a row. ===== */
+      const liCardHtml =
+          '<div style="flex:0 0 260px; border:2px solid ' + LC[next.level] + '; border-radius:12px;'
         +   ' padding:16px; background:' + (next.state === 'DUE NOW' ? '#fff5f4' : '#fff') + ';">'
         +   '<div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">'
         +     'NEXT SERIAL TO LINE INSPECT</div>'
@@ -16486,8 +16523,8 @@ function cpSimPanel(wantIdx){
         +     (next.state === 'DUE NOW' ? '#a5342a' : '#6b6257') + '; margin-top:3px;">'
         +     (next.state === 'BEING INSPECTED'
                 ? ('\u2691 THE INSPECTOR HAS IT \u00b7 done at S/N ' + next.doneAt)
-                : ('waiting \u00b7 ' + (next.serial - made) + ' more part(s) to go')) + '</div></div>'
-        + '';   /* Rev-1034: the grid stays open - the metrics and the levels go inside it */
+                : ('waiting \u00b7 ' + (next.serial - made) + ' more part(s) to go')) + '</div></div>';
+      h += '';   /* Rev-1034: the grid stays open - the metrics and the levels go inside it */
 
       /* ----- Rev-1032: how the run is actually going ----- */
       const mx = cpSimMetrics(key, rows, made, 30, st.pcpk, st.icpk, false, st.mgcpk);
@@ -16561,8 +16598,8 @@ function cpSimPanel(wantIdx){
         +   value + '</div>'
         + '<div style="font-size:10px; color:#6b6257; white-space:nowrap; overflow:hidden;'
         +   ' text-overflow:ellipsis;">' + note + '</div></div>';
-      h += '<div style="grid-column:2;">'
-        + '<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">'
+      const liTilesHtml =
+          '<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">'
         + liTile('INSPECTIONS COMPLETED', insDone, '#8a3a12', 'all three levels',
                  'Across all three levels. The inspector finishes on his own, 0-5 parts after '
                  + 'the one he was sent for.')
@@ -16574,7 +16611,11 @@ function cpSimPanel(wantIdx){
                         + '. A gap between the two figures is the gauges, not the process.')
                : liTile('INSPECTOR\u2019S OWN CPK', '\u2014', '#b9b3aa', 'not enough parts yet',
                         'Five parts are needed before a capability figure means anything.'))
-        + '</div>'
+        + '</div>';
+      h += '<div style="grid-column:2;">'
+        + '<div style="display:flex; gap:14px; align-items:flex-start;">'
+        + liCardHtml
+        + '<div style="flex:1 1 auto; min-width:0;">'
         + '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
         + '<thead><tr>'
         + ['LEVEL', 'COVERS', 'FEAT', 'EVERY', 'BLOCK', 'SERIAL', 'STATE', '']
@@ -16609,7 +16650,18 @@ function cpSimPanel(wantIdx){
                      + ' border-radius:6px; cursor:pointer;">INSPECT S/N ' + d.serial + '</button>')
                   : '') + '</td>'
             + '</tr>').join('')
-        + '</tbody></table></div>'
+        + '</tbody></table></div></div>'
+        + liTilesHtml
+        + '</div>'
+        + (simOds ? ('<div style="grid-column:3;">'
+                     + '<img id="cpSimOds" src="' + simOds + '" alt="ODS drawing"'
+                     + ' title="Click to open the drawing full screen"'
+                     + ' style="width:100%; height:auto; max-height:calc(100vh - 210px);'
+                     + ' object-fit:contain; background:#fff; border:1px solid #d8d3ca;'
+                     + ' border-radius:8px; cursor:zoom-in; display:block;">'
+                     + '<div style="font-size:10.5px; color:#6b6257; margin-top:6px; text-align:center;">'
+                     + 'Click the drawing to open it full screen</div></div>')
+                  : '')
         + '</div>'   /* Rev-1034: close the two columns; the comparison is full width */
         + (function(){
             /* ----- Rev-1033: the two measurements of the same part, side by side ----- */
@@ -16657,7 +16709,7 @@ function cpSimPanel(wantIdx){
                   +   x.insp.toFixed(dp) + '</td>'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
                   +   ' font-weight:800; color:' + (x.flag ? '#a5342a' : '#6b6257') + ';">'
-                  +   (x.diff >= 0 ? '+' : '') + x.diff.toFixed(dp) + '</td>'
+                  +   cpSimDev(x.diff) + '</td>'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
                   +   ' font-weight:800; color:#a5342a;">' + (x.flag ? '\u2691 CHECK THE GAUGES' : '') + '</td>'
                   + '</tr>').join('')
@@ -16698,7 +16750,7 @@ function cpSimPanel(wantIdx){
                    'sd of the differences \u00b7 ' + cr.gagePct.toFixed(1) + '% of the tolerance band')
               + t2('AVERAGE DEVIATION', cr.meanAbs.toFixed(4), '#3a352e',
                    'how far apart they typically read')
-              + t2('BIAS', (cr.mean >= 0 ? '+' : '') + cr.mean.toFixed(4),
+              + t2('BIAS', cpSimDev(cr.mean),
                    Math.abs(cr.mean) > CP_SIM_CRIT / 2 ? '#a35400' : '#1d6b3f',
                    cr.mean >= 0 ? 'inspector reads high on average' : 'inspector reads low on average')
               + t2('WORST DEVIATION', cr.absMax.toFixed(4), cr.absMax > CP_SIM_CRIT ? '#a5342a' : '#1d6b3f',
@@ -16708,7 +16760,7 @@ function cpSimPanel(wantIdx){
               + '</div>'
               + '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
               + '<thead><tr>'
-              + ['S/N','LEVEL','CRITICAL FEATURES CHECKED','OVER ' + CP_SIM_CRIT.toFixed(4),
+              + ['S/N','INSPECTION','CRITICAL FEATURES CHECKED','OVER ' + CP_SIM_CRIT.toFixed(4),
                  'WORST DEVIATION','']
                   .map((th, ix) => '<th style="border-bottom:1px solid #d8d3ca; padding:7px 9px;'
                     + ' background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px;'
@@ -16718,8 +16770,11 @@ function cpSimPanel(wantIdx){
               + cr.lines.slice(0, 15).map(x => '<tr style="background:' + (x.over ? '#fff5f4' : '#fff') + ';">'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
                   +   ' font-size:15px; font-weight:800; color:#000;">' + x.serial + '</td>'
+                  /* Rev-1044: the level is named, not numbered. A 2 means nothing on its own;
+                     CRITICAL ONLY says what the inspection actually was. */
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
-                  +   ' font-weight:800; color:' + LC[x.level] + ';">' + x.level + '</td>'
+                  +   ' font-weight:800; color:' + LC[x.level] + '; white-space:nowrap;">'
+                  +   LN[x.level] + '</td>'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
                   +   ' color:#3a352e;">' + x.n + '</td>'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
@@ -16727,11 +16782,17 @@ function cpSimPanel(wantIdx){
                   +   (x.over || '\u2014') + '</td>'
                   + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;'
                   +   ' font-weight:700; color:' + (Math.abs(x.worst) > CP_SIM_CRIT ? '#a5342a' : '#3a352e')
-                  +   ';">' + (x.worst >= 0 ? '+' : '') + x.worst.toFixed(4) + '</td>'
-                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; font-size:11px;'
-                  +   ' color:#6b6257;">'
-                  +   x.feats.filter(f => f.over).map(f => 'bubble ' + f.bubble + ' '
-                        + (f.diff >= 0 ? '+' : '') + f.diff.toFixed(4)).join(' \u00b7 ')
+                  +   ';">' + cpSimDev(x.worst) + '</td>'
+                  /* Rev-1047: the list of every offending bubble is gone. The row now carries
+                     the MAX difference and nothing else, with a small button to open the full
+                     side-by-side comparison for that serial when it is wanted. A row that read
+                     out five bubbles and their numbers was a table inside a table. */
+                  + '<td style="border-bottom:1px solid #eee7dc; padding:7px 9px; text-align:center;">'
+                  +   '<button data-simrow="' + x.level + '|' + x.serial + '"'
+                  +     ' title="Compare the machinist and the line inspector on S/N ' + x.serial + '"'
+                  +     ' style="font-size:10px; font-weight:800; padding:4px 9px; border:1px solid'
+                  +     ' #5b2a86; background:#fff; color:#5b2a86; border-radius:5px; cursor:pointer;'
+                  +     ' white-space:nowrap;">\u21c4 COMPARE</button>'
                   +   '</td></tr>').join('')
               + '</tbody></table>'
               + '<div style="font-size:11.5px; color:#6b6257; margin-top:12px; line-height:1.6;">'
@@ -16779,7 +16840,7 @@ function cpSimPanel(wantIdx){
         render();
       };
       const rs = document.getElementById('cpSimSetup');
-      if(rs) rs.onclick = () => { view = 'setup'; render(); };
+      if(rs) rs.onclick = () => { wantZero = true; view = 'setup'; render(); };
       [['cpSimPcpk','pcpk'],['cpSimMgcpk','mgcpk'],['cpSimIcpk','icpk']].forEach(c => {
         const el = document.getElementById(c[0]);
         if(el) el.onchange = () => { stOf(plans[sel])[c[1]] = parseFloat(el.value) || CP_SIM_PCPK;
@@ -16796,6 +16857,39 @@ function cpSimPanel(wantIdx){
         try{ logAct('sim', 'compared level ' + l); }catch(_){ }
         render();
       }; });
+      /* Rev-1047: open the side-by-side comparison for any completed inspection, not just
+         the one currently due. Same panel, same maths - only the serial differs. */
+      b.querySelectorAll('[data-simrow]').forEach(btn => { btn.onclick = () => {
+        const parts = String(btn.getAttribute('data-simrow')).split('|');
+        const st2 = stOf(plans[sel]);
+        st2.cmp = { level: parseInt(parts[0], 10), serial: parseInt(parts[1], 10) };
+        cpSimSave(all);
+        try{ logAct('sim', 'compared a past inspection'); }catch(_){ }
+        render();
+      }; });
+      const odsImgEl = document.getElementById('cpSimOds');
+      if(odsImgEl) odsImgEl.onclick = () => {
+        try{
+          const old2 = document.getElementById('cpSimOdsFull'); if(old2) old2.remove();
+          const v = document.createElement('div');
+          v.id = 'cpSimOdsFull';
+          v.style.cssText = 'position:fixed; inset:0; z-index:100012; background:rgba(20,15,12,.92);'
+            + ' display:flex; flex-direction:column; align-items:center; padding:14px; overflow:auto;';
+          v.innerHTML = '<div style="display:flex; align-items:center; gap:12px; width:100%;'
+              + ' max-width:1500px; margin-bottom:10px;">'
+            +   '<div style="color:#fff; font-weight:800; letter-spacing:.05em; flex:1 1 auto;">'
+            +     'ODS DRAWING \u2014 OP-' + esc(String(plans[sel].p.opNum || '')) + '</div>'
+            +   '<button id="cpSimOdsX" style="background:#a02020; color:#fff; border:2px solid #7a1414;'
+            +     ' border-radius:8px; padding:8px 22px; font-weight:800; cursor:pointer;">'
+            +     '\u2715 Close</button></div>'
+            + '<img src="' + simOds + '" style="max-width:96vw; max-height:86vh; background:#fff;'
+            +   ' border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5);">';
+          document.body.appendChild(v);
+          const xb2 = document.getElementById('cpSimOdsX');
+          if(xb2) xb2.onclick = () => v.remove();
+          v.onclick = e => { if(e.target === v) v.remove(); };
+        }catch(e){ console.warn('Rev-1049 ODS full view failed', e); }
+      };
       const cx = document.getElementById('cpSimCmpX');
       if(cx) cx.onclick = () => { const st2 = stOf(plans[sel]); st2.cmp = null; cpSimSave(all); render(); };
       /* Rev-1036: no manual completion any more - the simulated inspector finishes on his
