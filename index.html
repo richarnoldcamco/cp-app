@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1067</title>
+<title>CONTROL PLAN GENERATOR - Rev-1068</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1067 · 2026-08-09 9:33 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1068 · 2026-08-09 9:47 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -585,7 +585,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1067 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1068 · Built Aug 9, 2026</span>
   </div>
 </div>
 
@@ -1708,7 +1708,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1067";
+const APP_REV = "Rev-1068";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2238,6 +2238,14 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-09",
+  "rev": "App Rev-1068",
+  "type": "App",
+  "changes": [
+   "THE ITAR PROMPT NO LONGER ASSUMES YOU SAID YES (Rev-1068) — six places ask you to confirm before a drawing goes to the Anthropic API. Four asked properly. Two — the help/ask box and the line-inspection AI suggestion — started the answer at YES and only changed it to NO if the dialog came back NO. If the dialog threw, or if that function were ever renamed away, the answer stayed YES and the drawing was sent without anyone being asked. Both now start at NO and require an explicit yes; anything else — an error, a missing function, no answer, or an answer that merely looks positive — blocks the send and writes it to the Action Log. ALSO: DRAWING SAVES THAT FAILED WERE INVISIBLE. A drawing is written to this device's picture store, but that write finishes after the saving function has already returned, so the try/catch around it could only ever have caught a failure to start — never a write that actually failed. A drawing that never made it looked exactly like one that saved, until the next reload, when it was gone. The save now reports for itself: a late failure is logged and shown in red, telling you the drawing is still loaded and to push to GitHub before closing. Deletes report the same way. Tested against a store that fails after the fact, one that fails to open, and one that works — the working case stays silent."
+  ]
+ },
+ {
+  "ts": "2026-08-09",
   "rev": "App Rev-1067",
   "type": "App",
   "changes": [
@@ -2427,14 +2435,6 @@ const CHANGE_LOG = [
   "changes": [
    "THE RESULTS TABLE NAMES THE INSPECTION INSTEAD OF NUMBERING IT (Rev-1044, embedded validation REV-260) — per Rich. The LEVEL column carried a bare 1, 2 or 3, which means nothing without looking back up at the table above to see what a 2 stands for. It now reads COMPLETE CHECK, CRITICAL ONLY or ODD CHECKS, in that level’s own colour, and the heading changes from LEVEL to INSPECTION because that is what the column now says: what the inspection was, not which slot it came from. It matters most on the rows that look odd at first glance — an ODD CHECKS line showing nought critical features checked reads as an obvious fact rather than a fault the moment the words are there, because odd checks cover the loose features and the critical ones are not among them. Nothing else about the table moved. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 with a few inspections finished — the second column of the results table should read the level names rather than 1, 2 and 3."
   ]
- },
- {
-  "ts": "2026-08-09",
-  "rev": "App Rev-1043",
-  "type": "App",
-  "changes": [
-   "FOUR DECIMAL PLACES, NOT FIVE (Rev-1043, embedded validation REV-260) — per Rich, and he is right on the engineering as well as the look. The prints are held to four places — .6040/.6035 — and the gauges on the floor read to four. A fifth digit is a number nobody can measure, and putting one on screen invites an argument about a difference that does not exist. Every measured figure in the simulator now shows four: the MEASUREMENT VARIATION, AVERAGE DEVIATION, BIAS and WORST DEVIATION tiles, the WORST DEVIATION column, the bubble list beside each inspection, and both men’s readings in the side-by-side comparison. The numbers behind them are untouched — the arithmetic still runs at full precision and only the display is rounded, so nothing shifts a flag from one side of .0002 to the other by way of rounding. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, let a few inspections complete — every figure in the MACHINIST vs LINE INSPECTOR section should read like .0027 rather than .00269."
-  ]
  }
 ];
 /* Rev-1066: the FULL history lives in cp_changelog.json in the private data repo and is
@@ -2481,7 +2481,7 @@ let LIVE_CHANGE_LOG = null;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-09";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "9:33 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "9:47 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -10632,8 +10632,16 @@ function cpHelpOpen(){
     const key = localStorage.getItem('anthropicApiKey');
     if(!key){ out.textContent = 'No Anthropic API key set. Admin \u2192 Settings \u2192 API key.'; return; }
     if(!_cpHelpOkThisSession){
-      let ok = true;
-      try{ if(typeof showItarConfirm === 'function') ok = await showItarConfirm(); }catch(_){ }
+      /* Rev-1068: this started at YES and only became NO if the dialog returned NO.
+         If the dialog threw, or if showItarConfirm were ever renamed away, the drawing
+         went to the API without anyone being asked. It now starts at NO. */
+      let ok = false;
+      try{
+        ok = (typeof showItarConfirm === 'function') ? ((await showItarConfirm()) === true) : false;
+      }catch(_){
+        ok = false;
+        try{ logAct('itar', 'confirm dialog failed - send blocked'); }catch(__){ }
+      }
       if(!ok){ out.textContent = 'Cancelled \u2014 nothing was sent.'; return; }
       _cpHelpOkThisSession = true;
     }
@@ -11184,8 +11192,14 @@ function cpLineLevelPanel(idx){
           if(!rows.length){ flash('There are no feature rows to suggest levels for.', true); return; }
           const key = localStorage.getItem('anthropicApiKey');
           if(!key){ flash('No Anthropic API key set. Admin \u2192 Settings \u2192 API key.', true); return; }
-          let ok = true;
-          try{ if(typeof showItarConfirm === 'function') ok = await showItarConfirm(); }catch(_){ }
+          /* Rev-1068: fails closed now - see the note at the help-box gate. */
+          let ok = false;
+          try{
+            ok = (typeof showItarConfirm === 'function') ? ((await showItarConfirm()) === true) : false;
+          }catch(_){
+            ok = false;
+            try{ logAct('itar', 'confirm dialog failed - send blocked'); }catch(__){ }
+          }
           if(!ok){ flash('Cancelled \u2014 nothing was sent.'); return; }
           _ai.disabled = true; _ai.style.opacity = '.6';
           const was = _ai.innerHTML; _ai.textContent = '\u2728 Thinking\u2026';
@@ -11746,8 +11760,18 @@ function _idbPutDrawing(partNum, odsImage, cleanOdsImage){
   if(!_idbDb) return;
   try {
     const tx = _idbDb.transaction('drawings', 'readwrite');
+    /* Rev-1068: an IndexedDB write completes AFTER this function returns, so the catch
+       below only ever saw setup errors - never a write that actually failed. A drawing
+       that never reached the store looked identical to one that saved, until the next
+       reload, when it was simply gone. The transaction now reports for itself. */
+    tx.onerror = tx.onabort = function(){
+      try{ logAct('drawing', 'SAVE FAILED - ' + P + ' did not reach this device store'); }catch(_){ }
+      try{ if(typeof flash === 'function') flash('DRAWING NOT SAVED on this device (' + P + '). It is still loaded now - push to GitHub before you close the app.', true); }catch(_){ }
+    };
     tx.objectStore('drawings').put({ odsImage, cleanOdsImage: cleanOdsImage || null, ut: new Date().toISOString() }, P);
-  } catch(e){}
+  } catch(e){
+    try{ logAct('drawing', 'SAVE FAILED to start - ' + P + ' - ' + ((e && e.name) || 'error')); }catch(_){ }
+  }
 }
 function _idbGetDrawing(partNum){
   const P = String(partNum||'').trim().toUpperCase();
@@ -11788,7 +11812,15 @@ function _idbDelDrawing(partNum){
   if(!P) return;
   delete _idbDrawCache[P];
   if(!_idbDb) return;
-  try{ _idbDb.transaction('drawings', 'readwrite').objectStore('drawings').delete(P); }catch(e){}
+  try{
+    const dtx = _idbDb.transaction('drawings', 'readwrite');
+    dtx.onerror = dtx.onabort = function(){
+      try{ logAct('drawing', 'DELETE FAILED - ' + P + ' still in this device store'); }catch(_){ }
+    };
+    dtx.objectStore('drawings').delete(P);
+  }catch(e){
+    try{ logAct('drawing', 'DELETE FAILED to start - ' + P + ' - ' + ((e && e.name) || 'error')); }catch(_){ }
+  }
 }
 // ===== Rev-506: DRAWING SYNC =====================================================
 // Each part's ODS drawing lives in its own repo file drawings/{PART}.json. Saving a
