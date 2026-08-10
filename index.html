@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1069</title>
+<title>CONTROL PLAN GENERATOR - Rev-1070</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1069 · 2026-08-09 10:29 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1070 · 2026-08-10 06:46 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -585,7 +585,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1069 · Built Aug 9, 2026</span>
+    <span id="revFooter">App Rev-1070 · Built Aug 10, 2026</span>
   </div>
 </div>
 
@@ -1151,6 +1151,17 @@
   <h1>API Settings</h1>
   <p class="sub">Configure Anthropic API key for ODS balloon analysis</p>
 
+  <div class="field" id="cpUserNameBox" style="border:2px solid var(--signal); border-radius:8px; padding:12px; margin-bottom:22px;">
+    <label>&#128100; WHO IS USING THIS DEVICE</label>
+    <input type="text" id="cpUserName" placeholder="R. ARNOLD" autocapitalize="characters" autocorrect="off" spellcheck="false">
+    <p style="font-size:12px; color:var(--ink-dim); margin-top:8px;">
+      This name is stamped on every sign-off, override and inspection run made on THIS device.
+      Set it once per device. It is stored on the device only and is never sent anywhere.
+    </p>
+    <p style="font-size:12px; font-weight:700; margin:6px 0 0;" id="cpUserNameNow"></p>
+    <button class="btn-primary" id="cpUserNameSaveBtn" style="width:100%; margin-top:10px;">&#128190; SAVE NAME</button>
+  </div>
+
   <div class="field">
     <label>Anthropic API Key</label>
     <input type="password" id="apiKey" placeholder="sk-..." style="font-family: monospace;">
@@ -1708,7 +1719,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1069";
+const APP_REV = "Rev-1070";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2237,6 +2248,14 @@ function cpUpdateCurtain(msg){
 }
 const CHANGE_LOG = [
  {
+  "ts": "2026-08-10",
+  "rev": "App Rev-1070",
+  "type": "App",
+  "changes": [
+   "EVERY DEVICE STOPPED CLAIMING TO BE RICHARD ARNOLD (Rev-1070) — cpWhoAmI() reads localStorage 'cpUserInitials' and stamps it on sign-offs, frequency overrides and inspection runs. Nothing in the app ever WROTE that value: there was no field, no screen, no prompt. So it always fell through to CP_DEFAULT_USER and every record made on every device, by anyone, was attributed to RICHARD ARNOLD. This was about to matter because a machinist is running 1000237620 OP-030 on a shared desktop. Added: a WHO IS USING THIS DEVICE field at the top of API Settings that reads and writes cpUserInitials; a live readout showing what the device currently stamps as, in red when unset; and a red bottom banner on load, when no name is set, saying whose name is being used and offering a SET NAME button into Settings. To be clear about what this is: ATTRIBUTION, NOT AUTHENTICATION. It records who says they are at the screen; it does not prove it, and a password gate inside a public client-side file could not prove it either. Real sign-in has to come from whatever serves the page — if the app is hosted inside the Blazor ERP behind Windows authentication, that layer can write cpUserInitials and every line above keeps working with no undoing. The existing reader was left exactly as it was."
+  ]
+ },
+ {
   "ts": "2026-08-09",
   "rev": "App Rev-1069",
   "type": "App",
@@ -2427,14 +2446,6 @@ const CHANGE_LOG = [
   "changes": [
    "THE NEXT SERIAL AND THE LEVELS TABLE SHARE A ROW (Rev-1046, embedded validation REV-260) — per Rich. The NEXT SERIAL TO LINE INSPECT card ran the whole width of the right-hand column with three quarters of it empty, and the table it belongs with sat two blocks further down past the tiles. They answer the same question — what is owed, and when — so they now stand side by side: the card narrow on the left at 260px, the levels table filling the rest of the row. INSPECTIONS COMPLETED and the INSPECTOR’S OWN CPK move underneath the pair. Nothing about what any of it says has changed, and the right-hand column is shorter for it, which pulls the MACHINIST vs LINE INSPECTOR results up the page where they can be read without scrolling. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — the big serial number and the three-level table should sit on one line, with the two smaller tiles below."
   ]
- },
- {
-  "ts": "2026-08-09",
-  "rev": "App Rev-1045",
-  "type": "App",
-  "changes": [
-   "⚙ SET UP AGAIN NOW MEANS START OVER (Rev-1045, embedded validation REV-260) — per Rich. The button took him back to the setup sheet but left START AT SERIAL sitting at whatever the last run began from, so pressing START A NEW SIMULATION after 2,642 parts did not obviously begin again at one. Arriving by that button now opens the sheet with the serial back at ZERO, so the next run starts at S/N 1. NOTHING IS DESTROYED ON THE WAY IN, which is the part worth keeping: the running count is only reset when START A NEW SIMULATION is actually pressed, so CARRY ON is still honest and still resumes exactly where the run was. A button that threw a 2,642-part run away on a single press, sitting where this one sits next to STOP THE MACHINIST, is the reason RESET TO S/N 0 was removed in the first place. Reaching the sheet any other way — opening the simulator fresh, or INSPECT SIM from an operation row — still shows the serial the run last used. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, let it run past a few hundred parts, press ⚙ SET UP AGAIN — START AT SERIAL should read 0, and CARRY ON should still offer the full count. Press START A NEW SIMULATION and the count should begin at 1."
-  ]
  }
 ];
 /* Rev-1066: the FULL history lives in cp_changelog.json in the private data repo and is
@@ -2480,8 +2491,8 @@ let LIVE_CHANGE_LOG = null;
   };
   Storage.prototype.__cpWriteGuard = true;
 })();
-const BUILD_DATE = "2026-08-09";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "10:29 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_DATE = "2026-08-10";   // set on every build (with BUILD_TIME below)
+const BUILD_TIME = "06:46 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -9738,6 +9749,56 @@ function cpWhoAmI(){
     if(v) return v.toUpperCase();
   }catch(_){ }
   return CP_DEFAULT_USER;
+}
+
+/* Rev-1070: cpUserInitials had a reader but no writer. Nothing in the app ever set it, so
+   cpWhoAmI() always fell through to CP_DEFAULT_USER and every sign-off, override and run on
+   every device was stamped RICHARD ARNOLD regardless of who was actually at the screen. These
+   four functions give it a writer. This is attribution, not authentication - it records who
+   says they are here, it does not prove it. A real login, when it arrives from whatever serves
+   the page, should write cpUserInitials and everything below keeps working unchanged. */
+function cpUserNameIsSet(){
+  try{ return !!(localStorage.getItem('cpUserInitials') || '').trim(); }catch(_){ return false; }
+}
+function cpLoadUserName(){
+  const inp = document.getElementById('cpUserName');
+  const now = document.getElementById('cpUserNameNow');
+  let v = '';
+  try{ v = (localStorage.getItem('cpUserInitials') || '').trim(); }catch(_){ }
+  if(inp) inp.value = v;
+  if(now){
+    if(v){ now.textContent = 'Currently stamping as: ' + v.toUpperCase(); now.style.color = 'var(--ink-dim)'; }
+    else { now.textContent = 'NOT SET \u2014 work is being stamped as ' + CP_DEFAULT_USER + '.'; now.style.color = 'var(--danger, #c0392b)'; }
+  }
+}
+function cpSaveUserName(){
+  const inp = document.getElementById('cpUserName');
+  if(!inp) return;
+  const v = (inp.value || '').trim();
+  if(!v){ flash('Enter a name or initials first', true); return; }
+  if(v.length > 40){ flash('That name is too long \u2014 40 characters maximum', true); return; }
+  localStorage.setItem('cpUserInitials', v.toUpperCase());
+  cpLoadUserName();
+  const b = document.getElementById('cpUserNameFirstRun'); if(b) b.remove();
+  flash('\u2713 This device now stamps work as ' + v.toUpperCase());
+}
+function cpUserNameFirstRunBanner(){
+  if(cpUserNameIsSet()) return;
+  if(document.getElementById('cpUserNameFirstRun')) return;
+  const b = document.createElement('div');
+  b.id = 'cpUserNameFirstRun';
+  b.style.cssText = 'position:fixed; left:0; right:0; bottom:0; z-index:9998; background:#c0392b;'
+    + 'color:#fff; font-family:inherit; font-size:13px; font-weight:700; padding:10px 12px;'
+    + 'display:flex; align-items:center; gap:10px; justify-content:center; flex-wrap:wrap;';
+  const t = document.createElement('span');
+  t.textContent = 'This device has no name set \u2014 work is being recorded as ' + CP_DEFAULT_USER + '.';
+  const go = document.createElement('button');
+  go.textContent = 'SET NAME';
+  go.style.cssText = 'background:#fff; color:#c0392b; border:0; border-radius:6px; padding:6px 14px;'
+    + 'font-weight:800; font-size:13px; cursor:pointer;';
+  go.onclick = function(){ try{ showSettings(); }catch(_){ } };
+  b.appendChild(t); b.appendChild(go);
+  document.body.appendChild(b);
 }
 function cpOvrInfoModal(idx, key){
   const row = (cpBuildState && cpBuildState.rows) ? cpBuildState.rows[idx] : null;
@@ -19445,6 +19506,7 @@ function showSettings(){
   if(savedKey){
     $('apiKey').value = savedKey;
   }
+  try{ cpLoadUserName(); }catch(_){ }
   loadGitHubSettings();
   cpUpdateLearnStatus();
   const dm = $('cpDeviceModeSel'); if(dm){ const cur = localStorage.getItem('cpDeviceMode') || 'auto'; dm.value = cur; const note = $('cpDeviceModeNote'); if(note) note.textContent = (cur === 'auto' ? ('Auto-detect — currently seeing this as a ' + (cpAutoIsMobile() ? 'PHONE.' : 'DESKTOP.')) : ('Forced ' + (cur === 'phone' ? 'PHONE.' : 'DESKTOP.'))) + ' Phone-specific hints adjust accordingly.'; }
@@ -24667,6 +24729,8 @@ $('masterEditCancel').onclick = closeMasterEdit;
 $('instDownloadBtn').onclick = downloadInstructions;
 $('instViewBtn').onclick = viewInstructions;
 $('settingsSaveBtn').onclick = saveApiKey;
+try{ const _unb = $('cpUserNameSaveBtn'); if(_unb) _unb.onclick = cpSaveUserName; }catch(_){ }
+try{ cpUserNameFirstRunBanner(); }catch(_){ }
 $('ghSaveBtn').onclick = saveGitHubSettings;
 $('ghPushBtn').onclick = () => ghPush(false);
 $('ghPullBtn').onclick = () => ghPull(false);
