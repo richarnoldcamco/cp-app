@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1071</title>
+<title>CONTROL PLAN GENERATOR - Rev-1072</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1071 · 2026-08-15 08:49 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1072 · 2026-08-15 06:01 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -546,6 +546,10 @@
         <b style="font-size:15px;">🔧 GAGES TO BE MADE <span id="badgeGages" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">0</span></b><br>
         <small style="font-size:11px; color:var(--ink-dim);">SPECIAL GAGES AND FIXTURES CALLED OUT ON ANY CONTROL PLAN</small>
       </button>
+      <button class="menu-btn" id="mQeBoard" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
+        <b style="font-size:15px;">&#128300; QE BOARD</b><br>
+        <small style="font-size:11px; color:var(--ink-dim);">EVERY JOB RUNNING, ONE SCREEN</small>
+      </button>
       <button class="menu-btn" id="mReports" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
         <b style="font-size:15px;">📊 REPORTS</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">EVERY INSPECTION RUN, EVERY STATION</small>
@@ -585,7 +589,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1071 · Built Aug 15, 2026</span>
+    <span id="revFooter">App Rev-1072 · Built Aug 15, 2026</span>
   </div>
 </div>
 
@@ -1442,6 +1446,41 @@
   </table>
 </div>
 
+<div id="qeBoardScreen" class="setup hidden">
+  <button class="ob-back" id="qeBoardBack">&#8592; Back</button>
+  <h2 style="margin:6px 0 2px;">&#128300; QE BOARD</h2>
+  <div id="qeBoardSubtitle" style="font-size:12px; color:var(--ink-dim); margin-bottom:12px;">
+    Every job, one screen.
+  </div>
+
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
+    <div style="display:flex; border:2px solid var(--line); border-radius:8px; overflow:hidden;">
+      <button id="qeModeReal" class="qe-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">REAL RUNS</button>
+      <button id="qeModeSim"  class="qe-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">SIMULATED</button>
+    </div>
+    <button id="qeBoardRefresh" class="btn-primary" style="padding:9px 16px;">&#8635; REFRESH NOW</button>
+    <label style="font-size:12px; display:flex; align-items:center; gap:6px;">
+      <input type="checkbox" id="qeAutoRefresh" checked> Refresh every 60 seconds
+    </label>
+    <span id="qeBoardAge" style="font-size:12px; font-weight:700; color:var(--ink-dim);"></span>
+  </div>
+
+  <div id="qeSimBanner" style="display:none; background:#7a4a00; color:#fff; font-weight:800;
+       padding:10px 12px; border-radius:8px; margin-bottom:12px; font-size:13px;">
+    &#9888; SIMULATED &mdash; every figure on this screen is invented. Nothing here is measurement
+    evidence and nothing is written anywhere.
+  </div>
+
+  <div id="qeBoardCards" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:14px;"></div>
+  <div id="qeBoardEmpty" style="display:none; padding:26px; text-align:center; color:var(--ink-dim); font-size:14px;"></div>
+
+  <p style="font-size:11px; color:var(--ink-dim); margin-top:18px; line-height:1.5;">
+    A run reaches the repository when the machinist COMPLETES or SCRAPS a part &mdash; nothing is sent
+    while a part is being measured. So this board is minutes behind the floor, not live. The age
+    shown above is the age of the newest run it can see.
+  </p>
+</div>
+
 <div id="reportsScreen" class="setup hidden">
   <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
     <button class="ob-back" id="reportsBack" style="margin:0;">← Back</button>
@@ -1719,7 +1758,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1071";
+const APP_REV = "Rev-1072";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2249,6 +2288,14 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-15",
+  "rev": "App Rev-1072",
+  "type": "App",
+  "changes": [
+   "QE BOARD — EVERY JOB ON ONE SCREEN (Rev-1072) — a new screen off the main menu showing every part and operation at once, so a Quality Engineer can watch several jobs instead of opening one operation at a time. Per job: good parts today with percentage, scrap with reasons, out-of-tolerance readings, last serial and date, who ran it, and how many runs are on file. Cards outline red when there is scrap or an out-of-tolerance reading. TWO MODES: REAL RUNS reads the repository; SIMULATED renders invented jobs that tick forward with the clock, so the layout can be worked through without waiting on production — stamped with a banner, never mixed into real counts, never written anywhere. HONEST ABOUT LATENCY: a run reaches the repository only when a part is COMPLETED or SCRAPPED — cloudSaveRun() is called from exactly two places in the validation app and nothing is sent mid-part — so the board is minutes behind the floor and says so, with the age of the data on screen. Refresh is every 60 seconds and can be switched off. COST: one tree call per refresh gives every run filename, and the filename already carries part, operation, shop order, date and serial, so counts come from filenames alone. Run files are opened only for today's runs, only once each, cached by path plus sha so an unchanged file is never fetched twice. Simulated runs are excluded by filename before any fetch. An unreadable run is skipped rather than blanking the board."
+  ]
+ },
+ {
+  "ts": "2026-08-15",
   "rev": "App Rev-1071",
   "type": "App",
   "changes": [
@@ -2438,14 +2485,6 @@ const CHANGE_LOG = [
   "changes": [
    "NO MORE MINUS ZERO (Rev-1048, embedded validation REV-260) — four decimal places went in at Rev-1043 and brought a small nonsense with them, found while checking Rich’s latest screenshot rather than reported. A difference of four hundred-thousandths rounds to 0.0000 and the code still put the sign in front of it: “-0.0000”, which reads as no difference at all AND carries a minus sign in front of nothing. Every signed deviation now goes through one formatter — anything that rounds to zero prints as a plain 0.0000 with no sign, everything else keeps its + or -. It covers the WORST DEVIATION column, the DIFFERENCE column in the side-by-side comparison, and the BIAS tile, which is where it mattered most: a bias of minus nothing is exactly the sort of reading somebody acts on. The underlying numbers are untouched; only the printing changed. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 with the two gauges set well apart, then ⇄ COMPARE a row — no figure anywhere should read -0.0000."
   ]
- },
- {
-  "ts": "2026-08-09",
-  "rev": "App Rev-1047",
-  "type": "App",
-  "changes": [
-   "THE RESULTS ROW SHOWS THE MAX DIFFERENCE, AND A ⇄ COMPARE BUTTON OPENS THE REST (Rev-1047, embedded validation REV-260) — per Rich. Each line was reading out every bubble that broke .0002 and its number — five or six of them, a table inside a table, and the one figure that matters buried among them. The row now carries the WORST DEVIATION and nothing else, which is what a line inspection is judged on. WHAT WAS REMOVED IS NOT LOST: a small ⇄ COMPARE button on every row opens the full side-by-side for that serial — every critical feature, the machinist’s reading, the inspector’s reading, the difference and the flag — in the same panel that already existed for the inspection currently due. The only thing that changed there is which serial it opens on, so the maths and the layout are the ones already tested. It works on any completed inspection in the list, not just the newest. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, let a few inspections finish — each row should end with a small ⇄ COMPARE button, and pressing one on an older serial should open that part’s readings side by side."
-  ]
  }
 ];
 /* Rev-1066: the FULL history lives in cp_changelog.json in the private data repo and is
@@ -2492,7 +2531,7 @@ let LIVE_CHANGE_LOG = null;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-15";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:49 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "06:01 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -9890,7 +9929,8 @@ const CP_HELP_SCREENS = [
   ['customersScreen','Customers'], ['instructionsScreen','Instructions'],
   ['settingsScreen','Settings'], ['adminScreen','Admin'],
   ['appInstructionsScreen','App instructions'], ['recentChangesScreen','Recent changes'],
-  ['reportsScreen','Reports'], ['historyScreen','History']
+  ['reportsScreen','Reports'], ['historyScreen','History'],
+  ['qeBoardScreen','QE Board — every job on one screen']
 ];
 // ===== Rev-714: BACK MEANS BACK ==========================================
 // Nearly every back button called showMenu() outright, so Back meant a FIXED destination
@@ -9902,7 +9942,8 @@ const CP_NAV_SCREENS = [
   ['customersScreen','showCustomers'], ['instructionsScreen','showInstructions'],
   ['settingsScreen','showSettings'], ['adminScreen','showAdmin'],
   ['appInstructionsScreen','showAppInstructions'], ['recentChangesScreen','showRecentChanges'],
-  ['reportsScreen','showInspectionReports'], ['historyScreen','showHistory']
+  ['reportsScreen','showInspectionReports'], ['historyScreen','showHistory'],
+  ['qeBoardScreen','showQeBoard']
 ];
 let _cpNavStack = [];
 let _cpNavGoingBack = false;
@@ -20225,6 +20266,245 @@ function wireRunCards(scope){
     });
   });
 }
+/* ===== Rev-1072: QE BOARD ====================================================
+   One screen showing every job at once, instead of opening one operation at a
+   time. Two things shaped it, both measured rather than assumed:
+
+   1. A run reaches GitHub only when it COMPLETES or is SCRAPPED - cloudSaveRun()
+      is called from exactly two places in the validation app. Nothing is pushed
+      mid-part. So this board is MINUTES BEHIND, and says so on screen rather
+      than pretending to be live. Rich accepted that; 60 seconds is fine.
+   2. Runs are one file per run, so several machinists never collide. That is why
+      this works today and does not wait on the cp_data.json split.
+
+   Cost control: ONE tree call per refresh gives every run filename, and the
+   filename already encodes part, operation, shop order, date and serial. Counts
+   are drawn from filenames alone. Run files are opened only for today's runs,
+   only once each, and cached by path+sha - a file that has not changed is never
+   fetched twice. At 60s that is roughly one call a minute plus new runs, well
+   inside the 5,000/hour budget.
+
+   SIMULATED mode renders the same cards from invented jobs so the layout can be
+   worked through without waiting on production. It is stamped on screen and it
+   never touches the repository or mixes into real counts. */
+var QE_MODE = 'REAL';
+var QE_TIMER = null;
+var QE_CACHE = {};          /* path -> { sha, data } */
+var QE_LAST_LOAD = 0;
+var QE_SIM_T0 = 0;
+
+function qeEtToday(){
+  try{
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+  }catch(_){ return new Date().toISOString().slice(0,10); }
+}
+function qeParseRunPath(p){
+  /* runs/PART_OP-nnn_SHOPORDER_YYYYMMDD_SERIAL_RUNID.json */
+  var nm = String(p || '').replace(/^runs\//, '').replace(/\.json$/, '');
+  var bits = nm.split('_');
+  if(bits.length < 5) return null;
+  var dtok = bits[3] || '';
+  var d = /^\d{8}$/.test(dtok) ? (dtok.slice(0,4)+'-'+dtok.slice(4,6)+'-'+dtok.slice(6,8)) : '';
+  return {
+    path: p, part: bits[0] || '?', op: bits[1] || '?', shopOrder: bits[2] || '',
+    date: d, serial: bits[4] || '', sim: nm.indexOf('SIM-') >= 0
+  };
+}
+async function qeFetchJson(path, sha){
+  var hit = QE_CACHE[path];
+  if(hit && hit.sha === sha) return hit.data;
+  var c = ghConfig();
+  var url = 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/'
+          + path + '?cb=' + Date.now();
+  var r = await fetch(url, { cache: 'no-store',
+    headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github.raw' } });
+  if(!r.ok) throw new Error('run read failed (' + r.status + ')');
+  var j = await r.json();
+  QE_CACHE[path] = { sha: sha, data: j };
+  return j;
+}
+async function qeLoadReal(){
+  var c = ghConfig();
+  if(!c || !c.user || !c.repo || !c.token){
+    return { error: 'GitHub is not set up on this device \u2014 open API SETTINGS first.' };
+  }
+  var url = 'https://api.github.com/repos/' + c.user + '/' + c.repo
+          + '/git/trees/main?recursive=1&cb=' + Date.now();
+  var r = await fetch(url, { cache: 'no-store',
+    headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' } });
+  if(!r.ok) return { error: 'Could not read the repository (' + r.status + ').' };
+  var tree = await r.json();
+  var today = qeEtToday();
+  var jobs = {};
+  var todays = [];
+  (tree.tree || []).forEach(function(x){
+    if(x.type !== 'blob' || String(x.path).indexOf('runs/') !== 0) return;
+    var m = qeParseRunPath(x.path);
+    if(!m || m.sim) return;                       /* simulated never counts here */
+    var key = m.part + ' \u00b7 ' + m.op;
+    var j = jobs[key] || (jobs[key] = { key: key, part: m.part, op: m.op, total: 0,
+      today: 0, lastDate: '', lastSerial: '', shopOrders: {}, scrap: 0, oot: 0,
+      reasons: {}, operators: {}, detail: false });
+    j.total++;
+    if(m.shopOrder) j.shopOrders[m.shopOrder] = 1;
+    if(m.date > j.lastDate){ j.lastDate = m.date; j.lastSerial = m.serial; }
+    if(m.date === today){ j.today++; todays.push({ meta: m, sha: x.sha, job: j }); }
+  });
+  /* open only today's runs, only once each */
+  for(var i = 0; i < todays.length; i++){
+    var t = todays[i];
+    try{
+      var d = await qeFetchJson(t.meta.path, t.sha);
+      var run = (d && d.run) || {};
+      var who = String(run.operatorInitials || '').trim().toUpperCase();
+      if(who) t.job.operators[who] = 1;
+      if(run.scrapped){
+        t.job.scrap++;
+        var rsn = String(run.scrapped.reason || 'UNSTATED').toUpperCase();
+        t.job.reasons[rsn] = (t.job.reasons[rsn] || 0) + 1;
+      }
+      ((d && d.readings) || []).forEach(function(x){
+        if(x && (x.outOfTolerance || x.oot || x.inTolerance === false)) t.job.oot++;
+      });
+      t.job.detail = true;
+    }catch(e){ /* one unreadable run must not blank the board */ }
+  }
+  return { jobs: Object.keys(jobs).map(function(k){ return jobs[k]; }), today: today };
+}
+function qeLoadSim(){
+  /* Invented jobs that tick forward with the clock, so the board can be worked
+     through without waiting on production. Deterministic from the elapsed
+     minute so the numbers move but do not jump about at random. */
+  if(!QE_SIM_T0) QE_SIM_T0 = Date.now();
+  var mins = Math.floor((Date.now() - QE_SIM_T0) / 60000);
+  var today = qeEtToday();
+  var seeds = [
+    { part: '1000237620', op: 'OP-030', who: 'M. BROWN',  rate: 7, scrapEvery: 23 },
+    { part: '912767-M',   op: 'OP-040', who: 'R. SHEDDEN', rate: 5, scrapEvery: 31 },
+    { part: '1000222892', op: 'OP-055', who: 'T. HANNON', rate: 4, scrapEvery: 19 },
+    { part: '912478-M-P', op: 'OP-100', who: 'M. BROWN',  rate: 3, scrapEvery: 41 }
+  ];
+  return { today: today, jobs: seeds.map(function(sd, i){
+    var made = 12 + mins * sd.rate + i * 3;
+    var scrap = Math.floor(made / sd.scrapEvery);
+    var ops = {}; ops[sd.who] = 1;
+    var so = {}; so['SIM-' + (4400 + i)] = 1;
+    var reasons = {};
+    if(scrap > 0) reasons['OUT OF TOLERANCE'] = scrap;
+    return { key: sd.part + ' \u00b7 ' + sd.op, part: sd.part, op: sd.op,
+      total: made + 40, today: made, lastDate: today,
+      lastSerial: String(1000 + made), shopOrders: so,
+      scrap: scrap, oot: scrap + (mins % 3), reasons: reasons, operators: ops,
+      detail: true };
+  }) };
+}
+function qeCard(j){
+  var esc = function(t){ return String(t == null ? '' : t)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+  var good = Math.max(0, j.today - j.scrap);
+  var pct = j.today ? Math.round(good / j.today * 100) : 0;
+  var who = Object.keys(j.operators);
+  var so  = Object.keys(j.shopOrders);
+  var reasons = Object.keys(j.reasons).map(function(r){
+    return esc(r) + ' \u00d7' + j.reasons[r]; }).join(' \u00b7 ');
+  var warn = j.scrap > 0 || j.oot > 0;
+  return ''
+    + '<div style="border:2px solid ' + (warn ? '#c0392b' : 'var(--line)') + '; border-radius:12px; padding:14px;">'
+    +   '<div style="font-weight:800; font-size:15px;">' + esc(j.part) + '</div>'
+    +   '<div style="font-size:12px; color:var(--ink-dim); margin-bottom:10px;">' + esc(j.op)
+    +     (so.length ? ' \u00b7 ' + esc(so.slice(0,2).join(', ')) : '') + '</div>'
+    +   '<div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:10px;">'
+    +     '<div><div style="font-size:26px; font-weight:800;">' + good + '</div>'
+    +       '<div style="font-size:10px; color:var(--ink-dim);">GOOD TODAY' + (j.today ? ' \u00b7 ' + pct + '%' : '') + '</div></div>'
+    +     '<div><div style="font-size:26px; font-weight:800; color:' + (j.scrap ? '#c0392b' : 'inherit') + ';">' + j.scrap + '</div>'
+    +       '<div style="font-size:10px; color:var(--ink-dim);">SCRAP</div></div>'
+    +     '<div><div style="font-size:26px; font-weight:800; color:' + (j.oot ? '#c0392b' : 'inherit') + ';">' + j.oot + '</div>'
+    +       '<div style="font-size:10px; color:var(--ink-dim);">OUT OF TOL</div></div>'
+    +   '</div>'
+    +   (reasons ? '<div style="font-size:11px; color:#c0392b; font-weight:700; margin-bottom:8px;">' + reasons + '</div>' : '')
+    +   '<div style="font-size:11px; color:var(--ink-dim); line-height:1.7;">'
+    +     'LAST S/N <b>' + esc(j.lastSerial || '\u2014') + '</b> on ' + esc(j.lastDate || '\u2014') + '<br>'
+    +     (who.length ? 'RUN BY <b>' + esc(who.join(', ')) + '</b><br>' : '')
+    +     esc(j.total) + ' run(s) on file'
+    +     (j.today && !j.detail ? ' \u00b7 counts from filenames only' : '')
+    +   '</div>'
+    + '</div>';
+}
+function qeRenderAge(){
+  var el = document.getElementById('qeBoardAge'); if(!el) return;
+  if(!QE_LAST_LOAD){ el.textContent = ''; return; }
+  var secs = Math.round((Date.now() - QE_LAST_LOAD) / 1000);
+  el.textContent = secs < 60 ? ('updated ' + secs + 's ago')
+                             : ('updated ' + Math.floor(secs/60) + 'm ago');
+}
+async function qeBoardLoad(){
+  var cards = document.getElementById('qeBoardCards');
+  var empty = document.getElementById('qeBoardEmpty');
+  if(!cards || !empty) return;
+  var sim = (QE_MODE === 'SIM');
+  var bn = document.getElementById('qeSimBanner');
+  if(bn) bn.style.display = sim ? 'block' : 'none';
+  try{
+    var res = sim ? qeLoadSim() : await qeLoadReal();
+    if(res.error){
+      cards.innerHTML = '';
+      empty.style.display = 'block';
+      empty.textContent = res.error;
+      return;
+    }
+    var jobs = (res.jobs || []).sort(function(a, b){
+      return String(b.lastDate).localeCompare(String(a.lastDate))
+          || String(a.key).localeCompare(String(b.key));
+    });
+    QE_LAST_LOAD = Date.now();
+    qeRenderAge();
+    if(!jobs.length){
+      cards.innerHTML = '';
+      empty.style.display = 'block';
+      empty.textContent = 'No runs on file yet. A job appears here once a machinist completes a part.';
+      return;
+    }
+    empty.style.display = 'none';
+    cards.innerHTML = jobs.map(qeCard).join('');
+  }catch(e){
+    cards.innerHTML = '';
+    empty.style.display = 'block';
+    empty.textContent = 'Could not load the board \u2014 ' + (e && e.message || e);
+    try{ logAct('error', 'QE board: ' + (e && e.message || e)); }catch(_){ }
+  }
+}
+function qeSetMode(m){
+  QE_MODE = (m === 'SIM') ? 'SIM' : 'REAL';
+  var a = document.getElementById('qeModeReal'), b = document.getElementById('qeModeSim');
+  if(a && b){
+    a.style.background = (QE_MODE === 'REAL') ? '#1a5276' : 'transparent';
+    a.style.color      = (QE_MODE === 'REAL') ? '#fff' : 'var(--ink)';
+    b.style.background = (QE_MODE === 'SIM')  ? '#7a4a00' : 'transparent';
+    b.style.color      = (QE_MODE === 'SIM')  ? '#fff' : 'var(--ink)';
+  }
+  qeBoardLoad();
+}
+function qeBoardStopTimer(){ if(QE_TIMER){ clearInterval(QE_TIMER); QE_TIMER = null; } }
+function qeBoardStartTimer(){
+  qeBoardStopTimer();
+  QE_TIMER = setInterval(function(){
+    var scr = document.getElementById('qeBoardScreen');
+    if(!scr || scr.classList.contains('hidden')){ qeBoardStopTimer(); return; }
+    qeRenderAge();
+    var cb = document.getElementById('qeAutoRefresh');
+    if(cb && cb.checked && (Date.now() - QE_LAST_LOAD) >= 60000) qeBoardLoad();
+  }, 5000);
+}
+function showQeBoard(){
+  ['menuScreen','newCPScreen','projectsScreen','masterListScreen','customersScreen','instructionsScreen',
+   'settingsScreen','adminScreen','appInstructionsScreen','recentChangesScreen','reportsScreen',
+   'historyScreen','gagesScreen']
+    .forEach(function(id){ var e = document.getElementById(id); if(e) e.classList.add('hidden'); });
+  var g = document.getElementById('qeBoardScreen'); if(g) g.classList.remove('hidden');
+  try{ setHeaderBackVisible(true); }catch(e){}
+  qeSetMode(QE_MODE);
+  qeBoardStartTimer();
+}
 function showInspectionReports(){
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.add('hidden');
@@ -24474,6 +24754,11 @@ $('cpCustomer').onchange = onCustomerSelect;
 $('mInstructions').onclick = showInstructions;
 $('mRecentChanges').onclick = showRecentChanges;
 if($('mReports')) $('mReports').onclick = showInspectionReports;
+if($('mQeBoard')) $('mQeBoard').onclick = showQeBoard;
+if($('qeBoardBack')) $('qeBoardBack').onclick = cpNavBack;
+if($('qeBoardRefresh')) $('qeBoardRefresh').onclick = qeBoardLoad;
+if($('qeModeReal')) $('qeModeReal').onclick = function(){ qeSetMode('REAL'); };
+if($('qeModeSim')) $('qeModeSim').onclick = function(){ qeSetMode('SIM'); };
 // Rev-448: shop floor settings (scrap/pause reasons + management email)
 (function(){
   const DEF_SCRAP = ["OUT OF TOLERANCE","TOOL BREAKAGE","MATERIAL DEFECT","SETUP SCRAP","OPERATOR ERROR","OTHER"];
