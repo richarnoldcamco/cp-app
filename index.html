@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1070</title>
+<title>CONTROL PLAN GENERATOR - Rev-1071</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1070 · 2026-08-10 06:46 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1071 · 2026-08-15 08:49 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -514,7 +514,7 @@
     <div style="display:flex; align-items:center; gap:12px;">
       <div class="brand-mark">📋</div>
       <div>
-        <div class="brand-title">Control Plan Generator</div>
+        <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
         <div class="brand-sub" id="brandRev">REV-1064 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 5:54 PM ET</span></div>
       </div>
     </div>
@@ -585,7 +585,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1070 · Built Aug 10, 2026</span>
+    <span id="revFooter">App Rev-1071 · Built Aug 15, 2026</span>
   </div>
 </div>
 
@@ -1719,7 +1719,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1070";
+const APP_REV = "Rev-1071";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2248,6 +2248,14 @@ function cpUpdateCurtain(msg){
 }
 const CHANGE_LOG = [
  {
+  "ts": "2026-08-15",
+  "rev": "App Rev-1071",
+  "type": "App",
+  "changes": [
+   "HI ON THE HEADER (Rev-1071) — added the text HI next to the Control Plan Generator title on the main menu header, at Rich's request. Cosmetic only: no logic, data, storage or sync behaviour was touched. The rev stamp span next to it is untouched and still repainted by cpSyncBuildStamp from the real GitHub commit time on load. Marked with id cpHeaderHi so it can be removed cleanly in one edit."
+  ]
+ },
+ {
   "ts": "2026-08-10",
   "rev": "App Rev-1070",
   "type": "App",
@@ -2438,14 +2446,6 @@ const CHANGE_LOG = [
   "changes": [
    "THE RESULTS ROW SHOWS THE MAX DIFFERENCE, AND A ⇄ COMPARE BUTTON OPENS THE REST (Rev-1047, embedded validation REV-260) — per Rich. Each line was reading out every bubble that broke .0002 and its number — five or six of them, a table inside a table, and the one figure that matters buried among them. The row now carries the WORST DEVIATION and nothing else, which is what a line inspection is judged on. WHAT WAS REMOVED IS NOT LOST: a small ⇄ COMPARE button on every row opens the full side-by-side for that serial — every critical feature, the machinist’s reading, the inspector’s reading, the difference and the flag — in the same panel that already existed for the inspection currently due. The only thing that changed there is which serial it opens on, so the maths and the layout are the ones already tested. It works on any completed inspection in the list, not just the newest. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030, let a few inspections finish — each row should end with a small ⇄ COMPARE button, and pressing one on an older serial should open that part’s readings side by side."
   ]
- },
- {
-  "ts": "2026-08-09",
-  "rev": "App Rev-1046",
-  "type": "App",
-  "changes": [
-   "THE NEXT SERIAL AND THE LEVELS TABLE SHARE A ROW (Rev-1046, embedded validation REV-260) — per Rich. The NEXT SERIAL TO LINE INSPECT card ran the whole width of the right-hand column with three quarters of it empty, and the table it belongs with sat two blocks further down past the tiles. They answer the same question — what is owed, and when — so they now stand side by side: the card narrow on the left at 260px, the levels table filling the rest of the row. INSPECTIONS COMPLETED and the INSPECTOR’S OWN CPK move underneath the pair. Nothing about what any of it says has changed, and the right-hand column is shorter for it, which pulls the MACHINIST vs LINE INSPECTOR results up the page where they can be read without scrolling. WHAT TO TEST (rule 8): ▶ INSPECT SIM on 1000237620 OP-030 — the big serial number and the three-level table should sit on one line, with the two smaller tiles below."
-  ]
  }
 ];
 /* Rev-1066: the FULL history lives in cp_changelog.json in the private data repo and is
@@ -2491,8 +2491,8 @@ let LIVE_CHANGE_LOG = null;
   };
   Storage.prototype.__cpWriteGuard = true;
 })();
-const BUILD_DATE = "2026-08-10";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "06:46 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_DATE = "2026-08-15";   // set on every build (with BUILD_TIME below)
+const BUILD_TIME = "08:49 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
