@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1074</title>
+<title>CONTROL PLAN GENERATOR - Rev-1077</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1074 · 2026-08-15 07:40 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1077 · 2026-08-18 05:04 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -554,6 +554,10 @@
         <b style="font-size:15px;">&#128225; QUALITY INSPECTOR</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">WHAT EVERY STATION IS MEASURING RIGHT NOW</small>
       </button>
+      <button class="menu-btn" id="mFinalInsp" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
+        <b style="font-size:15px;">&#129534; FINAL INSPECTION</b><br>
+        <small style="font-size:11px; color:var(--ink-dim);">ENTER A FINAL VALIDATION CHECK &mdash; NO SPREADSHEET</small>
+      </button>
       <button class="menu-btn" id="mReports" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
         <b style="font-size:15px;">📊 REPORTS</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">EVERY INSPECTION RUN, EVERY STATION</small>
@@ -593,7 +597,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1074 · Built Aug 15, 2026</span>
+    <span id="revFooter">App Rev-1077 · Built Aug 18, 2026</span>
   </div>
 </div>
 
@@ -1450,6 +1454,55 @@
   </table>
 </div>
 
+<div id="fiScreen" class="setup hidden">
+  <button class="ob-back" id="fiBack">&#8592; Back</button>
+  <h2 style="margin:6px 0 2px;">&#129534; FINAL INSPECTION</h2>
+  <div style="font-size:12px; color:var(--ink-dim); margin-bottom:12px;">
+    The final validation check, entered here instead of on a spreadsheet.
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:12px;">
+    <label style="font-size:11px; font-weight:700;">PART<br>
+      <select id="fiPart" style="width:100%; padding:8px; font-size:14px;"></select></label>
+    <label style="font-size:11px; font-weight:700;">SERIAL #<br>
+      <input id="fiSerial" style="width:100%; padding:8px; font-size:14px;" placeholder="e.g. 190"></label>
+    <label style="font-size:11px; font-weight:700;">INSPECTOR<br>
+      <input id="fiInspector" style="width:100%; padding:8px; font-size:14px;" placeholder="initials"></label>
+    <label style="font-size:11px; font-weight:700;">DATE<br>
+      <input id="fiDate" type="date" style="width:100%; padding:8px; font-size:14px;"></label>
+    <label style="font-size:11px; font-weight:700;">SHOP ORDER<br>
+      <input id="fiShopOrder" style="width:100%; padding:8px; font-size:14px;" placeholder="optional"></label>
+  </div>
+
+  <div id="fiTally" style="font-size:13px; font-weight:800; padding:10px 12px; border-radius:8px;
+       background:rgba(127,127,127,0.12); margin-bottom:10px;"></div>
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+    <button class="fi-filter" data-f="ALL"    style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">ALL</button>
+    <button class="fi-filter" data-f="CMM"    style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">CMM</button>
+    <button class="fi-filter" data-f="GAGE"   style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">GAGE &amp; INDICATOR</button>
+    <button class="fi-filter" data-f="VISUAL" style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">VISUAL</button>
+    <button class="fi-filter" data-f="TODO"   style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">NOT DONE</button>
+    <button class="fi-filter" data-f="BAD"    style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid #c0392b; border-radius:8px; color:#c0392b;">PROBLEMS</button>
+  </div>
+
+  <div id="fiRows"></div>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 6px;">
+    <button id="fiSave" class="btn-primary" style="padding:11px 20px;">&#128190; SAVE ON THIS DEVICE</button>
+    <button id="fiPush" style="padding:11px 20px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">&#9729;&#65039; SAVE TO GITHUB</button>
+    <button id="fiClear" style="padding:11px 20px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">START A NEW SERIAL</button>
+  </div>
+  <div id="fiStatus" style="font-size:12px; font-weight:700; margin-top:6px;"></div>
+
+  <p style="font-size:11px; color:var(--ink-dim); margin-top:18px; line-height:1.5;">
+    Every entry is kept on this device as you type &mdash; closing the screen does not lose it. A value
+    typed against a characteristic with numeric limits is judged in or out of tolerance immediately;
+    plug gage, drop indicator and visual checks are marked by hand, because there is no number to judge.
+    RE-MEASURE opens a second value and a second call on the same line, the way the spreadsheet does.
+  </p>
+</div>
+
 <div id="qiScreen" class="setup hidden">
   <button class="ob-back" id="qiBack">&#8592; Back</button>
   <h2 style="margin:6px 0 2px;">&#128225; QUALITY INSPECTOR</h2>
@@ -1458,11 +1511,22 @@
   </div>
 
   <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
+    <div style="display:flex; border:2px solid var(--line); border-radius:8px; overflow:hidden;">
+      <button id="qiModeLive" class="qi-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">LIVE STATIONS</button>
+      <button id="qiModeSim"  class="qi-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">SIMULATED TABLETS</button>
+    </div>
     <button id="qiRefresh" class="btn-primary" style="padding:9px 16px;">&#8635; REFRESH NOW</button>
     <label style="font-size:12px; display:flex; align-items:center; gap:6px;">
       <input type="checkbox" id="qiAuto" checked> Refresh every 30 seconds
     </label>
     <span id="qiAge" style="font-size:12px; font-weight:700; color:var(--ink-dim);"></span>
+  </div>
+
+  <div id="qiSimBanner" style="display:none; background:#7a4a00; color:#fff; font-weight:800;
+       padding:10px 12px; border-radius:8px; margin-bottom:12px; font-size:13px;">
+    &#9888; SIMULATED TABLETS &mdash; every station, part, serial and reading on this screen is
+    invented. No tablet is running, nothing is written anywhere, and none of it is measurement
+    evidence. Switch to LIVE STATIONS for the real floor.
   </div>
 
   <div id="qiCards" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:14px;"></div>
@@ -1791,7 +1855,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1074";
+const APP_REV = "Rev-1077";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2320,6 +2384,31 @@ function cpUpdateCurtain(msg){
 }
 const CHANGE_LOG = [
  {
+  "ts": "2026-08-18",
+  "rev": "App Rev-1077",
+  "type": "App",
+  "changes": [
+   "FINAL INSPECTION — THE FINAL VALIDATION CHECK WITHOUT A SPREADSHEET (Rev-1077) — per Rich. A new screen off the main menu, seeded with the 81 characteristics of 1000237498 FINAL VALIDATION CHECK REV 05 read straight out of the workbook Rich uses: the same descriptions, the same tolerances, the same order, grouped under the same method headings (POST MILL CMM, FINAL INSP LATHE CMM, PLUG GAGE, DROP INDICATOR, VISUAL and the thread counts), so nobody has to re-learn the job. Header carries part, serial, inspector, date and shop order. Each line takes a value and one of GOOD / BAD / REPAIR / RE-MEASURE / IDK, and RE-MEASURE opens a second value and a second call on the same line — which is what the second block of columns on the spreadsheet was for. JUDGED WHERE IT CAN BE: the 60 characteristics that carry both an upper and a lower limit are marked IN TOL or OUT OF TOL the moment a number is typed; the 21 plug gage, drop indicator and visual checks carry a written requirement instead of a number and are called by hand, because guessing at those would be worse than asking. A tally across the top counts what is entered, what is left, what is out of tolerance and what is waiting on a decision, and filters narrow the list to CMM, gage, visual, NOT DONE or PROBLEMS. NOTHING IS LOST: every keystroke is written to this device, so leaving the screen or closing the app costs nothing, and nothing leaves the device until SAVE TO GITHUB is pressed — which writes finalinsp/PART_SERIAL_DATE.json and says so, and says just as plainly when it fails that the check is still safe locally. Manual entry first by Rich's decision; loading the values from a CMM report is the next step."
+  ]
+ },
+ {
+  "ts": "2026-08-17",
+  "rev": "App Rev-1076",
+  "type": "App",
+  "changes": [
+   "THE QUALITY INSPECTOR SAYS HOW MANY STATIONS IT CAN SEE (Rev-1076) — the line beside REFRESH NOW read only \"checked 12s ago\", which could not tell the difference between a quiet shop and a screen that had read the repository and come back with nothing. It now reads \"3 stations · checked 12s ago\", or \"no stations\" when there is genuinely nothing reporting, and it updates on every read in both live and simulated modes. Cut mainly as a publishing check — a small, plainly visible change so Rich can confirm a new revision has actually reached the website rather than a cached copy — but the count earns its place. Build date and time read from the machine clock in Eastern, not typed from memory."
+  ]
+ },
+ {
+  "ts": "2026-08-15",
+  "rev": "App Rev-1075",
+  "type": "App",
+  "changes": [
+   "SIMULATED TABLETS ON THE QUALITY INSPECTOR (Rev-1075) — per Rich. A SIMULATED TABLETS button beside LIVE STATIONS puts five invented tablets on the screen working through real part numbers: CELL-4-HAAS on 912767-M OP-030, CELL-7-MAZAK on 1000222892 OP-055, CMM-ROOM on 1000237620 OP-030 with a twelve-feature CMM layout, CELL-2-OKUMA on 912478-M-P OP-100 which throws an out-of-tolerance reading and scraps a part now and then, and BENCH-1 which stops reporting after about a minute so the QUIET state can be watched arriving on its own rather than being faked. Serials advance, features tick across, values wander inside a believable band. It draws the SAME cards through the SAME code as the live screen, so what is on show is what the real floor will look like. NOTHING IS WRITTEN ANYWHERE — not one byte reaches GitHub, exactly like the Line Simulator — and it is stamped as invented with a banner across the top and a SIMULATED tag on every card. In simulated mode the screen redraws every five seconds so it visibly moves; live stations still hold to the thirty-second poll to stay inside the API budget.",
+   "A DOWNLOADED COPY NO LONGER TRAPS ITSELF IN A RELOAD LOOP (Rev-1075) — opening a saved CP-RevNNNN.html from the Downloads folder could spin forever. The updater compares this tab against cp_app.html and, when it is behind, reloads location.pathname to move up. From a file:// address that reloads the very same saved revision, which is still behind, so it reloads again — with the 'the site is catching up' curtain over the top of it. The same trap caught the website itself tonight while index.html and cp_app.html disagreed. TWO FIXES: the updater now refuses outright to self-update anything opened from a file:// address, since a downloaded copy cannot move itself forward, and says so plainly instead; and the 'just updated' flag now carries the time it was set and is thrown away on sight once it is three minutes old. The old sixty-second escape only worked if the page survived sixty seconds, which is exactly what a reload loop prevents."
+  ]
+ },
+ {
   "ts": "2026-08-15",
   "rev": "App Rev-1074",
   "type": "App",
@@ -2623,8 +2712,8 @@ let GH_CHANGELOG_REMOTE_N = 0;
   };
   Storage.prototype.__cpWriteGuard = true;
 })();
-const BUILD_DATE = "2026-08-15";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "07:40 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_DATE = "2026-08-18";   // set on every build (with BUILD_TIME below)
+const BUILD_TIME = "05:04 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -10024,7 +10113,8 @@ const CP_HELP_SCREENS = [
   ['appInstructionsScreen','App instructions'], ['recentChangesScreen','Recent changes'],
   ['reportsScreen','Reports'], ['historyScreen','History'],
   ['qeBoardScreen','QE Board — every job on one screen'],
-  ['qiScreen','Quality Inspector — what every station is measuring right now']
+  ['qiScreen','Quality Inspector — what every station is measuring right now'],
+  ['fiScreen','Final Inspection — final validation check entry']
 ];
 // ===== Rev-714: BACK MEANS BACK ==========================================
 // Nearly every back button called showMenu() outright, so Back meant a FIXED destination
@@ -10037,7 +10127,7 @@ const CP_NAV_SCREENS = [
   ['settingsScreen','showSettings'], ['adminScreen','showAdmin'],
   ['appInstructionsScreen','showAppInstructions'], ['recentChangesScreen','showRecentChanges'],
   ['reportsScreen','showInspectionReports'], ['historyScreen','showHistory'],
-  ['qeBoardScreen','showQeBoard'], ['qiScreen','showQiLive']
+  ['qeBoardScreen','showQeBoard'], ['qiScreen','showQiLive'], ['fiScreen','showFinalInsp']
 ];
 let _cpNavStack = [];
 let _cpNavGoingBack = false;
@@ -10113,7 +10203,7 @@ function cpNavWire(){
          friends carry hand-written hide lists that predate them, so without this
          the QE Board and the Quality Inspector stayed on screen after Back. */
       try{
-        ['qeBoardScreen','qiScreen'].forEach(function(lateId){
+        ['qeBoardScreen','qiScreen','fiScreen'].forEach(function(lateId){
           if(lateId === id) return;
           const el = document.getElementById(lateId);
           if(el) el.classList.add('hidden');
@@ -20371,6 +20461,379 @@ function wireRunCards(scope){
   });
 }
 
+
+
+/* ===== Rev-1077: FINAL INSPECTION ===========================================
+   The final validation check, entered on screen instead of on a spreadsheet.
+
+   The characteristic list, the tolerances and the order all come from the sheet
+   Rich already uses, so an inspector sees the same job in the same sequence --
+   nothing has to be re-learned. What changes is that a value typed against a
+   numeric characteristic is judged the moment it is entered, the tally at the
+   top counts what is left and what is out, and the finished check is a record
+   rather than a file on somebody's desktop.
+
+   Deliberate:
+   - Entries are written to this device on every keystroke. Leaving the screen,
+     or closing the app, loses nothing.
+   - Only characteristics with BOTH an upper and a lower limit are auto-judged.
+     Plug gage, drop indicator and visual checks carry a written requirement
+     instead of a number, so they are called by hand -- guessing would be worse
+     than asking.
+   - RE-MEASURE opens a second value and a second call on the same line, which
+     is what the spreadsheet's second block of columns is for.
+   - Nothing is pushed anywhere until SAVE TO GITHUB is pressed. */
+var FI_TEMPLATES = {"1000237498":{"part":"1000237498","rev":"REV 05","title":"FINAL VALIDATION CHECK","chars":[{"item":".5","flag":"","method":"POST MILL CMM","cmmId":"33 - DATUM_A_CYL","desc":"ID - DATUM A - SIZE","upper":1.0665,"lower":1.0635,"req":"","baseTP":null,"type":"D","bubble":"33-A-SZ"},{"item":"1","flag":"A","method":"POST MILL CMM","cmmId":"33_DATUM_A_END - DATUM_A_END","desc":"DAT A - ID - END - SIZE","upper":1.0665,"lower":1.0635,"req":"","baseTP":null,"type":"D","bubble":"33.0"},{"item":"2","flag":"RT","method":"POST MILL CMM","cmmId":"33_END_ROUNDNESS - DATUM_A_END","desc":"DAT A - ID ROUND END","upper":0.002,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"33-A-RND"},{"item":"3","flag":"B","method":"POST MILL CMM","cmmId":"33_DATUM_A_BOTTOM - DATUM_A_BOTTOM","desc":"DAT A - ID BOTTOM","upper":1.0665,"lower":1.0635,"req":"","baseTP":null,"type":"D","bubble":"33"},{"item":"4","flag":"RB","method":"POST MILL CMM","cmmId":"33_BOTTOM_ROUNDNESS - DATUM_A_BOTTOM","desc":"DAT A - ID ROUND BOTTOM","upper":0.002,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"33"},{"item":"5","flag":"A","method":"POST MILL CMM","cmmId":"13_14.1-A_-SIDE_OD","desc":"OD - DATUM A SIDE - SIZE","upper":1.121,"lower":1.114,"req":"","baseTP":null,"type":"DF","bubble":"13-A-SZ"},{"item":"6","flag":"A","method":"POST MILL CMM","cmmId":"13_14.1-A_-SIDE_OD","desc":"OD - A DATUM SIDE - TP","upper":0.0084,"lower":0.0,"req":"","baseTP":0.003,"type":"TP","bubble":"14-A-TP"},{"item":"6.3","flag":"","method":"POST MILL CMM","cmmId":"ROUNDNESS_OD_A-END - A_-SIDE_OD","desc":"OD - DATUM A SIDE - ROUNDNESS","upper":0.005,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"14-A-RND"},{"item":"6.5","flag":"A","method":"POST MILL CMM","cmmId":"15_16 - DATUM_A_END_ID","desc":"ID 1.074 / 1.073 - DATUM A - SIZE","upper":1.0744,"lower":1.072,"req":"","baseTP":null,"type":"DF","bubble":"15-A"},{"item":"6.7","flag":"","method":"POST MILL CMM","cmmId":"15_16 - DATUM_A_END_ID","desc":"ID 1.074 / 1.073 - DATUM A SIDE - TP","upper":0.0046,"lower":0.0,"req":"","baseTP":0.002,"type":"TP","bubble":"16-A-TP"},{"item":"6.7","flag":"","method":"POST MILL CMM","cmmId":"ROUNDNESS_A-END SHORT ID - A_END_ID","desc":"ID 1.074/1.073 - DATUM A SIDE - ROUNDNESS","upper":0.004,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"16-A-RND"},{"item":"6.8","flag":"","method":"POST MILL CMM","cmmId":"13_14.2 - D_END_OD","desc":"OD - DATUM D SIDE - SIZE","upper":1.121,"lower":1.114,"req":"","baseTP":null,"type":"DF","bubble":"13-D"},{"item":"6.9","flag":"","method":"POST MILL CMM","cmmId":"13_14.2 - D_END_OD","desc":"OD - DATUM D SIDE - TP","upper":0.0073,"lower":0.0,"req":"","baseTP":0.003,"type":"TP","bubble":"14-D-TP"},{"item":"7","flag":"AR","method":"POST MILL CMM","cmmId":"ROUNDNESS_OD_D-END-D_END_OD","desc":"OD - D DATUM SIDE - ROUNDNESS","upper":0.003,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"14-D-RND"},{"item":"13","flag":"","method":"POST MILL CMM","cmmId":"17 - DATUM_A_CYL TO DATUM B_FACE","desc":"DAT A - PERP TO DATUM B","upper":0.002,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"17"},{"item":"14","flag":"","method":"POST MILL CMM","cmmId":"20 - DATUM B_FACE TO XPLUS","desc":"B - D PARALLELISM","upper":0.002,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"20.0"},{"item":"15","flag":"","method":"POST MILL CMM","cmmId":"21 - DATUMB_FACE TO DSIDE_FACE","desc":"B-D WIDTH","upper":0.267,"lower":0.261,"req":"","baseTP":null,"type":"M","bubble":"21.0"},{"item":"16","flag":"A","method":"POST MILL CMM","cmmId":"26_DATUM D END - DATUM_D_EXIT","desc":"1.066/1.064 ID - DATUM D - SIZE","upper":1.0663,"lower":1.0638,"req":"","baseTP":null,"type":"D","bubble":"26.0"},{"item":"16.5","flag":"TP","method":"POST MILL CMM","cmmId":"26_27 - DATUM_D_CYL","desc":"DAT D 1.066/1.064 ID - TP","upper":0.004,"lower":0.0,"req":"","baseTP":null,"type":"","bubble":"26"},{"item":"17","flag":"RT","method":"POST MILL CMM","cmmId":"ROUNDNESS DATUM D END - DATUM_D_EXIT","desc":"1.066/1.064 - DAT D ROUNDNESS - END","upper":0.003,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"26.0"},{"item":"18","flag":"B","method":"POST MILL CMM","cmmId":"26_DATUM D BOTTOM - DATUM_D_BOTTOM","desc":"DAT D - ID - BOTTOM","upper":1.0663,"lower":1.0638,"req":"","baseTP":null,"type":"D","bubble":"26"},{"item":"19","flag":"RB","method":"POST MILL CMM","cmmId":"ROUNDNESS DATUM D BOTTOM - DATUM_D_BOTTOM","desc":"DAT D ROUNDNESS - BOTTOM","upper":0.002,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"26"},{"item":"20","flag":"A","method":"POST MILL CMM","cmmId":"28_29 - D-END SHORT ID -D-END_ID","desc":"1.074 - ID - SIZE","upper":1.0744,"lower":1.072,"req":"","baseTP":null,"type":"DF","bubble":"28.0"},{"item":"21","flag":"TP","method":"POST MILL CMM","cmmId":"28_29 - D-END SHORT ID -D-END_ID","desc":"1.074 DATUM D TP","upper":0.0027,"lower":0.0,"req":"","baseTP":0.002,"type":"TP","bubble":"29"},{"item":"21.5","flag":"","method":"POST MILL CMM","cmmId":"ROUNDNESS_D-END SHORT ID - DEND_ID","desc":"1.074/1.073 ID - DATUM D SIDE - ROUNDNESS","upper":0.003,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"29-R"},{"item":"22","flag":"","method":"POST MILL CMM","cmmId":"56_57 - THRUBORE","desc":".487 / .484 BORE - SIZE","upper":0.4875,"lower":0.4835,"req":"","baseTP":null,"type":"DF","bubble":"56.0"},{"item":"23","flag":"TP","method":"POST MILL CMM","cmmId":"56_57 - THRUBORE","desc":".487 / .484 BORE - TP","upper":0.0075,"lower":0.0,"req":"","baseTP":0.005,"type":"TP","bubble":"57"},{"item":"26.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"22_ -CSLOT_FARSIDE TO CSLOT_NEARSIDE","desc":"DATUM C - SLOT - WIDTH","upper":0.226,"lower":0.222,"req":"","baseTP":null,"type":"M","bubble":"22"},{"item":"27.0","flag":"TP","method":"FINAL INSP LATHE CMM","cmmId":"23_ - CSLOT_MIDPLN","desc":"DATUM C - SLOT - TP","upper":0.012,"lower":0.0,"req":"","baseTP":0.01,"type":"TP","bubble":"23.0"},{"item":"28.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"32 - DATUMC_PIN TO FAREND","desc":"DIST TO DAT C","upper":1.208,"lower":1.2,"req":"","baseTP":null,"type":"M","bubble":"32.0"},{"item":"29.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"45_ - NOTCH_FG_FARFACE TO NOTCH_FG_NEARFACE","desc":"DATUM F/G SLOT - WIDTH","upper":0.227,"lower":0.221,"req":"","baseTP":null,"type":"M","bubble":"45.0"},{"item":"30.0","flag":"TP","method":"FINAL INSP LATHE CMM","cmmId":"46 - NOTCH_FG_MIDPLN","desc":"DATUM F/G SLOT - TP","upper":0.004,"lower":0.0,"req":"","baseTP":null,"type":"TP","bubble":"46.0"},{"item":"31.0","flag":"A","method":"FINAL INSP LATHE CMM","cmmId":"102 - DATUMC_MEAS","desc":"DATUM C - HOLE - SIZE","upper":0.0843,"lower":0.0817,"req":"","baseTP":null,"type":"DF","bubble":"102.0"},{"item":"32.0","flag":"TP","method":"FINAL INSP LATHE CMM","cmmId":"103_MEAS - DATUMC_MEAS","desc":"DATUM C - TP","upper":0.007,"lower":0.0,"req":"","baseTP":null,"type":"TP","bubble":"103.0"},{"item":"33.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"105 - NOTCHFACE_C","desc":"DATUM C SLOT - FLATNESS","upper":0.003,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"105.0"},{"item":"34.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"106 -M NOTCHFACE_C","desc":"DATUM C - SLOT - DISTANCE TO CENTER","upper":0.485,"lower":0.473,"req":"","baseTP":null,"type":"X","bubble":"106"},{"item":"35.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"100 - 191_BORE","desc":"DATUM C  .190\" C'BORE - SIZE","upper":0.1925,"lower":0.1895,"req":"","baseTP":null,"type":"DF","bubble":"100.0"},{"item":"36.0","flag":"TP","method":"FINAL INSP LATHE CMM","cmmId":"100_101 - 191_BORE","desc":"DATUM C  .190\" C'BORE - TP","upper":0.005,"lower":0.0,"req":"","baseTP":null,"type":"TP","bubble":"101"},{"item":"37.0","flag":"L","method":"FINAL INSP LATHE CMM","cmmId":"71_L - THDBORE_LEFT_C","desc":"DATUM C - THREAD - TP","upper":0.007,"lower":0.0,"req":"","baseTP":null,"type":"TP","bubble":"71.0"},{"item":"39.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"96 - NOTCHFACE_C TO 191_FACE","desc":"DATUM C - C'BORE -HEIGHT","upper":0.0255,"lower":0.0225,"req":"","baseTP":null,"type":"M","bubble":"96.0"},{"item":"40.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"94 - 191_FACE","desc":"DATUM C - C'BORE - FLATNESS","upper":0.003,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"94.0"},{"item":"41.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"98- NOTCHFACE_FG","desc":"DATUM F/G - SLOT - DISTANCE TO CENTER","upper":0.52,"lower":0.508,"req":"","baseTP":null,"type":"Z","bubble":"98.0"},{"item":"42.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"97 - NOTCHFACE_FG","desc":"DAT F/G - SLOT - FLATNESS","upper":0.003,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"97.0"},{"item":"43.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"91 - F_RIGHTBORE","desc":"DATUM G - C'BORE - SIZE","upper":0.1285,"lower":0.1265,"req":"","baseTP":null,"type":"DF","bubble":"91.0"},{"item":"44.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"92 - F_RIGHTBORE","desc":"DAT G - C'BORE  TP","upper":0.0136,"lower":0.0,"req":"","baseTP":0.01,"type":"TP","bubble":"92"},{"item":"45.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"119 - G_LEFTCBORE","desc":"DATUM F - C'BORE - SIZE","upper":0.1285,"lower":0.1265,"req":"","baseTP":null,"type":"DF","bubble":"119"},{"item":"46.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"120 - G_LEFTCBORE","desc":"DATUM F - C'BORE -TP","upper":0.0134,"lower":0.0,"req":"","baseTP":0.01,"type":"TP","bubble":"120"},{"item":"47.0","flag":"A","method":"FINAL INSP LATHE CMM","cmmId":"75 - DATUM_F_THRUBORE","desc":"DATUM F HOLE - SIZE","upper":0.1075,"lower":0.103,"req":"","baseTP":null,"type":"DF","bubble":"75.0"},{"item":"48.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"77 - DATUM_F_THRUBORE","desc":"DATUM F HOLE - TP","upper":0.0018,"lower":0.0,"req":"","baseTP":0.002,"type":"TP","bubble":"77.0"},{"item":"49.0","flag":"A","method":"FINAL INSP LATHE CMM","cmmId":"72 - DATUM_G_THRUBORE","desc":"DATUM G HOLE - SIZE","upper":0.1075,"lower":0.103,"req":"","baseTP":null,"type":"DF","bubble":"72.0"},{"item":"50.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"74 - DATUM_G_THRUBORE - TP","desc":"DATUM G - TP","upper":0.015,"lower":0.0,"req":"","baseTP":0.002,"type":"TP","bubble":"74.0"},{"item":"51.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"108 - NOTCH_E_FACE","desc":"DATUM E - SLOT - DISTANCE TO CENTER","upper":0.551,"lower":0.539,"req":"","baseTP":null,"type":"X","bubble":"108.0"},{"item":"52.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"109 - NOTCH_E_FACE","desc":"DATUM E - SLOT - FLATNESS","upper":0.003,"lower":0.0,"req":"","baseTP":null,"type":"M","bubble":"109.0"},{"item":"53.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"110 - E_BOREBOTTOMPT TO NOTCH_E_FACE","desc":"DEPTH OF DATUM E C'BORE","upper":0.295,"lower":0.289,"req":"","baseTP":null,"type":"M","bubble":"110.0"},{"item":"54.0","flag":"","method":"FINAL INSP LATHE CMM","cmmId":"90 - TRUEPOSITION_PIN","desc":"DATUM E - THREADED LOC PIN - TP","upper":0.006,"lower":0.0,"req":"","baseTP":0.004,"type":"TP","bubble":"90.0"},{"item":"56.0","flag":"A","method":"FINAL INSP LATHE CMM","cmmId":"82 - E_THRUBORE","desc":"DATUM E    .040\" HOLE - SIZE","upper":0.0415,"lower":0.0385,"req":"","baseTP":null,"type":"DF","bubble":"82.0"},{"item":"57.0","flag":"","method":"FINAL INSP CMM","cmmId":"84 - E_THRUBORE","desc":"DATUM E - THRU .040\" HOLE - TP","upper":0.004,"lower":0.0,"req":"","baseTP":0.007,"type":"TP","bubble":"84.0"},{"item":"58","flag":"B","method":"PLUG GAGE","cmmId":"","desc":"ID 1.074 / 1.074 - DATUM A SIDE","upper":null,"lower":null,"req":"Ø 1.074-1.072","baseTP":null,"type":"PG","bubble":"15.0"},{"item":"59","flag":"B","method":"PLUG GAGE","cmmId":"","desc":"ID 1.074 / 1.074 - DATUM D SIDE","upper":null,"lower":null,"req":"Ø 1.074-1.072","baseTP":null,"type":"PG","bubble":"28"},{"item":"60","flag":"C","method":"PLUG GAGE (QRN 093356)","cmmId":"","desc":"DAT D - ID","upper":null,"lower":null,"req":"1.0663 / 1.0636","baseTP":null,"type":"PG","bubble":"26.0"},{"item":"61","flag":"B1","method":"PLUG GAGE (QRN 093356)","cmmId":"","desc":"DAT A - ID","upper":null,"lower":null,"req":"1.0663 / 1.0636","baseTP":null,"type":"PG","bubble":"33.0"},{"item":"62","flag":"","method":"9 TURNS MIN","cmmId":"","desc":"DAT C - 2-56 UNC THREAD","upper":9.0,"lower":0.0,"req":"","baseTP":null,"type":"PG","bubble":"67.0"},{"item":"63","flag":"","method":"9 TURNS MIN","cmmId":"","desc":"DAT C - 2-56 UNC THREAD","upper":9.0,"lower":0.0,"req":"","baseTP":null,"type":"PG","bubble":"68.0"},{"item":"64","flag":"B","method":"TP & SIZE (QRN 131189)","cmmId":"","desc":"DAT F/G HOLES TP & SIZE","upper":null,"lower":null,"req":"HARD GAGE","baseTP":null,"type":"PG","bubble":"72.0"},{"item":"65","flag":"B","method":"PLUG GAGE","cmmId":"","desc":"DATUM F HOLES - SIZE","upper":null,"lower":null,"req":".1070 / .1025","baseTP":null,"type":"PG","bubble":"75.0"},{"item":"66","flag":"B","method":"PLUG GAGE","cmmId":"","desc":"DATUM E  .040\" HOLE - SIZE","upper":null,"lower":null,"req":".0415 / .0385","baseTP":null,"type":"PG","bubble":"82.0"},{"item":"67","flag":"C","method":"TP & SIZE (QRN XXXXX)","cmmId":"","desc":"DATUM E  .040\" HOLE - GAGE","upper":null,"lower":null,"req":"TP & SIZE","baseTP":null,"type":"PG","bubble":"82.0"},{"item":"68","flag":"","method":"11 TURNS MIN","cmmId":"","desc":"DATUM E - 4-48 THREADS","upper":12.0,"lower":11.0,"req":"","baseTP":null,"type":"PG","bubble":"87.0"},{"item":"69","flag":"B","method":"PLUG GAGE","cmmId":"","desc":"DATUM C - .084/.082\" HOLE - SIZE","upper":null,"lower":null,"req":".084 / .0815","baseTP":null,"type":"PG","bubble":"102.0"},{"item":"71","flag":"","method":"PLUG GAGE","cmmId":"","desc":"DATUM E  .082/.078  C'BORE - SIZE","upper":null,"lower":null,"req":".0825 / .0775","baseTP":null,"type":"PG","bubble":"113.0"},{"item":"72","flag":"","method":"DROP INDICATOR","cmmId":"","desc":"1.074/1.073 DEPTH","upper":null,"lower":null,"req":"2x .150 ± .001","baseTP":null,"type":"","bubble":"47.0"},{"item":"73","flag":"","method":"DROP INDICATOR","cmmId":"","desc":"C'BORE DEPTH","upper":null,"lower":null,"req":".0595 / .0575","baseTP":null,"type":"","bubble":"118.0"},{"item":"74","flag":"","method":"VISUAL","cmmId":"","desc":".020\" WIDE ID GROOVE","upper":null,"lower":null,"req":"","baseTP":null,"type":"V","bubble":"24.0"},{"item":"75","flag":"","method":"VISUAL","cmmId":"","desc":"CHAMFER - BOTH SIDES","upper":null,"lower":null,"req":"PRESENT","baseTP":null,"type":"","bubble":"37"},{"item":"76","flag":"","method":"VISUAL","cmmId":"","desc":"FACE C'BORE ON BOTTOM OF DAYUM A & D","upper":null,"lower":null,"req":"PRESENT","baseTP":null,"type":"","bubble":"48"},{"item":"77","flag":"","method":"VISUAL","cmmId":"","desc":"DAT F/G HOLES","upper":null,"lower":null,"req":"BREAK THRU TO NEXT OPENING","baseTP":null,"type":"","bubble":"73.0"},{"item":"78","flag":"","method":"VISUAL","cmmId":"","desc":"DAT E - HOLE","upper":null,"lower":null,"req":"THRU TO CENTER","baseTP":null,"type":"","bubble":"83.0"},{"item":"79","flag":"","method":"VISUAL","cmmId":"","desc":"SURFACE FINISH","upper":null,"lower":null,"req":"NO NICKS/DINGS","baseTP":null,"type":"","bubble":"95"},{"item":"80","flag":"","method":"VISUAL","cmmId":"","desc":"SURFACE FINISH","upper":null,"lower":null,"req":"NO NICKS/DINGS","baseTP":null,"type":"","bubble":"104"},{"item":"81","flag":"","method":"VISUAL","cmmId":"","desc":"SURFACE FINISH","upper":null,"lower":null,"req":"NO NICKS/DINGS","baseTP":null,"type":"","bubble":"112"},{"item":"","flag":"","method":"CMM","cmmId":"","desc":"DAT D - TP TO A/B","upper":null,"lower":null,"req":".001 MAX OUTTOL","baseTP":null,"type":"","bubble":"27.0"}]}};
+var FI_KEY = 'cpFinalInsp';
+var FI_FILTER = 'ALL';
+var FI_STATE = null;
+
+function fiLoadState(){
+  try{ var raw = localStorage.getItem(FI_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return null;
+}
+function fiSaveState(){
+  try{ localStorage.setItem(FI_KEY, JSON.stringify(FI_STATE)); }catch(e){
+    try{ flash('Could not save on this device — ' + (e && e.message || e), true); }catch(_){ }
+  }
+}
+function fiToday(){
+  try{ return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); }
+  catch(_){ return new Date().toISOString().slice(0,10); }
+}
+function fiTemplate(){
+  return FI_TEMPLATES[FI_STATE && FI_STATE.part] || null;
+}
+function fiBlank(part){
+  var t = FI_TEMPLATES[part];
+  return { part: part, serial: '', inspector: '', date: fiToday(), shopOrder: '',
+           entries: (t ? t.chars : []).map(function(){
+             return { value:'', disp:'', value2:'', disp2:'', note:'' }; }) };
+}
+function fiGroup(method){
+  var m = String(method || '').toUpperCase();
+  if(m.indexOf('CMM') >= 0) return 'CMM';
+  if(m.indexOf('VISUAL') >= 0) return 'VISUAL';
+  return 'GAGE';
+}
+/* in / out of tolerance, but ONLY where there are two real limits to judge against */
+function fiJudge(ch, v){
+  if(ch.upper === null || ch.upper === undefined) return null;
+  if(ch.lower === null || ch.lower === undefined) return null;
+  var n = parseFloat(String(v).replace(/[^0-9.eE+-]/g, ''));
+  if(!isFinite(n)) return null;
+  return (n >= ch.lower && n <= ch.upper);
+}
+function fiTally(){
+  var t = fiTemplate(); if(!t) return { total:0, done:0, out:0, flagged:0 };
+  var done = 0, out = 0, flagged = 0;
+  t.chars.forEach(function(ch, i){
+    var e = FI_STATE.entries[i] || {};
+    var has = String(e.value || '').trim() !== '' || e.disp;
+    if(has) done++;
+    var j = fiJudge(ch, e.value);
+    if(j === false || e.disp === 'BAD' || e.disp2 === 'BAD') out++;
+    if(e.disp === 'REPAIR' || e.disp === 'IDK' || e.disp2 === 'REPAIR' || e.disp2 === 'IDK') flagged++;
+  });
+  return { total: t.chars.length, done: done, out: out, flagged: flagged };
+}
+function fiRenderTally(){
+  var el = document.getElementById('fiTally'); if(!el) return;
+  var s = fiTally();
+  var left = s.total - s.done;
+  el.innerHTML = s.done + ' of ' + s.total + ' entered'
+    + ' &nbsp;·&nbsp; <span style="color:' + (left ? 'inherit' : '#1f8a3b') + ';">'
+    + (left ? left + ' still to do' : 'all done') + '</span>'
+    + ' &nbsp;·&nbsp; <span style="color:' + (s.out ? '#c0392b' : 'inherit') + ';">'
+    + s.out + ' out of tolerance</span>'
+    + (s.flagged ? ' &nbsp;·&nbsp; <span style="color:#7a4a00;">' + s.flagged + ' needing a decision</span>' : '');
+}
+var FI_DISPS = ['GOOD','BAD','REPAIR','RE-MEASURE','IDK'];
+function fiRenderRows(){
+  var host = document.getElementById('fiRows'); if(!host) return;
+  var t = fiTemplate();
+  if(!t){ host.innerHTML = '<div style="padding:22px; text-align:center; color:var(--ink-dim);">'
+      + 'No final inspection list is loaded for this part yet.</div>'; return; }
+  var esc = function(x){ return String(x == null ? '' : x)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+  var html = [], lastMethod = null;
+  t.chars.forEach(function(ch, i){
+    var e = FI_STATE.entries[i] || (FI_STATE.entries[i] = { value:'', disp:'', value2:'', disp2:'', note:'' });
+    var grp = fiGroup(ch.method);
+    var judged = fiJudge(ch, e.value);
+    var bad = judged === false || e.disp === 'BAD';
+    var done = String(e.value || '').trim() !== '' || e.disp;
+    if(FI_FILTER === 'CMM' && grp !== 'CMM') return;
+    if(FI_FILTER === 'VISUAL' && grp !== 'VISUAL') return;
+    if(FI_FILTER === 'GAGE' && grp !== 'GAGE') return;
+    if(FI_FILTER === 'TODO' && done) return;
+    if(FI_FILTER === 'BAD' && !(bad || e.disp === 'REPAIR' || e.disp === 'IDK')) return;
+    if(ch.method !== lastMethod){
+      lastMethod = ch.method;
+      html.push('<div style="font-size:11px; font-weight:800; letter-spacing:.08em; color:var(--ink-dim); '
+        + 'margin:16px 0 6px; padding-bottom:4px; border-bottom:1px solid var(--line);">' + esc(ch.method) + '</div>');
+    }
+    var limits = (ch.upper !== null && ch.upper !== undefined && ch.lower !== null && ch.lower !== undefined)
+      ? (ch.lower + ' to ' + ch.upper) : (ch.req || '—');
+    html.push(''
+      + '<div class="fi-row" data-i="' + i + '" style="border:2px solid ' + (bad ? '#c0392b' : 'var(--line)')
+      +   '; border-radius:10px; padding:10px 12px; margin-bottom:8px;'
+      +   (done && !bad ? ' background:rgba(31,138,59,0.05);' : '') + '">'
+      +   '<div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:baseline;">'
+      +     '<div style="font-weight:800; font-size:13px;">'
+      +       (ch.item ? '<span style="color:var(--ink-dim);">' + esc(ch.item) + '</span> &nbsp;' : '')
+      +       esc(ch.desc) + '</div>'
+      +     '<div style="font-size:11px; color:var(--ink-dim);">'
+      +       (ch.bubble ? 'BUBBLE ' + esc(ch.bubble) + ' · ' : '') + esc(limits) + '</div>'
+      +   '</div>'
+      +   (ch.cmmId ? '<div style="font-size:10px; color:var(--ink-dim); margin-top:2px;">' + esc(ch.cmmId) + '</div>' : '')
+      +   '<div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:8px;">'
+      +     '<input class="fi-val" data-i="' + i + '" value="' + esc(e.value) + '" placeholder="value"'
+      +       ' style="width:120px; padding:8px; font-size:15px; font-weight:700;">'
+      +     (judged === true  ? '<span style="color:#1f8a3b; font-weight:800; font-size:12px;">IN TOL</span>' : '')
+      +     (judged === false ? '<span style="color:#c0392b; font-weight:800; font-size:12px;">OUT OF TOL</span>' : '')
+      +     FI_DISPS.map(function(d){
+             var on = e.disp === d;
+             return '<button class="fi-disp" data-i="' + i + '" data-d="' + d + '" style="padding:6px 10px; font-size:11px;'
+               + ' font-weight:800; cursor:pointer; border-radius:6px; border:2px solid '
+               + (on ? (d === 'BAD' ? '#c0392b' : d === 'GOOD' ? '#1f8a3b' : '#7a4a00') : 'var(--line)') + ';'
+               + (on ? ' background:' + (d === 'BAD' ? '#c0392b' : d === 'GOOD' ? '#1f8a3b' : '#7a4a00') + '; color:#fff;' : '')
+               + '">' + d + '</button>'; }).join('')
+      +   '</div>'
+      +   (e.disp === 'RE-MEASURE'
+          ? '<div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:8px; padding-left:10px; border-left:3px solid #7a4a00;">'
+            + '<span style="font-size:11px; font-weight:800; color:#7a4a00;">RE-MEASURED</span>'
+            + '<input class="fi-val2" data-i="' + i + '" value="' + esc(e.value2) + '" placeholder="value"'
+            + ' style="width:120px; padding:7px; font-size:14px; font-weight:700;">'
+            + (fiJudge(ch, e.value2) === true  ? '<span style="color:#1f8a3b; font-weight:800; font-size:12px;">IN TOL</span>' : '')
+            + (fiJudge(ch, e.value2) === false ? '<span style="color:#c0392b; font-weight:800; font-size:12px;">OUT OF TOL</span>' : '')
+            + FI_DISPS.filter(function(d){ return d !== 'RE-MEASURE'; }).map(function(d){
+                var on = e.disp2 === d;
+                return '<button class="fi-disp2" data-i="' + i + '" data-d="' + d + '" style="padding:5px 9px; font-size:11px;'
+                  + ' font-weight:800; cursor:pointer; border-radius:6px; border:2px solid '
+                  + (on ? (d === 'BAD' ? '#c0392b' : d === 'GOOD' ? '#1f8a3b' : '#7a4a00') : 'var(--line)') + ';'
+                  + (on ? ' background:' + (d === 'BAD' ? '#c0392b' : d === 'GOOD' ? '#1f8a3b' : '#7a4a00') + '; color:#fff;' : '')
+                  + '">' + d + '</button>'; }).join('')
+            + '</div>'
+          : '')
+      +   '<input class="fi-note" data-i="' + i + '" value="' + esc(e.note) + '" placeholder="notes"'
+      +     ' style="width:100%; padding:6px; font-size:12px; margin-top:8px;">'
+      + '</div>');
+  });
+  if(!html.length) html.push('<div style="padding:22px; text-align:center; color:var(--ink-dim);">Nothing matches that filter.</div>');
+  host.innerHTML = html.join('');
+  fiWireRows();
+}
+function fiWireRows(){
+  var host = document.getElementById('fiRows'); if(!host) return;
+  var set = function(sel, field, redraw){
+    Array.prototype.forEach.call(host.querySelectorAll(sel), function(el){
+      el.oninput = function(){
+        var i = parseInt(el.getAttribute('data-i'), 10);
+        FI_STATE.entries[i][field] = el.value;
+        fiSaveState(); fiRenderTally();
+        if(redraw){ var p = el.selectionStart; fiRenderRows();
+          var again = host.querySelector(sel + '[data-i="' + i + '"]');
+          if(again){ again.focus(); try{ again.setSelectionRange(p, p); }catch(_){ } } }
+      };
+    });
+  };
+  set('.fi-val', 'value', true);
+  set('.fi-val2', 'value2', true);
+  set('.fi-note', 'note', false);
+  Array.prototype.forEach.call(host.querySelectorAll('.fi-disp'), function(b){
+    b.onclick = function(){
+      var i = parseInt(b.getAttribute('data-i'), 10), d = b.getAttribute('data-d');
+      FI_STATE.entries[i].disp = (FI_STATE.entries[i].disp === d) ? '' : d;
+      fiSaveState(); fiRenderRows(); fiRenderTally();
+    };
+  });
+  Array.prototype.forEach.call(host.querySelectorAll('.fi-disp2'), function(b){
+    b.onclick = function(){
+      var i = parseInt(b.getAttribute('data-i'), 10), d = b.getAttribute('data-d');
+      FI_STATE.entries[i].disp2 = (FI_STATE.entries[i].disp2 === d) ? '' : d;
+      fiSaveState(); fiRenderRows(); fiRenderTally();
+    };
+  });
+}
+function fiRenderHeader(){
+  var sel = document.getElementById('fiPart');
+  if(sel && !sel.options.length){
+    Object.keys(FI_TEMPLATES).forEach(function(p){
+      var o = document.createElement('option'); o.value = p;
+      o.textContent = p + ' — ' + FI_TEMPLATES[p].title + ' ' + FI_TEMPLATES[p].rev;
+      sel.appendChild(o);
+    });
+  }
+  if(sel) sel.value = FI_STATE.part;
+  [['fiSerial','serial'],['fiInspector','inspector'],['fiDate','date'],['fiShopOrder','shopOrder']]
+    .forEach(function(p){ var el = document.getElementById(p[0]); if(el) el.value = FI_STATE[p[1]] || ''; });
+}
+function fiRecord(){
+  var t = fiTemplate();
+  return {
+    savedUtc: new Date().toISOString(), appRev: APP_REV, kind: 'FINAL INSPECTION',
+    part: FI_STATE.part, formRev: t ? t.rev : '', serial: FI_STATE.serial,
+    inspector: FI_STATE.inspector, date: FI_STATE.date, shopOrder: FI_STATE.shopOrder,
+    entries: (t ? t.chars : []).map(function(ch, i){
+      var e = FI_STATE.entries[i] || {};
+      return { item: ch.item, bubble: ch.bubble, method: ch.method, cmmId: ch.cmmId,
+               desc: ch.desc, upper: ch.upper, lower: ch.lower, requirement: ch.req,
+               value: e.value, disposition: e.disp, valueReMeasured: e.value2,
+               dispositionReMeasured: e.disp2, note: e.note, inTolerance: fiJudge(ch, e.value) };
+    })
+  };
+}
+function fiSetStatus(msg, bad){
+  var el = document.getElementById('fiStatus'); if(!el) return;
+  el.textContent = msg; el.style.color = bad ? '#c0392b' : '#1f8a3b';
+}
+async function fiPushToGitHub(){
+  var c = ghConfig();
+  if(!c || !c.user || !c.repo || !c.token){ fiSetStatus('GitHub is not set up on this device — open API SETTINGS first.', true); return; }
+  if(!FI_STATE.serial){ fiSetStatus('Enter a serial number first — it names the file.', true); return; }
+  var clean = function(x){ return String(x || '').replace(/[^A-Za-z0-9._-]/g, '-'); };
+  var path = 'finalinsp/' + clean(FI_STATE.part) + '_' + clean(FI_STATE.serial) + '_'
+           + clean(FI_STATE.date || fiToday()) + '.json';
+  var url = 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/' + path;
+  var hdrs = { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' };
+  try{
+    fiSetStatus('Saving to GitHub…');
+    var sha = null;
+    try{ var g = await fetch(url + '?cb=' + Date.now(), { headers: hdrs, cache: 'no-store' });
+         if(g.ok){ var j = await g.json(); sha = j.sha; } }catch(e){}
+    var body = { message: 'Final inspection ' + FI_STATE.part + ' S/N ' + FI_STATE.serial,
+                 content: btoa(unescape(encodeURIComponent(JSON.stringify(fiRecord(), null, 1)))) };
+    if(sha) body.sha = sha;
+    var r = await fetch(url, { method: 'PUT',
+      headers: Object.assign({}, hdrs, { 'Content-Type': 'application/json' }), body: JSON.stringify(body) });
+    if(!r.ok){ fiSetStatus('Save to GitHub failed (' + r.status + ') — the check is still safe on this device.', true); return; }
+    fiSetStatus('✓ Saved to GitHub as ' + path);
+    try{ logAct('sync', 'final inspection saved: ' + path); }catch(e){}
+  }catch(err){
+    fiSetStatus('Save to GitHub failed — ' + (err && err.message || err) + '. The check is still safe on this device.', true);
+  }
+}
+function showFinalInsp(){
+  ['menuScreen','newCPScreen','projectsScreen','masterListScreen','customersScreen','instructionsScreen',
+   'settingsScreen','adminScreen','appInstructionsScreen','recentChangesScreen','reportsScreen',
+   'historyScreen','gagesScreen','qeBoardScreen','qiScreen']
+    .forEach(function(id){ var e = document.getElementById(id); if(e) e.classList.add('hidden'); });
+  var g = document.getElementById('fiScreen'); if(g) g.classList.remove('hidden');
+  try{ setHeaderBackVisible(true); }catch(e){}
+  if(!FI_STATE){
+    FI_STATE = fiLoadState() || fiBlank(Object.keys(FI_TEMPLATES)[0]);
+    if(!FI_TEMPLATES[FI_STATE.part]) FI_STATE = fiBlank(Object.keys(FI_TEMPLATES)[0]);
+  }
+  fiRenderHeader(); fiRenderRows(); fiRenderTally(); fiSetStatus('');
+}
+
+/* ===== Rev-1075: SIMULATED TABLETS ==========================================
+   Five invented tablets working through real parts, so the Quality Inspector
+   layout can be shaken out without waiting on the floor -- and so the screen can
+   be demonstrated to somebody at a desk.
+
+   It renders the SAME cards from the SAME drawing code as the live screen, so
+   what you see here is what you will see when the tablets are real.
+
+   Nothing is written anywhere. Not one byte reaches GitHub, exactly like the
+   Line Simulator. Every figure is invented and the screen says so in a banner
+   and on every card.
+
+   Everything is computed from the seconds elapsed since the mode was switched
+   on, so the numbers move steadily and do not jump about at random. */
+var QI_MODE = 'LIVE';
+var QI_SIM_T0 = 0;
+
+var QI_SIM_STATIONS = [
+  { station:'CELL-4-HAAS',  operator:'MH', part:'912767-M',   op:'OP-030', so:'SO-24852',
+    features:['SMALL ID','LARGE OD','FACE RUNOUT','CHAMFER','BORE DEPTH','THREAD PITCH','SURFACE FIN','OVERALL LEN'],
+    secsPerFeature:26, serial:1074, oobEvery:0, scrapEvery:0 },
+  { station:'CELL-7-MAZAK', operator:'RS', part:'1000222892', op:'OP-055', so:'SO-30011',
+    features:['BORE DIA','STEP DIA','SHOULDER','SLOT WIDTH','TRUE POSITION','FLATNESS','EDGE BREAK'],
+    secsPerFeature:38, serial:88,   oobEvery:9, scrapEvery:0 },
+  { station:'CMM-ROOM',     operator:'TH', part:'1000237620', op:'OP-030', so:'SO-31140',
+    features:['DATUM A','DATUM B','HOLE 1 POS','HOLE 2 POS','HOLE 3 POS','PROFILE','PERP','PARALLEL','CBORE DEPTH','ANGLE','RADIUS','WEB THK'],
+    secsPerFeature:55, serial:12,   oobEvery:0, scrapEvery:0 },
+  { station:'CELL-2-OKUMA', operator:'MK', part:'912478-M-P', op:'OP-100', so:'SO-29907',
+    features:['ID BORE','OD TURN','GROOVE','FACE','BACK ANGLE'],
+    secsPerFeature:31, serial:503,  oobEvery:7, scrapEvery:5 },
+  { station:'BENCH-1',      operator:'DS', part:'912767-M',   op:'OP-040', so:'SO-24852',
+    features:['VISUAL','BURR CHECK','ID GAGE'],
+    secsPerFeature:40, serial:1042, oobEvery:0, scrapEvery:0, wentHomeAfter:70 }
+];
+
+function qiSimJobs(){
+  if(!QI_SIM_T0) QI_SIM_T0 = Date.now();
+  var elapsed = Math.floor((Date.now() - QI_SIM_T0) / 1000);
+  return QI_SIM_STATIONS.map(function(sd){
+    /* A station that knocked off: it stops reporting, and the live screen's own
+       five-minute rule turns it QUIET on its own. Nothing special-cased here. */
+    var live = (sd.wentHomeAfter != null && elapsed > sd.wentHomeAfter)
+             ? sd.wentHomeAfter : elapsed;
+    var perPart   = sd.secsPerFeature * sd.features.length;
+    var partsDone = Math.floor(live / perPart);
+    var into      = live % perPart;
+    var done      = Math.min(sd.features.length, Math.floor(into / sd.secsPerFeature) + 1);
+    var serial    = sd.serial + partsDone;
+
+    /* out-of-tolerance and scrap arrive on a fixed cadence, so the red states can
+       actually be looked at rather than waited for */
+    var oob   = sd.oobEvery   ? Math.floor(done / sd.oobEvery)   : 0;
+    var scrap = sd.scrapEvery && partsDone > 0 && (partsDone % sd.scrapEvery === 0);
+    var lastIdx = done - 1;
+    var lastOut = sd.oobEvery ? ((lastIdx + 1) % sd.oobEvery === 0) : false;
+    var beatAge = (into % sd.secsPerFeature);
+
+    /* the reading value: a believable number that wanders inside a band */
+    var base = 0.6040 + (lastIdx * 0.0007) + (partsDone * 0.00013);
+    var val  = (lastOut ? base + 0.0031 : base).toFixed(5);
+
+    return {
+      station: sd.station,
+      state: scrap ? 'SCRAP' : 'RUNNING',
+      operator: sd.operator,
+      partNumber: sd.part, operation: sd.op, shopOrder: sd.so,
+      serialNumber: String(serial),
+      readingsDone: done, readingsTotal: sd.features.length,
+      outOfTol: oob + (scrap ? 1 : 0),
+      lastBubble: String(done),
+      lastCharacteristic: sd.features[Math.max(0, lastIdx)],
+      lastValue: val,
+      lastInTolerance: lastOut ? false : true,
+      lastReadingUtc: new Date(Date.now() - beatAge * 1000).toISOString(),
+      utc: new Date(Date.now() - ((sd.wentHomeAfter != null && elapsed > sd.wentHomeAfter)
+              ? (elapsed - sd.wentHomeAfter) : beatAge) * 1000).toISOString(),
+      simulated: true
+    };
+  });
+}
+function qiSetMode(m){
+  QI_MODE = (m === 'SIM') ? 'SIM' : 'LIVE';
+  if(QI_MODE === 'SIM') QI_SIM_T0 = Date.now();
+  var a = document.getElementById('qiModeLive'), b = document.getElementById('qiModeSim');
+  if(a && b){
+    a.style.background = (QI_MODE === 'LIVE') ? '#1a5276' : 'transparent';
+    a.style.color      = (QI_MODE === 'LIVE') ? '#fff' : 'var(--ink)';
+    b.style.background = (QI_MODE === 'SIM')  ? '#7a4a00' : 'transparent';
+    b.style.color      = (QI_MODE === 'SIM')  ? '#fff' : 'var(--ink)';
+  }
+  var bn = document.getElementById('qiSimBanner');
+  if(bn) bn.style.display = (QI_MODE === 'SIM') ? 'block' : 'none';
+  qiLoad();
+}
+function qiRenderSim(){
+  var cards = document.getElementById('qiCards');
+  var empty = document.getElementById('qiEmpty');
+  if(!cards || !empty) return;
+  var jobs = qiSimJobs();
+  QI_LAST_LOAD = Date.now();
+  QI_LAST_COUNT = jobs.length;
+  qiRenderAge();
+  empty.style.display = 'none';
+  cards.innerHTML = jobs.map(qiCard).join('');
+}
+
 /* ===== Rev-1073: QUALITY INSPECTOR ==========================================
    The QE Board (Rev-1072) can only show parts that are FINISHED, because a run
    reaches the repository only when it is completed or scrapped. This screen
@@ -20388,6 +20851,7 @@ function wireRunCards(scope){
    came off the machine or the tablet was closed. It is not an alarm. */
 var QI_TIMER = null;
 var QI_LAST_LOAD = 0;
+var QI_LAST_COUNT = 0;   /* Rev-1076: how many stations the last read produced */
 var QI_QUIET_MS = 5 * 60 * 1000;
 
 function qiAgeText(ms){
@@ -20401,6 +20865,7 @@ async function qiLoad(){
   var cards = document.getElementById('qiCards');
   var empty = document.getElementById('qiEmpty');
   if(!cards || !empty) return;
+  if(QI_MODE === 'SIM'){ qiRenderSim(); return; }   /* Rev-1075 */
   try{
     var c = ghConfig();
     if(!c || !c.user || !c.repo || !c.token){
@@ -20441,11 +20906,14 @@ async function qiLoad(){
     if(!out.length){
       cards.innerHTML = ''; empty.style.display = 'block';
       empty.textContent = 'No station is reporting a part right now.';
+      QI_LAST_COUNT = 0; qiRenderAge();
       return;
     }
     out.sort(function(a, b){ return String(b.utc || '').localeCompare(String(a.utc || '')); });
     empty.style.display = 'none';
+    QI_LAST_COUNT = out.length;
     cards.innerHTML = out.map(qiCard).join('');
+    qiRenderAge();
   }catch(e){
     cards.innerHTML = ''; empty.style.display = 'block';
     empty.textContent = 'Could not load the screen — ' + (e && e.message || e);
@@ -20466,6 +20934,8 @@ function qiCard(j){
   var lastTol = j.lastInTolerance;
   return ''
     + '<div style="border:2px solid ' + tone + '; border-radius:12px; padding:14px; opacity:' + (quiet ? '0.62' : '1') + ';">'
+    +   (j.simulated ? '<div style="display:inline-block; background:#7a4a00; color:#fff; font-size:9px; '
+        + 'font-weight:800; letter-spacing:.08em; padding:2px 7px; border-radius:4px; margin-bottom:6px;">SIMULATED</div>' : '')
     +   '<div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px;">'
     +     '<div style="font-weight:800; font-size:15px;">' + esc(j.station) + '</div>'
     +     '<div style="font-size:10px; font-weight:800; color:' + tone + ';">' + esc(label) + '</div>'
@@ -20499,7 +20969,12 @@ function qiCard(j){
 function qiRenderAge(){
   var el = document.getElementById('qiAge'); if(!el) return;
   if(!QI_LAST_LOAD){ el.textContent = ''; return; }
-  el.textContent = 'checked ' + qiAgeText(Date.now() - QI_LAST_LOAD);
+  /* Rev-1076: say how many stations are on screen. "checked 12s ago" on its own
+     could not tell the difference between a quiet shop and a screen that had
+     failed to read anything. */
+  var n = QI_LAST_COUNT;
+  var head = (n === 0) ? 'no stations' : (n === 1 ? '1 station' : n + ' stations');
+  el.textContent = head + ' \u00b7 checked ' + qiAgeText(Date.now() - QI_LAST_LOAD);
 }
 function qiStopTimer(){ if(QI_TIMER){ clearInterval(QI_TIMER); QI_TIMER = null; } }
 function qiStartTimer(){
@@ -20508,6 +20983,9 @@ function qiStartTimer(){
     var scr = document.getElementById('qiScreen');
     if(!scr || scr.classList.contains('hidden')){ qiStopTimer(); return; }
     qiRenderAge();
+    /* Rev-1075: simulated tablets redraw on every tick so the screen visibly
+       moves; live stations still hold to the 30s poll to stay inside budget. */
+    if(QI_MODE === 'SIM'){ qiRenderSim(); return; }
     var cb = document.getElementById('qiAuto');
     if(cb && cb.checked && (Date.now() - QI_LAST_LOAD) >= 30000) qiLoad();
   }, 5000);
@@ -20519,7 +20997,7 @@ function showQiLive(){
     .forEach(function(id){ var e = document.getElementById(id); if(e) e.classList.add('hidden'); });
   var g = document.getElementById('qiScreen'); if(g) g.classList.remove('hidden');
   try{ setHeaderBackVisible(true); }catch(e){}
-  qiLoad();
+  qiSetMode(QI_MODE);
   qiStartTimer();
 }
 
@@ -21872,6 +22350,17 @@ async function ghPullApp(silent, autoApply){
       const proceed = confirm('A newer app version is on GitHub:\n\n  This device: ' + APP_REV + '\n  GitHub: ' + remoteRev + '\n\nUpdate this app now? Your GitHub token and all your data stay exactly as they are — only the app code is refreshed.');
       if(!proceed) return;
     }
+    /* Rev-1075: NEVER SELF-UPDATE A DOWNLOADED FILE. The update is a reload of
+       location.pathname. From a file:// URL that reloads the very same saved rev,
+       which is still behind GitHub, so it reloads again -- forever. A downloaded
+       copy cannot move itself forward; only the website can. */
+    if(location.protocol === 'file:'){
+      try{ localStorage.removeItem('cpJustUpdatedTo'); localStorage.removeItem('cpJustUpdatedAt'); }catch(_){ }
+      ghSetStatus('This is a downloaded copy (' + APP_REV + '). GitHub has ' + remoteRev
+                + ' — open the website to move up, or publish this file with Import App Code.', true);
+      if(!silent) flash('Downloaded copies do not self-update. Open the website for ' + remoteRev + '.', true);
+      return;
+    }
     try {
       // Rev-311: TRUE in-place update. Rewriting the current document with the new HTML
       // reloads the tab as the new rev WITHOUT changing the origin, so localStorage
@@ -21890,6 +22379,7 @@ async function ghPullApp(silent, autoApply){
       // (new badge, dead buttons, stale footer). Every update now applies the way
       // Ctrl+Shift+R does: a cache-skipping reload of the site. Token and data untouched.
       localStorage.setItem('cpJustUpdatedTo', remoteRev);
+      try{ localStorage.setItem('cpJustUpdatedAt', String(Date.now())); }catch(_){ }   // Rev-1075
       location.replace(location.pathname + '?v=' + Date.now());
       return;
       document.close();
@@ -25046,6 +25536,35 @@ if($('mQeBoard')) $('mQeBoard').onclick = showQeBoard;
 if($('mQiLive')) $('mQiLive').onclick = showQiLive;
 if($('qiBack')) $('qiBack').onclick = cpNavBack;
 if($('qiRefresh')) $('qiRefresh').onclick = qiLoad;
+if($('qiModeLive')) $('qiModeLive').onclick = function(){ qiSetMode('LIVE'); };
+if($('qiModeSim')) $('qiModeSim').onclick = function(){ qiSetMode('SIM'); };
+if($('mFinalInsp')) $('mFinalInsp').onclick = showFinalInsp;
+if($('fiBack')) $('fiBack').onclick = cpNavBack;
+if($('fiPart')) $('fiPart').onchange = function(){
+  if(!confirm('Switch to ' + this.value + '? Entries for the current part stay saved on this device only until you start a new serial.')){
+    this.value = FI_STATE.part; return; }
+  FI_STATE = fiBlank(this.value); fiSaveState(); fiRenderHeader(); fiRenderRows(); fiRenderTally();
+};
+[['fiSerial','serial'],['fiInspector','inspector'],['fiDate','date'],['fiShopOrder','shopOrder']].forEach(function(p){
+  var el = $(p[0]); if(el) el.oninput = function(){ FI_STATE[p[1]] = el.value; fiSaveState(); };
+});
+Array.prototype.forEach.call(document.querySelectorAll('.fi-filter'), function(b){
+  b.onclick = function(){
+    FI_FILTER = b.getAttribute('data-f');
+    Array.prototype.forEach.call(document.querySelectorAll('.fi-filter'), function(o){
+      var on = o.getAttribute('data-f') === FI_FILTER;
+      o.style.background = on ? '#1a5276' : 'transparent';
+      o.style.color = on ? '#fff' : (o.getAttribute('data-f') === 'BAD' ? '#c0392b' : 'var(--ink)');
+    });
+    fiRenderRows();
+  };
+});
+if($('fiSave')) $('fiSave').onclick = function(){ fiSaveState(); fiSetStatus('\u2713 Saved on this device'); };
+if($('fiPush')) $('fiPush').onclick = fiPushToGitHub;
+if($('fiClear')) $('fiClear').onclick = function(){
+  if(!confirm('Start a new serial? Save to GitHub first if this one is not finished \u2014 the entries on screen will be cleared.')) return;
+  FI_STATE = fiBlank(FI_STATE.part); fiSaveState(); fiRenderHeader(); fiRenderRows(); fiRenderTally(); fiSetStatus('');
+};
 if($('qeBoardBack')) $('qeBoardBack').onclick = cpNavBack;
 if($('qeBoardRefresh')) $('qeBoardRefresh').onclick = qeBoardLoad;
 if($('qeModeReal')) $('qeModeReal').onclick = function(){ qeSetMode('REAL'); };
@@ -25521,6 +26040,16 @@ if($('cpCardRev')) $('cpCardRev').textContent = APP_REV.toUpperCase() + ' · ' +
 try{ $('brandRev').innerHTML = APP_REV.toUpperCase() + ' <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">' + BUILD_DATE + ' ' + BUILD_TIME + '</span>';}catch(e){}
 $('headerTitle').textContent = `CONTROL PLAN GENERATOR`;
 // Rev-804: landing from a self-update? keep the curtain up through boot, then fade it
+/* Rev-1075: the 60s escape only worked if the page stayed put for 60s. When the
+   updater reloaded again first, the flag survived and the curtain came straight
+   back. The flag now carries the time it was set and is thrown away on sight if
+   it is older than three minutes, whatever else happens. */
+try{
+  const _uAt = parseInt(localStorage.getItem('cpJustUpdatedAt') || '0', 10);
+  if(_uAt && (Date.now() - _uAt) > 180000){
+    localStorage.removeItem('cpJustUpdatedTo'); localStorage.removeItem('cpJustUpdatedAt');
+  }
+}catch(_){ }
 try{ if(localStorage.getItem('cpJustUpdatedTo')){
   // Rev-837: if the site is still serving the OLDER rev (publishing lag), keep ONE
   // continuous curtain up while the retries happen behind it - no blink cycles. It
@@ -25532,7 +26061,8 @@ try{ if(localStorage.getItem('cpJustUpdatedTo')){
     cpUpdateCurtain('Publishing ' + _want + ' \u2014 the site is catching up\u2026');
     setTimeout(() => { const c = document.getElementById('cpUpdateCurtain');
       if(c){ c.style.transition = 'opacity .35s'; c.style.opacity = '0'; setTimeout(() => c.remove(), 400); }
-      try{ localStorage.removeItem('cpJustUpdatedTo'); }catch(_){ } }, 60000);
+      try{ localStorage.removeItem('cpJustUpdatedTo');
+            localStorage.removeItem('cpJustUpdatedAt'); }catch(_){ } }, 60000);
   } else {
   cpUpdateCurtain('Now on ' + APP_REV);
   setTimeout(() => { const c = document.getElementById('cpUpdateCurtain');
