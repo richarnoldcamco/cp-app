@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1079</title>
+<title>CONTROL PLAN GENERATOR - Rev-1081</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1079 · 2026-08-18 06:39 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1081 · 2026-08-18 07:02 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -597,7 +597,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1079 · Built Aug 18, 2026</span>
+    <span id="revFooter">App Rev-1081 · Built Aug 18, 2026</span>
   </div>
 </div>
 
@@ -1493,6 +1493,44 @@
     <span id="fiScanMsg" style="font-size:12px; font-weight:700; color:var(--ink-dim);"></span>
   </div>
 
+  <style>
+    @keyframes fiSweep { 0% { left:-40%; } 100% { left:100%; } }
+    @keyframes fiPulse { 0%,100% { opacity:1; } 50% { opacity:.55; } }
+    #fiBusy .fiBar { position:relative; height:22px; border-radius:11px; overflow:hidden;
+                     background:rgba(127,127,127,0.22); }
+    #fiBusy .fiBar > i { position:absolute; top:0; bottom:0; width:40%; border-radius:11px;
+                     background:linear-gradient(90deg, rgba(26,82,118,0) 0%, #1a5276 50%, rgba(26,82,118,0) 100%);
+                     animation: fiSweep 1.15s linear infinite; }
+    #fiBusy .fiBar > b { position:absolute; top:0; bottom:0; left:0; width:0%; border-radius:11px;
+                     background:#1a5276; transition: width .3s; }
+    #fiBusy .fiDot { animation: fiPulse 1.1s ease-in-out infinite; }
+  </style>
+
+  <div id="fiBusy" style="display:none; border:3px solid #1a5276; border-radius:14px;
+       padding:26px 24px; margin-bottom:16px; background:rgba(26,82,118,0.06);">
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <span class="fiDot" style="font-size:40px; line-height:1;">&#128444;&#65039;</span>
+      <div style="flex:1; min-width:220px;">
+        <div id="fiBusyTitle" style="font-size:30px; font-weight:900; letter-spacing:.01em; line-height:1.15;">
+          READING THE REPORT</div>
+        <div id="fiBusyDetail" style="font-size:17px; font-weight:700; color:var(--ink-dim); margin-top:4px;">
+          Starting&hellip;</div>
+      </div>
+      <div style="text-align:right;">
+        <div id="fiBusyTimer" style="font-size:30px; font-weight:900; font-variant-numeric:tabular-nums;">0:00</div>
+        <div style="font-size:11px; color:var(--ink-dim); font-weight:700;">ELAPSED</div>
+      </div>
+    </div>
+    <div class="fiBar" style="margin-top:18px;"><i></i><b id="fiBusyFill"></b></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap;">
+      <div style="font-size:13px; color:var(--ink-dim);">
+        This runs on this machine &mdash; the scan is not sent anywhere. A long report takes a few minutes.
+      </div>
+      <button id="fiBusyCancel" style="padding:9px 18px; font-weight:800; cursor:pointer;
+        border:2px solid var(--line); border-radius:8px;">CANCEL</button>
+    </div>
+  </div>
+
   <div id="fiReview" style="display:none; border:2px solid #1a5276; border-radius:10px; padding:12px; margin-bottom:16px;">
     <div style="font-weight:800; font-size:14px; margin-bottom:4px;">READ OFF THE REPORT &mdash; NOTHING IS FILLED IN YET</div>
     <div style="font-size:11px; color:var(--ink-dim); line-height:1.5; margin-bottom:10px;">
@@ -1878,7 +1916,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1079";
+const APP_REV = "Rev-1081";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2408,6 +2446,22 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-18",
+  "rev": "App Rev-1081",
+  "type": "App",
+  "changes": [
+   "SCANNING A REPORT REFUSES TO GUESS, AND SAYS HOW MUCH IT ACTUALLY DID (Rev-1081) — Rich said the scan left a lot of values blank, and sent the workbook with a sheet per serial, which finally allowed the reading to be scored against what he had recorded by hand. On the SERIAL 64 scan the honest figures were: 13 values offered, 9 right, 2 WRONG, 42 never found. Two wrong out of eleven checkable is not acceptable on a validation record, so: WHERE TWO BLOCKS CLAIM THE SAME CHARACTERISTIC AND DISAGREE, NEITHER IS OFFERED. Keeping the better-scoring one seemed reasonable and was how 0.0011 came to sit on ROUNDNESS_OD_D-END where the report says 0.0017 — a conflict means the page was not read well enough to tell two blocks apart, and a value left blank gets typed while a plausible wrong one gets accepted. That takes it to 10 offered, 7 right, 1 wrong. The one that remains is not a matching fault and cannot be fixed by matching: the page says 0.0001 and the reader saw 0.0000. A digit misread is invisible. The screen now states the score rather than implying success — '10 of 57 CMM characteristics read', with the blocks skipped for ambiguity and for conflict counted separately, and a plain line that anything not listed has to be typed in. THE CONCLUSION FROM THE MEASUREMENT: reading scans is a stopgap, not the answer. The numbers are in the report and they are correct; the difficulty is photographing them. A text or CSV report out of PC-DMIS removes the reading step, and with it both the missing 47 and the wrong one."
+  ]
+ },
+ {
+  "ts": "2026-08-18",
+  "rev": "App Rev-1080",
+  "type": "App",
+  "changes": [
+   "YOU CAN NOW TELL THAT IT IS READING (Rev-1080) — per Rich, who watched it twice without being sure anything was happening. Reading a CMM report takes minutes on a long one, and all it said was 'Opening the report…' in twelve-point grey beside the button. It now puts up a panel roughly six times the size: a thirty-point heading, the page it is on out of the total, a bar that sweeps while it works and fills as the pages go by, and a running clock so a slow report reads as slow rather than as stuck. It also says on screen that the reading happens on that machine and nothing is sent anywhere, since that is the question anyone sensible asks while watching a progress bar. And there is now a CANCEL button: the loop checks between every page, so stopping is immediate and nothing on the form is touched."
+  ]
+ },
+ {
+  "ts": "2026-08-18",
   "rev": "App Rev-1079",
   "type": "App",
   "changes": [
@@ -2752,7 +2806,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-18";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "06:39 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "07:02 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -20529,6 +20583,34 @@ function wireRunCards(scope){
    The inspector confirms. That is slower than trusting it, and much faster than
    typing fifty-seven numbers. */
 var FI_SCAN = null;
+var FI_SCAN_CANCEL = false;
+var FI_BUSY_T0 = 0, FI_BUSY_TIMER = null;
+
+/* Rev-1080: the old progress was one line of 12px grey text beside the button and
+   Rich walked past it twice. Reading thirteen pages takes minutes, so "is this
+   doing anything?" is the obvious question and it deserves an obvious answer:
+   a panel with a sweeping bar, the page it is on, a running clock, and a way out. */
+function fiBusy(on, title, detail, pct){
+  var p = document.getElementById('fiBusy'); if(!p) return;
+  p.style.display = on ? 'block' : 'none';
+  if(!on){
+    if(FI_BUSY_TIMER){ clearInterval(FI_BUSY_TIMER); FI_BUSY_TIMER = null; }
+    return;
+  }
+  var t = document.getElementById('fiBusyTitle'); if(t && title) t.textContent = title;
+  var d = document.getElementById('fiBusyDetail'); if(d && detail !== undefined) d.textContent = detail;
+  var f = document.getElementById('fiBusyFill');
+  if(f) f.style.width = (pct === undefined || pct === null) ? '0%' : Math.max(0, Math.min(100, pct)) + '%';
+  if(!FI_BUSY_TIMER){
+    FI_BUSY_T0 = Date.now();
+    var tick = function(){
+      var el = document.getElementById('fiBusyTimer'); if(!el) return;
+      var sec = Math.floor((Date.now() - FI_BUSY_T0) / 1000);
+      el.textContent = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+    };
+    tick(); FI_BUSY_TIMER = setInterval(tick, 1000);
+  }
+}
 
 function fiTwoGrams(x){
   var out = {}, t = String(x).toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -20572,7 +20654,7 @@ function fiParseReport(text, chars){
   var lines = String(text || '').split(/\r?\n/);
   var known = [];
   chars.forEach(function(ch, i){ if(ch.cmmId) known.push({ i: i, id: ch.cmmId, ch: ch }); });
-  var blocks = [], cur = null, ambiguous = 0;
+  var blocks = [], cur = null, ambiguous = 0, conflicts = 0;
   var rowRe = /^([A-Z]{1,3})\s+(-?\d+\.\d{3,5})(?:\s+(-?[\d.]+))*/;
   lines.forEach(function(raw){
     var l = String(raw).replace(/\|/g, ' ').replace(/\s+/g, ' ').trim();
@@ -20615,20 +20697,32 @@ function fiParseReport(text, chars){
   blocks.forEach(function(b){
     var pick = fiPickAxis(b.target.ch.type, b.rows);
     if(!pick) return;
+    /* Rev-1081: IF TWO BLOCKS CLAIM THE SAME CHARACTERISTIC AND DISAGREE, PROPOSE
+       NEITHER. Keeping the better-scoring one looked reasonable and was wrong: on
+       the SERIAL 64 scan it put 0.0011 on ROUNDNESS_OD_D-END, where the report says
+       0.0017. A conflict means the page was not read well enough to tell the two
+       apart, and a missing value gets typed while a plausible wrong one does not. */
     var already = out.find(function(o){ return o.index === b.target.i; });
-    if(already){ if(b.score <= already.score) return;
-                 out.splice(out.indexOf(already), 1); }
+    if(already){
+      if(already.value !== pick.meas){ already.conflict = true; }
+      if(b.score <= already.score) return;
+      var keepConflict = already.conflict || (already.value !== pick.meas);
+      out.splice(out.indexOf(already), 1);
+      if(keepConflict){ conflicts++; return; }
+    }
     out.push({ index: b.target.i, ch: b.target.ch, value: pick.meas,
                axis: pick.axis, score: b.score, matched: b.line, raw: pick.raw });
   });
+  out = out.filter(function(o){ return !o.conflict; });
   out.ambiguous = ambiguous;
+  out.conflicts = conflicts;
   return out;
 }
 async function fiLoadOcr(){
   if(window.Tesseract) return;
   await _cpLoadScript('https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js');
 }
-async function fiScanSetMsg(m){ var el = document.getElementById('fiScanMsg'); if(el) el.textContent = m; }
+function fiScanSetMsg(m){ var el = document.getElementById('fiScanMsg'); if(el) el.textContent = m; }
 async function fiPagesFromFile(file){
   var pages = [];
   if(/pdf$/i.test(file.name) || file.type === 'application/pdf'){
@@ -20658,29 +20752,41 @@ async function fiPagesFromFile(file){
 async function fiScanReport(file){
   var t = fiTemplate();
   if(!t){ fiScanSetMsg('Load a part first.'); return; }
+  FI_SCAN_CANCEL = false;
   try{
-    fiScanSetMsg('Opening the report…');
+    fiScanSetMsg('');
+    fiBusy(true, 'OPENING THE REPORT', 'Turning the pages into images\u2026', null);
     var pages = await fiPagesFromFile(file);
-    fiScanSetMsg('Reading ' + pages.length + ' page(s) — this takes a moment…');
+    if(FI_SCAN_CANCEL){ fiBusy(false); fiScanSetMsg('Stopped \u2014 nothing was changed.'); return; }
+    fiBusy(true, 'READING THE REPORT', 'Fetching the reader\u2026', 0);
     await fiLoadOcr();
     var all = '';
     for(var i = 0; i < pages.length; i++){
-      fiScanSetMsg('Reading page ' + (i + 1) + ' of ' + pages.length + '…');
+      if(FI_SCAN_CANCEL){ fiBusy(false); fiScanSetMsg('Stopped \u2014 nothing was changed.'); return; }
+      fiBusy(true, 'READING THE REPORT', 'Page ' + (i + 1) + ' of ' + pages.length,
+             Math.round((i / pages.length) * 100));
       var r = await window.Tesseract.recognize(pages[i], 'eng');
       all += '\n' + ((r && r.data && r.data.text) || '');
     }
+    fiBusy(true, 'MATCHING TO THIS PART', 'Comparing what was read to the characteristic list\u2026', 100);
     var props = fiParseReport(all, t.chars);
+    fiBusy(false);
     if(!props.length){
-      fiScanSetMsg('Nothing on that report matched this part’s characteristics. If the scan is faint, a darker one reads far better.');
+      fiScanSetMsg('Nothing on that report matched this part\u2019s characteristics. If the scan is faint, a darker one reads far better.');
       return;
     }
     FI_SCAN = props;
-    fiScanSetMsg(props.length + ' value(s) read — check them below.'
-      + (props.ambiguous ? ' ' + props.ambiguous + ' block(s) were skipped because the name could have been'
-        + ' two different characteristics — type those in by hand.' : ''));
+    var cmmTotal = t.chars.filter(function(c){ return c.cmmId; }).length;
+    fiScanSetMsg(props.length + ' of ' + cmmTotal + ' CMM characteristics read \u2014 check them below.'
+      + (props.ambiguous ? ' ' + props.ambiguous + ' block(s) skipped \u2014 the name could have been two'
+        + ' different characteristics.' : '')
+      + (props.conflicts ? ' ' + props.conflicts + ' skipped \u2014 the page gave two different values for the'
+        + ' same characteristic.' : '')
+      + ' Anything not listed below has to be typed in.');
     fiRenderReview();
   }catch(err){
-    fiScanSetMsg('Could not read that file — ' + ((err && err.message) || err)
+    fiBusy(false);
+    fiScanSetMsg('Could not read that file \u2014 ' + ((err && err.message) || err)
       + '. If this device is offline the reader cannot be fetched.');
   }
 }
@@ -25880,6 +25986,8 @@ if($('fiScan')) $('fiScan').onclick = function(){ var f = $('fiScanFile'); if(f)
 if($('fiScanFile')) $('fiScanFile').onchange = function(e){
   var f = e.target.files && e.target.files[0]; if(f) fiScanReport(f);
 };
+if($('fiBusyCancel')) $('fiBusyCancel').onclick = function(){
+  FI_SCAN_CANCEL = true; fiBusy(false); fiScanSetMsg('Stopping\u2026'); };
 if($('fiReviewAccept')) $('fiReviewAccept').onclick = fiReviewAccept;
 if($('fiReviewCancel')) $('fiReviewCancel').onclick = function(){
   FI_SCAN = null; var p = $('fiReview'); if(p) p.style.display = 'none'; fiScanSetMsg(''); };
