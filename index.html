@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1077</title>
+<title>CONTROL PLAN GENERATOR - Rev-1079</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1077 · 2026-08-18 05:04 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1079 · 2026-08-18 06:39 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -597,7 +597,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1077 · Built Aug 18, 2026</span>
+    <span id="revFooter">App Rev-1079 · Built Aug 18, 2026</span>
   </div>
 </div>
 
@@ -1486,6 +1486,29 @@
     <button class="fi-filter" data-f="BAD"    style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid #c0392b; border-radius:8px; color:#c0392b;">PROBLEMS</button>
   </div>
 
+  <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
+    <button id="fiScan" style="padding:10px 18px; font-weight:800; cursor:pointer; border-radius:8px;
+      border:2px solid #1a5276; background:#1a5276; color:#fff;">&#128444;&#65039; SCAN A CMM REPORT</button>
+    <input type="file" id="fiScanFile" accept="application/pdf,image/*" style="display:none;">
+    <span id="fiScanMsg" style="font-size:12px; font-weight:700; color:var(--ink-dim);"></span>
+  </div>
+
+  <div id="fiReview" style="display:none; border:2px solid #1a5276; border-radius:10px; padding:12px; margin-bottom:16px;">
+    <div style="font-weight:800; font-size:14px; margin-bottom:4px;">READ OFF THE REPORT &mdash; NOTHING IS FILLED IN YET</div>
+    <div style="font-size:11px; color:var(--ink-dim); line-height:1.5; margin-bottom:10px;">
+      Check each line against the report before accepting it. Reading a scan is not exact: a dropped
+      minus sign or a value landing on the wrong feature both look perfectly ordinary afterwards.
+      Only lines the app is confident about are ticked to start with.
+    </div>
+    <div id="fiReviewRows" style="max-height:420px; overflow:auto;"></div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+      <button id="fiReviewAccept" class="btn-primary" style="padding:10px 18px;">ACCEPT THE TICKED LINES</button>
+      <button id="fiReviewAll" style="padding:10px 18px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">TICK EVERYTHING</button>
+      <button id="fiReviewNone" style="padding:10px 18px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">UNTICK EVERYTHING</button>
+      <button id="fiReviewCancel" style="padding:10px 18px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">CANCEL</button>
+    </div>
+  </div>
+
   <div id="fiRows"></div>
 
   <div style="display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 6px;">
@@ -1855,7 +1878,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1077";
+const APP_REV = "Rev-1079";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2385,6 +2408,22 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-18",
+  "rev": "App Rev-1079",
+  "type": "App",
+  "changes": [
+   "SCAN A CMM REPORT INTO THE FINAL INSPECTION FIELDS (Rev-1079) — per Rich. A SCAN A CMM REPORT button on the Final Inspection screen takes a PDF or a photo, renders the pages, reads them, and offers up the measured values it found. It all happens in the browser on the machine doing it: the scan is never uploaded anywhere, which matters for ITAR-controlled work — the reading library itself comes from the same CDN the app already uses for pdf.js and Excel, which is a download, not an upload. BUILT AROUND WHAT A REAL SCAN ACTUALLY DID, not around what would be convenient. On a good scan of SERIAL 64 the numbers came off exactly; on a faint scan of the SAME report one row read 1.0640 as 1.0646 and 0.0008 as 6.0008. Minus signs go missing — across thirteen pages exactly one negative survived out of 257 numbers. And the feature NAMES read far worse than the numbers, which is the dangerous one, because a misread name files a perfectly good number against the wrong characteristic and nothing downstream would ever flag it. So names are matched against the list this part already carries — a small closed set, and therefore forgiving of mangling — and where a block holds a size row, a true-position row and a form row, the kind recorded on the sheet decides which row is taken rather than whichever appeared first. NOTHING IS FILLED IN AUTOMATICALLY. Every value found is offered in a review panel showing the characteristic it matched, the tolerance, whether it passes, how sure the match is, whether it would replace something already typed, and the raw line it was read from. Only matches above 90% are ticked to begin with, anything below is marked CHECK THIS ONE, and nothing reaches the form until ACCEPT THE TICKED LINES is pressed. Accepted values are stamped 'from scan' in their notes so they can be told apart from hand-entered ones forever after. Slower than trusting it. Far faster than typing fifty-seven numbers."
+  ]
+ },
+ {
+  "ts": "2026-08-18",
+  "rev": "App Rev-1078",
+  "type": "App",
+  "changes": [
+   "IMPORT APP CODE COULD NEVER OVERWRITE A FILE OVER 1 MB (Rev-1078) — found while working out why publishing kept landing in the data repo and dying on the website. It was never the token: claude-push has had Contents read and write on cp-app and cp-generator-data all along. Before writing, the import reads the existing file's blob id so GitHub knows which version is being replaced, and it was reading it from the CONTENTS api — which refuses any file over 1 MB. This app is 2.5 MB. So the lookup came back 403, the id stayed empty, and GitHub rejected the write with 422 'sha wasn't supplied'. Import App Code therefore worked exactly once per file, while that file did not yet exist, and never again. The data repo kept moving forward only because App-sync reaches it by a different route — ghPushApp, which was moved off the contents api in Rev-424 for this very reason, as ghPublishPages was in Rev-423. Import App Code was written after both fixes and went straight back to the old api. It now takes the id from the git TREES api, which has no size limit, and falls back to the plain folder listing if the git-data service is unavailable — the same two-step ghGetAppFile settled on. A failure also now says what actually went wrong in words rather than only a number: 422 explains that the existing file's id could not be read, 403 names the repository the token cannot write to."
+  ]
+ },
+ {
+  "ts": "2026-08-18",
   "rev": "App Rev-1077",
   "type": "App",
   "changes": [
@@ -2713,7 +2752,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-18";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "05:04 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "06:39 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -20463,6 +20502,244 @@ function wireRunCards(scope){
 
 
 
+
+/* ===== Rev-1079: READ A CMM REPORT INTO THE FIELDS ==========================
+   Rich needs the CMM report typed in by the app rather than by hand. It reads
+   the pages here, in this browser -- the scan is never uploaded anywhere, which
+   matters for ITAR-controlled work. (The reading library itself is fetched from
+   the same CDN the app already uses for pdf.js and Excel; that is a download,
+   not an upload.)
+
+   MEASURED ON A REAL SCAN BEFORE THIS WAS BUILT, and the design follows what it
+   showed rather than what would be convenient:
+
+   - On a good scan the NUMBERS come off exactly. On a faint one they do not: a
+     single row read 1.0640 as 1.0646 and 0.0008 as 6.0008. So scan quality, not
+     cleverness, decides whether this is usable.
+   - MINUS SIGNS GO MISSING. Across thirteen pages exactly one negative survived
+     out of 257 numbers. A dropped sign is invisible afterwards.
+   - THE FEATURE NAMES read far worse than the numbers -- table borders bleed in,
+     capitals turn to lowercase. A misread name files a perfectly good number
+     against the wrong characteristic, which is the failure nobody would catch.
+
+   So: names are matched against the list this part already has, which is a small
+   closed set and therefore forgiving; every proposal shows what it matched, how
+   sure it is, and the raw line it came from; nothing is written into the form
+   until it is ticked and accepted; and only proposals above 90% are pre-ticked.
+   The inspector confirms. That is slower than trusting it, and much faster than
+   typing fifty-seven numbers. */
+var FI_SCAN = null;
+
+function fiTwoGrams(x){
+  var out = {}, t = String(x).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  for(var i = 0; i < t.length - 1; i++){ var g = t.substr(i, 2); out[g] = (out[g] || 0) + 1; }
+  return { grams: out, n: Math.max(1, t.length - 1), txt: t };
+}
+/* Dice similarity on letter pairs: tolerant of the junk OCR sprinkles into a
+   name, and it does not need an exact length match the way a ratio would. */
+function fiSimilar(a, b){
+  var A = fiTwoGrams(a), B = fiTwoGrams(b);
+  if(!A.txt || !B.txt) return 0;
+  if(A.txt === B.txt) return 1;
+  var hit = 0;
+  for(var g in A.grams){ if(B.grams[g]) hit += Math.min(A.grams[g], B.grams[g]); }
+  var d = (2 * hit) / (A.n + B.n);
+  /* Rev-1079b: a containment bonus, but only when the shorter name is long
+     enough to be distinctive AND sits at the START of the longer one. Awarding
+     it for any overlap made "33 - DATUM_A_CYL" and "17 - DATUM_A_CYL TO DATUM
+     B_FACE" look like the same feature, which put one characteristic's value on
+     another's line -- the exact mistake nobody would catch afterwards. */
+  var shortT = A.txt.length <= B.txt.length ? A.txt : B.txt;
+  var longT  = A.txt.length <= B.txt.length ? B.txt : A.txt;
+  if(shortT.length >= 10 && longT.indexOf(shortT) === 0) d = Math.max(d, 0.92);
+  return d;
+}
+/* Which row of a block belongs to this characteristic. A block can carry a size
+   row, a true-position row and a form row; the sheet already says which kind
+   each line is, so use it rather than taking whichever came first. */
+function fiPickAxis(type, rows){
+  var t = String(type || '').toUpperCase();
+  var want = (t === 'TP') ? ['TP']
+           : (t === 'M')  ? ['M','RN','RB','RT']
+           : (t === 'D' || t === 'DF') ? ['D','DF']
+           : [];
+  for(var i = 0; i < want.length; i++){
+    for(var j = 0; j < rows.length; j++){ if(rows[j].axis === want[i]) return rows[j]; }
+  }
+  return rows[0] || null;
+}
+function fiParseReport(text, chars){
+  var lines = String(text || '').split(/\r?\n/);
+  var known = [];
+  chars.forEach(function(ch, i){ if(ch.cmmId) known.push({ i: i, id: ch.cmmId, ch: ch }); });
+  var blocks = [], cur = null, ambiguous = 0;
+  var rowRe = /^([A-Z]{1,3})\s+(-?\d+\.\d{3,5})(?:\s+(-?[\d.]+))*/;
+  lines.forEach(function(raw){
+    var l = String(raw).replace(/\|/g, ' ').replace(/\s+/g, ' ').trim();
+    if(!l) return;
+    if(/MEAS/.test(l) && /NOMINAL/.test(l)) return;          /* column headings */
+    var body = l.replace(/^[^A-Za-z0-9]+/, '');
+    var m = rowRe.exec(body);
+    if(m && cur){ cur.rows.push({ axis: m[1], meas: m[2], raw: l }); return; }
+    /* otherwise: is this line a feature name we know? Try the line as read and
+       again with the table furniture OCR leaves on the front of it. */
+    var tries = [body,
+                 body.replace(/^(IN|OUT|INn|1N)\b[^A-Za-z0-9]*/i, ''),
+                 body.replace(/^[A-Za-z]{0,3}[^A-Za-z0-9]{1,6}/, '')];
+    var best = null, bestScore = 0, second = 0;
+    for(var k = 0; k < known.length; k++){
+      var sc = 0;
+      for(var q = 0; q < tries.length; q++){ var v = fiSimilar(tries[q], known[k].id); if(v > sc) sc = v; }
+      if(sc > bestScore){ second = bestScore; bestScore = sc; best = known[k]; }
+      else if(sc > second){ second = sc; }
+    }
+    /* Rev-1079b: REFUSE AN AMBIGUOUS NAME. If the runner-up is close behind, this
+       line could belong to either characteristic, and a value on the wrong line is
+       worse than a value missing -- the inspector sees a gap and types it, but
+       would never see a plausible number sitting in the wrong place. */
+    if(best && bestScore >= 0.60 && (bestScore >= 0.97 || (bestScore - second) >= 0.08)){
+      cur = { target: best, score: bestScore, rows: [], line: l };
+      blocks.push(cur);
+    } else if(best && bestScore >= 0.60){
+      cur = null; ambiguous++;
+    } else if(/_/.test(body) || / - /.test(body)){
+      /* Rev-1079b: A BARRIER. This line looks like a feature name but matches
+         nothing we know, so it is the start of some block we cannot identify.
+         Without this, its rows kept attaching to the LAST feature that did match
+         and one characteristic ended up wearing another's measurement -- which is
+         exactly how 1.0729 landed on 33 - DATUM_A_CYL in testing. */
+      cur = null;
+    }
+  });
+  var out = [];
+  blocks.forEach(function(b){
+    var pick = fiPickAxis(b.target.ch.type, b.rows);
+    if(!pick) return;
+    var already = out.find(function(o){ return o.index === b.target.i; });
+    if(already){ if(b.score <= already.score) return;
+                 out.splice(out.indexOf(already), 1); }
+    out.push({ index: b.target.i, ch: b.target.ch, value: pick.meas,
+               axis: pick.axis, score: b.score, matched: b.line, raw: pick.raw });
+  });
+  out.ambiguous = ambiguous;
+  return out;
+}
+async function fiLoadOcr(){
+  if(window.Tesseract) return;
+  await _cpLoadScript('https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js');
+}
+async function fiScanSetMsg(m){ var el = document.getElementById('fiScanMsg'); if(el) el.textContent = m; }
+async function fiPagesFromFile(file){
+  var pages = [];
+  if(/pdf$/i.test(file.name) || file.type === 'application/pdf'){
+    await loadPdfJs();
+    var buf = await file.arrayBuffer();
+    var doc = await window.pdfjsLib.getDocument({ data: buf }).promise;
+    for(var p = 1; p <= doc.numPages; p++){
+      var page = await doc.getPage(p);
+      var vp = page.getViewport({ scale: 2.6 });     /* ~=200dpi: enough for four decimals */
+      var cv = document.createElement('canvas');
+      cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
+      await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+      pages.push(cv);
+    }
+  } else {
+    var img = await new Promise(function(res, rej){
+      var im = new Image(); im.onload = function(){ res(im); }; im.onerror = rej;
+      im.src = URL.createObjectURL(file);
+    });
+    var c2 = document.createElement('canvas');
+    c2.width = img.naturalWidth; c2.height = img.naturalHeight;
+    c2.getContext('2d').drawImage(img, 0, 0);
+    pages.push(c2);
+  }
+  return pages;
+}
+async function fiScanReport(file){
+  var t = fiTemplate();
+  if(!t){ fiScanSetMsg('Load a part first.'); return; }
+  try{
+    fiScanSetMsg('Opening the report…');
+    var pages = await fiPagesFromFile(file);
+    fiScanSetMsg('Reading ' + pages.length + ' page(s) — this takes a moment…');
+    await fiLoadOcr();
+    var all = '';
+    for(var i = 0; i < pages.length; i++){
+      fiScanSetMsg('Reading page ' + (i + 1) + ' of ' + pages.length + '…');
+      var r = await window.Tesseract.recognize(pages[i], 'eng');
+      all += '\n' + ((r && r.data && r.data.text) || '');
+    }
+    var props = fiParseReport(all, t.chars);
+    if(!props.length){
+      fiScanSetMsg('Nothing on that report matched this part’s characteristics. If the scan is faint, a darker one reads far better.');
+      return;
+    }
+    FI_SCAN = props;
+    fiScanSetMsg(props.length + ' value(s) read — check them below.'
+      + (props.ambiguous ? ' ' + props.ambiguous + ' block(s) were skipped because the name could have been'
+        + ' two different characteristics — type those in by hand.' : ''));
+    fiRenderReview();
+  }catch(err){
+    fiScanSetMsg('Could not read that file — ' + ((err && err.message) || err)
+      + '. If this device is offline the reader cannot be fetched.');
+  }
+}
+function fiRenderReview(){
+  var host = document.getElementById('fiReviewRows');
+  var panel = document.getElementById('fiReview');
+  if(!host || !panel || !FI_SCAN) return;
+  var esc = function(x){ return String(x == null ? '' : x)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+  panel.style.display = 'block';
+  host.innerHTML = FI_SCAN.map(function(p, k){
+    var ch = p.ch;
+    var judged = fiJudge(ch, p.value);
+    var existing = (FI_STATE.entries[p.index] || {}).value || '';
+    var sure = Math.round(p.score * 100);
+    if(p.take === undefined) p.take = (p.score >= 0.90);
+    return '<div style="border-bottom:1px solid var(--line); padding:8px 4px;">'
+      + '<label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">'
+      +   '<input type="checkbox" class="fi-rv" data-k="' + k + '"' + (p.take ? ' checked' : '') + ' style="margin-top:3px;">'
+      +   '<div style="flex:1; min-width:0;">'
+      +     '<div style="font-weight:800; font-size:13px;">' + esc(ch.desc) + '</div>'
+      +     '<div style="font-size:11px; color:var(--ink-dim);">' + esc(ch.cmmId)
+      +       ' · ' + (ch.lower !== null && ch.upper !== null ? esc(ch.lower + ' to ' + ch.upper) : esc(ch.req))
+      +       ' · matched ' + sure + '%'
+      +       (sure < 90 ? ' <b style="color:#7a4a00;">— check this one</b>' : '') + '</div>'
+      +     '<div style="margin-top:4px; font-size:14px;">reads <b>' + esc(p.value) + '</b>'
+      +       ' <span style="font-size:11px; color:var(--ink-dim);">(row ' + esc(p.axis) + ')</span> '
+      +       (judged === true  ? '<span style="color:#1f8a3b; font-weight:800; font-size:12px;">IN TOL</span>' : '')
+      +       (judged === false ? '<span style="color:#c0392b; font-weight:800; font-size:12px;">OUT OF TOL</span>' : '')
+      +       (existing ? ' <span style="color:#c0392b; font-size:11px; font-weight:800;">— replaces ' + esc(existing) + '</span>' : '')
+      +     '</div>'
+      +     '<div style="margin-top:3px; font-size:10px; color:var(--ink-dim); font-family:monospace; white-space:pre-wrap;">'
+      +       esc(p.raw) + '</div>'
+      +   '</div>'
+      + '</label></div>';
+  }).join('');
+  Array.prototype.forEach.call(host.querySelectorAll('.fi-rv'), function(cb){
+    cb.onchange = function(){ FI_SCAN[parseInt(cb.getAttribute('data-k'), 10)].take = cb.checked; };
+  });
+}
+function fiReviewAccept(){
+  if(!FI_SCAN) return;
+  var n = 0;
+  FI_SCAN.forEach(function(p){
+    if(!p.take) return;
+    var e = FI_STATE.entries[p.index]; if(!e) return;
+    e.value = p.value;
+    var j = fiJudge(p.ch, p.value);
+    if(j === true) e.disp = 'GOOD';
+    if(j === false) e.disp = 'BAD';
+    e.note = (e.note ? e.note + ' · ' : '') + 'from scan (' + Math.round(p.score * 100) + '%)';
+    n++;
+  });
+  FI_SCAN = null;
+  var panel = document.getElementById('fiReview'); if(panel) panel.style.display = 'none';
+  fiSaveState(); fiRenderRows(); fiRenderTally();
+  fiScanSetMsg(n + ' value(s) filled in. Every one is marked "from scan" in its notes.');
+}
+
 /* ===== Rev-1077: FINAL INSPECTION ===========================================
    The final validation check, entered on screen instead of on a spreadsheet.
 
@@ -22163,6 +22440,39 @@ async function ghGetPagesFile(){
    Guards, in order: it must look like this app, it must carry an APP_REV, and that rev
    must be NEWER than what is already published. The last one is the important one --
    publishing an older file is exactly the accident that keeps resurrecting old revs. */
+/* Rev-1078: blob sha for a file of ANY size. Trees first (no size limit), then
+   the plain folder listing as a fallback for when the git-data service is having
+   a bad day -- the same two-step ghGetAppFile settled on. Returns null only when
+   the file genuinely is not there yet, which is the one case where a write with
+   no sha is correct. */
+async function cpImportShaOf(user, repo, path, token){
+  const hdrs = { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' };
+  try{
+    const tr = await fetch('https://api.github.com/repos/' + user + '/' + repo
+                 + '/git/trees/main?recursive=1&cb=' + Date.now(), { headers: hdrs, cache: 'no-store' });
+    if(tr.ok){
+      const tj = await tr.json();
+      const hit = (tj.tree || []).find(e => e.path === path && e.type === 'blob');
+      if(hit) return hit.sha;
+      if(!tj.truncated) return null;            /* listed in full and simply not there */
+    }
+  }catch(e){ /* fall through to the listing */ }
+  try{
+    const dir = path.indexOf('/') >= 0 ? path.slice(0, path.lastIndexOf('/')) : '';
+    const name = path.slice(path.lastIndexOf('/') + 1);
+    const ls = await fetch('https://api.github.com/repos/' + user + '/' + repo + '/contents/'
+                 + dir + '?cb=' + Date.now(), { headers: hdrs, cache: 'no-store' });
+    if(ls.ok){
+      const arr = await ls.json();
+      if(Array.isArray(arr)){
+        const hit = arr.find(e => e && e.name === name);
+        if(hit) return hit.sha;
+      }
+    }
+  }catch(e){ }
+  return null;
+}
+
 async function cpImportAppCode(file){
   if(!file) return;
   if(!ghConfigured()){ flash('Configure GitHub settings first', true); return; }
@@ -22204,11 +22514,14 @@ async function cpImportAppCode(file){
       const url = 'https://api.github.com/repos/' + c.user + '/' + t.repo + '/contents/' + t.path;
       let resp = null, lastTxt = '';
       for(let attempt = 0; attempt < 3; attempt++){
-        let sha = null;
-        try{
-          const g = await fetch(url, { headers: { 'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json' } });
-          if(g.ok){ const j = await g.json(); sha = j.sha; }
-        }catch(e){}
+        /* Rev-1078: the sha comes from the TREES api, not the contents api.
+           The contents api refuses any file over 1 MB, and this app is 2.5 MB, so
+           the lookup returned 403, the sha stayed null, and GitHub rejected the
+           write with 422 "sha wasn't supplied". Import App Code therefore worked
+           exactly once per file -- while it did not exist -- and never again.
+           ghGetAppFile and ghGetPagesFile were moved off the contents api for this
+           same reason in Rev-423/424; this path was written later and missed it. */
+        let sha = await cpImportShaOf(c.user, t.repo, t.path, c.token);
         const body = { message: 'CP Generator import ' + incoming + ' ' + new Date().toISOString(), content: encoded };
         if(sha) body.sha = sha;
         resp = await fetch(url, {
@@ -22222,6 +22535,8 @@ async function cpImportAppCode(file){
       }
       if(!resp || !resp.ok){
         const m = 'Publish to ' + t.label + ' failed: ' + (resp ? resp.status : '?') + ' ' + lastTxt.slice(0,120) +
+                  (resp && resp.status === 422 ? ' — could not read the existing file\u2019s id, so GitHub refused the overwrite' : '') +
+                  (resp && resp.status === 403 ? ' — the token cannot write to ' + t.repo : '') +
                   (done.length ? ' (already published to: ' + done.join(', ') + ')' : '');
         ghSetStatus(m, true); flash(m, true); return;
       }
@@ -25561,6 +25876,17 @@ Array.prototype.forEach.call(document.querySelectorAll('.fi-filter'), function(b
 });
 if($('fiSave')) $('fiSave').onclick = function(){ fiSaveState(); fiSetStatus('\u2713 Saved on this device'); };
 if($('fiPush')) $('fiPush').onclick = fiPushToGitHub;
+if($('fiScan')) $('fiScan').onclick = function(){ var f = $('fiScanFile'); if(f){ f.value = ''; f.click(); } };
+if($('fiScanFile')) $('fiScanFile').onchange = function(e){
+  var f = e.target.files && e.target.files[0]; if(f) fiScanReport(f);
+};
+if($('fiReviewAccept')) $('fiReviewAccept').onclick = fiReviewAccept;
+if($('fiReviewCancel')) $('fiReviewCancel').onclick = function(){
+  FI_SCAN = null; var p = $('fiReview'); if(p) p.style.display = 'none'; fiScanSetMsg(''); };
+if($('fiReviewAll')) $('fiReviewAll').onclick = function(){
+  if(FI_SCAN){ FI_SCAN.forEach(function(p){ p.take = true; }); fiRenderReview(); } };
+if($('fiReviewNone')) $('fiReviewNone').onclick = function(){
+  if(FI_SCAN){ FI_SCAN.forEach(function(p){ p.take = false; }); fiRenderReview(); } };
 if($('fiClear')) $('fiClear').onclick = function(){
   if(!confirm('Start a new serial? Save to GitHub first if this one is not finished \u2014 the entries on screen will be cleared.')) return;
   FI_STATE = fiBlank(FI_STATE.part); fiSaveState(); fiRenderHeader(); fiRenderRows(); fiRenderTally(); fiSetStatus('');
