@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1081</title>
+<title>CONTROL PLAN GENERATOR - Rev-1083</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1081 · 2026-08-18 07:02 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1083 · 2026-08-18 08:40 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -597,7 +597,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1081 · Built Aug 18, 2026</span>
+    <span id="revFooter">App Rev-1083 · Built Aug 18, 2026</span>
   </div>
 </div>
 
@@ -1486,6 +1486,15 @@
     <button class="fi-filter" data-f="BAD"    style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid #c0392b; border-radius:8px; color:#c0392b;">PROBLEMS</button>
   </div>
 
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
+    <span style="font-size:11px; font-weight:800; color:var(--ink-dim); letter-spacing:.06em;">VIEW</span>
+    <div style="display:flex; border:2px solid var(--line); border-radius:8px; overflow:hidden;">
+      <button id="fiViewCards"  class="fi-view" style="border:0; padding:8px 16px; font-weight:800; cursor:pointer;">CARDS</button>
+      <button id="fiViewReport" class="fi-view" style="border:0; padding:8px 16px; font-weight:800; cursor:pointer;">REPORT LAYOUT</button>
+    </div>
+    <span style="font-size:11px; color:var(--ink-dim);">Report layout reads down the page like the CMM printout &mdash; Tab and Enter jump straight to the next value.</span>
+  </div>
+
   <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
     <button id="fiScan" style="padding:10px 18px; font-weight:800; cursor:pointer; border-radius:8px;
       border:2px solid #1a5276; background:#1a5276; color:#fff;">&#128444;&#65039; SCAN A CMM REPORT</button>
@@ -1916,7 +1925,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1081";
+const APP_REV = "Rev-1083";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2446,6 +2455,22 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-18",
+  "rev": "App Rev-1083",
+  "type": "App",
+  "changes": [
+   "REPORT LAYOUT — THE ENTRY FIELDS NOW READ LIKE THE CMM PRINTOUT (Rev-1083) — per Rich. A VIEW switch on the Final Inspection screen offers CARDS or REPORT LAYOUT. The cards were built for a tablet: one characteristic at a time, big targets, buttons you can hit with a glove on. At a desk with the printout beside you they are the wrong shape — the eye has to hunt for each line and then travel back. REPORT LAYOUT is laid out the way the report is: the CMM feature id as a block heading printed exactly as the report prints it, then a row per characteristic underneath with the kind of measurement, the value, and the MAX and MIN it is judged against, in that order, in a monospaced column so the decimal points line up. The order is the report's order, because the sheet already follows the order the CMM runs. TAB AND ENTER RUN STRAIGHT DOWN THE VALUE COLUMN — notes and buttons are skipped, and the next box is selected rather than merely focused, so an overtyped value replaces cleanly. A page of the report can be typed without touching the mouse. Typing a number on a line that has limits also settles it: it is marked IN or OUT and called GOOD or BAD as you type, because having typed the figure, being asked to also press a button is being asked twice. Lines with no numeric limits — plug gage, drop indicator, visual — are still called by hand in the card view, where there is room to say what the requirement actually is."
+  ]
+ },
+ {
+  "ts": "2026-08-18",
+  "rev": "App Rev-1082",
+  "type": "App",
+  "changes": [
+   "A PDF THAT CARRIES ITS OWN TEXT IS NO LONGER PHOTOGRAPHED (Rev-1082) — the single biggest improvement available, and it needs nothing from the CMM beyond choosing a different printer. A report PRINTED to PDF from PC-DMIS already contains its text; only one that has been printed onto paper and scanned back in is a picture. The app now looks for that text first and, when it finds it, reads it directly and never guesses at a digit. Measured on the SERIAL 64 figures against the values Rich recorded by hand: off the scan, 10 values with 1 wrong; from exact text, 43 values with none. The check costs about a second and falls straight through to reading the picture when there is no text there, so nothing is lost on the scans already in the drawer. The screen says which of the two happened, because it changes how hard the review needs to be: 'Read straight out of the PDF's own text — nothing was guessed at', or 'Read off a picture of the page, so check every line.' ALSO: one CMM block can now answer several lines on the sheet. A block carrying a size row and a true-position row satisfies two characteristics that both quote the same header id — 13_14.1-A_-SIDE_OD appears twice, once for SIZE and once for TP — and each line now takes the row matching its kind instead of the pair being discarded as a conflict. ALSO MEASURED AND REJECTED: rendering at 450dpi with a hard black-and-white threshold, on the theory that crisper pixels read better. It was worse — 8 values with 2 wrong against 10 with 1 — so it is not in this build. Image tuning is not the lever; the file format is."
+  ]
+ },
+ {
+  "ts": "2026-08-18",
   "rev": "App Rev-1081",
   "type": "App",
   "changes": [
@@ -2806,7 +2831,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-18";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "07:02 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "08:40 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -20557,6 +20582,128 @@ function wireRunCards(scope){
 
 
 
+
+/* ===== Rev-1083: REPORT LAYOUT ==============================================
+   Per Rich: make typing off the CMM printout feel like typing off the CMM
+   printout. The card view is right on a tablet, one characteristic at a time
+   with big targets. At a desk with the report beside you it is the wrong shape --
+   the eye has to hunt for each line and then travel back.
+
+   This view is laid out the way the report is: the CMM feature id as a block
+   heading exactly as it is printed, then a row per characteristic underneath
+   with the kind of measurement (AX), the value, and the limits it is judged
+   against. Same order as the report, because the sheet is in the order the CMM
+   runs. Tab and Enter run STRAIGHT DOWN the value column -- notes and buttons are
+   skipped -- so a page of the report can be typed without touching the mouse. */
+var FI_VIEW = 'CARDS';
+
+function fiSetView(v){
+  FI_VIEW = (v === 'REPORT') ? 'REPORT' : 'CARDS';
+  var a = document.getElementById('fiViewCards'), b = document.getElementById('fiViewReport');
+  if(a && b){
+    a.style.background = (FI_VIEW === 'CARDS')  ? '#1a5276' : 'transparent';
+    a.style.color      = (FI_VIEW === 'CARDS')  ? '#fff' : 'var(--ink)';
+    b.style.background = (FI_VIEW === 'REPORT') ? '#1a5276' : 'transparent';
+    b.style.color      = (FI_VIEW === 'REPORT') ? '#fff' : 'var(--ink)';
+  }
+  fiRenderRows();
+}
+function fiRenderReportView(){
+  var host = document.getElementById('fiRows'); if(!host) return;
+  var t = fiTemplate(); if(!t) return;
+  var esc = function(x){ return String(x == null ? '' : x)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+  var html = [], lastBlock = null, shown = 0;
+  html.push('<div style="font-size:11px; color:var(--ink-dim); margin-bottom:8px;">'
+    + 'Type the MEAS figure. Tab or Enter drops to the next line.</div>');
+  t.chars.forEach(function(ch, i){
+    var e = FI_STATE.entries[i] || (FI_STATE.entries[i] = { value:'', disp:'', value2:'', disp2:'', note:'' });
+    var grp = fiGroup(ch.method);
+    var judged = fiJudge(ch, e.value);
+    var bad = judged === false || e.disp === 'BAD';
+    var done = String(e.value || '').trim() !== '' || e.disp;
+    if(FI_FILTER === 'CMM' && grp !== 'CMM') return;
+    if(FI_FILTER === 'VISUAL' && grp !== 'VISUAL') return;
+    if(FI_FILTER === 'GAGE' && grp !== 'GAGE') return;
+    if(FI_FILTER === 'TODO' && done) return;
+    if(FI_FILTER === 'BAD' && !(bad || e.disp === 'REPAIR' || e.disp === 'IDK')) return;
+    shown++;
+    /* the block heading, printed the way the CMM prints it */
+    var block = ch.cmmId || ch.method;
+    if(block !== lastBlock){
+      lastBlock = block;
+      html.push('<div style="margin:14px 0 0; padding:6px 10px; border:1px solid var(--line);'
+        + ' border-bottom:0; background:rgba(127,127,127,0.10); font-family:monospace;'
+        + ' font-size:12px; font-weight:700;">' + esc(block) + '</div>');
+      html.push('<div style="display:grid; grid-template-columns:1fr 52px 132px 92px 92px 96px;'
+        + ' gap:0; border:1px solid var(--line); border-bottom:0; font-size:10px; font-weight:800;'
+        + ' letter-spacing:.05em; color:var(--ink-dim); background:rgba(127,127,127,0.05);">'
+        + ['FEATURE','AX','MEAS','MAX','MIN','RESULT'].map(function(h, k){
+            return '<div style="padding:5px 8px;' + (k ? ' text-align:right;' : '') + '">' + h + '</div>'; }).join('')
+        + '</div>');
+    }
+    var hasLimits = (ch.upper !== null && ch.upper !== undefined && ch.lower !== null && ch.lower !== undefined);
+    html.push('<div style="display:grid; grid-template-columns:1fr 52px 132px 92px 92px 96px; gap:0;'
+      + ' border:1px solid ' + (bad ? '#c0392b' : 'var(--line)') + '; border-bottom:0;'
+      + (bad ? ' background:rgba(192,57,43,0.07);' : (done ? ' background:rgba(31,138,59,0.05);' : '')) + '">'
+      + '<div style="padding:6px 8px; font-size:12px; font-weight:700; overflow:hidden; text-overflow:ellipsis;">'
+      +   (ch.item ? '<span style="color:var(--ink-dim);">' + esc(ch.item) + '</span> ' : '') + esc(ch.desc) + '</div>'
+      + '<div style="padding:6px 8px; text-align:right; font-family:monospace; font-size:11px; color:var(--ink-dim);">'
+      +   esc(ch.type || '') + '</div>'
+      + '<div style="padding:3px 4px;"><input class="fi-val fi-tab" data-i="' + i + '" value="' + esc(e.value) + '"'
+      +   ' style="width:100%; padding:5px 6px; font-size:14px; font-weight:700; text-align:right;'
+      +   ' font-family:monospace;"></div>'
+      + '<div style="padding:6px 8px; text-align:right; font-family:monospace; font-size:11px;">'
+      +   (hasLimits ? esc(ch.upper) : '') + '</div>'
+      + '<div style="padding:6px 8px; text-align:right; font-family:monospace; font-size:11px;">'
+      +   (hasLimits ? esc(ch.lower) : '<span style="color:var(--ink-dim);">' + esc(ch.req || '') + '</span>') + '</div>'
+      + '<div style="padding:6px 8px; text-align:right; font-size:11px; font-weight:800;">'
+      +   (judged === true  ? '<span style="color:#1f8a3b;">IN</span>' : '')
+      +   (judged === false ? '<span style="color:#c0392b;">OUT</span>' : '')
+      +   (judged === null && e.disp ? '<span style="color:var(--ink-dim);">' + esc(e.disp) + '</span>' : '')
+      + '</div>'
+      + '</div>');
+  });
+  if(!shown) html.push('<div style="padding:22px; text-align:center; color:var(--ink-dim);">Nothing matches that filter.</div>');
+  else html.push('<div style="border-top:1px solid var(--line);"></div>');
+  host.innerHTML = html.join('');
+  fiWireReportRows();
+}
+function fiWireReportRows(){
+  var host = document.getElementById('fiRows'); if(!host) return;
+  var boxes = Array.prototype.slice.call(host.querySelectorAll('.fi-tab'));
+  boxes.forEach(function(el, n){
+    el.oninput = function(){
+      var i = parseInt(el.getAttribute('data-i'), 10);
+      FI_STATE.entries[i].value = el.value;
+      /* Rev-1083: judge it and call it in one go. Typing a number IS the answer
+         on a line that has limits, so making the inspector also press GOOD would
+         be asking twice. Lines without limits are left alone for the card view. */
+      var ch = fiTemplate().chars[i];
+      var j = fiJudge(ch, el.value);
+      if(j === true) FI_STATE.entries[i].disp = 'GOOD';
+      else if(j === false) FI_STATE.entries[i].disp = 'BAD';
+      fiSaveState(); fiRenderTally();
+      var row = el.parentNode && el.parentNode.parentNode;
+      if(row){
+        row.style.borderColor = (j === false) ? '#c0392b' : 'var(--line)';
+        row.style.background = (j === false) ? 'rgba(192,57,43,0.07)'
+                             : (el.value ? 'rgba(31,138,59,0.05)' : '');
+        var res = row.lastChild;
+        if(res) res.innerHTML = (j === true)  ? '<span style="color:#1f8a3b;">IN</span>'
+                              : (j === false) ? '<span style="color:#c0392b;">OUT</span>' : '';
+      }
+    };
+    el.onkeydown = function(ev){
+      if(ev.key === 'Enter' || (ev.key === 'Tab' && !ev.shiftKey)){
+        if(n + 1 < boxes.length){ ev.preventDefault(); boxes[n + 1].focus(); boxes[n + 1].select(); }
+      } else if(ev.key === 'Tab' && ev.shiftKey && n > 0){
+        ev.preventDefault(); boxes[n - 1].focus(); boxes[n - 1].select();
+      }
+    };
+  });
+}
+
 /* ===== Rev-1079: READ A CMM REPORT INTO THE FIELDS ==========================
    Rich needs the CMM report typed in by the app rather than by hand. It reads
    the pages here, in this browser -- the scan is never uploaded anywhere, which
@@ -20695,6 +20842,25 @@ function fiParseReport(text, chars){
   });
   var out = [];
   blocks.forEach(function(b){
+    /* Rev-1082: ONE BLOCK CAN SERVE SEVERAL CHARACTERISTICS. A CMM block that
+       carries a size row and a true-position row answers two lines on the sheet,
+       and both lines quote the same header id -- 13_14.1-A_-SIDE_OD appears twice,
+       once for SIZE and once for TP. Treating that as one match threw the second
+       away; treating it as a conflict threw both away. Each line takes the row
+       that matches the kind of characteristic it is. */
+    var family = chars.map(function(c, ci){ return { ch: c, i: ci }; })
+      .filter(function(x){ return x.ch.cmmId === b.target.ch.cmmId; });
+    if(family.length > 1){
+      family.forEach(function(f){
+        var px = fiPickAxis(f.ch.type, b.rows);
+        if(!px) return;
+        var dup = out.find(function(o){ return o.index === f.i; });
+        if(dup){ if(dup.value !== px.meas){ dup.conflict = true; conflicts++; } return; }
+        out.push({ index: f.i, ch: f.ch, value: px.meas, axis: px.axis,
+                   score: b.score, matched: b.line, raw: px.raw });
+      });
+      return;
+    }
     var pick = fiPickAxis(b.target.ch.type, b.rows);
     if(!pick) return;
     /* Rev-1081: IF TWO BLOCKS CLAIM THE SAME CHARACTERISTIC AND DISAGREE, PROPOSE
@@ -20723,6 +20889,36 @@ async function fiLoadOcr(){
   await _cpLoadScript('https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js');
 }
 function fiScanSetMsg(m){ var el = document.getElementById('fiScanMsg'); if(el) el.textContent = m; }
+/* Rev-1082: A PDF PRINTED FROM PC-DMIS ALREADY CONTAINS ITS TEXT. Only a PDF
+   that has been printed onto paper and scanned back in is a photograph. If the
+   file carries real text we read it directly and never guess at a single digit:
+   on the SERIAL 64 figures that is the difference between 10 values with 1 wrong
+   and 43 values with none. Costs nothing to try, and takes about a second. */
+async function fiTextLayer(file){
+  try{
+    await loadPdfJs();
+    var buf = await file.arrayBuffer();
+    var doc = await window.pdfjsLib.getDocument({ data: buf }).promise;
+    var out = '';
+    for(var p = 1; p <= doc.numPages; p++){
+      var page = await doc.getPage(p);
+      var tc = await page.getTextContent();
+      var lastY = null, line = '';
+      (tc.items || []).forEach(function(it){
+        var y = it.transform ? Math.round(it.transform[5]) : null;
+        if(lastY !== null && y !== null && Math.abs(y - lastY) > 2){ out += line.trim() + '\n'; line = ''; }
+        line += (it.str || '') + ' ';
+        lastY = y;
+      });
+      out += line.trim() + '\n';
+    }
+    return out;
+  }catch(e){ return ''; }
+}
+function fiLooksLikeAReport(txt){
+  return /MEAS/i.test(txt) && /NOMINAL/i.test(txt) && String(txt).replace(/\s/g,'').length > 300;
+}
+
 async function fiPagesFromFile(file){
   var pages = [];
   if(/pdf$/i.test(file.name) || file.type === 'application/pdf'){
@@ -20753,9 +20949,19 @@ async function fiScanReport(file){
   var t = fiTemplate();
   if(!t){ fiScanSetMsg('Load a part first.'); return; }
   FI_SCAN_CANCEL = false;
+  var readDirect = false;
   try{
     fiScanSetMsg('');
-    fiBusy(true, 'OPENING THE REPORT', 'Turning the pages into images\u2026', null);
+    fiBusy(true, 'OPENING THE REPORT', 'Checking whether the file carries its own text\u2026', null);
+    var all = '';
+    if(/pdf$/i.test(file.name) || file.type === 'application/pdf'){
+      var direct = await fiTextLayer(file);
+      if(fiLooksLikeAReport(direct)){ all = direct; readDirect = true; }
+    }
+    if(readDirect){
+      fiBusy(true, 'READING THE REPORT', 'This PDF carries its own text \u2014 no guessing needed\u2026', 100);
+    } else {
+    fiBusy(true, 'OPENING THE REPORT', 'A picture, not text \u2014 turning the pages into images\u2026', null);
     var pages = await fiPagesFromFile(file);
     if(FI_SCAN_CANCEL){ fiBusy(false); fiScanSetMsg('Stopped \u2014 nothing was changed.'); return; }
     fiBusy(true, 'READING THE REPORT', 'Fetching the reader\u2026', 0);
@@ -20768,6 +20974,7 @@ async function fiScanReport(file){
       var r = await window.Tesseract.recognize(pages[i], 'eng');
       all += '\n' + ((r && r.data && r.data.text) || '');
     }
+    }
     fiBusy(true, 'MATCHING TO THIS PART', 'Comparing what was read to the characteristic list\u2026', 100);
     var props = fiParseReport(all, t.chars);
     fiBusy(false);
@@ -20777,7 +20984,9 @@ async function fiScanReport(file){
     }
     FI_SCAN = props;
     var cmmTotal = t.chars.filter(function(c){ return c.cmmId; }).length;
-    fiScanSetMsg(props.length + ' of ' + cmmTotal + ' CMM characteristics read \u2014 check them below.'
+    fiScanSetMsg((readDirect ? 'Read straight out of the PDF\u2019s own text \u2014 nothing was guessed at. '
+                             : 'Read off a picture of the page, so check every line. ')
+      + props.length + ' of ' + cmmTotal + ' CMM characteristics read.'
       + (props.ambiguous ? ' ' + props.ambiguous + ' block(s) skipped \u2014 the name could have been two'
         + ' different characteristics.' : '')
       + (props.conflicts ? ' ' + props.conflicts + ' skipped \u2014 the page gave two different values for the'
@@ -20935,6 +21144,7 @@ var FI_DISPS = ['GOOD','BAD','REPAIR','RE-MEASURE','IDK'];
 function fiRenderRows(){
   var host = document.getElementById('fiRows'); if(!host) return;
   var t = fiTemplate();
+  if(t && FI_VIEW === 'REPORT'){ fiRenderReportView(); return; }   /* Rev-1083 */
   if(!t){ host.innerHTML = '<div style="padding:22px; text-align:center; color:var(--ink-dim);">'
       + 'No final inspection list is loaded for this part yet.</div>'; return; }
   var esc = function(x){ return String(x == null ? '' : x)
@@ -21108,7 +21318,7 @@ function showFinalInsp(){
     FI_STATE = fiLoadState() || fiBlank(Object.keys(FI_TEMPLATES)[0]);
     if(!FI_TEMPLATES[FI_STATE.part]) FI_STATE = fiBlank(Object.keys(FI_TEMPLATES)[0]);
   }
-  fiRenderHeader(); fiRenderRows(); fiRenderTally(); fiSetStatus('');
+  fiRenderHeader(); fiSetView(FI_VIEW); fiRenderTally(); fiSetStatus('');
 }
 
 /* ===== Rev-1075: SIMULATED TABLETS ==========================================
@@ -25982,6 +26192,8 @@ Array.prototype.forEach.call(document.querySelectorAll('.fi-filter'), function(b
 });
 if($('fiSave')) $('fiSave').onclick = function(){ fiSaveState(); fiSetStatus('\u2713 Saved on this device'); };
 if($('fiPush')) $('fiPush').onclick = fiPushToGitHub;
+if($('fiViewCards')) $('fiViewCards').onclick = function(){ fiSetView('CARDS'); };
+if($('fiViewReport')) $('fiViewReport').onclick = function(){ fiSetView('REPORT'); };
 if($('fiScan')) $('fiScan').onclick = function(){ var f = $('fiScanFile'); if(f){ f.value = ''; f.click(); } };
 if($('fiScanFile')) $('fiScanFile').onchange = function(e){
   var f = e.target.files && e.target.files[0]; if(f) fiScanReport(f);
