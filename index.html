@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1083</title>
+<title>CONTROL PLAN GENERATOR - Rev-1084</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1083 · 2026-08-18 08:40 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1084 · 2026-08-18 08:55 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -597,7 +597,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1083 · Built Aug 18, 2026</span>
+    <span id="revFooter">App Rev-1084 · Built Aug 18, 2026</span>
   </div>
 </div>
 
@@ -1925,7 +1925,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1083";
+const APP_REV = "Rev-1084";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2455,6 +2455,14 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-18",
+  "rev": "App Rev-1084",
+  "type": "App",
+  "changes": [
+   "REPORT LAYOUT GROUPS BY BUBBLE, NOT BY CMM HEADER (Rev-1084) — per Rich, who pointed at item 16 and item 16.5 and asked why the size and the true position of the same hole were not next to each other. They are one feature on the drawing — bubble 26 — but the CMM prints that feature as five separate blocks: the end size under 26_DATUM D END - DATUM_D_EXIT, its true position under 26_27 - DATUM_D_CYL, then its roundness, the bottom size and the bottom roundness, each under a header of its own. Rev-1083 headed every one of those separately, which drove a full-width title and a fresh column header in between lines that belong together and made them read as unrelated. The bubble is how the drawing marks it and how Rich reads it, so the bubble is now the group: BUBBLE 26 heads all six of its lines, with one set of column headings, and the CMM header rides on each row underneath the description — still there to match against the printout, no longer cutting the group in half. Twelve of the fifty-eight bubbles on 1000237498 carry more than one line; bubble 33 and bubble 26 carry six each."
+  ]
+ },
+ {
+  "ts": "2026-08-18",
   "rev": "App Rev-1083",
   "type": "App",
   "changes": [
@@ -2831,7 +2839,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-18";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:40 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "08:55 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -20597,6 +20605,15 @@ function wireRunCards(scope){
    skipped -- so a page of the report can be typed without touching the mouse. */
 var FI_VIEW = 'CARDS';
 
+/* Rev-1084: the bubble as the drawing marks it. Column N carries things like
+   "26", "26.0", "33-A-SZ" and "14-A-TP" -- the leading number is the bubble and
+   the suffix says which aspect of it, so the leading number is the group. */
+function fiBubbleOf(ch){
+  var b = String((ch && ch.bubble) || '').trim();
+  var m = /^(\d+)/.exec(b);
+  if(m) return m[1];
+  return b || (ch && ch.cmmId) || '\u2014';
+}
 function fiSetView(v){
   FI_VIEW = (v === 'REPORT') ? 'REPORT' : 'CARDS';
   var a = document.getElementById('fiViewCards'), b = document.getElementById('fiViewReport');
@@ -20613,7 +20630,7 @@ function fiRenderReportView(){
   var t = fiTemplate(); if(!t) return;
   var esc = function(x){ return String(x == null ? '' : x)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
-  var html = [], lastBlock = null, shown = 0;
+  var html = [], lastBubble = null, lastMethod = null, shown = 0;
   html.push('<div style="font-size:11px; color:var(--ink-dim); margin-bottom:8px;">'
     + 'Type the MEAS figure. Tab or Enter drops to the next line.</div>');
   t.chars.forEach(function(ch, i){
@@ -20628,13 +20645,26 @@ function fiRenderReportView(){
     if(FI_FILTER === 'TODO' && done) return;
     if(FI_FILTER === 'BAD' && !(bad || e.disp === 'REPAIR' || e.disp === 'IDK')) return;
     shown++;
-    /* the block heading, printed the way the CMM prints it */
-    var block = ch.cmmId || ch.method;
-    if(block !== lastBlock){
-      lastBlock = block;
-      html.push('<div style="margin:14px 0 0; padding:6px 10px; border:1px solid var(--line);'
-        + ' border-bottom:0; background:rgba(127,127,127,0.10); font-family:monospace;'
-        + ' font-size:12px; font-weight:700;">' + esc(block) + '</div>');
+    /* Rev-1084: GROUP BY BUBBLE, NOT BY CMM HEADER. Bubble 26 is one feature on
+       the drawing, but the CMM prints it as five separate blocks -- the end size,
+       its true position, its roundness, the bottom size, the bottom roundness --
+       each under its own header. Heading every one of those separately drove a
+       full-width title and a column header between lines that belong together, so
+       the size and the true position of the same hole ended up looking unrelated.
+       The bubble is how the drawing marks it and how Rich reads it, so the bubble
+       is the group. The CMM header still appears on every row, because that is
+       what has to be matched against the printout. */
+    var bubble = fiBubbleOf(ch);
+    if(ch.method !== lastMethod){
+      lastMethod = ch.method; lastBubble = null;
+      html.push('<div style="font-size:11px; font-weight:800; letter-spacing:.08em;'
+        + ' color:var(--ink-dim); margin:20px 0 6px;">' + esc(ch.method) + '</div>');
+    }
+    if(bubble !== lastBubble){
+      lastBubble = bubble;
+      html.push('<div style="margin:12px 0 0; padding:5px 10px; border:1px solid var(--line);'
+        + ' border-bottom:0; background:rgba(127,127,127,0.10); font-size:11px; font-weight:800;'
+        + ' letter-spacing:.05em;">BUBBLE ' + esc(bubble) + '</div>');
       html.push('<div style="display:grid; grid-template-columns:1fr 52px 132px 92px 92px 96px;'
         + ' gap:0; border:1px solid var(--line); border-bottom:0; font-size:10px; font-weight:800;'
         + ' letter-spacing:.05em; color:var(--ink-dim); background:rgba(127,127,127,0.05);">'
@@ -20646,8 +20676,11 @@ function fiRenderReportView(){
     html.push('<div style="display:grid; grid-template-columns:1fr 52px 132px 92px 92px 96px; gap:0;'
       + ' border:1px solid ' + (bad ? '#c0392b' : 'var(--line)') + '; border-bottom:0;'
       + (bad ? ' background:rgba(192,57,43,0.07);' : (done ? ' background:rgba(31,138,59,0.05);' : '')) + '">'
-      + '<div style="padding:6px 8px; font-size:12px; font-weight:700; overflow:hidden; text-overflow:ellipsis;">'
-      +   (ch.item ? '<span style="color:var(--ink-dim);">' + esc(ch.item) + '</span> ' : '') + esc(ch.desc) + '</div>'
+      + '<div style="padding:6px 8px; font-size:12px; font-weight:700; overflow:hidden;">'
+      +   (ch.item ? '<span style="color:var(--ink-dim);">' + esc(ch.item) + '</span> ' : '') + esc(ch.desc)
+      +   (ch.cmmId ? '<div style="font-family:monospace; font-size:10px; font-weight:400;'
+                    + ' color:var(--ink-dim); margin-top:1px;">' + esc(ch.cmmId) + '</div>' : '')
+      + '</div>'
       + '<div style="padding:6px 8px; text-align:right; font-family:monospace; font-size:11px; color:var(--ink-dim);">'
       +   esc(ch.type || '') + '</div>'
       + '<div style="padding:3px 4px;"><input class="fi-val fi-tab" data-i="' + i + '" value="' + esc(e.value) + '"'
