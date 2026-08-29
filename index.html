@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1084</title>
+<title>CONTROL PLAN GENERATOR - Rev-1085</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -316,8 +316,17 @@
   .cp-rev{ font-size:11px; font-weight:700; color:#8a8279; letter-spacing:.03em; white-space:nowrap; }
   .btn-ghost:active{transform:translateY(2px);background:var(--panel-2);box-shadow:0 0 0 var(--line-strong), 0 1px 2px rgba(0,0,0,.15), inset 0 2px 4px rgba(0,0,0,.12)}
 
-  .menu{padding:0 0 8px;max-width:none;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column;overflow:hidden;max-height:100vh}
+  /* Rev-1085: THE MENU IS NO LONGER TRAPPED IN ONE SCREEN. It was capped at
+     100vh with the list scrolling inside its own box, which was fine when there
+     were nine buttons. There are now thirteen -- QE Board, Quality Inspector and
+     Final Inspection all arrived this week -- and on a laptop, or with the browser
+     zoomed, the first button hid behind the brand bar and the last ones fell off
+     the bottom with no page scrollbar to reach them. The list now grows to
+     whatever it needs and the window scrolls normally; the brand bar is pinned so
+     it stays put without covering anything. */
+  .menu{padding:0 0 8px;max-width:none;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column}
   .brand{
+    position:sticky;top:0;z-index:30;   /* Rev-1085: pinned, and it reserves its own space */
     display:flex;align-items:center;gap:14px;padding:12px 24px;margin-bottom:2px;
     background:linear-gradient(135deg,var(--header-a),var(--header-b));
     border-bottom:1px solid rgba(255,255,255,.08);
@@ -329,7 +338,7 @@
   }
   .brand-title{font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.2;color:#fff}
   .brand-sub{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:#a52a2a;letter-spacing:.04em;text-transform:uppercase;margin-top:6px;padding:3px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.3)}
-  .menu-inner{padding:8px 20px 0;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden}
+  .menu-inner{padding:8px 20px 0;display:flex;flex-direction:column;overflow-x:hidden}
   .menu-section-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;margin:2px 4px 4px}
   .menu-btn{
     display:flex;align-items:center;gap:12px;text-align:left;width:100%;
@@ -489,7 +498,7 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1084 · 2026-08-18 08:55 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1085 · 2026-08-18 08:06 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -597,7 +606,7 @@
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1084 · Built Aug 18, 2026</span>
+    <span id="revFooter">App Rev-1085 · Built Aug 18, 2026</span>
   </div>
 </div>
 
@@ -1925,7 +1934,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1084";
+const APP_REV = "Rev-1085";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2455,6 +2464,14 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-18",
+  "rev": "App Rev-1085",
+  "type": "App",
+  "changes": [
+   "EVERY BUTTON ON THE MAIN MENU IS REACHABLE AGAIN (Rev-1085) — per Rich, who could not see all of them. The menu was built as a fixed pane exactly one screen tall, with the button list scrolling inside its own box: .menu carried max-height:100vh and overflow:hidden, and .menu-inner did the scrolling. That was fine with nine buttons. There are thirteen now — QE BOARD, QUALITY INSPECTOR and FINAL INSPECTION all arrived this week — so on a laptop screen, or with the browser zoomed in, NEW CONTROL PLAN sat half-hidden behind the brand bar and the bottom of the list ran off the screen with no page scrollbar to reach it. The cap and the inner scroller are gone: the list is as tall as it needs to be and the window scrolls the way it does everywhere else in the app. The brand bar is now sticky rather than fixed in a pane, so it stays at the top while the list moves and reserves its own space instead of sitting on top of the first button."
+  ]
+ },
+ {
+  "ts": "2026-08-18",
   "rev": "App Rev-1084",
   "type": "App",
   "changes": [
@@ -2839,7 +2856,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-18";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:55 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "08:06 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
