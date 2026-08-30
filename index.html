@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1099</title>
+<title>CONTROL PLAN GENERATOR - Rev-1101</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -524,18 +524,18 @@ window.addEventListener('DOMContentLoaded', function(){
   }
 </style>
 </head>
-<body><div id="appUpdateBanner" style="background: rgb(26, 82, 118); color: rgb(255, 255, 255); padding: 8px 14px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;"><span>⬇️ App update available: Rev-1099 → Rev-1101 (your token &amp; data are kept)</span><button style="background: rgb(255, 255, 255); color: rgb(26, 82, 118); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 5px; padding: 5px 14px; font-size: 13px; font-weight: 800; cursor: pointer;">Update now</button><button title="Dismiss" style="background: transparent; color: rgb(255, 255, 255); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 5px; padding: 4px 9px; font-size: 12px; cursor: pointer;">✕</button></div>
+<body>
 
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1099 · 2026-08-30 12:55 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1101 · 2026-08-30 2:10 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
   <button id="hcChkBtn" title="Is this machine safe to leave?" onclick="hcOpenCheck()" style="background:#1E7A34; color:#fff; border:1px solid #124A1F; border-radius:6px; padding:6px 12px; font-family:monospace; font-size:10.5px; font-weight:800; letter-spacing:.08em; cursor:pointer; white-space:nowrap; margin-right:8px;">✓ HANDOFF CHECK</button>
   <button id="headerPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-right:8px;">⬆️ Push App</button>
-  <button class="ob-back" id="headerBack">← Back</button>
+  <button class="ob-back hidden" id="headerBack">← Back</button>
 </header>
 
 <div id="newerVersionBanner" style="display:none; background:#2c6e49; color:#fff; padding:6px 12px; font-size:12px; line-height:1.3; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
@@ -549,13 +549,13 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- MAIN MENU -->
-<div id="menuScreen" class="menu hidden">
+<div id="menuScreen" class="menu">
   <div class="brand" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
     <div style="display:flex; align-items:center; gap:12px;">
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1099 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 12:55 PM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1101 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 2:10 PM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -568,7 +568,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1099 · 2026-08-30 12:55 PM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1101 · 2026-08-30 2:10 PM</div>
 
       <div class="menu-grid">
       <button class="menu-btn" id="mNewPlan" onclick="showNewCP(true)" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -633,7 +633,7 @@ window.addEventListener('DOMContentLoaded', function(){
       </button>
       <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
         <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
-        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1099 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1101 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
       </button>
       </div>
       <div style="display:none">
@@ -643,7 +643,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1099 · Built 2026-08-30 12:55 PM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1101 · Published 2026-08-30 2:10 PM ET</span>
   </div>
 </div>
 
@@ -801,7 +801,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <button type="button" id="enhanceOdsBtn" style="background:#1a5276; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🔧 Make Clearer</button>
         <button type="button" id="addBalloonsBtn" style="background:#6e1414; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🎯 Add Balloons with AI</button>
         <button type="button" id="downloadBalloonedBtn" style="background:#2c6e49; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">👁️ View Ballooned Drawing</button>
-        <button type="button" id="odsRevsBtn" onclick="openDrawingRevs()" style="background:#5a4a2a; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🕐 Revisions (1)</button>
+        <button type="button" id="odsRevsBtn" onclick="openDrawingRevs()" style="background:#5a4a2a; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🕐 Revisions (0)</button>
         <span id="balloonStatusMsg" style="font-size:12px; color:var(--ink-dim);"></span>
       </div>
     </div>
@@ -1028,7 +1028,7 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- PROJECTS SCREEN -->
-<div id="projectsScreen" class="setup wide parts-index">
+<div id="projectsScreen" class="setup wide parts-index hidden">
   <button class="ob-back" id="projectsBack">← Back</button>
   <h1>Control Plans</h1>
   <p class="sub">All Control Plans on this device — drafts and saved projects together</p>
@@ -1036,9 +1036,9 @@ window.addEventListener('DOMContentLoaded', function(){
   <button id="projectsNewBtn" onclick="showNewCP(true)" style="align-items: center; gap: 8px; background: rgb(44, 110, 73); color: rgb(255, 255, 255); border: 1px solid rgb(33, 82, 54); border-radius: 8px; padding: 12px 20px; font-size: 15px; font-weight: 800; cursor: pointer; margin: 6px 0px 16px;">＋ New Control Plan</button>
   <table id="projectsTable">
     <thead>
-      <tr class="cp-plan-head" id="cpPlanHeadRow"><th>Part Number</th><th>Part Description</th><th>Open</th><th>Operations</th><th>Progress</th><th>Last Updated</th><th style="border-left:2px solid #c9c0b4;">Traveller</th></tr>
+      <tr class="cp-plan-head" id="cpPlanHeadRow"><th>Part Number</th><th>Part Description</th><th>Open</th><th>Operations</th><th>Last Updated</th></tr>
     </thead>
-    <tbody id="projectsTbody"><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">1000237620</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 1000237620. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; font-weight:600; color:#5a5148;">AIR COIL</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>2</b> <span style="font-size:11px; color:#6b6257;">OP-030 · OP-040</span></td><td style="text-align: left;"><span class="cp-pill" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">0 OF 2 COMPLETE</span></td><td style="text-align: left;">8/9/2026</td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" style="width: 140px; background: rgb(122, 92, 42); border-color: rgb(99, 72, 31);">Upload Traveller</button></td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">1000237498</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 1000237498. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; font-weight:600; color:#5a5148;">COMPRESSOR HOUSING</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>6</b> <span style="font-size:11px; color:#6b6257;">OP-040 · OP-050 · OP-100 · OP-110 · OP-150 · OP-160</span></td><td style="text-align: left;"><span class="cp-pill" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">0 OF 6 COMPLETE</span></td><td style="text-align: left;">8/6/2026</td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" style="width: 140px; background: rgb(122, 92, 42); border-color: rgb(99, 72, 31);">Upload Traveller</button></td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">912993</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 912993. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; color:#b3aa9c;" title="No part description yet — add one with the ✏️ pencil beside the part number">—</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;"><span class="cp-pill" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">0 OF 1 COMPLETE</span></td><td style="text-align: left;">7/30/2026</td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" style="width: 140px; background: rgb(122, 92, 42); border-color: rgb(99, 72, 31);">Upload Traveller</button></td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">912767-M</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 912767-M. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; color:#b3aa9c;" title="No part description yet — add one with the ✏️ pencil beside the part number">—</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;"><span class="cp-pill" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">0 OF 1 COMPLETE</span></td><td style="text-align: left;">7/27/2026</td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" style="width: 140px; background: rgb(122, 92, 42); border-color: rgb(99, 72, 31);">Upload Traveller</button></td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">1000222892</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 1000222892. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; font-weight:600; color:#5a5148;">COMPRESSOR BORE</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;"><span class="cp-pill" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">0 OF 1 COMPLETE</span></td><td style="text-align: left;">7/16/2026</td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" style="width: 140px; background: rgb(122, 92, 42); border-color: rgb(99, 72, 31);">Upload Traveller</button></td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">Test1</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for Test1. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; color:#b3aa9c;" title="No part description yet — add one with the ✏️ pencil beside the part number">—</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;"><span class="cp-pill" style="background:#f2efe9; color:#8a8279; border:1px solid #ddd6cc;">NOT STARTED</span></td><td style="text-align: left;">7/4/2026</td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" style="width: 140px; background: rgb(122, 92, 42); border-color: rgb(99, 72, 31);">Upload Traveller</button></td></tr></tbody>
+    <tbody id="projectsTbody"><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">1000237620</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 1000237620. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; font-weight:600; color:#5a5148;">AIR COIL</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>2</b> <span style="font-size:11px; color:#6b6257;">OP-030 · OP-040</span></td><td style="text-align: left;">8/9/2026</td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">1000237498</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 1000237498. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; font-weight:600; color:#5a5148;">COMPRESSOR HOUSING</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>6</b> <span style="font-size:11px; color:#6b6257;">OP-040 · OP-050 · OP-100 · OP-110 · OP-150 · OP-160</span></td><td style="text-align: left;">8/6/2026</td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">912993</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 912993. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; color:#b3aa9c;" title="No part description yet — add one with the ✏️ pencil beside the part number">—</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;">7/30/2026</td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">912767-M</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 912767-M. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; color:#b3aa9c;" title="No part description yet — add one with the ✏️ pencil beside the part number">—</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;">7/27/2026</td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">1000222892</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 1000222892. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; font-weight:600; color:#5a5148;">COMPRESSOR BORE</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;">7/16/2026</td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">Test1</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for Test1. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; color:#b3aa9c;" title="No part description yet — add one with the ✏️ pencil beside the part number">—</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;">7/4/2026</td></tr></tbody>
   </table>
   <p id="projectsEmpty" class="sub" style="margin-top: 24px; text-align: center; display: none;">No saved projects yet</p>
 </div>
@@ -1993,7 +1993,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1099";
+const APP_REV = "Rev-1101";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2762,6 +2762,26 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-30",
+  "rev": "App Rev-1101",
+  "type": "App",
+  "changes": [
+   "COMING IN TO INSPECT, THE PARTS LIST DROPS THE TWO BUILD COLUMNS (Rev-1101) — Rich struck out PROGRESS and TRAVELLER. He is right: the same list serves two different errands. Opened from CONTROL PLANS it is a building screen, and how far each part's paperwork has got and whether a traveller has been uploaded are the whole point. Opened from INSPECT PARTS it is a way to reach a part and go and measure it, and neither of those columns has anything to do with that — they are just width between him and the Open button.",
+   "One flag, set by whichever tile was pressed. INSPECT PARTS asks for the trimmed list: Part Number, Description, Open, Operations, Last Updated. CONTROL PLANS is exactly as it was, both columns included. Anything else that opens the screen gets the full building view, so no other route is changed by this."
+  ]
+ },
+ {
+  "ts": "2026-08-30",
+  "rev": "App Rev-1100",
+  "type": "App",
+  "changes": [
+   "A DOWNLOADED BUILD NOW ASKS TO BE PUBLISHED BEFORE IT LETS YOU IN (Rev-1100) — Rich's idea, and a good one. Opening a freshly downloaded CP-RevNNNN.html and starting work in it is a quiet trap: nothing looks wrong, but the shop is still on the old revision and everything done in that tab is being done in a build nobody else has. A downloaded copy now checks, before showing the menu, whether the website and the data repo are already on this revision. If they are, it goes straight through and nothing has changed. If they are not, it puts up one screen: this build's revision, what the website and GitHub are actually on, and one big blue PUBLISH THIS BUILD. When the publish lands the screen fades and the menu is there.",
+   "IT IS DELIBERATELY NARROW. It appears only when the file was opened from disk — on the website the running app IS the published one, so there is nothing to ask — AND GitHub is set up on this device — a tablet with no token could not publish and must never be stopped by a screen it cannot get past — AND GitHub could actually be read and really is behind. Offline means carry on, because a downloaded copy has to keep working with no network.",
+   "There is a quiet \"carry on without publishing\" underneath. Being locked out of the app because a publish failed would be a worse trap than the one this fixes, so the way past is always there — small, so it is not the obvious move. The button also refuses to let the screen go until the publish has been READ BACK as landed; if it did not, it changes to TRY PUBLISHING AGAIN rather than pretending.",
+   "The menu is drawn first and the gate laid over it a moment later, so a device that cannot reach GitHub is never left looking at a blank screen while a check runs."
+  ]
+ },
+ {
+  "ts": "2026-08-30",
   "rev": "App Rev-1099",
   "type": "App",
   "changes": [
@@ -3296,7 +3316,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:55 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "02:05 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3828,8 +3848,11 @@ function onCustomerSelect(){
   $('cpQualityLevel').value = customers[idx].qualityLevel || '';
 }
 
-function showProjects(){
+function showProjects(mode){
   cpPartFilter = null;        // Rev-591: always land on the parts list
+  /* Rev-1101: only the INSPECT PARTS tile asks for the trimmed list. Every other
+     caller passes nothing and gets the full building view, exactly as before. */
+  cpSetListMode(mode);
   $('menuScreen').classList.add('hidden');
   $('newCPScreen').classList.add('hidden');
   $('projectsScreen').classList.remove('hidden');
@@ -3887,6 +3910,13 @@ try{ cpPurgeRestoredTombstones(); }catch(e){}
 // about. It now opens on a plain list of PART NUMBERS; clicking one opens just that
 // part's operations, with the construction steps and actions.
 let cpPartFilter = null;
+/* Rev-1101: the same parts list serves two errands. Coming from CONTROL PLANS it
+   is a building screen and PROGRESS and TRAVELLER are the whole point. Coming from
+   INSPECT PARTS it is a way to reach a part and inspect it -- how far the paperwork
+   has got and whether a traveller has been uploaded are nothing to do with that,
+   and Rich struck both columns out. One flag, set by whichever tile was pressed. */
+let cpListMode = 'plans';
+function cpSetListMode(m){ cpListMode = (m === 'inspect') ? 'inspect' : 'plans'; }
 function cpOpenPart(part){ cpPartFilter = String(part || '').toUpperCase() || null; renderProjects(); }
 function cpBackToParts(){ cpPartFilter = null; renderProjects(); }
 function renderPartsIndex(tbody, combined){
@@ -3901,15 +3931,16 @@ function renderPartsIndex(tbody, combined){
     const d = it.data.updated || it.sortDate || it.data.created || '';
     if(d > byPart[k].latest) byPart[k].latest = d;
   });
+  const _insp = (typeof cpListMode !== 'undefined' && cpListMode === 'inspect');
   const head = document.getElementById('cpPlanHeadRow');
   if(head) head.innerHTML =
       '<th>Part Number</th>'
     + '<th>Part Description</th>'   /* Rev-959 */
     + '<th>Open</th>'
     + '<th>Operations</th>'
-    + '<th>Progress</th>'
+    + (_insp ? '' : '<th>Progress</th>')
     + '<th>Last Updated</th>'
-    + '<th style="border-left:2px solid #c9c0b4;">Traveller</th>';
+    + (_insp ? '' : '<th style="border-left:2px solid #c9c0b4;">Traveller</th>');
 
   Object.keys(byPart).sort((a, b) => (byPart[b].latest || '').localeCompare(byPart[a].latest || ''))
     .forEach(k => {
@@ -3980,26 +4011,30 @@ function renderPartsIndex(tbody, combined){
                            : ' <span style="font-size:11px; color:#a49a8d;">not numbered</span>')));
 
       // how far along the whole part is, counted across its operations
-      let done = 0, started = 0;
-      g.ops.forEach(o => { const st = cpPlanComplete(o.data); if(st.done) done++; else if(cpStepProgress(o.data).total) started++; });
-      const tone = done === g.ops.length ? ['#dcecdf','#1f5133','#a9cdb5','COMPLETE']
-        : (done || started) ? ['#f0e2c0','#5c4708','#d9c48a', done + ' OF ' + g.ops.length + ' COMPLETE']
-        : ['#f2efe9','#8a8279','#ddd6cc','NOT STARTED'];
-      tr.appendChild(cell('<span class="cp-pill" style="background:' + tone[0] + '; color:' + tone[1]
-        + '; border:1px solid ' + tone[2] + ';">' + tone[3] + '</span>'));
+      if(!_insp){
+        let done = 0, started = 0;
+        g.ops.forEach(o => { const st = cpPlanComplete(o.data); if(st.done) done++; else if(cpStepProgress(o.data).total) started++; });
+        const tone = done === g.ops.length ? ['#dcecdf','#1f5133','#a9cdb5','COMPLETE']
+          : (done || started) ? ['#f0e2c0','#5c4708','#d9c48a', done + ' OF ' + g.ops.length + ' COMPLETE']
+          : ['#f2efe9','#8a8279','#ddd6cc','NOT STARTED'];
+        tr.appendChild(cell('<span class="cp-pill" style="background:' + tone[0] + '; color:' + tone[1]
+          + '; border:1px solid ' + tone[2] + ';">' + tone[3] + '</span>'));
+      }
 
       tr.appendChild(cell(g.latest ? new Date(g.latest).toLocaleDateString() : ''));
 
-      let hasTrav = false;
-      try{ const d = _idbGetDrawing(k + '::TRAVELLER'); hasTrav = !!(d && d.odsImage); }catch(e){}
-      const tdTrav = cell('', 'left', 'border-left:2px solid #e2ddd4;');
-      const tb = document.createElement('button');
-      tb.className = 'cp-btn ' + (hasTrav ? 'cp-btn-quiet' : 'cp-btn-primary');
-      tb.textContent = hasTrav ? 'View Traveller' : 'Upload Traveller';
-      tb.style.cssText = 'width:140px;' + (hasTrav ? '' : ' background:#7a5c2a; border-color:#63481f;');
-      tb.onclick = (e) => { e.stopPropagation(); hasTrav ? cpViewTraveller(g.part) : cpTravellerPick(g.part); };
-      tdTrav.appendChild(tb);
-      tr.appendChild(tdTrav);
+      if(!_insp){
+        let hasTrav = false;
+        try{ const d = _idbGetDrawing(k + '::TRAVELLER'); hasTrav = !!(d && d.odsImage); }catch(e){}
+        const tdTrav = cell('', 'left', 'border-left:2px solid #e2ddd4;');
+        const tb = document.createElement('button');
+        tb.className = 'cp-btn ' + (hasTrav ? 'cp-btn-quiet' : 'cp-btn-primary');
+        tb.textContent = hasTrav ? 'View Traveller' : 'Upload Traveller';
+        tb.style.cssText = 'width:140px;' + (hasTrav ? '' : ' background:#7a5c2a; border-color:#63481f;');
+        tb.onclick = (e) => { e.stopPropagation(); hasTrav ? cpViewTraveller(g.part) : cpTravellerPick(g.part); };
+        tdTrav.appendChild(tb);
+        tr.appendChild(tdTrav);
+      }
 
       tbody.appendChild(tr);
     });
@@ -6362,7 +6397,10 @@ async function cpPublishThisBuild(){
   }
   const btn = document.getElementById('mPublishNow');
   const sub = document.getElementById('mPublishNowSub');
-  const say = (t) => { if(sub) sub.textContent = t; };
+  const say = (t) => { if(sub) sub.textContent = t;
+    /* Rev-1100: the gate shows the same progress, so the words appear wherever
+       the press came from. */
+    try{ const g = document.getElementById('cpGateStatus'); if(g) g.textContent = t; }catch(e){} };
   const was = sub ? sub.textContent : '';
   try{
     say('CHECKING WHAT IS ON GITHUB\u2026');
@@ -6430,6 +6468,89 @@ async function cpPublishThisBuild(){
     const m = 'Publish failed: ' + ((err && err.message) || err);
     say(m); flash(m, true); ghSetStatus(m, true);
   }
+}
+
+/* ===== Rev-1100: A DOWNLOADED BUILD ASKS TO BE PUBLISHED FIRST ==============
+   Per Rich. Opening a freshly downloaded CP-RevNNNN.html and working in it is a
+   trap: nothing is wrong on screen, but the shop is still on the old revision and
+   anything done here is being done in a build nobody else has. So a downloaded
+   copy now checks, before it shows the menu, whether the website and the data
+   repo are already on this revision. If they are, it goes straight through and
+   nothing changes. If they are not, it puts up one screen with one blue button.
+   Deliberately narrow. It only ever appears when ALL of these are true:
+     - the file was opened from disk (file://), not the website. On the website
+       the running app IS the published one, so there is nothing to ask.
+     - GitHub is set up on this device. A tablet with no token could not publish
+       and must never be stopped by a screen it cannot get past.
+     - GitHub could actually be read, and really is behind. Offline, or unreadable,
+       means carry on -- a downloaded copy has to keep working with no network.
+   There is a quiet way past it. Being unable to open the app because a publish
+   failed would be a worse trap than the one this is fixing.
+   ========================================================================== */
+async function cpPublishGate(){
+  try{
+    if(location.protocol !== 'file:') return false;
+    if(typeof ghConfigured !== 'function' || !ghConfigured()) return false;
+    const here = cpRevNum(APP_REV);
+    const web  = await cpWebsiteRevNow();
+    const data = await cpDataRepoRev();
+    if(!web && !data) return false;                       /* offline: carry on */
+    const behind = [];
+    if(web  && cpRevNum(web)  < here) behind.push('the website is on ' + web);
+    if(data && cpRevNum(data) < here) behind.push('GitHub is on ' + data);
+    if(!behind.length) return false;                      /* already published */
+
+    try{ logAct('sync', 'publish gate: ' + APP_REV + ' not published yet ('
+         + behind.join(', ') + ')'); }catch(e){}
+
+    const old = document.getElementById('cpGate'); if(old) old.remove();
+    const g = document.createElement('div');
+    g.id = 'cpGate';
+    g.style.cssText = 'position:fixed; inset:0; z-index:2147482000; display:flex;'
+      + ' flex-direction:column; align-items:center; justify-content:center; gap:18px;'
+      + ' padding:24px; text-align:center; background:#e9e6e1;';
+    g.innerHTML =
+        '<div style="font:900 15px system-ui; letter-spacing:.14em; color:#7a1a1c;">CONTROL PLAN GENERATOR</div>'
+      + '<div style="font:800 30px system-ui; color:#1d1a17; line-height:1.2; max-width:760px;">'
+      +   'THIS BUILD IS NOT PUBLISHED YET</div>'
+      + '<div style="font:600 15px/1.6 system-ui; color:#5a5148; max-width:640px;">'
+      +   'You are running <b>' + APP_REV + '</b> from your Downloads folder, but '
+      +   behind.join(' and ') + '.<br>Everything you do in here would be in a build nobody else has.'
+      +   '<br><br>Publish it and the whole shop moves to ' + APP_REV + '.</div>'
+      + '<button id="cpGateGo" style="margin-top:6px; padding:20px 40px; font:800 19px system-ui;'
+      +   ' cursor:pointer; border:0; border-radius:12px; background:#1d4e89; color:#fff;'
+      +   ' box-shadow:0 3px 10px rgba(0,0,0,.18);">&#128640; PUBLISH THIS BUILD</button>'
+      + '<div id="cpGateStatus" style="font:700 13px system-ui; color:#5a5148; min-height:20px;'
+      +   ' max-width:640px;"></div>'
+      + '<button id="cpGateSkip" style="margin-top:10px; padding:8px 14px; font:600 12px system-ui;'
+      +   ' cursor:pointer; border:0; background:none; color:#8a8279; text-decoration:underline;">'
+      +   'carry on without publishing</button>';
+    document.body.appendChild(g);
+
+    const gate = () => document.getElementById('cpGate');
+    document.getElementById('cpGateSkip').onclick = function(){
+      try{ logAct('sync', 'publish gate skipped on ' + APP_REV); }catch(e){}
+      const el = gate(); if(el) el.remove();
+    };
+    document.getElementById('cpGateGo').onclick = async function(){
+      const btn = this;
+      btn.disabled = true; btn.style.opacity = '.6'; btn.style.cursor = 'default';
+      try{ await cpPublishThisBuild(); }catch(e){}
+      /* only leave when it really did land */
+      const w2 = await cpWebsiteRevNow();
+      const d2 = await cpDataRepoRev();
+      const okNow = w2 && d2 && cpRevNum(w2) >= here && cpRevNum(d2) >= here;
+      if(okNow){
+        const el = gate();
+        if(el){ el.style.transition = 'opacity .3s'; el.style.opacity = '0';
+                setTimeout(() => el.remove(), 320); }
+      } else {
+        btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
+        btn.textContent = '\ud83d\ude80 TRY PUBLISHING AGAIN';
+      }
+    };
+    return true;
+  }catch(e){ console.warn('publish gate failed', e); return false; }
 }
 
 // Home-screen "Machinist Validation" tile: open validation for ALL saved control plans.
@@ -27227,7 +27348,7 @@ $('mMasterList').onclick = showMasterList;
    to fix this by opening that same picker in inspect mode rather than edit mode:
    the right mode, still the wrong screen. This is the screen Rich pointed at. */
 $('mValidation').onclick = function(){ try{ logAct('nav', 'Inspect Parts \u2192 Control Plans'); }catch(e){}
-                                       showProjects(); };
+                                       showProjects('inspect'); };
 if($('mPublishNow')) $('mPublishNow').onclick = cpPublishThisBuild;
 $('validationBack').onclick = hideValidation;
 $('mCustomers').onclick = showCustomers;
@@ -27828,6 +27949,10 @@ document.addEventListener('focusin', e => {
 });
 
 showMenu();
+/* Rev-1100: the menu is drawn first, then the gate is laid over it if this
+   downloaded build has not been published. Drawing the menu first means a device
+   that cannot reach GitHub, or has no token, is never left looking at nothing. */
+try{ setTimeout(function(){ try{ cpPublishGate(); }catch(e){ console.warn(e); } }, 1200); }catch(e){}
 
 // Detect contexts where GitHub sync cannot work and warn the user
 function checkSyncContext(){
@@ -28642,4 +28767,4 @@ report can be read instead of guessed at.
 </div>
 
 
-<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div></body></html>
+<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="EXPERT USER: nothing is highlighted. Click to switch to NEW USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(239, 233, 223); color: rgb(58, 53, 46); border: 1px solid rgb(201, 192, 180);">🎓 EXPERT USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div><div id="cpGate" style="position: fixed; inset: 0px; z-index: 2147482000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; background: rgb(233, 230, 225);"><div style="font:900 15px system-ui; letter-spacing:.14em; color:#7a1a1c;">CONTROL PLAN GENERATOR</div><div style="font:800 30px system-ui; color:#1d1a17; line-height:1.2; max-width:760px;">THIS BUILD IS NOT PUBLISHED YET</div><div style="font:600 15px/1.6 system-ui; color:#5a5148; max-width:640px;">You are running <b>Rev-1101</b> from your Downloads folder, but GitHub is on Rev-1099.<br>Everything you do in here would be in a build nobody else has.<br><br>Publish it and the whole shop moves to Rev-1101.</div><button id="cpGateGo" style="margin-top: 6px; padding: 20px 40px; font: 800 19px system-ui; cursor: default; border: 0px; border-radius: 12px; background: rgb(29, 78, 137); color: rgb(255, 255, 255); box-shadow: rgba(0, 0, 0, 0.18) 0px 3px 10px; opacity: 0.6;" disabled="">🚀 TRY PUBLISHING AGAIN</button><div id="cpGateStatus" style="font:700 13px system-ui; color:#5a5148; min-height:20px; max-width:640px;">CHECKING IT LANDED… (2 of 5)</div><button id="cpGateSkip" style="margin-top:10px; padding:8px 14px; font:600 12px system-ui; cursor:pointer; border:0; background:none; color:#8a8279; text-decoration:underline;">carry on without publishing</button></div></body></html>
