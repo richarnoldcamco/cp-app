@@ -535,7 +535,7 @@ window.addEventListener('DOMContentLoaded', function(){
        the same twin-button confusion again. -->
   <button id="hcChkBtn" title="Is this machine safe to leave?" onclick="hcOpenCheck()" style="background:#1E7A34; color:#fff; border:1px solid #124A1F; border-radius:6px; padding:6px 12px; font-family:monospace; font-size:10.5px; font-weight:800; letter-spacing:.08em; cursor:pointer; white-space:nowrap; margin-right:8px;">✓ HANDOFF CHECK</button>
   <button id="headerPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-right:8px;">⬆️ Push App</button>
-  <button class="ob-back" id="headerBack">← Back</button>
+  <button class="ob-back hidden" id="headerBack">← Back</button>
 </header>
 
 <div id="newerVersionBanner" style="display:none; background:#2c6e49; color:#fff; padding:6px 12px; font-size:12px; line-height:1.3; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
@@ -549,7 +549,7 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- MAIN MENU -->
-<div id="menuScreen" class="menu hidden">
+<div id="menuScreen" class="menu">
   <div class="brand" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
     <div style="display:flex; align-items:center; gap:12px;">
       <div class="brand-mark">📋</div>
@@ -633,7 +633,7 @@ window.addEventListener('DOMContentLoaded', function(){
       </button>
       <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
         <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
-        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">NOT FINISHED — the website is still on Rev-1095, could not read GitHub back. Try again, or use ADMIN → Advanced.</small>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1096 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
       </button>
       </div>
       <div style="display:none">
@@ -1198,7 +1198,7 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- API SETTINGS SCREEN -->
-<div id="settingsScreen" class="setup">
+<div id="settingsScreen" class="setup hidden">
   <button class="ob-back" id="settingsBack">← Back</button>
   <h1>API Settings</h1>
   <p class="sub">Configure Anthropic API key for ODS balloon analysis</p>
@@ -1307,7 +1307,7 @@ window.addEventListener('DOMContentLoaded', function(){
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">Publishing to website…</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 12:35:27 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -1376,14 +1376,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <button class="cp-btn cp-btn-danger" id="cpLogClear" style="width:96px;">Clear</button>
     </div>
     <div id="cpLogStat" style="font-size:11px; color:var(--ink-dim); margin:0 0 8px;">This device: DESKTOP-9226DF · 3000 entries here · archived 5000 to logs/DESKTOP-9226DF.json at 8/4/2026, 8:18:48 PM</div>
-    <pre id="cpLogView" style="max-height:260px; overflow:auto; border:1px solid var(--line); background:#fbfaf7; padding:8px; font-size:10.5px; line-height:1.5; margin:0; white-space:pre-wrap;">2026-08-30 16:05:53  CLICK       #mProjects 📁 CONTROL PLANS 14 Projects
-        OPE
-2026-08-30 16:05:53  NAV         Projects
-2026-08-30 16:05:57  CLICK       ✏️
-2026-08-30 16:06:00  CLICK       #cpRenX ✕ Close
-2026-08-30 16:06:14  PUSH        data push started
-2026-08-30 16:06:20  NAV         refused to chase Rev-1096: the website serves Rev-1093
-2026-08-30 16:07:02  NAV         auto-update paused after 3 tries chasing Rev-1096
+    <pre id="cpLogView" style="max-height:260px; overflow:auto; border:1px solid var(--line); background:#fbfaf7; padding:8px; font-size:10.5px; line-height:1.5; margin:0; white-space:pre-wrap;">2026-08-30 16:07:02  NAV         auto-update paused after 3 tries chasing Rev-1096
 2026-08-30 16:07:12  CLICK       #projectsBack ← Back
 2026-08-30 16:07:12  NAV         Back to All Parts
 2026-08-30 16:07:22  CLICK       Update now
@@ -1435,7 +1428,14 @@ window.addEventListener('DOMContentLoaded', function(){
 2026-08-30 16:34:22  PUSH        data push started
 2026-08-30 16:34:28  CLICK       #mAdmin ⚙️ ADMIN
         ACTION LOG · RECENT CHA
-2026-08-30 16:34:28  NAV         Admin</pre>
+2026-08-30 16:34:28  NAV         Admin
+2026-08-30 16:34:30  CLICK       ⚙️ API Key &amp; GitHub Sync Settings
+2026-08-30 16:34:30  NAV         Settings
+2026-08-30 16:34:41  CLICK       #ghPublishPagesBtn 🌐 Publish to Website
+2026-08-30 16:34:42  TYPE        apiKey
+2026-08-30 16:34:42  CLICK       #ghPushAppBtn ⬆️ Push App Code
+2026-08-30 16:34:48  CLICK       #settingsBack ← Back
+2026-08-30 16:34:48  NAV         Admin</pre>
   </div>
 
   <!-- Rev-511: reference screens moved off the home menu into Admin -->
@@ -2026,7 +2026,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- FLASH MESSAGE -->
-<div id="flash" class="flash hidden">✓ Data pushed to GitHub</div>
+<div id="flash" class="flash hidden">🔧 Inspect Parts opened — All Control Plans (11)</div>
 
 <!-- BOOT -->
 <script>
