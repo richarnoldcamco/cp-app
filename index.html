@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1110</title>
+<title>CONTROL PLAN GENERATOR - Rev-1111</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -561,7 +561,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1110 · 2026-08-30 04:16 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1111 · 2026-08-30 04:30 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -587,7 +587,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1110 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 04:16 PM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1111 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 04:30 PM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -600,7 +600,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1110 · 2026-08-30 04:16 PM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1111 · 2026-08-30 04:30 PM</div>
 
       <div class="menu-grid">
       <button class="menu-btn" id="mNewPlan" onclick="showNewCP(true)" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -665,7 +665,7 @@ window.addEventListener('DOMContentLoaded', function(){
       </button>
       <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
         <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
-        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1110 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1111 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
       </button>
       </div>
       <div style="display:none">
@@ -675,7 +675,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1110 · Built 2026-08-30 04:16 PM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1111 · Built 2026-08-30 04:30 PM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -1404,7 +1404,7 @@ Part / drawing rev: Rev-1">Rev-3</div></td></tr><tr class="cp-op-row"><td colspa
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 4:46:22 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 4:48:22 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -2090,7 +2090,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1110";
+const APP_REV = "Rev-1111";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2861,6 +2861,17 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-30",
+  "rev": "App Rev-1111",
+  "type": "App",
+  "changes": [
+   "THE SHOP-ORDER LIST HAS COLUMN HEADINGS (Rev-1111) — per Rich. It carried one label across the whole thing, \"EXISTING SHOP ORDERS · 1\", and the column of buttons down the right had nothing over it at all. There are two columns now with a heading over each: SHOP ORDER on the left, carrying the count, and ARCHIVE over the buttons, lined up with them.",
+   "AND ARCHIVE LOOKS LIKE A SAFE (Rev-1111) — per Rich. It is what the button actually does: a finished shop order is not deleted, it is put away where it can be fetched back out, and a plain grey outline said none of that. It is a steel door now, with a combination dial that turns when the cursor is on it. UNARCHIVE is the same door in green, because it is the same act in reverse. Nothing about what either button does has changed — archiving still hides a completed shop order from the list and unarchiving still brings it back.",
+   "AND THE SERIAL NUMBER MOVED TO THE MIDDLE OF THE BAR (Rev-1111) — per Rich. The whole centre of that strip was empty while the one number that changes with every part sat in the corner with the three that do not. It is centred on the bar itself rather than merely between its neighbours, so it lands in the same place whatever the part number and shop order happen to be, and it is a little larger again now that it has the room. On a phone, where the header wraps and there is no centre to sit in, it stays where it was.",
+   "THE DOUBLE-CHECK QUESTION TAKES THE ARROW KEYS (Rev-1111) — per Rich: \"if I hit the down arrow then the selection should go down 1 to Re-enter.\" That question comes up on a reading more than half a tolerance band outside the limit — almost always a decimal slip — and it is asked at the machine, where the operator's hands are on a keypad and not a mouse. Down and up move the selection between the two answers, Enter takes the one selected, Escape is Re-enter. The selected answer is ringed so there is never a question about which one Enter will press, and it opens on \"Yes, save it\" exactly as before, so nothing changes for anyone using the mouse."
+  ]
+ },
+ {
+  "ts": "2026-08-30",
   "rev": "App Rev-1110",
   "type": "App",
   "changes": [
@@ -3518,7 +3529,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "04:16 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "04:30 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6702,6 +6713,18 @@ async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpe
     +   ' border:1px solid #b03a3c; color:#fff; padding:3px 16px; border-radius:6px;'
     +   ' font-size:12px; letter-spacing:.12em; box-shadow:0 2px 8px rgba(0,0,0,.28);}'
     + '#pillSN b{color:#fff; font-size:30px; font-weight:900; line-height:1.05; letter-spacing:.02em;}'
+    /* Rev-1111: and it sits in the MIDDLE of the bar, per Rich -- the whole centre
+       of that strip was empty while the one number that changes with every part
+       was tucked in the corner with the three that do not. Centred on the bar
+       itself, not merely between its neighbours, so it lands in the same place
+       whatever the part number and shop order happen to be. Only on a real
+       screen: on a phone the header wraps, and there is nothing to centre it in. */
+    + '@media (min-width:900px){'
+    +   'header#hdr{position:relative;}'
+    +   '#pillSN{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);'
+    +     ' margin:0; z-index:2; padding:4px 22px;}'
+    +   '#pillSN b{font-size:34px;}'
+    + '}'
     /* ===== Rev-1110: THE LOW CARD WAS BEING CUT IN HALF =====================
        Rich, on Rev-1108: "I still can't see the lower limit value" -- and the
        screenshot showed HIGH .6040 with the top of .6035 sliced off underneath.
@@ -6719,7 +6742,87 @@ async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpe
     + '.tol-strip{flex:0 0 auto !important; min-height:max-content !important;}'
     + '.tol-cell{flex:0 0 auto !important;}'
     + '.stage{overflow-y:auto !important;}'
+    /* ===== Rev-1111: THE SHOP-ORDER LIST GETS HEADINGS ======================
+       Per Rich. The list had one label -- "EXISTING SHOP ORDERS - 1" -- sitting
+       over the whole thing, and the column of buttons on the right had nothing
+       over it at all. Two columns, two headings, each sitting over what it
+       names. ============================================================== */
+    + '.so-existing-head{display:flex !important; align-items:flex-end; gap:8px;}'
+    + '.so-existing-head .soh-l{flex:1;}'
+    + '.so-existing-head .soh-r{flex:none; width:116px; text-align:center;}'
+    /* ===== Rev-1111: AND ARCHIVE LOOKS LIKE A SAFE ==========================
+       Per Rich: "the archive button should look somewhat like a safe." It is
+       what the button does -- a finished shop order is not deleted, it is put
+       away and can be brought back out -- and a plain grey outline said none of
+       that. A steel door with a combination dial, and the dial turns when the
+       cursor is on it. Unarchive is the same door in green, because it is the
+       same act in reverse. Nothing about what either button DOES has changed.
+       ==================================================================== */
+    + '.so-archive,.so-unarchive{width:116px !important; padding:8px 6px !important;'
+    +   ' border-radius:10px !important; display:flex !important; flex-direction:column;'
+    +   ' align-items:center; justify-content:center; gap:6px;'
+    +   ' font-size:10.5px !important; font-weight:900 !important; letter-spacing:.14em;'
+    +   ' text-transform:uppercase; text-shadow:0 1px 1px rgba(0,0,0,.55);'
+    +   ' background:linear-gradient(155deg,#7c828a 0%,#4a5057 45%,#343a40 100%) !important;'
+    +   ' border:2px solid #23272c !important; color:#eef1f4 !important;'
+    +   ' box-shadow:inset 0 1px 0 rgba(255,255,255,.28), inset 0 -3px 6px rgba(0,0,0,.38),'
+    +     ' 0 3px 7px rgba(0,0,0,.3) !important;}'
+    /* the combination dial */
+    + '.so-archive::before,.so-unarchive::before{content:\'\'; width:26px; height:26px;'
+    +   ' border-radius:50%; flex:none; transition:transform .35s ease;'
+    +   ' background:radial-gradient(circle at 50% 50%, #f4f6f8 0 17%, rgba(0,0,0,0) 18%),'
+    +     ' conic-gradient(#cfd5db 0 12.5%, #939aa2 0 25%, #cfd5db 0 37.5%, #939aa2 0 50%,'
+    +     ' #cfd5db 0 62.5%, #939aa2 0 75%, #cfd5db 0 87.5%, #939aa2 0 100%);'
+    +   ' border:2px solid #1c1f23;'
+    +   ' box-shadow:inset 0 0 0 2px rgba(255,255,255,.32), 0 1px 2px rgba(0,0,0,.6);}'
+    + '.so-archive:hover::before,.so-unarchive:hover::before{transform:rotate(40deg);}'
+    + '.so-archive:hover{border-color:#7a1a1c !important; filter:brightness(1.08);}'
+    + '.so-unarchive{background:linear-gradient(155deg,#5f8469 0%,#3a5a44 45%,#294430 100%) !important;'
+    +   ' border-color:#1e3324 !important; color:#eaf5ec !important;}'
+    + '.so-unarchive:hover{filter:brightness(1.1);}'
+    /* Rev-1111: the selected answer on the double-check question */
+    + '#cfModal .cf-sel{outline:3px solid #1d4e89 !important; outline-offset:2px;'
+    +   ' box-shadow:0 0 0 5px rgba(29,78,137,.22) !important;}'
     + '</style></head>');
+
+  /* Rev-1111: the two headings themselves. The count stays -- it is worth
+     knowing how many shop orders are already open on this operation. */
+  appHtml = appHtml.replace(
+    '<div class="so-existing-head">Existing shop orders <span class="cp-muted" id="soExistNote"></span></div>',
+    '<div class="so-existing-head"><span class="soh-l">Shop order'
+      + ' <span class="cp-muted" id="soExistNote"></span></span>'
+      + '<span class="soh-r">Archive</span></div>');
+
+  /* ===== Rev-1111: THE DOUBLE-CHECK QUESTION TAKES THE ARROW KEYS ===========
+     Per Rich: "if I hit the down arrow then the selection should go down 1 to
+     Re-enter." That question comes up on a reading more than half a tolerance
+     band outside the limit -- almost always a decimal slip -- and it is asked at
+     the machine, where the operator's hands are on a keypad, not a mouse. Down
+     and up move the selection between the two answers, Enter takes the one that
+     is selected, Escape is Re-enter. The selected answer is ringed so there is
+     never a question about which one Enter will press, and it opens on "Yes,
+     save it" exactly as it did, so nothing changes for anyone using the mouse.
+     ======================================================================= */
+  appHtml = appHtml.replace(
+      '    const done=v=>{ $("cfModal").classList.add("hidden"); res(v); };\n'
+    + '    $("cfOk").onclick=()=>done(true);\n'
+    + '    $("cfCancel").onclick=()=>done(false);',
+      '    var __cfBtns=[$("cfOk"),$("cfCancel")], __cfSel=0;\n'
+    + '    var __cfPaint=function(){ __cfBtns.forEach(function(b,i){\n'
+    + '      if(!b) return; b.classList.toggle("cf-sel", i===__cfSel);\n'
+    + '      if(i===__cfSel){ try{ b.focus({preventScroll:true}); }catch(e){ try{ b.focus(); }catch(_){ } } } }); };\n'
+    + '    var __cfKey=function(ev){ var k=ev.key;\n'
+    + '      if(k==="ArrowDown"||k==="ArrowRight"){ __cfSel=1; __cfPaint(); ev.preventDefault(); ev.stopPropagation(); }\n'
+    + '      else if(k==="ArrowUp"||k==="ArrowLeft"){ __cfSel=0; __cfPaint(); ev.preventDefault(); ev.stopPropagation(); }\n'
+    + '      else if(k==="Enter"){ ev.preventDefault(); ev.stopPropagation(); done(__cfSel===0); }\n'
+    + '      else if(k==="Escape"){ ev.preventDefault(); ev.stopPropagation(); done(false); } };\n'
+    + '    const done=v=>{ try{ document.removeEventListener("keydown", __cfKey, true); }catch(e){}\n'
+    + '      __cfBtns.forEach(function(b){ if(b) b.classList.remove("cf-sel"); });\n'
+    + '      $("cfModal").classList.add("hidden"); res(v); };\n'
+    + '    $("cfOk").onclick=()=>done(true);\n'
+    + '    $("cfCancel").onclick=()=>done(false);\n'
+    + '    document.addEventListener("keydown", __cfKey, true);\n'
+    + '    setTimeout(__cfPaint, 0);');
 
   const marker = 'let PARTS = [';
   const at = appHtml.indexOf(marker);
