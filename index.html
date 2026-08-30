@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1095</title>
+<title>CONTROL PLAN GENERATOR - Rev-1096</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -524,12 +524,12 @@ window.addEventListener('DOMContentLoaded', function(){
   }
 </style>
 </head>
-<body><div id="appUpdateBanner" style="background: rgb(26, 82, 118); color: rgb(255, 255, 255); padding: 8px 14px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;"><span>⬇️ App update available: Rev-1095 → Rev-1096 (your token &amp; data are kept)</span><button style="background: rgb(255, 255, 255); color: rgb(26, 82, 118); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 5px; padding: 5px 14px; font-size: 13px; font-weight: 800; cursor: pointer;">Update now</button><button title="Dismiss" style="background: transparent; color: rgb(255, 255, 255); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 5px; padding: 4px 9px; font-size: 12px; cursor: pointer;">✕</button></div>
+<body>
 
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1095 · 2026-08-30 09:55 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1096 · 2026-08-30 11:15 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -555,7 +555,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1095 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 09:55 AM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1096 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 11:15 AM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -568,7 +568,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1095 · 2026-08-30 09:55 AM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1096 · 2026-08-30 11:15 AM</div>
 
       <div class="menu-grid">
       <button class="menu-btn" id="mNewPlan" onclick="showNewCP(true)" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -631,6 +631,10 @@ window.addEventListener('DOMContentLoaded', function(){
         <b style="font-size:15px;">↻ PULL CODE &amp; DATA</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">GET THE NEWEST APP CODE AND DATA FROM GITHUB RIGHT NOW — DON'T WAIT FOR THE TIMER</small>
       </button>
+      <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
+        <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1096 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
+      </button>
       </div>
       <div style="display:none">
         <span id="badgeMaster">76<span class="bsub">Control Types</span></span><span id="badgeCustomers">11<span class="bsub">Customers</span></span><span id="badgeInstructions">Rev-92<span class="bsub">Instructions</span></span>
@@ -639,7 +643,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1095 · Built 2026-08-30 09:55 AM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1096 · Built 2026-08-30 11:15 AM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -1377,51 +1381,8 @@ window.addEventListener('DOMContentLoaded', function(){
       <button class="cp-btn cp-btn-quiet" id="cpLogAllBtn" style="width:130px;">All devices</button>
       <button class="cp-btn cp-btn-danger" id="cpLogClear" style="width:96px;">Clear</button>
     </div>
-    <div id="cpLogStat" style="font-size:11px; color:var(--ink-dim); margin:0 0 8px;">This device: DESKTOP-0E4EA4 · 1279 entries here · archived 1274 to logs/DESKTOP-0E4EA4.json at 8/30/2026, 9:27:39 AM</div>
-    <pre id="cpLogView" style="max-height:260px; overflow:auto; border:1px solid var(--line); background:#fbfaf7; padding:8px; font-size:10.5px; line-height:1.5; margin:0; white-space:pre-wrap;">2026-08-29 13:53:58  PUSH        data push started
-2026-08-30 12:55:30  NAV         app-start Rev-1092
-2026-08-30 12:55:30  NAV         Menu
-2026-08-30 12:55:32  CLICK       #mAdmin ⚙️ ADMIN
-        ACTION LOG · RECENT CHA
-2026-08-30 12:55:32  NAV         Admin
-2026-08-30 12:55:39  CLICK       ⚙️ API Key &amp; GitHub Sync Settings
-2026-08-30 12:55:39  NAV         Settings
-2026-08-30 12:55:49  PUSH        data push started
-2026-08-30 12:56:02  TYPE        ghToken
-2026-08-30 12:56:03  CLICK       #ghSaveBtn 💾 Save GitHub Settings
-2026-08-30 12:56:03  PUSH        data push started
-2026-08-30 12:56:08  CLICK       #ghTestBtn 🔌 Test Connection
-2026-08-30 12:56:13  CLICK       #ghTestBtn 🔌 Test Connection
-2026-08-30 12:56:16  PUSH        data push started
-2026-08-30 12:56:18  LOGSYNC-FAIL GitHub refused the write (409)
-2026-08-30 12:56:20  PUSH        data push started
-2026-08-30 12:56:46  PUSH        data push started
-2026-08-30 12:56:49  CLICK       #cpImportAppBtn 📂 Import App Code
-2026-08-30 12:56:51  PUSH        data push started
-2026-08-30 12:56:59  TYPE        cpImportAppFile
-2026-08-30 12:57:05  PUSH        data push started
-2026-08-30 13:00:56  CLICK       #cpImportAppBtn 📂 Import App Code
-2026-08-30 13:01:00  TYPE        cpImportAppFile
-2026-08-30 13:01:06  CLICK       #cpImportAppBtn 📂 Import App Code
-2026-08-30 13:01:09  TYPE        cpImportAppFile
-2026-08-30 13:03:34  PUSH        data push started
-2026-08-30 13:05:22  NAV         auto-update paused after 3 tries chasing Rev-1092
-2026-08-30 13:06:23  NAV         auto-update paused after 3 tries chasing Rev-1092
-2026-08-30 13:07:23  NAV         auto-update paused after 3 tries chasing Rev-1092
-2026-08-30 13:09:22  NAV         auto-update paused after 3 tries chasing Rev-1092
-2026-08-30 13:10:23  NAV         auto-update paused after 3 tries chasing Rev-1092
-2026-08-30 13:12:22  NAV         auto-update paused after 3 tries chasing Rev-1092
-2026-08-30 13:14:23  NAV         auto-update paused after 3 tries chasing Rev-1092
-2026-08-30 13:15:23  NAV         auto-update paused after 3 tries chasing Rev-1092
-2026-08-30 13:17:23  NAV         auto-update paused after 3 tries chasing Rev-1092
-2026-08-30 13:17:35  NAV         app-start Rev-1093
-2026-08-30 13:17:35  NAV         Menu
-2026-08-30 13:17:36  CLICK       #mAdmin ⚙️ ADMIN
-        ACTION LOG · RECENT CHA
-2026-08-30 13:17:36  NAV         Admin
-2026-08-30 13:17:38  CLICK       ⚙️ API Key &amp; GitHub Sync Settings
-2026-08-30 13:17:38  NAV         Settings
-2026-08-30 13:17:45  PUSH        data push started
+    <div id="cpLogStat" style="font-size:11px; color:var(--ink-dim); margin:0 0 8px;">This device: DESKTOP-0E4EA4 · 1321 entries here · archived 1316 to logs/DESKTOP-0E4EA4.json at 8/30/2026, 11:56:25 AM</div>
+    <pre id="cpLogView" style="max-height:260px; overflow:auto; border:1px solid var(--line); background:#fbfaf7; padding:8px; font-size:10.5px; line-height:1.5; margin:0; white-space:pre-wrap;">2026-08-30 13:17:45  PUSH        data push started
 2026-08-30 13:18:52  PUSH        data push started
 2026-08-30 13:19:20  PUSH        data push started
 2026-08-30 13:19:43  PUSH        data push started
@@ -1437,7 +1398,50 @@ window.addEventListener('DOMContentLoaded', function(){
 2026-08-30 15:08:54  NAV         Menu
 2026-08-30 15:08:56  CLICK       #mAdmin ⚙️ ADMIN
         ACTION LOG · RECENT CHA
-2026-08-30 15:08:56  NAV         Admin</pre>
+2026-08-30 15:08:56  NAV         Admin
+2026-08-30 15:08:58  PUSH        data push started
+2026-08-30 15:09:08  CLICK       ⚙️ API Key &amp; GitHub Sync Settings
+2026-08-30 15:09:08  NAV         Settings
+2026-08-30 15:09:13  PUSH        data push started
+2026-08-30 15:09:19  CLICK       #ghPublishPagesBtn 🌐 Publish to Website
+2026-08-30 15:09:20  PUSH        data push started
+2026-08-30 15:09:23  CLICK       #ghPushAppBtn ⬆️ Push App Code
+2026-08-30 15:09:26  CLICK       #ghPushAppBtn ⬆️ Push App Code
+2026-08-30 15:09:32  PUSH        data push started
+2026-08-30 15:15:22  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:16:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:17:22  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:19:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:20:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:22:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:23:22  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:24:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:26:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:28:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:29:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:30:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:32:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:34:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:36:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:37:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:38:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:40:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:41:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:42:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:43:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:44:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:46:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:48:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:49:29  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:51:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:53:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:54:22  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:55:23  NAV         auto-update paused after 3 tries chasing Rev-1095
+2026-08-30 15:57:09  NAV         app-start Rev-1096
+2026-08-30 15:57:09  NAV         Menu
+2026-08-30 15:57:11  CLICK       #mAdmin ⚙️ ADMIN
+        ACTION LOG · RECENT CHA
+2026-08-30 15:57:11  NAV         Admin</pre>
   </div>
 
   <!-- Rev-511: reference screens moved off the home menu into Admin -->
@@ -2028,8 +2032,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- FLASH MESSAGE -->
-<div id="flash" class="flash error hidden">❌ Push failed: GitHub PUT failed: 409 {
-  "message": "is at 3419c85193a75ec1e7c9166c312e473adc3e8569 but expected cda1f19aa7d277bba9e9fc21</div>
+<div id="flash" class="flash hidden">✓ App code (Rev-1096) pushed to GitHub</div>
 
 <!-- BOOT -->
 <script>
@@ -2055,7 +2058,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1095";
+const APP_REV = "Rev-1096";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2789,6 +2792,17 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-30",
+  "rev": "App Rev-1096",
+  "type": "App",
+  "changes": [
+   "ONE BUTTON PUBLISHES A NEW BUILD (Rev-1096) — Rich asked for it and he is right: getting a downloaded build live took five moves, four of which were bookkeeping. Open Admin, find the collapsed Advanced section, Publish to Website, Push App Code, then work out for yourself whether either actually worked. 🚀 PUBLISH THIS BUILD now sits on the main menu and does the lot: download the file, open it, press the button.",
+   "IT CHECKS ITS OWN WORK. Before pushing it reads what the website serves and what the data repo holds, tells you both in the confirmation, and refuses — with an override — if this build would move either of them backwards. After pushing it READS BOTH BACK and says plainly whether this revision really is on the website and in GitHub. If one of them did not take, it says which one and what it is still showing, rather than reporting success and leaving it to be discovered days later. That is not decoration: a publish that quietly did not land is exactly what left the website on Rev-1085 and the data repo on Rev-1086 while five revisions piled up unpublished.",
+   "The tile is hidden unless that device is set up for GitHub, so the tablets on the floor never see it — publishing is not their job, and a blue button they cannot use is only a question waiting to be asked. It also names the revision it is about to publish, so there is no doubt which tab is being sent.",
+   "The two Advanced buttons are untouched and still there for troubleshooting."
+  ]
+ },
+ {
+  "ts": "2026-08-30",
   "rev": "App Rev-1095",
   "type": "App",
   "changes": [
@@ -3280,7 +3294,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "09:55 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "11:15 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3452,6 +3466,20 @@ function updateMenuBadges(){
         : 'OPEN, EDIT, INSPECT OR DOWNLOAD ANY SAVED PLAN';
       sub.style.color = bare ? '#7a4a00' : 'var(--ink-dim)';
       sub.style.fontWeight = bare ? '700' : '';
+    }
+  }catch(e){}
+
+  /* Rev-1096: the publish tile. Hidden unless this device is set up for GitHub,
+     so a tablet on the shop floor never sees it — publishing is not their job and
+     a blue button they cannot use is just a question waiting to be asked. */
+  try{
+    const pb = $('mPublishNow');
+    if(pb){
+      const on = (typeof ghConfigured === 'function') && ghConfigured();
+      pb.style.display = on ? 'block' : 'none';
+      const ps = $('mPublishNowSub');
+      if(ps && on) ps.textContent = 'PUT ' + APP_REV.toUpperCase()
+        + ' ON THE WEBSITE AND GITHUB \u2014 ONE PRESS, THEN IT CHECKS IT LANDED';
     }
   }catch(e){}
 
@@ -6215,6 +6243,87 @@ async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpe
   outHtml = outHtml.replace('</head>', CP_HDR_PAD + '</head>');
 
   openMachinistValidationPanel(outHtml, titleText || 'All Control Plans', '', 0, false, partBlocks.length);
+}
+
+/* ===== Rev-1096: PUBLISH THIS BUILD, IN ONE PRESS ===========================
+   Per Rich: downloading a new build and getting it live took five moves — open
+   Admin, find the collapsed Advanced section, Publish to Website, Push App Code,
+   and then work out for yourself whether either of them actually worked. Four of
+   those five are bookkeeping. This is the one button: it says what it is about to
+   do and what is there now, does both pushes, and then READS BOTH BACK and tells
+   you plainly whether this revision is really on the website and in the data repo.
+   Verifying matters more than the convenience: a publish that quietly did not land
+   is what left the two repositories disagreeing for five revisions.
+   ========================================================================== */
+async function cpPublishThisBuild(){
+  if(!ghConfigured()){
+    alert('Set up GitHub first: ADMIN \u2192 GitHub Sync \u2192 paste the token \u2192 Save.');
+    return;
+  }
+  const btn = document.getElementById('mPublishNow');
+  const sub = document.getElementById('mPublishNowSub');
+  const say = (t) => { if(sub) sub.textContent = t; };
+  const was = sub ? sub.textContent : '';
+  try{
+    say('CHECKING WHAT IS ON GITHUB\u2026');
+    const pubBefore  = await cpPublishedRev();
+    const dataBefore = await cpDataRepoRev();
+    const here = cpRevNum(APP_REV);
+    const behind = [];
+    if(pubBefore  && here < cpRevNum(pubBefore))  behind.push('the website already serves ' + pubBefore);
+    if(dataBefore && here < cpRevNum(dataBefore)) behind.push('GitHub already holds ' + dataBefore);
+    if(behind.length){
+      if(!confirm('WAIT \u2014 this would go BACKWARDS.\n\n' + behind.join('\n')
+        + '\n\nand this tab is ' + APP_REV + '.\n\nPublish the older code anyway?')){
+        say(was); return;
+      }
+    } else {
+      const now = [];
+      if(pubBefore)  now.push('the website has ' + pubBefore);
+      if(dataBefore) now.push('GitHub has ' + dataBefore);
+      if(!confirm('Publish ' + APP_REV + ' to the website and GitHub?'
+        + (now.length ? '\n\nRight now ' + now.join(' and ') + '.' : ''))){
+        say(was); return;
+      }
+    }
+    /* the data-repo push skips itself if it has already run once this page load;
+       this is a deliberate press, so let it run. */
+    try{ sessionStorage.removeItem('appPushedThisSession'); }catch(e){}
+
+    say('PUBLISHING TO THE WEBSITE\u2026');
+    await ghPublishPages(true);
+    say('PUSHING TO GITHUB\u2026');
+    await ghPushApp(true);
+
+    /* Rev-1096: READ IT BACK. Neither push is trusted on its own say-so. */
+    say('CHECKING IT LANDED\u2026');
+    await new Promise(r => setTimeout(r, 1200));
+    const pubAfter  = await cpPublishedRev();
+    const dataAfter = await cpDataRepoRev();
+    const okPub  = pubAfter  ? (cpRevNum(pubAfter)  >= here) : null;
+    const okData = dataAfter ? (cpRevNum(dataAfter) >= here) : null;
+
+    if(okPub === true && okData === true){
+      say('\u2713 ' + APP_REV.toUpperCase() + ' IS ON THE WEBSITE AND GITHUB');
+      flash('\u2713 ' + APP_REV + ' published to both \u2014 checked and confirmed');
+      ghSetStatus('\u2713 ' + APP_REV + ' published to the website and GitHub, and read back to confirm it');
+      try{ logAct('sync', 'published ' + APP_REV + ' to both repositories, verified'); }catch(e){}
+      return;
+    }
+    const bad = [];
+    if(okPub  === false) bad.push('the website is still on ' + pubAfter);
+    if(okData === false) bad.push('GitHub is still on ' + dataAfter);
+    if(okPub  === null)  bad.push('could not read the website back');
+    if(okData === null)  bad.push('could not read GitHub back');
+    const msg = 'NOT FINISHED \u2014 ' + bad.join(', ') + '. Try again, or use ADMIN \u2192 Advanced.';
+    say(msg);
+    flash(msg, true);
+    ghSetStatus(msg, true);
+    try{ logAct('sync', 'publish of ' + APP_REV + ' did not fully land: ' + bad.join(', ')); }catch(e){}
+  }catch(err){
+    const m = 'Publish failed: ' + ((err && err.message) || err);
+    say(m); flash(m, true); ghSetStatus(m, true);
+  }
 }
 
 // Home-screen "Machinist Validation" tile: open validation for ALL saved control plans.
@@ -27006,6 +27115,7 @@ if($('gagesFilter')) $('gagesFilter').onchange = renderGages;
 try{ cpUpdateGageBadge(); }catch(e){}
 $('mMasterList').onclick = showMasterList;
 $('mValidation').onclick = openAllMachinistValidations;
+if($('mPublishNow')) $('mPublishNow').onclick = cpPublishThisBuild;
 $('validationBack').onclick = hideValidation;
 $('mCustomers').onclick = showCustomers;
 $('cpCustomer').onchange = onCustomerSelect;
