@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1093</title>
+<title>CONTROL PLAN GENERATOR - Rev-1095</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -529,7 +529,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1093 · 2026-08-30 09:15 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1095 · 2026-08-30 09:55 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -555,7 +555,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1093 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 09:15 AM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1095 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 09:55 AM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -568,7 +568,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1093 · 2026-08-30 09:15 AM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1095 · 2026-08-30 09:55 AM</div>
 
       <div class="menu-grid">
       <button class="menu-btn" id="mNewPlan" onclick="showNewCP(true)" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -580,7 +580,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <small id="mProjectsSub" style="font-size:11px; color:var(--ink-dim);">OPEN, EDIT, INSPECT OR DOWNLOAD ANY SAVED PLAN</small>
       </button>
       <button class="menu-btn" id="mValidation" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block; background:#2c6e49; border-color:#215236; color:#fff;">
-        <b style="font-size:15px;">🔬 MACHINIST VALIDATION</b><br>
+        <b style="font-size:15px;">🔬 INSPECT PARTS</b><br>
         <small style="font-size:11px; opacity:.9;">ALL PLANS, READY TO INSPECT</small>
       </button>
       <button class="menu-btn" id="mGages" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -639,7 +639,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1093 · Built 2026-08-30 09:15 AM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1095 · Built 2026-08-30 09:55 AM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -1309,7 +1309,7 @@ window.addEventListener('DOMContentLoaded', function(){
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 11:08:22 AM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">Publishing to website…</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -1377,27 +1377,8 @@ window.addEventListener('DOMContentLoaded', function(){
       <button class="cp-btn cp-btn-quiet" id="cpLogAllBtn" style="width:130px;">All devices</button>
       <button class="cp-btn cp-btn-danger" id="cpLogClear" style="width:96px;">Clear</button>
     </div>
-    <div id="cpLogStat" style="font-size:11px; color:var(--ink-dim); margin:0 0 8px;">This device: DESKTOP-0E4EA4 · 1261 entries here · archived 1255 to logs/DESKTOP-0E4EA4.json at 8/30/2026, 9:16:26 AM</div>
-    <pre id="cpLogView" style="max-height:260px; overflow:auto; border:1px solid var(--line); background:#fbfaf7; padding:8px; font-size:10.5px; line-height:1.5; margin:0; white-space:pre-wrap;">2026-08-29 12:49:24  CLICK       ✏️
-2026-08-29 12:49:27  TYPE        cpRenDesc
-2026-08-29 12:49:30  TYPE        cpRenDesc
-2026-08-29 12:49:32  CLICK       #cpRenSave ✓ Save
-2026-08-29 12:49:37  CLICK       Open →
-2026-08-29 12:49:43  CLICK       📄 UPLOAD ODSDO THIS NEXT
-2026-08-29 12:50:30  CLICK       #cptvCancel Cancel
-2026-08-29 12:50:35  CLICK       📄 UPLOAD ODSDO THIS NEXT
-2026-08-29 12:53:50  PUSH        data push started
-2026-08-29 12:54:38  NAV         app-start Rev-1086
-2026-08-29 12:54:38  NAV         Menu
-2026-08-29 12:54:39  NAV         build stamp from GitHub: 2026-08-28 8:10 PM
-2026-08-29 12:54:52  CLICK       #mProjects 📁 CONTROL PLANS 14 Projects
-        OPE
-2026-08-29 12:54:52  NAV         Projects
-2026-08-29 12:54:54  CLICK       Open →
-2026-08-29 12:54:55  CLICK       📄 UPLOAD ODSDO THIS NEXT
-2026-08-29 12:55:11  TYPE        INPUT
-2026-08-29 13:49:31  PUSH        data push started
-2026-08-29 13:53:58  PUSH        data push started
+    <div id="cpLogStat" style="font-size:11px; color:var(--ink-dim); margin:0 0 8px;">This device: DESKTOP-0E4EA4 · 1279 entries here · archived 1274 to logs/DESKTOP-0E4EA4.json at 8/30/2026, 9:27:39 AM</div>
+    <pre id="cpLogView" style="max-height:260px; overflow:auto; border:1px solid var(--line); background:#fbfaf7; padding:8px; font-size:10.5px; line-height:1.5; margin:0; white-space:pre-wrap;">2026-08-29 13:53:58  PUSH        data push started
 2026-08-30 12:55:30  NAV         app-start Rev-1092
 2026-08-30 12:55:30  NAV         Menu
 2026-08-30 12:55:32  CLICK       #mAdmin ⚙️ ADMIN
@@ -1437,7 +1418,26 @@ window.addEventListener('DOMContentLoaded', function(){
 2026-08-30 13:17:35  NAV         Menu
 2026-08-30 13:17:36  CLICK       #mAdmin ⚙️ ADMIN
         ACTION LOG · RECENT CHA
-2026-08-30 13:17:36  NAV         Admin</pre>
+2026-08-30 13:17:36  NAV         Admin
+2026-08-30 13:17:38  CLICK       ⚙️ API Key &amp; GitHub Sync Settings
+2026-08-30 13:17:38  NAV         Settings
+2026-08-30 13:17:45  PUSH        data push started
+2026-08-30 13:18:52  PUSH        data push started
+2026-08-30 13:19:20  PUSH        data push started
+2026-08-30 13:19:43  PUSH        data push started
+2026-08-30 13:20:15  PUSH        data push started
+2026-08-30 13:22:23  NAV         auto-update paused after 3 tries chasing Rev-1093
+2026-08-30 13:26:12  CLICK       #ghPublishPagesBtn 🌐 Publish to Website
+2026-08-30 13:26:15  PUSH        data push started
+2026-08-30 13:26:37  CLICK       #ghPushAppBtn ⬆️ Push App Code
+2026-08-30 13:26:39  PUSH        data push started
+2026-08-30 13:26:49  CLICK       #ghPushAppBtn ⬆️ Push App Code
+2026-08-30 13:26:59  PUSH        data push started
+2026-08-30 15:08:54  NAV         app-start Rev-1095
+2026-08-30 15:08:54  NAV         Menu
+2026-08-30 15:08:56  CLICK       #mAdmin ⚙️ ADMIN
+        ACTION LOG · RECENT CHA
+2026-08-30 15:08:56  NAV         Admin</pre>
   </div>
 
   <!-- Rev-511: reference screens moved off the home menu into Admin -->
@@ -1503,9 +1503,9 @@ window.addEventListener('DOMContentLoaded', function(){
 <div id="validationScreen" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:5000; background:#fff; display:flex; flex-direction:column;">
   <div style="display:flex; align-items:center; gap:12px; padding:8px 14px; background:var(--signal); flex-shrink:0;">
     <button id="validationBack" style="background:#fff; color:var(--signal); border:none; border-radius:6px; padding:6.4px 16px; font-weight:700; cursor:pointer; font-size:13px;">← Back to Control Plan</button>
-    <span style="color:#fff; font-weight:600; font-size:14px;">🔬 Machinist Validation</span>
+    <span style="color:#fff; font-weight:600; font-size:14px;">🔬 Inspect Parts</span>
   </div>
-  <iframe id="validationFrame" style="flex:1; width:100%; border:none;" title="Machinist Validation App"></iframe>
+  <iframe id="validationFrame" style="flex:1; width:100%; border:none;" title="Inspect Parts App"></iframe>
 </div>
 
 <!-- RECENT CHANGES SCREEN -->
@@ -2054,7 +2054,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1093";
+const APP_REV = "Rev-1095";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2788,6 +2788,25 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-30",
+  "rev": "App Rev-1095",
+  "type": "App",
+  "changes": [
+   "THE INSPECT PARTS TILE NOW GOES WHERE THE INSPECT BUTTON GOES (Rev-1095) — Rich pointed at the green Inspect button on an operation row and said the green tile on the main menu should take him to the same place. It did not. The row button opens the inspection program in INSPECT mode: Start Inspection, shop order, serial, initials, and readings that are SAVED. The tile opened the same program in EDIT mode and stopped on the app's own home menu — the editing screens, with nothing recorded. Two different journeys behind two green buttons that read as the same thing.",
+   "The tile now opens in inspect mode as well. Because it carries every control plan rather than one, it lands on \"Start Inspection — pick the part you're inspecting\" with all of them listed; choose one and it goes on to Choose Operation and then the real inspection, exactly as the row button does. That is the same road, joined one step earlier — the only difference that cannot be removed, since the tile cannot know which part is on the bench.",
+   "It also gets the same opening curtain and the same wording, \"Preparing the inspection…\", so the two routes feel like one thing. The curtain is dropped by the app reporting it has landed, which the new path posts; without that it would have sat there until it timed out. EDIT mode is untouched: no part named still means the app's home menu, as before."
+  ]
+ },
+ {
+  "ts": "2026-08-30",
+  "rev": "App Rev-1094",
+  "type": "App",
+  "changes": [
+   "MACHINIST VALIDATION IS NOW CALLED INSPECT PARTS (Rev-1094) — Rich's wording. The old name described what the software did; the new one says what the person is about to do, which is the right test for a button on a shop floor screen. Renamed in every place anybody sees it: the green tile on the main menu, the header bar of the inspection screen itself, the single-row preview heading, the tooltip on the per-row preview button in the builder, the four progress messages (loading, building for all plans, building one, opened), the browser's own name for the embedded frame, and the line on the How This App Works page.",
+   "Nothing underneath was renamed — the screen id, the function names and the address of the embedded app are untouched, so no saved plan, stored setting or inspection record is affected by this. The embedded inspection program keeps its own internal name; only what CAMCO sees has changed."
+  ]
+ },
+ {
+  "ts": "2026-08-30",
   "rev": "App Rev-1093",
   "type": "App",
   "changes": [
@@ -3260,7 +3279,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "09:15 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "09:55 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -5982,7 +6001,7 @@ async function mvPreviewRow(idx){
   back.onclick = () => panel.remove();
   const htitle = document.createElement('div');
   htitle.style.cssText = 'font-weight:800; letter-spacing:.03em;';
-  htitle.textContent = 'MACHINIST VALIDATION PREVIEW \u2014 ' + part + (rev ? ' ' + rev : '') + ' \u00b7 Balloon ' + bubble;
+  htitle.textContent = 'INSPECT PARTS PREVIEW \u2014 ' + part + (rev ? ' ' + rev : '') + ' \u00b7 Balloon ' + bubble;
   const hnote = document.createElement('div');
   hnote.style.cssText = 'margin-left:auto; font-size:12px; opacity:.85;';
   hnote.textContent = 'Preview only \u2014 the full validation runs all rows together';
@@ -6061,7 +6080,7 @@ async function mvPreviewRow(idx){
 async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpenMode){
   if(!partBlocks || !partBlocks.length){ flash('No control plans with features to validate.', true); return; }
 
-  flash('Loading Machinist Validation…');
+  flash('Loading Inspect Parts…');
   let appHtml;
   try{
     // Rev-419 CLEAN MERGE: decode the baked-in Machinist Validation app (REV-93)
@@ -6121,7 +6140,18 @@ async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpe
       'var op = document.getElementById("inOp"); ' +
       'if(op && !String(op.value||"").trim() && __cpLineWho){ op.value = __cpLineWho; } ' +
     '}catch(e){ console.warn("cpLineDress failed", e); } }\n' +
-    'function cpAutoOpen(){ try{ if(!__cpAutoOpenPart) return; ' +
+    'function cpAutoOpen(){ try{ ' +
+      /* Rev-1095: no part named. In EDIT mode that means "stop on the app's home
+         menu", as before. In INSPECT mode it means "go to Start Inspection and let
+         them pick the part" -- the same screen the per-row Inspect button is heading
+         for, one step earlier. Posting cpValLanded drops the curtain; without it the
+         curtain would sit there for its full timeout. */
+      'if(!__cpAutoOpenPart){ ' +
+        'if(__cpAutoOpenMode==="inspect"){ ' +
+          'try{ if(typeof manageMode!=="undefined") manageMode=false; ' +
+               'if(typeof showPicker==="function") showPicker(); }catch(e){ console.warn("inspect picker failed", e); } ' +
+          'try{ parent.postMessage({type:"cpValLanded"},"*"); }catch(e){} ' +
+        '} return; } ' +
       'var idx = PARTS.findIndex(function(p){ return p.partNumber === __cpAutoOpenPart; }); ' +
       'if(idx<0) return; var __pt = PARTS[idx]; ' +
     /* Rev-483: INSPECT mode — land the machinist in the real Start Inspection flow
@@ -6190,14 +6220,24 @@ async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpe
 async function openAllMachinistValidations(){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   if(!projects.length){ flash('No saved control plans yet.', true); return; }
-  flash('Building Machinist Validation for all plans…');
+  flash('Building Inspect Parts for all plans…');
   const blocks = [];
   for(const p of projects){
     try{ const built = await mvBuildPartForProject(p); if(built) blocks.push(built.partBlock); }
     catch(e){ console.error('build failed for', p && p.partNum, e); }
   }
-  if(!blocks.length){ flash('None of your control plans have features to validate yet.', true); return; }
-  await mvOpenPanelWithParts(blocks, 'All Control Plans (' + blocks.length + ')');
+  if(!blocks.length){ flash('None of your control plans have features to inspect yet.', true); return; }
+  /* Rev-1095: PER RICH — the INSPECT PARTS tile must land in the same place as the
+     green Inspect button on a control plan row. That button opens the inspection
+     program in INSPECT mode, so the machinist gets shop order / serial / initials
+     and readings that are SAVED. The tile opened the same program in EDIT mode, on
+     the app's own home menu, which is a different journey entirely: the editing
+     screens, and nothing recorded. Same mode now. The only difference left is the
+     one that cannot be avoided — the tile carries every plan, so which part is
+     being inspected is picked on screen instead of being known in advance. */
+  window._cpMvWantCurtain = true;
+  try{ if(!window._cpMvCurtainText) window._cpMvCurtainText = 'Preparing the inspection\u2026'; }catch(e){}
+  await mvOpenPanelWithParts(blocks, 'All Control Plans (' + blocks.length + ')', null, 'inspect');
 }
 
 // Rev-414: remember which plans have had a Machinist Validation created (so the button reads "Edit" after).
@@ -6331,7 +6371,7 @@ async function inspectMachinistValidation(idx){
 async function createMachinistValidation(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   const p = projects[idx]; if(!p){ flash('Plan not found.', true); return; }
-  flash('Building Machinist Validation…');
+  flash('Building Inspect Parts…');
   const built = await mvBuildPartForProject(p);
   if(!built){ flash('This plan has no features to validate.', true); return; }
   mvMarkCreated(p);
@@ -6454,7 +6494,7 @@ function openMachinistValidationPanel(html, part, rev, featCount, hadImage, part
   const doc = frame.contentWindow.document;
   doc.open(); doc.write(html); doc.close();
 
-  flash('\ud83d\udd27 Machinist Validation opened' + (part ? (' \u2014 ' + part) : ''));
+  flash('\ud83d\udd27 Inspect Parts opened' + (part ? (' \u2014 ' + part) : ''));
 }
 
 function deleteProject(idx){
@@ -9523,7 +9563,7 @@ function renderCPBuilder(){
     // Rev-399: small per-row button — preview this single feature in Machinist Validation.
     const mvBtn = document.createElement('button');
     mvBtn.textContent = '🔬';
-    mvBtn.title = 'Preview Machinist Validation for this row (balloon ' + row.bubble + ')';
+    mvBtn.title = 'Preview Inspect Parts for this row (balloon ' + row.bubble + ')';
     mvBtn.style.cssText = 'display:block; margin:3px auto 0; border:1px solid #215236; background:#2c6e49; color:#fff; border-radius:5px; font-size:' + (focused ? '12px' : '10px') + '; line-height:1.1; padding:1px 6px; cursor:pointer;';
     mvBtn.onclick = (e) => { e.stopPropagation(); mvPreviewRow(idx); };
     tdDoc.appendChild(mvBtn);
@@ -26604,7 +26644,7 @@ function buildCpSpecific(){
   const logs = (typeof CHANGE_LOG !== 'undefined' ? CHANGE_LOG : []).slice(0, 8)
     .map(e => '- ' + e.rev + ' (' + e.ts + '): ' + String((e.changes&&e.changes[0])||'').slice(0, 220) + '…').join('\n');
   return [
-'THIS APP: Control Plan Generator · CURRENT ' + APP_REV + ' · built ' + BUILD_DATE + ' ' + BUILD_TIME + ' · embedded Machinist Validation REV-' + valRev,
+'THIS APP: Control Plan Generator · CURRENT ' + APP_REV + ' · built ' + BUILD_DATE + ' ' + BUILD_TIME + ' · embedded Inspect Parts app REV-' + valRev,
 'LIVE SITE: https://richarnoldcamco.github.io/cp-app/ (index.html) · data repo: richarnoldcamco/cp-generator-data (cp_app.html app copy · cp_data.json data · runs/ inspection pieces · drawings/ ODS images)',
 '',
 'HOW CLAUDE SHIPS CHANGES: read the CHANGE_LOG at the top of the main script FIRST (authoritative feature history). On any change: bump APP_REV +1, set BUILD_DATE/BUILD_TIME, add a most-recent-first CHANGE_LOG entry, node --check the largest script block, push the file to BOTH targets (cp-generator-data/cp_app.html AND cp-app/index.html) via GitHub Contents API with the claude-push token, then read both back and confirm the rev. Devices self-update (open / 60s / every tap / tab-return) with a never-downgrade guard. NEVER hand the user files unless a push fails or they say DL.',
