@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1103</title>
+<title>CONTROL PLAN GENERATOR - Rev-1104</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -529,7 +529,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1103 · 2026-08-30 02:35 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1104 · 2026-08-30 02:45 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -555,7 +555,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1103 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 02:35 PM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1104 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 02:45 PM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -568,7 +568,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1103 · 2026-08-30 02:35 PM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1104 · 2026-08-30 02:45 PM</div>
 
       <div class="menu-grid">
       <button class="menu-btn" id="mNewPlan" onclick="showNewCP(true)" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -633,7 +633,7 @@ window.addEventListener('DOMContentLoaded', function(){
       </button>
       <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
         <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
-        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">✓ REV-1103 IS ON THE WEBSITE AND GITHUB</small>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUBLISHING TO THE WEBSITE…</small>
       </button>
       </div>
       <div style="display:none">
@@ -643,7 +643,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1103 · Built 2026-08-30 02:35 PM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1104 · Built 2026-08-30 02:45 PM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -1313,7 +1313,7 @@ window.addEventListener('DOMContentLoaded', function(){
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 2:48:22 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ App Rev-1104 pushed at 8/30/2026, 2:49:03 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -1999,7 +1999,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1103";
+const APP_REV = "Rev-1104";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2770,6 +2770,16 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-30",
+  "rev": "App Rev-1104",
+  "type": "App",
+  "changes": [
+   "THE PUBLISH SCREEN STOPPED CONTRADICTING ITSELF (Rev-1104) — Rich sent a photograph of the publish gate reading \"NOT FINISHED\" in thirty-point type with \"✓ REV-1103 IS ON THE WEBSITE AND GITHUB\" printed on the line directly beneath it. Both lines were written by the same screen. The publish verifies itself and reported success into the status line; the gate then ignored that and worked out its own answer by reading raw.githubusercontent.com — the CDN Rev-1103 had just stopped trusting, because it serves the previous file for well over half a minute after a commit is made. The heading was the cache's opinion; the line under it was the truth.",
+   "There is one verdict now because there is one check. cpPublishThisBuild returns true or false — it always knew, it simply never told anybody — and the gate uses that answer instead of asking a cache a question it cannot answer yet.",
+   "AND A FINISHED PUBLISH NOW TAKES YOU TO THE MENU (Rev-1104) — per Rich. It used to stop the bar, show a tick and fade out after nine tenths of a second, which was quick enough to miss and left him looking at whatever happened to be underneath. The panel turns green, the bar stops sweeping and fills to the end, the tick lands, it says \"The whole shop is on Rev-NNNN. Taking you to the menu…\", and then the whole screen lifts and fades away onto the main menu with the usual confirmation across the bottom."
+  ]
+ },
+ {
+  "ts": "2026-08-30",
   "rev": "App Rev-1103",
   "type": "App",
   "changes": [
@@ -3346,7 +3356,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "02:35 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "02:45 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6421,9 +6431,13 @@ async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpe
    is what left the two repositories disagreeing for five revisions.
    ========================================================================== */
 async function cpPublishThisBuild(){
+  /* Rev-1104: this function now ANSWERS. It knew perfectly well whether the
+     publish landed -- it says so on screen -- but it told nobody, so the gate
+     that called it went off and worked it out again from a CDN and got it
+     wrong. true means both writes were accepted; false means they were not. */
   if(!ghConfigured()){
     alert('Set up GitHub first: ADMIN \u2192 GitHub Sync \u2192 paste the token \u2192 Save.');
-    return;
+    return false;
   }
   const btn = document.getElementById('mPublishNow');
   const sub = document.getElementById('mPublishNowSub');
@@ -6443,7 +6457,7 @@ async function cpPublishThisBuild(){
     if(behind.length){
       if(!confirm('WAIT \u2014 this would go BACKWARDS.\n\n' + behind.join('\n')
         + '\n\nand this tab is ' + APP_REV + '.\n\nPublish the older code anyway?')){
-        say(was); return;
+        say(was); return false;
       }
     }
     /* Rev-1103: there used to be a second question here -- "Publish Rev-NNNN to the
@@ -6497,7 +6511,7 @@ async function cpPublishThisBuild(){
       ghSetStatus('\u2713 ' + APP_REV + ' published to the website and GitHub. The website address'
         + ' can take a minute to serve the new file \u2014 the commit is already made.');
       try{ logAct('sync', 'published ' + APP_REV + ' to both repositories, verified'); }catch(e){}
-      return;
+      return true;
     }
     const bad = [];
     if(!okPub)  bad.push('the website did not take it'
@@ -6509,9 +6523,11 @@ async function cpPublishThisBuild(){
     flash(msg, true);
     ghSetStatus(msg, true);
     try{ logAct('sync', 'publish of ' + APP_REV + ' did not fully land: ' + bad.join(', ')); }catch(e){}
+    return false;
   }catch(err){
     const m = 'Publish failed: ' + ((err && err.message) || err);
     say(m); flash(m, true); ghSetStatus(m, true);
+    return false;
   }
 }
 
@@ -6580,6 +6596,11 @@ async function cpPublishGate(){
     st.textContent =
         '@keyframes cpGateSweep{0%{left:-40%}100%{left:100%}}'
       + '@keyframes cpGatePulse{0%,100%{opacity:1}50%{opacity:.55}}'
+      /* Rev-1104: the finish. A bar that FILLS rather than sweeps, because the
+         work is over, and a tick that lands with some weight. */
+      + '@keyframes cpGateFill{from{width:0}to{width:100%}}'
+      + '@keyframes cpGatePop{0%{transform:scale(.4); opacity:0}'
+      +   '60%{transform:scale(1.25); opacity:1}100%{transform:scale(1); opacity:1}}'
       + '#cpGateWork{display:none; width:min(760px,92vw); margin-top:6px;'
       +   ' border:3px solid #1d4e89; border-radius:16px; padding:26px 24px;'
       +   ' background:rgba(29,78,137,.06); text-align:left;}'
@@ -6628,6 +6649,50 @@ async function cpPublishGate(){
       const ic = work.querySelector('.cpGwIcon'); if(ic) ic.style.animation = 'none';
     };
 
+    /* ===== Rev-1104: WHEN IT FINISHES, GO TO THE MENU =========================
+       Per Rich: "when it finishes publishing there needs to be some animation
+       that takes us to the main menu." Until now a successful publish stopped the
+       bar, showed a tick, and faded the screen out after nine tenths of a second
+       -- quick enough that the tick was easy to miss, and it left him looking at
+       whatever was underneath rather than being taken anywhere. The panel now
+       turns green, the sweeping bar becomes one that fills to the end, it says in
+       plain words that the whole shop is on this build, and then the whole screen
+       lifts away to the menu. ================================================= */
+    const finishWork = () => {
+      if(clock){ clearInterval(clock); clock = null; }
+      work.style.transition = 'border-color .35s, background .35s';
+      work.style.borderColor = '#1e7a3c';
+      work.style.background = 'rgba(30,122,60,.10)';
+      const t = document.getElementById('cpGateWorkTitle');
+      if(t){ t.textContent = '\u2713 PUBLISHED \u2014 ' + APP_REV.toUpperCase();
+             t.style.color = '#14532d'; }
+      const ic = work.querySelector('.cpGwIcon');
+      if(ic){ ic.textContent = '\u2705'; ic.style.animation = 'cpGatePop .55s ease-out'; }
+      const cl = document.getElementById('cpGateClock'); if(cl) cl.style.color = '#1e7a3c';
+      const stx = document.getElementById('cpGateStatus');
+      if(stx){ stx.textContent = 'The whole shop is on ' + APP_REV
+                 + '. Taking you to the menu\u2026';
+               stx.style.color = '#14532d'; }
+      const bar = work.querySelector('.cpGwBar');
+      if(bar){ bar.style.background = 'rgba(30,122,60,.18)';
+        bar.innerHTML = '<b id="cpGateFill" style="position:absolute; top:0; bottom:0; left:0;'
+          + ' width:0; border-radius:11px; background:linear-gradient(90deg,#2f9e52,#1e7a3c);'
+          + ' animation:cpGateFill 1.2s ease-out forwards;"></b>'; }
+      setTimeout(function(){
+        const el = gate(); if(!el){ try{ showMenu(); }catch(e){} return; }
+        el.style.transition = 'transform .55s ease-in, opacity .55s ease-in';
+        el.style.transformOrigin = '50% 40%';
+        el.style.transform = 'scale(1.15)';
+        el.style.opacity = '0';
+        setTimeout(function(){
+          try{ el.remove(); }catch(e){}
+          try{ if(typeof showMenu === 'function') showMenu(); }catch(e){}
+          try{ window.scrollTo(0, 0); }catch(e){}
+          try{ flash('\u2713 ' + APP_REV + ' published \u2014 the whole shop is on this build'); }catch(e){}
+        }, 580);
+      }, 1600);
+    };
+
     const gate = () => document.getElementById('cpGate');
     document.getElementById('cpGateSkip').onclick = function(){
       try{ logAct('sync', 'publish gate skipped on ' + APP_REV); }catch(e){}
@@ -6637,16 +6702,22 @@ async function cpPublishGate(){
       const btn = this;
       btn.disabled = true; btn.style.opacity = '.6'; btn.style.cursor = 'default';
       startWork();
-      try{ await cpPublishThisBuild(); }catch(e){}
-      /* only leave when it really did land */
-      const w2 = await cpWebsiteRevNow();
-      const d2 = await cpDataRepoRev();
-      const okNow = w2 && d2 && cpRevNum(w2) >= here && cpRevNum(d2) >= here;
-      if(okNow){
-        stopWork('\u2713 PUBLISHED \u2014 ' + APP_REV.toUpperCase());
-        const el = gate();
-        if(el){ setTimeout(function(){ el.style.transition = 'opacity .4s'; el.style.opacity = '0';
-                setTimeout(() => el.remove(), 420); }, 900); }
+      /* ===== Rev-1104: ONE VERDICT, NOT TWO ==================================
+         The screen Rich photographed said NOT FINISHED in thirty-point type with
+         "\u2713 REV-1103 IS ON THE WEBSITE AND GITHUB" printed directly beneath it.
+         Both lines came from this gate: the publish did its own verification and
+         reported success into the status line, and then the gate threw that away
+         and worked it out a second time by reading raw.githubusercontent.com --
+         the CDN that Rev-1103 had just stopped trusting, because it goes on
+         serving the previous file for half a minute after the commit is made. So
+         the heading was the cache's opinion and the line under it was the truth.
+         The gate now takes the answer from the publish that just ran. There is
+         only one verdict on the screen because there is only one check.
+         ==================================================================== */
+      let landed = false;
+      try{ landed = (await cpPublishThisBuild()) === true; }catch(e){ landed = false; }
+      if(landed){
+        finishWork();
       } else {
         stopWork('NOT FINISHED');
         btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
@@ -28878,4 +28949,4 @@ report can be read instead of guessed at.
 </div>
 
 
-<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div><div id="cpGate" style="position: fixed; inset: 0px; z-index: 2147482000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; background: rgb(233, 230, 225);"><div style="font:900 15px system-ui; letter-spacing:.14em; color:#7a1a1c;">CONTROL PLAN GENERATOR</div><div style="font:800 30px system-ui; color:#1d1a17; line-height:1.2; max-width:760px;">THIS BUILD IS NOT PUBLISHED YET</div><div style="font:600 15px/1.6 system-ui; color:#5a5148; max-width:640px;">You are running <b>Rev-1103</b> from your Downloads folder, but the website is on Rev-1102 and GitHub is on Rev-1102.<br>Everything you do in here would be in a build nobody else has.<br><br>Publish it and the whole shop moves to Rev-1103.</div><button id="cpGateGo" style="margin-top: 10px; padding: 30px 60px; font: 900 30px system-ui; cursor: pointer; border: 0px; border-radius: 16px; background: rgb(29, 78, 137); color: rgb(255, 255, 255); letter-spacing: 0.02em; box-shadow: rgba(0, 0, 0, 0.22) 0px 6px 18px; opacity: 1;">🚀 TRY PUBLISHING AGAIN</button><div id="cpGateWork" style="display: block;"><div class="cpGwTop"><span class="cpGwIcon" style="animation: auto ease 0s 1 normal none running none;">🚀</span><div style="flex:1; min-width:240px;"><div class="cpGwTitle" id="cpGateWorkTitle">NOT FINISHED</div><div id="cpGateStatus" style="font:700 17px system-ui; color:#4a4139; margin-top:6px;">✓ REV-1103 IS ON THE WEBSITE AND GITHUB</div></div><div style="text-align:right;"><div class="cpGwClock" id="cpGateClock">0:05</div><div style="font:700 11px system-ui; color:#6b6257;">ELAPSED</div></div></div><div class="cpGwBar" style="display: none;"><i></i></div></div><button id="cpGateSkip" style="margin-top:10px; padding:8px 14px; font:600 12px system-ui; cursor:pointer; border:0; background:none; color:#8a8279; text-decoration:underline;">carry on without publishing</button><style>@keyframes cpGateSweep{0%{left:-40%}100%{left:100%}}@keyframes cpGatePulse{0%,100%{opacity:1}50%{opacity:.55}}#cpGateWork{display:none; width:min(760px,92vw); margin-top:6px; border:3px solid #1d4e89; border-radius:16px; padding:26px 24px; background:rgba(29,78,137,.06); text-align:left;}#cpGateWork .cpGwTop{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}#cpGateWork .cpGwIcon{font-size:44px; line-height:1; animation:cpGatePulse 1.1s ease-in-out infinite;}#cpGateWork .cpGwTitle{font:900 30px system-ui; letter-spacing:.01em; line-height:1.15; color:#12324f;}#cpGateWork .cpGwClock{font:900 30px system-ui; font-variant-numeric:tabular-nums; color:#1d4e89;}#cpGateWork .cpGwBar{position:relative; height:22px; border-radius:11px; overflow:hidden; background:rgba(29,78,137,.18); margin-top:18px;}#cpGateWork .cpGwBar>i{position:absolute; top:0; bottom:0; width:40%; border-radius:11px; background:linear-gradient(90deg,rgba(29,78,137,0) 0%,#1d4e89 50%,rgba(29,78,137,0) 100%); animation:cpGateSweep 1.15s linear infinite;}</style></div></body></html>
+<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div><div id="cpGate" style="position: fixed; inset: 0px; z-index: 2147482000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; background: rgb(233, 230, 225);"><div style="font:900 15px system-ui; letter-spacing:.14em; color:#7a1a1c;">CONTROL PLAN GENERATOR</div><div style="font:800 30px system-ui; color:#1d1a17; line-height:1.2; max-width:760px;">THIS BUILD IS NOT PUBLISHED YET</div><div style="font:600 15px/1.6 system-ui; color:#5a5148; max-width:640px;">You are running <b>Rev-1104</b> from your Downloads folder, but the website is on Rev-1103 and GitHub is on Rev-1103.<br>Everything you do in here would be in a build nobody else has.<br><br>Publish it and the whole shop moves to Rev-1104.</div><button id="cpGateGo" style="margin-top: 10px; padding: 30px 60px; font: 900 30px system-ui; cursor: default; border: 0px; border-radius: 16px; background: rgb(29, 78, 137); color: rgb(255, 255, 255); letter-spacing: 0.02em; box-shadow: rgba(0, 0, 0, 0.22) 0px 6px 18px; opacity: 0.6;" disabled="">🚀 PUBLISH THIS BUILD</button><div id="cpGateWork" style="display: block;"><div class="cpGwTop"><span class="cpGwIcon">🚀</span><div style="flex:1; min-width:240px;"><div class="cpGwTitle" id="cpGateWorkTitle">PUBLISHING…</div><div id="cpGateStatus" style="font:700 17px system-ui; color:#4a4139; margin-top:6px;">PUBLISHING TO THE WEBSITE…</div></div><div style="text-align:right;"><div class="cpGwClock" id="cpGateClock">0:01</div><div style="font:700 11px system-ui; color:#6b6257;">ELAPSED</div></div></div><div class="cpGwBar"><i></i></div></div><button id="cpGateSkip" style="margin-top:10px; padding:8px 14px; font:600 12px system-ui; cursor:pointer; border:0; background:none; color:#8a8279; text-decoration:underline;">carry on without publishing</button><style>@keyframes cpGateSweep{0%{left:-40%}100%{left:100%}}@keyframes cpGatePulse{0%,100%{opacity:1}50%{opacity:.55}}@keyframes cpGateFill{from{width:0}to{width:100%}}@keyframes cpGatePop{0%{transform:scale(.4); opacity:0}60%{transform:scale(1.25); opacity:1}100%{transform:scale(1); opacity:1}}#cpGateWork{display:none; width:min(760px,92vw); margin-top:6px; border:3px solid #1d4e89; border-radius:16px; padding:26px 24px; background:rgba(29,78,137,.06); text-align:left;}#cpGateWork .cpGwTop{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}#cpGateWork .cpGwIcon{font-size:44px; line-height:1; animation:cpGatePulse 1.1s ease-in-out infinite;}#cpGateWork .cpGwTitle{font:900 30px system-ui; letter-spacing:.01em; line-height:1.15; color:#12324f;}#cpGateWork .cpGwClock{font:900 30px system-ui; font-variant-numeric:tabular-nums; color:#1d4e89;}#cpGateWork .cpGwBar{position:relative; height:22px; border-radius:11px; overflow:hidden; background:rgba(29,78,137,.18); margin-top:18px;}#cpGateWork .cpGwBar>i{position:absolute; top:0; bottom:0; width:40%; border-radius:11px; background:linear-gradient(90deg,rgba(29,78,137,0) 0%,#1d4e89 50%,rgba(29,78,137,0) 100%); animation:cpGateSweep 1.15s linear infinite;}</style></div></body></html>
