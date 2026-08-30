@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1110</title>
+<title>CONTROL PLAN GENERATOR - Rev-1108</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -523,45 +523,13 @@ window.addEventListener('DOMContentLoaded', function(){
     #cpBuilderTable input, #cpBuilderTable select, #cpBuilderTable textarea{font-size:9px !important; padding:2px 3px !important}
   }
 </style>
-</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script></head>
 <body>
-<script>
-/* ===== Rev-1109: THE MENU IS VISIBLE WHILE THE PAGE IS STILL PARSING ========
-   Putting the publish check up before showMenu() was not enough, and measuring
-   frame by frame in a browser showed why: #menuScreen carries no hidden class,
-   so the browser paints it as soon as it parses that markup -- which is well
-   before the end of a 2.6 MB script, where any boot code lives. Rich saw two
-   frames of menu. No amount of reordering inside the script can beat that,
-   because the script has not finished loading yet.
-   So this runs where it can win: at the top of the body, before the app is
-   parsed at all. A plain cover, the same colour the check screen uses, put up
-   only in the one case that leads to the check -- a file opened from disk on a
-   device with a token. The boot takes it away in the same instant it puts the
-   real screen up, so nothing is ever painted between the two. It also removes
-   itself after twenty seconds whatever happens, because a cover that outlives a
-   broken build would be worse than the flash. ============================== */
-(function(){
-  try{
-    if(location.protocol !== 'file:') return;
-    if(!localStorage.getItem('ghToken')) return;
-    var c = document.createElement('div');
-    c.id = 'cpBootCover';
-    c.style.cssText = 'position:fixed; inset:0; z-index:2147483000; background:#e9e6e1;'
-      + ' display:flex; flex-direction:column; align-items:center; justify-content:center;'
-      + ' gap:14px; text-align:center;';
-    c.innerHTML =
-        '<div style="font:900 15px system-ui; letter-spacing:.14em; color:#7a1a1c;">CONTROL PLAN GENERATOR</div>'
-      + '<div style="font:800 30px system-ui; color:#1d1a17;">STARTING\u2026</div>';
-    document.body.appendChild(c);
-    setTimeout(function(){ try{ var e = document.getElementById('cpBootCover');
-      if(e) e.remove(); }catch(_){ } }, 20000);
-  }catch(e){}
-})();
-</script>
+
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1110 · 2026-08-30 04:16 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1108 · 2026-08-30 03:36 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -587,7 +555,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1110 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 04:16 PM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1108 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 03:36 PM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -600,7 +568,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1110 · 2026-08-30 04:16 PM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1108 · 2026-08-30 03:36 PM</div>
 
       <div class="menu-grid">
       <button class="menu-btn" id="mNewPlan" onclick="showNewCP(true)" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -665,7 +633,7 @@ window.addEventListener('DOMContentLoaded', function(){
       </button>
       <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
         <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
-        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1110 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1108 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
       </button>
       </div>
       <div style="display:none">
@@ -675,7 +643,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1110 · Built 2026-08-30 04:16 PM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1108 · Built 2026-08-30 03:36 PM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -1404,7 +1372,7 @@ Part / drawing rev: Rev-1">Rev-3</div></td></tr><tr class="cp-op-row"><td colspa
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 4:36:22 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 4:37:22 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -2090,7 +2058,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1110";
+const APP_REV = "Rev-1108";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2861,28 +2829,6 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-30",
-  "rev": "App Rev-1110",
-  "type": "App",
-  "changes": [
-   "THE LOW LIMIT WAS BEING CUT IN HALF BY THE LAYOUT (Rev-1110) — Rich, on Rev-1108: \"I still can't see the lower limit value\", with a screenshot showing HIGH .6040 and the top of .6035 sliced off underneath. Rev-1108 was right as far as it went — it put the number back into the data — but there was a second fault on top of it, in the layout, and it had been hiding low limits for as long as the cards have been this size.",
-   "Measured in a browser at his window size: the strip holding the two cards is 136 pixels tall and the two cards need 199. The strip sits in a flex column as \"flex: 0 1 auto\", so when the column runs short of room flexbox shrinks it, and the strip clips whatever no longer fits. The HIGH card, being first, survived whole; the LOW card lost 63 pixels off its bottom, which at 76-point digits is most of the number.",
-   "The two cards can no longer be shrunk — they are the specification, and a specification that is only two thirds visible is worse than no specification at all. Where the screen is genuinely too short for everything, the screen scrolls, which is what a short screen is supposed to do. Verified at 2000x840, the size Rich is working at: both cards whole, and the reading box and the buttons still on screen under them."
-  ]
- },
- {
-  "ts": "2026-08-30",
-  "rev": "App Rev-1109",
-  "type": "App",
-  "changes": [
-   "THE MENU NO LONGER FLASHES BEFORE THE PUBLISH CHECK (Rev-1109) — per Rich: \"the main menu flashes for less than a second and then changes to the publish screen; I don't want to see the main menu flash.\" It was built in. Rev-1100 drew the menu and laid the check over it a second later; Rev-1106 cut that to a tenth of a second, which is still long enough to see, and a flash reads worse than a wait.",
-   "The order is the other way round now. The check builds its whole screen — panel, bar, buttons — before it asks GitHub anything, so putting it first means the first thing painted is the check. The menu is drawn underneath it and waits there, ready for the moment the check lifts away.",
-   "Nothing else moves. On the website, or on a device with no token, the check returns immediately without building anything and the menu is drawn exactly as before; and a device that cannot reach GitHub is still never left looking at nothing, because the check gives up and lifts after seven seconds.",
-   "AND THE REASON IT FLASHED AT ALL — the menu markup carries no hidden class, so the browser paints it the moment it parses that part of the file, long before the end of a 2.6 MB script where any boot code can run. Reordering inside the script could never beat that. A plain cover now goes up at the very top of the body, before the app is parsed at all, and only in the one case that leads to the check: a file opened from disk on a device with a token. The boot removes it in the same instant it puts the real screen up, so no frame is ever painted between the two. It also removes itself after twenty seconds whatever happens, because a cover outliving a broken build would be worse than the flash. Measured frame by frame in a browser: zero frames of bare menu.",
-   "THE SERIAL NUMBER IS UNMISSABLE NOW (Rev-1109) — per Rich. It sat in the top corner as an eleven-point chip identical to the part number, the shop order and the operation beside it, and the serial is the one of those four that changes with every part in his hand — get it wrong and a reading is filed against the wrong piece. The number is thirty points on the signal red now, with a small S/N label beside it, the largest thing on that bar. Styling only; nothing about how a run is recorded changes."
-  ]
- },
- {
-  "ts": "2026-08-30",
   "rev": "App Rev-1108",
   "type": "App",
   "changes": [
@@ -3518,7 +3464,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "04:16 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "03:36 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6687,39 +6633,6 @@ async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpe
     flash('Could not load the built-in validation app: ' + err.message, true);
     return;
   }
-
-  /* ===== Rev-1109: THE SERIAL NUMBER IS THE THING HE IS HOLDING =============
-     Per Rich. It sat in the top corner as an eleven-point chip identical to the
-     part number, the shop order and the operation beside it, and the serial is
-     the one of those four that changes with every part in his hand -- get it
-     wrong and a reading is filed against the wrong piece. It is now the largest
-     thing on that bar: the number at thirty points on the signal red, with a
-     small S/N label beside it. Styling only; nothing about how the run is
-     recorded changes. ==================================================== */
-  appHtml = appHtml.replace('</head>',
-      '<style>'
-    + '#pillSN{display:inline-flex; align-items:baseline; gap:9px; background:#7a1a1c;'
-    +   ' border:1px solid #b03a3c; color:#fff; padding:3px 16px; border-radius:6px;'
-    +   ' font-size:12px; letter-spacing:.12em; box-shadow:0 2px 8px rgba(0,0,0,.28);}'
-    + '#pillSN b{color:#fff; font-size:30px; font-weight:900; line-height:1.05; letter-spacing:.02em;}'
-    /* ===== Rev-1110: THE LOW CARD WAS BEING CUT IN HALF =====================
-       Rich, on Rev-1108: "I still can't see the lower limit value" -- and the
-       screenshot showed HIGH .6040 with the top of .6035 sliced off underneath.
-       Rev-1108 put the number back into the data; this is a different fault, in
-       the layout, and it had been hiding the low limit for as long as the cards
-       have been this size. Measured in a browser at his window size: the strip
-       holding the two cards is 136 pixels tall and its two cards need 199. The
-       strip sits in a flex column as "flex: 0 1 auto", so when the column runs
-       short of room flexbox SHRINKS it -- and the strip clips what overflows.
-       The high card, being first, survived; the low card lost 63 pixels off its
-       bottom, which at 76-point digits is most of the number.
-       The two cards may not be shrunk now: they are the specification. If the
-       screen is too short to hold everything, the screen scrolls instead, which
-       is what a short screen is supposed to do. ============================ */
-    + '.tol-strip{flex:0 0 auto !important; min-height:max-content !important;}'
-    + '.tol-cell{flex:0 0 auto !important;}'
-    + '.stage{overflow-y:auto !important;}'
-    + '</style></head>');
 
   const marker = 'let PARTS = [';
   const at = appHtml.indexOf(marker);
@@ -28642,27 +28555,15 @@ document.addEventListener('focusin', e => {
   }
 });
 
-/* ===== Rev-1109: NO FLASH OF THE MENU FIRST ================================
-   Per Rich: "the main menu flashes for less than a second and then changes to
-   the publish screen; I don't want to see the main menu flash." He is right, and
-   the flash was built in. Rev-1100 drew the menu and laid the gate over it a
-   second later; Rev-1106 cut that to a tenth of a second, which is still long
-   enough to see and, being a flash rather than a wait, reads worse.
-   The order is simply the other way round now. cpPublishGate builds its whole
-   screen synchronously -- the panel, the bar, the buttons -- BEFORE it asks
-   GitHub anything, so calling it first means the very first thing painted is the
-   check. showMenu() then draws the menu underneath it, where it waits, ready for
-   the moment the gate lifts away.
-   Nothing else changes. On the website, or on a device with no token, the gate
-   returns immediately without building anything and the menu is drawn exactly as
-   before -- a device that cannot reach GitHub is still never left looking at
-   nothing, because the gate itself gives up and lifts after seven seconds.
-   ========================================================================== */
-try{ cpPublishGate(); }catch(e){ console.warn('publish gate failed to start', e); }
 showMenu();
-/* Rev-1109: the cover goes now, in the same task that put the real screen up, so
-   the browser never gets a frame to paint between them. */
-try{ var _cpBC = document.getElementById('cpBootCover'); if(_cpBC) _cpBC.remove(); }catch(e){}
+/* Rev-1100: the menu is drawn first, then the gate is laid over it. Drawing the
+   menu first means a device that cannot reach GitHub, or has no token, is never
+   left looking at nothing.
+   Rev-1106: but it goes over the top AT ONCE rather than a second and a bit
+   later, per Rich -- opening a downloaded build should land on the check, not on
+   the menu with the check arriving afterwards. The screen puts itself up before
+   it asks GitHub anything, so the waiting is visible instead of invisible. */
+try{ setTimeout(function(){ try{ cpPublishGate(); }catch(e){ console.warn(e); } }, 120); }catch(e){}
 
 // Detect contexts where GitHub sync cannot work and warn the user
 function checkSyncContext(){
@@ -29477,4 +29378,4 @@ report can be read instead of guessed at.
 </div>
 
 
-<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div><div id="mvPanel" style="position: fixed; inset: 0px; z-index: 100000; background: rgb(233, 230, 223); display: flex; flex-direction: column;"><iframe id="mvFrame" style="flex: 1 1 auto; width: 100%; height: 100%; border: 0px; background: rgb(255, 255, 255);"></iframe><button style="position: fixed; top: 7px; left: 10px; z-index: 100002; background: rgb(122, 20, 20); color: rgb(255, 255, 255); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 6px; font-weight: 800; padding: 7px 12px; cursor: pointer; font-size: 13px; box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 6px;">← Control Plans</button></div></body></html>
+<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div><div id="bootErrBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 9999; background: rgb(192, 57, 43); color: rgb(255, 255, 255); padding: 10px 14px; font: 700 13px system-ui;">⚠️ APP ERROR — screenshot this line for Claude: Uncaught NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope': The script at 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js' failed to load. @ blob:null/8a5b5ed8-f136-4474-87da-ed8021f43edc:1</div><div id="mvPanel" style="position: fixed; inset: 0px; z-index: 100000; background: rgb(233, 230, 223); display: flex; flex-direction: column;"><iframe id="mvFrame" style="flex: 1 1 auto; width: 100%; height: 100%; border: 0px; background: rgb(255, 255, 255);"></iframe><button style="position: fixed; top: 7px; left: 10px; z-index: 100002; background: rgb(122, 20, 20); color: rgb(255, 255, 255); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 6px; font-weight: 800; padding: 7px 12px; cursor: pointer; font-size: 13px; box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 6px;">← Control Plans</button></div></body></html>
