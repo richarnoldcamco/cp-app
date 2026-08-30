@@ -535,7 +535,7 @@ window.addEventListener('DOMContentLoaded', function(){
        the same twin-button confusion again. -->
   <button id="hcChkBtn" title="Is this machine safe to leave?" onclick="hcOpenCheck()" style="background:#1E7A34; color:#fff; border:1px solid #124A1F; border-radius:6px; padding:6px 12px; font-family:monospace; font-size:10.5px; font-weight:800; letter-spacing:.08em; cursor:pointer; white-space:nowrap; margin-right:8px;">✓ HANDOFF CHECK</button>
   <button id="headerPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-right:8px;">⬆️ Push App</button>
-  <button class="ob-back" id="headerBack">← Back</button>
+  <button class="ob-back hidden" id="headerBack">← Back</button>
 </header>
 
 <div id="newerVersionBanner" style="display:none; background:#2c6e49; color:#fff; padding:6px 12px; font-size:12px; line-height:1.3; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
@@ -549,7 +549,7 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- MAIN MENU -->
-<div id="menuScreen" class="menu hidden">
+<div id="menuScreen" class="menu">
   <div class="brand" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
     <div style="display:flex; align-items:center; gap:12px;">
       <div class="brand-mark">📋</div>
@@ -1028,7 +1028,7 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- PROJECTS SCREEN -->
-<div id="projectsScreen" class="setup wide parts-index">
+<div id="projectsScreen" class="setup wide parts-index hidden">
   <button class="ob-back" id="projectsBack">← Back</button>
   <h1>Control Plans</h1>
   <p class="sub">All Control Plans on this device — drafts and saved projects together</p>
@@ -1307,7 +1307,7 @@ window.addEventListener('DOMContentLoaded', function(){
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 3:37:18 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 3:39:16 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -1967,7 +1967,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- FLASH MESSAGE -->
-<div id="flash" class="flash">✓ Data pushed to GitHub</div>
+<div id="flash" class="flash hidden">✓ Progress saved — back to the parts list</div>
 
 <!-- BOOT -->
 <script>
