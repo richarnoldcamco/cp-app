@@ -8,12 +8,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1085</title>
+<title>CONTROL PLAN GENERATOR - Rev-1093</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script>
+/* Rev-1087: the two libraries above are plain tags, so if that host is blocked
+   they simply are not there and every Excel or Word action fails later with a
+   puzzling message. Boot checks for them and quietly fetches a backup copy. */
+window.addEventListener('DOMContentLoaded', function(){
+  try{
+    if(typeof XLSX === 'undefined' && typeof cpLoadLib === 'function')
+      cpLoadLib('xlsx', function(){ return typeof XLSX !== 'undefined'; }).catch(function(){});
+    if(typeof mammoth === 'undefined' && typeof cpLoadLib === 'function')
+      cpLoadLib('mammoth', function(){ return typeof mammoth !== 'undefined'; }).catch(function(){});
+  }catch(e){}
+});
+</script>
 <style>
   @keyframes aiSpin { to { transform: rotate(360deg); } }
   @keyframes aiDotPulse { 0%,100%{ opacity:0.35; } 50%{ opacity:1; } }
@@ -339,6 +352,24 @@
   .brand-title{font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.2;color:#fff}
   .brand-sub{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:#a52a2a;letter-spacing:.04em;text-transform:uppercase;margin-top:6px;padding:3px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.3)}
   .menu-inner{padding:8px 20px 0;display:flex;flex-direction:column;overflow-x:hidden}
+  /* Rev-1086: TWO COLUMNS, SO THE MAIN MENU DOES NOT SCROLL. Rev-1085 let the
+     page scroll, which made every button reachable but still made Rich scroll a
+     main menu to reach the bottom half of it. Thirteen buttons in one 560px
+     column was always going to run past the bottom of a laptop screen; there was
+     a third of the window empty on either side of it. Two columns and a wider
+     card fit the lot in about half the height. One column again under 900px,
+     where a phone or a tablet in portrait has no room for two. */
+  .menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px;align-items:start;text-align:left}
+  .menu-grid > .menu-btn{margin-bottom:6px;padding:10px 14px}
+  @media (max-width:760px){ .menu-grid{grid-template-columns:1fr} }
+  /* Rev-1086: on a SHORT screen the one-line description under each button is
+     what pushes the last row off the bottom. Thirteen headings still say what
+     everything is, so the descriptions stand down rather than the menu scrolling. */
+  @media (max-height:860px){
+    .menu-grid > .menu-btn small{display:none}
+    .menu-grid > .menu-btn{padding:9px 14px;margin-bottom:5px}
+    .menu-grid > .menu-btn br{display:none}
+  }
   .menu-section-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;margin:2px 4px 4px}
   .menu-btn{
     display:flex;align-items:center;gap:12px;text-align:left;width:100%;
@@ -498,13 +529,13 @@
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1085 · 2026-08-18 08:06 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1093 · 2026-08-30 09:15 AM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
   <button id="hcChkBtn" title="Is this machine safe to leave?" onclick="hcOpenCheck()" style="background:#1E7A34; color:#fff; border:1px solid #124A1F; border-radius:6px; padding:6px 12px; font-family:monospace; font-size:10.5px; font-weight:800; letter-spacing:.08em; cursor:pointer; white-space:nowrap; margin-right:8px;">✓ HANDOFF CHECK</button>
   <button id="headerPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-right:8px;">⬆️ Push App</button>
-  <button class="ob-back hidden" id="headerBack">← Back</button>
+  <button class="ob-back" id="headerBack">← Back</button>
 </header>
 
 <div id="newerVersionBanner" style="display:none; background:#2c6e49; color:#fff; padding:6px 12px; font-size:12px; line-height:1.3; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
@@ -518,13 +549,13 @@
 </div>
 
 <!-- MAIN MENU -->
-<div id="menuScreen" class="menu">
+<div id="menuScreen" class="menu hidden">
   <div class="brand" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
     <div style="display:flex; align-items:center; gap:12px;">
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1064 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 5:54 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1093 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 09:15 AM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -532,40 +563,41 @@
     <button id="cpShotBtn" title="Take a picture of this screen and put it in your private data store" onclick="cpShotPush()" style="background:#7a1414; color:#fff; border:1px solid #5a0f0f; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-left:8px;">📷 Screenshot</button>
     <button id="newChatPromptBtn" title="Move this work to a fresh chat — guided, checked and quizzed" onclick="hcOpenWizard()" style="background:#1a5276; color:#fff; border:1px solid #154360; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-left:8px;">💬 New Chat Prompt</button>
   </div>
-  <div class="menu-inner" style="display:flex; justify-content:center; align-items:center; min-height:calc(100vh - 230px); padding:26px 16px;">
-    <div style="background:var(--panel,#fff); border-radius:16px; box-shadow:0 6px 30px rgba(0,0,0,.12); padding:28px 26px; width:min(560px,96vw); text-align:center;">
-      <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:8px 13px; margin-bottom:10px;">CP</div>
-      <div style="font-size:24px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:2px;">CONTROL PLAN GENERATOR</div>
-      <div style="font-size:12px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:6px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;"></div>
+  <div class="menu-inner" style="display:flex; justify-content:center; align-items:center; min-height:auto; padding:14px 16px;">
+    <div style="background:var(--panel,#fff); border-radius:16px; box-shadow:0 6px 30px rgba(0,0,0,.12); padding:18px 22px; width:min(1180px,96vw); text-align:center;">
+      <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
+      <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
+      <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1093 · 2026-08-30 09:15 AM</div>
 
+      <div class="menu-grid">
       <button class="menu-btn" id="mNewPlan" onclick="showNewCP(true)" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
         <b style="font-size:15px;">🆕 NEW CONTROL PLAN</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">UPLOAD AN ODS AND BUILD A NEW PLAN</small>
       </button>
       <button class="menu-btn" id="mProjects" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">📁 CONTROL PLANS <span id="badgeProjects" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">0</span></b><br>
-        <small style="font-size:11px; color:var(--ink-dim);">OPEN, EDIT, INSPECT OR DOWNLOAD ANY SAVED PLAN</small>
+        <b style="font-size:15px;">📁 CONTROL PLANS <span id="badgeProjects" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">14 <span class="bsub">Projects</span></span></b><br>
+        <small id="mProjectsSub" style="font-size:11px; color:var(--ink-dim);">OPEN, EDIT, INSPECT OR DOWNLOAD ANY SAVED PLAN</small>
       </button>
       <button class="menu-btn" id="mValidation" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block; background:#2c6e49; border-color:#215236; color:#fff;">
         <b style="font-size:15px;">🔬 MACHINIST VALIDATION</b><br>
         <small style="font-size:11px; opacity:.9;">ALL PLANS, READY TO INSPECT</small>
       </button>
       <button class="menu-btn" id="mGages" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">🔧 GAGES TO BE MADE <span id="badgeGages" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">0</span></b><br>
+        <b style="font-size:15px;">🔧 GAGES TO BE MADE <span id="badgeGages" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">2 OPEN / 2</span></b><br>
         <small style="font-size:11px; color:var(--ink-dim);">SPECIAL GAGES AND FIXTURES CALLED OUT ON ANY CONTROL PLAN</small>
       </button>
       <button class="menu-btn" id="mQeBoard" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">&#128300; QE BOARD</b><br>
+        <b style="font-size:15px;">🔬 QE BOARD</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">EVERY JOB RUNNING, ONE SCREEN</small>
       </button>
       <button class="menu-btn" id="mQiLive" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">&#128225; QUALITY INSPECTOR</b><br>
+        <b style="font-size:15px;">📡 QUALITY INSPECTOR</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">WHAT EVERY STATION IS MEASURING RIGHT NOW</small>
       </button>
       <button class="menu-btn" id="mFinalInsp" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">&#129534; FINAL INSPECTION</b><br>
-        <small style="font-size:11px; color:var(--ink-dim);">ENTER A FINAL VALIDATION CHECK &mdash; NO SPREADSHEET</small>
+        <b style="font-size:15px;">🧾 FINAL INSPECTION</b><br>
+        <small style="font-size:11px; color:var(--ink-dim);">ENTER A FINAL VALIDATION CHECK — NO SPREADSHEET</small>
       </button>
       <button class="menu-btn" id="mReports" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
         <b style="font-size:15px;">📊 REPORTS</b><br>
@@ -599,14 +631,15 @@
         <b style="font-size:15px;">↻ PULL CODE &amp; DATA</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">GET THE NEWEST APP CODE AND DATA FROM GITHUB RIGHT NOW — DON'T WAIT FOR THE TIMER</small>
       </button>
+      </div>
       <div style="display:none">
-        <span id="badgeMaster"></span><span id="badgeCustomers"></span><span id="badgeInstructions"></span>
+        <span id="badgeMaster">76<span class="bsub">Control Types</span></span><span id="badgeCustomers">11<span class="bsub">Customers</span></span><span id="badgeInstructions">Rev-92<span class="bsub">Instructions</span></span>
       </div>
     </div>
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1085 · Built Aug 18, 2026</span>
+    <span id="revFooter">App Rev-1093 · Built 2026-08-30 09:15 AM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -764,7 +797,7 @@
         <button type="button" id="enhanceOdsBtn" style="background:#1a5276; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🔧 Make Clearer</button>
         <button type="button" id="addBalloonsBtn" style="background:#6e1414; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🎯 Add Balloons with AI</button>
         <button type="button" id="downloadBalloonedBtn" style="background:#2c6e49; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">👁️ View Ballooned Drawing</button>
-        <button type="button" id="odsRevsBtn" onclick="openDrawingRevs()" style="background:#5a4a2a; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🕐 Revisions (0)</button>
+        <button type="button" id="odsRevsBtn" onclick="openDrawingRevs()" style="background:#5a4a2a; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🕐 Revisions (1)</button>
         <span id="balloonStatusMsg" style="font-size:12px; color:var(--ink-dim);"></span>
       </div>
     </div>
@@ -1167,20 +1200,20 @@
 </div>
 
 <!-- API SETTINGS SCREEN -->
-<div id="settingsScreen" class="setup hidden">
+<div id="settingsScreen" class="setup">
   <button class="ob-back" id="settingsBack">← Back</button>
   <h1>API Settings</h1>
   <p class="sub">Configure Anthropic API key for ODS balloon analysis</p>
 
   <div class="field" id="cpUserNameBox" style="border:2px solid var(--signal); border-radius:8px; padding:12px; margin-bottom:22px;">
-    <label>&#128100; WHO IS USING THIS DEVICE</label>
+    <label>👤 WHO IS USING THIS DEVICE</label>
     <input type="text" id="cpUserName" placeholder="R. ARNOLD" autocapitalize="characters" autocorrect="off" spellcheck="false">
     <p style="font-size:12px; color:var(--ink-dim); margin-top:8px;">
       This name is stamped on every sign-off, override and inspection run made on THIS device.
       Set it once per device. It is stored on the device only and is never sent anywhere.
     </p>
-    <p style="font-size:12px; font-weight:700; margin:6px 0 0;" id="cpUserNameNow"></p>
-    <button class="btn-primary" id="cpUserNameSaveBtn" style="width:100%; margin-top:10px;">&#128190; SAVE NAME</button>
+    <p style="font-size: 12px; font-weight: 700; margin: 6px 0px 0px; color: var(--ink-dim);" id="cpUserNameNow">Currently stamping as: HOME DESKTOP</p>
+    <button class="btn-primary" id="cpUserNameSaveBtn" style="width:100%; margin-top:10px;">💾 SAVE NAME</button>
   </div>
 
   <div class="field">
@@ -1201,7 +1234,7 @@
       <option value="desktop">Force Desktop</option>
       <option value="phone">Force Phone</option>
     </select>
-    <p style="font-size:12px; color:var(--ink-dim); margin-top:8px;" id="cpDeviceModeNote">Controls phone-specific hints (e.g. "run Locate on desktop"). Auto-detect uses your browser/screen. Override if it guesses wrong.</p>
+    <p style="font-size:12px; color:var(--ink-dim); margin-top:8px;" id="cpDeviceModeNote">Auto-detect — currently seeing this as a DESKTOP. Phone-specific hints adjust accordingly.</p>
   </div>
 
   <div style="margin-top: 28px; padding-top: 24px; border-top: 2px solid var(--signal);">
@@ -1253,7 +1286,7 @@
          pushes releases). The manual/emergency tools live in this collapsed section. -->
     <button class="btn-ghost" id="cpArchBtn" style="min-height:48px; width:100%; margin-bottom:10px;">📐 How This App Works — architecture &amp; storage</button>
     <button class="btn-ghost" id="cpRecipeBtn" style="min-height:48px; width:100%; margin-bottom:10px;">📋 New-App Recipe — copy &amp; paste into a new chat</button>
-    <details style="margin-bottom:10px; border:1px solid var(--line); border-radius:10px; padding:8px 12px;">
+    <details style="margin-bottom:10px; border:1px solid var(--line); border-radius:10px; padding:8px 12px;" open="">
       <summary style="cursor:pointer; font-size:13px; font-weight:700; color:var(--ink-dim); padding:4px 0;">🛠️ Advanced — rarely needed (emergency app publishing &amp; data reset)</summary>
       <div style="font-size:11px; color:var(--ink-dim); margin:8px 0 6px;">Everything here happens automatically in normal use. Use only if directed during troubleshooting.</div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px;">
@@ -1276,7 +1309,7 @@
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ App Rev-467 pushed at 7/17/2026, 9:32:21 AM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">Publishing to website…</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -1284,7 +1317,7 @@
   <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line);">
     <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">🧠 Shop Learning (control-type proposals)</h2>
     <p class="sub" style="margin-bottom: 12px;">The app learns feature → control-type mappings from every plan you build and syncs them shop-wide. Seed it from your entire plan history in one pass so the 📌 and 🤖 proposals are sharp right away.</p>
-    <p id="cpLearnStatus" style="font-size:12px; color:var(--ink-dim); padding:10px; background:var(--panel-2); border-radius:6px; margin-bottom:10px;">—</p>
+    <p id="cpLearnStatus" style="font-size:12px; color:var(--ink-dim); padding:10px; background:var(--panel-2); border-radius:6px; margin-bottom:10px;">20 learned feature→type mappings in shop memory.</p>
     <button class="btn-ghost" id="cpLearnAllBtn" onclick="cpLearnFromAllPlans()" style="width:100%; min-height:48px; background:#1a5276; color:#fff; border:1px solid #154360; font-weight:700;">📚 Learn from all saved plans</button>
     <p style="font-size:11px; color:var(--ink-dim); margin-top:8px;">Scans every saved project's rows for a feature + chosen control type, records the mappings (newest plan wins on conflicts, existing corrections kept), and syncs them to GitHub so all desktops share them. Safe to re-run anytime.</p>
     <button class="btn-ghost" id="cpLearnReportBtn" onclick="cpExportLearnedReport()" style="width:100%; min-height:44px; margin-top:10px;">📄 Export Learned Behavior (printable report)</button>
@@ -1344,8 +1377,67 @@
       <button class="cp-btn cp-btn-quiet" id="cpLogAllBtn" style="width:130px;">All devices</button>
       <button class="cp-btn cp-btn-danger" id="cpLogClear" style="width:96px;">Clear</button>
     </div>
-    <div id="cpLogStat" style="font-size:11px; color:var(--ink-dim); margin:0 0 8px;"></div>
-    <pre id="cpLogView" style="max-height:260px; overflow:auto; border:1px solid var(--line); background:#fbfaf7; padding:8px; font-size:10.5px; line-height:1.5; margin:0; white-space:pre-wrap;"></pre>
+    <div id="cpLogStat" style="font-size:11px; color:var(--ink-dim); margin:0 0 8px;">This device: DESKTOP-0E4EA4 · 1261 entries here · archived 1255 to logs/DESKTOP-0E4EA4.json at 8/30/2026, 9:16:26 AM</div>
+    <pre id="cpLogView" style="max-height:260px; overflow:auto; border:1px solid var(--line); background:#fbfaf7; padding:8px; font-size:10.5px; line-height:1.5; margin:0; white-space:pre-wrap;">2026-08-29 12:49:24  CLICK       ✏️
+2026-08-29 12:49:27  TYPE        cpRenDesc
+2026-08-29 12:49:30  TYPE        cpRenDesc
+2026-08-29 12:49:32  CLICK       #cpRenSave ✓ Save
+2026-08-29 12:49:37  CLICK       Open →
+2026-08-29 12:49:43  CLICK       📄 UPLOAD ODSDO THIS NEXT
+2026-08-29 12:50:30  CLICK       #cptvCancel Cancel
+2026-08-29 12:50:35  CLICK       📄 UPLOAD ODSDO THIS NEXT
+2026-08-29 12:53:50  PUSH        data push started
+2026-08-29 12:54:38  NAV         app-start Rev-1086
+2026-08-29 12:54:38  NAV         Menu
+2026-08-29 12:54:39  NAV         build stamp from GitHub: 2026-08-28 8:10 PM
+2026-08-29 12:54:52  CLICK       #mProjects 📁 CONTROL PLANS 14 Projects
+        OPE
+2026-08-29 12:54:52  NAV         Projects
+2026-08-29 12:54:54  CLICK       Open →
+2026-08-29 12:54:55  CLICK       📄 UPLOAD ODSDO THIS NEXT
+2026-08-29 12:55:11  TYPE        INPUT
+2026-08-29 13:49:31  PUSH        data push started
+2026-08-29 13:53:58  PUSH        data push started
+2026-08-30 12:55:30  NAV         app-start Rev-1092
+2026-08-30 12:55:30  NAV         Menu
+2026-08-30 12:55:32  CLICK       #mAdmin ⚙️ ADMIN
+        ACTION LOG · RECENT CHA
+2026-08-30 12:55:32  NAV         Admin
+2026-08-30 12:55:39  CLICK       ⚙️ API Key &amp; GitHub Sync Settings
+2026-08-30 12:55:39  NAV         Settings
+2026-08-30 12:55:49  PUSH        data push started
+2026-08-30 12:56:02  TYPE        ghToken
+2026-08-30 12:56:03  CLICK       #ghSaveBtn 💾 Save GitHub Settings
+2026-08-30 12:56:03  PUSH        data push started
+2026-08-30 12:56:08  CLICK       #ghTestBtn 🔌 Test Connection
+2026-08-30 12:56:13  CLICK       #ghTestBtn 🔌 Test Connection
+2026-08-30 12:56:16  PUSH        data push started
+2026-08-30 12:56:18  LOGSYNC-FAIL GitHub refused the write (409)
+2026-08-30 12:56:20  PUSH        data push started
+2026-08-30 12:56:46  PUSH        data push started
+2026-08-30 12:56:49  CLICK       #cpImportAppBtn 📂 Import App Code
+2026-08-30 12:56:51  PUSH        data push started
+2026-08-30 12:56:59  TYPE        cpImportAppFile
+2026-08-30 12:57:05  PUSH        data push started
+2026-08-30 13:00:56  CLICK       #cpImportAppBtn 📂 Import App Code
+2026-08-30 13:01:00  TYPE        cpImportAppFile
+2026-08-30 13:01:06  CLICK       #cpImportAppBtn 📂 Import App Code
+2026-08-30 13:01:09  TYPE        cpImportAppFile
+2026-08-30 13:03:34  PUSH        data push started
+2026-08-30 13:05:22  NAV         auto-update paused after 3 tries chasing Rev-1092
+2026-08-30 13:06:23  NAV         auto-update paused after 3 tries chasing Rev-1092
+2026-08-30 13:07:23  NAV         auto-update paused after 3 tries chasing Rev-1092
+2026-08-30 13:09:22  NAV         auto-update paused after 3 tries chasing Rev-1092
+2026-08-30 13:10:23  NAV         auto-update paused after 3 tries chasing Rev-1092
+2026-08-30 13:12:22  NAV         auto-update paused after 3 tries chasing Rev-1092
+2026-08-30 13:14:23  NAV         auto-update paused after 3 tries chasing Rev-1092
+2026-08-30 13:15:23  NAV         auto-update paused after 3 tries chasing Rev-1092
+2026-08-30 13:17:23  NAV         auto-update paused after 3 tries chasing Rev-1092
+2026-08-30 13:17:35  NAV         app-start Rev-1093
+2026-08-30 13:17:35  NAV         Menu
+2026-08-30 13:17:36  CLICK       #mAdmin ⚙️ ADMIN
+        ACTION LOG · RECENT CHA
+2026-08-30 13:17:36  NAV         Admin</pre>
   </div>
 
   <!-- Rev-511: reference screens moved off the home menu into Admin -->
@@ -1384,8 +1476,8 @@
   <div style="margin-bottom: 24px; padding-top: 24px; border-top: 1px solid var(--line);">
     <h3 style="font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px;">Data Storage</h3>
     <div style="background: var(--panel-2); padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 13px;">
-      <p style="margin: 0;"><strong>Master List:</strong> <span id="adminMasterCount">0</span> rows</p>
-      <p style="margin: 8px 0 0 0;"><strong>Saved Projects:</strong> <span id="adminProjectCount">0</span> projects</p>
+      <p style="margin: 0;"><strong>Master List:</strong> <span id="adminMasterCount">76</span> rows</p>
+      <p style="margin: 8px 0 0 0;"><strong>Saved Projects:</strong> <span id="adminProjectCount">12</span> projects</p>
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
       <button class="btn-secondary" onclick="downloadBackup()" style="font-size:13px; padding:10px;">⬆️ Backup</button>
@@ -1434,7 +1526,7 @@
     <button class="ob-back" id="gagesBack" style="margin:0;">← Back</button>
     <h1 style="margin:0; font-size:20px;">Gages To Be Made</h1>
     <select id="gagesFilter" style="height:34px; border:1px solid var(--line-strong); border-radius:8px; padding:0 8px; font-size:13px; margin-left:auto;">
-      <option value="OPEN" selected>Open only</option>
+      <option value="OPEN" selected="">Open only</option>
       <option value="ALL">All</option>
       <option value="TO BE MADE">To be made</option>
       <option value="DESIGNED">Designed</option>
@@ -1464,8 +1556,8 @@
 </div>
 
 <div id="fiScreen" class="setup hidden">
-  <button class="ob-back" id="fiBack">&#8592; Back</button>
-  <h2 style="margin:6px 0 2px;">&#129534; FINAL INSPECTION</h2>
+  <button class="ob-back" id="fiBack">← Back</button>
+  <h2 style="margin:6px 0 2px;">🧾 FINAL INSPECTION</h2>
   <div style="font-size:12px; color:var(--ink-dim); margin-bottom:12px;">
     The final validation check, entered here instead of on a spreadsheet.
   </div>
@@ -1487,28 +1579,32 @@
        background:rgba(127,127,127,0.12); margin-bottom:10px;"></div>
 
   <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
-    <button class="fi-filter" data-f="ALL"    style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">ALL</button>
-    <button class="fi-filter" data-f="CMM"    style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">CMM</button>
-    <button class="fi-filter" data-f="GAGE"   style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">GAGE &amp; INDICATOR</button>
+    <button class="fi-filter" data-f="ALL" style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">ALL</button>
+    <button class="fi-filter" data-f="CMM" style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">CMM</button>
+    <button class="fi-filter" data-f="GAGE" style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">GAGE &amp; INDICATOR</button>
     <button class="fi-filter" data-f="VISUAL" style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">VISUAL</button>
-    <button class="fi-filter" data-f="TODO"   style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">NOT DONE</button>
-    <button class="fi-filter" data-f="BAD"    style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid #c0392b; border-radius:8px; color:#c0392b;">PROBLEMS</button>
+    <button class="fi-filter" data-f="TODO" style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">NOT DONE</button>
+    <button class="fi-filter" data-f="BAD" style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid #c0392b; border-radius:8px; color:#c0392b;">PROBLEMS</button>
   </div>
 
   <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
     <span style="font-size:11px; font-weight:800; color:var(--ink-dim); letter-spacing:.06em;">VIEW</span>
     <div style="display:flex; border:2px solid var(--line); border-radius:8px; overflow:hidden;">
-      <button id="fiViewCards"  class="fi-view" style="border:0; padding:8px 16px; font-weight:800; cursor:pointer;">CARDS</button>
+      <button id="fiViewCards" class="fi-view" style="border:0; padding:8px 16px; font-weight:800; cursor:pointer;">CARDS</button>
       <button id="fiViewReport" class="fi-view" style="border:0; padding:8px 16px; font-weight:800; cursor:pointer;">REPORT LAYOUT</button>
     </div>
-    <span style="font-size:11px; color:var(--ink-dim);">Report layout reads down the page like the CMM printout &mdash; Tab and Enter jump straight to the next value.</span>
+    <span style="font-size:11px; color:var(--ink-dim);">Report layout reads down the page like the CMM printout — Tab and Enter jump straight to the next value.</span>
   </div>
 
   <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
     <button id="fiScan" style="padding:10px 18px; font-weight:800; cursor:pointer; border-radius:8px;
-      border:2px solid #1a5276; background:#1a5276; color:#fff;">&#128444;&#65039; SCAN A CMM REPORT</button>
-    <input type="file" id="fiScanFile" accept="application/pdf,image/*" style="display:none;">
+      border:2px solid #1a5276; background:#1a5276; color:#fff;">📄 LOAD A CMM REPORT</button>
+    <input type="file" id="fiScanFile" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain,application/pdf,image/*" style="display:none;">
     <span id="fiScanMsg" style="font-size:12px; font-weight:700; color:var(--ink-dim);"></span>
+    <span style="font-size:11px; color:var(--ink-dim); flex-basis:100%;">
+      A <b>CSV or text export from the CMM</b> is read exactly — the numbers come across as the machine
+      wrote them. A PDF or a picture has to be guessed at letter by letter, so ask for the export if you can get one.
+    </span>
   </div>
 
   <style>
@@ -1527,12 +1623,12 @@
   <div id="fiBusy" style="display:none; border:3px solid #1a5276; border-radius:14px;
        padding:26px 24px; margin-bottom:16px; background:rgba(26,82,118,0.06);">
     <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-      <span class="fiDot" style="font-size:40px; line-height:1;">&#128444;&#65039;</span>
+      <span class="fiDot" style="font-size:40px; line-height:1;">🖼️</span>
       <div style="flex:1; min-width:220px;">
         <div id="fiBusyTitle" style="font-size:30px; font-weight:900; letter-spacing:.01em; line-height:1.15;">
           READING THE REPORT</div>
         <div id="fiBusyDetail" style="font-size:17px; font-weight:700; color:var(--ink-dim); margin-top:4px;">
-          Starting&hellip;</div>
+          Starting…</div>
       </div>
       <div style="text-align:right;">
         <div id="fiBusyTimer" style="font-size:30px; font-weight:900; font-variant-numeric:tabular-nums;">0:00</div>
@@ -1542,16 +1638,40 @@
     <div class="fiBar" style="margin-top:18px;"><i></i><b id="fiBusyFill"></b></div>
     <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap;">
       <div style="font-size:13px; color:var(--ink-dim);">
-        This runs on this machine &mdash; the scan is not sent anywhere. A long report takes a few minutes.
+        This runs on this machine — the scan is not sent anywhere. A long report takes a few minutes.
       </div>
       <button id="fiBusyCancel" style="padding:9px 18px; font-weight:800; cursor:pointer;
         border:2px solid var(--line); border-radius:8px;">CANCEL</button>
     </div>
   </div>
 
+  <div id="fiMap" style="display:none; border:2px solid #7a4a00; border-radius:10px; padding:12px; margin-bottom:16px;
+       background:rgba(122,74,0,0.05);">
+    <div style="font-weight:800; font-size:14px; margin-bottom:4px;">WHICH COLUMN IS WHICH?</div>
+    <div id="fiMapNote" style="font-size:12px; color:var(--ink-dim); line-height:1.5; margin-bottom:10px;"></div>
+    <div id="fiMapPreview" style="overflow:auto; max-height:220px; border:1px solid var(--line);
+         border-radius:6px; margin-bottom:10px;"></div>
+    <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+      <label style="font-size:12px; font-weight:800;">FEATURE NAME<br>
+        <select id="fiMapName" style="padding:7px; font-size:13px; min-width:180px;"></select></label>
+      <label style="font-size:12px; font-weight:800;">MEASURED VALUE<br>
+        <select id="fiMapAct" style="padding:7px; font-size:13px; min-width:180px;"></select></label>
+      <label style="font-size:12px; font-weight:700; align-self:flex-end;">
+        <input type="checkbox" id="fiMapHeader"> the first row is column headings</label>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+      <button id="fiMapGo" class="btn-primary" style="padding:10px 18px;">USE THESE COLUMNS</button>
+      <button id="fiMapCancel" style="padding:10px 18px; font-weight:800; cursor:pointer;
+        border:2px solid var(--line); border-radius:8px;">CANCEL</button>
+    </div>
+    <div style="font-size:11px; color:var(--ink-dim); margin-top:8px;">
+      This is remembered for this part, so it only has to be answered once.
+    </div>
+  </div>
+
   <div id="fiReview" style="display:none; border:2px solid #1a5276; border-radius:10px; padding:12px; margin-bottom:16px;">
-    <div style="font-weight:800; font-size:14px; margin-bottom:4px;">READ OFF THE REPORT &mdash; NOTHING IS FILLED IN YET</div>
-    <div style="font-size:11px; color:var(--ink-dim); line-height:1.5; margin-bottom:10px;">
+    <div id="fiReviewTitle" style="font-weight:800; font-size:14px; margin-bottom:4px;">READ OFF THE REPORT — NOTHING IS FILLED IN YET</div>
+    <div id="fiReviewNote" style="font-size:11px; color:var(--ink-dim); line-height:1.5; margin-bottom:10px;">
       Check each line against the report before accepting it. Reading a scan is not exact: a dropped
       minus sign or a value landing on the wrong feature both look perfectly ordinary afterwards.
       Only lines the app is confident about are ticked to start with.
@@ -1568,14 +1688,14 @@
   <div id="fiRows"></div>
 
   <div style="display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 6px;">
-    <button id="fiSave" class="btn-primary" style="padding:11px 20px;">&#128190; SAVE ON THIS DEVICE</button>
-    <button id="fiPush" style="padding:11px 20px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">&#9729;&#65039; SAVE TO GITHUB</button>
+    <button id="fiSave" class="btn-primary" style="padding:11px 20px;">💾 SAVE ON THIS DEVICE</button>
+    <button id="fiPush" style="padding:11px 20px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">☁️ SAVE TO GITHUB</button>
     <button id="fiClear" style="padding:11px 20px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">START A NEW SERIAL</button>
   </div>
   <div id="fiStatus" style="font-size:12px; font-weight:700; margin-top:6px;"></div>
 
   <p style="font-size:11px; color:var(--ink-dim); margin-top:18px; line-height:1.5;">
-    Every entry is kept on this device as you type &mdash; closing the screen does not lose it. A value
+    Every entry is kept on this device as you type — closing the screen does not lose it. A value
     typed against a characteristic with numeric limits is judged in or out of tolerance immediately;
     plug gage, drop indicator and visual checks are marked by hand, because there is no number to judge.
     RE-MEASURE opens a second value and a second call on the same line, the way the spreadsheet does.
@@ -1583,8 +1703,8 @@
 </div>
 
 <div id="qiScreen" class="setup hidden">
-  <button class="ob-back" id="qiBack">&#8592; Back</button>
-  <h2 style="margin:6px 0 2px;">&#128225; QUALITY INSPECTOR</h2>
+  <button class="ob-back" id="qiBack">← Back</button>
+  <h2 style="margin:6px 0 2px;">📡 QUALITY INSPECTOR</h2>
   <div style="font-size:12px; color:var(--ink-dim); margin-bottom:12px;">
     What every station is measuring right now.
   </div>
@@ -1592,18 +1712,18 @@
   <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
     <div style="display:flex; border:2px solid var(--line); border-radius:8px; overflow:hidden;">
       <button id="qiModeLive" class="qi-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">LIVE STATIONS</button>
-      <button id="qiModeSim"  class="qi-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">SIMULATED TABLETS</button>
+      <button id="qiModeSim" class="qi-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">SIMULATED TABLETS</button>
     </div>
-    <button id="qiRefresh" class="btn-primary" style="padding:9px 16px;">&#8635; REFRESH NOW</button>
+    <button id="qiRefresh" class="btn-primary" style="padding:9px 16px;">↻ REFRESH NOW</button>
     <label style="font-size:12px; display:flex; align-items:center; gap:6px;">
-      <input type="checkbox" id="qiAuto" checked> Refresh every 30 seconds
+      <input type="checkbox" id="qiAuto" checked=""> Refresh every 30 seconds
     </label>
     <span id="qiAge" style="font-size:12px; font-weight:700; color:var(--ink-dim);"></span>
   </div>
 
   <div id="qiSimBanner" style="display:none; background:#7a4a00; color:#fff; font-weight:800;
        padding:10px 12px; border-radius:8px; margin-bottom:12px; font-size:13px;">
-    &#9888; SIMULATED TABLETS &mdash; every station, part, serial and reading on this screen is
+    ⚠ SIMULATED TABLETS — every station, part, serial and reading on this screen is
     invented. No tablet is running, nothing is written anywhere, and none of it is measurement
     evidence. Switch to LIVE STATIONS for the real floor.
   </div>
@@ -1614,17 +1734,17 @@
   <p style="font-size:11px; color:var(--ink-dim); margin-top:18px; line-height:1.5;">
     Each station overwrites one small file while a part is on the machine, at most once every
     45&nbsp;seconds. This screen is therefore about a minute behind the floor rather than several
-    minutes &mdash; but it is still not a live video feed, and the age of every card is shown on it.
+    minutes — but it is still not a live video feed, and the age of every card is shown on it.
     A station that has said nothing for five minutes is marked QUIET; that usually means the part
     finished or the tablet was closed, not that anything is wrong. Nothing on this screen is
-    measurement evidence &mdash; the record of a part is still the run written when it is completed
+    measurement evidence — the record of a part is still the run written when it is completed
     or scrapped.
   </p>
 </div>
 
 <div id="qeBoardScreen" class="setup hidden">
-  <button class="ob-back" id="qeBoardBack">&#8592; Back</button>
-  <h2 style="margin:6px 0 2px;">&#128300; QE BOARD</h2>
+  <button class="ob-back" id="qeBoardBack">← Back</button>
+  <h2 style="margin:6px 0 2px;">🔬 QE BOARD</h2>
   <div id="qeBoardSubtitle" style="font-size:12px; color:var(--ink-dim); margin-bottom:12px;">
     Every job, one screen.
   </div>
@@ -1632,18 +1752,18 @@
   <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
     <div style="display:flex; border:2px solid var(--line); border-radius:8px; overflow:hidden;">
       <button id="qeModeReal" class="qe-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">REAL RUNS</button>
-      <button id="qeModeSim"  class="qe-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">SIMULATED</button>
+      <button id="qeModeSim" class="qe-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">SIMULATED</button>
     </div>
-    <button id="qeBoardRefresh" class="btn-primary" style="padding:9px 16px;">&#8635; REFRESH NOW</button>
+    <button id="qeBoardRefresh" class="btn-primary" style="padding:9px 16px;">↻ REFRESH NOW</button>
     <label style="font-size:12px; display:flex; align-items:center; gap:6px;">
-      <input type="checkbox" id="qeAutoRefresh" checked> Refresh every 60 seconds
+      <input type="checkbox" id="qeAutoRefresh" checked=""> Refresh every 60 seconds
     </label>
     <span id="qeBoardAge" style="font-size:12px; font-weight:700; color:var(--ink-dim);"></span>
   </div>
 
   <div id="qeSimBanner" style="display:none; background:#7a4a00; color:#fff; font-weight:800;
        padding:10px 12px; border-radius:8px; margin-bottom:12px; font-size:13px;">
-    &#9888; SIMULATED &mdash; every figure on this screen is invented. Nothing here is measurement
+    ⚠ SIMULATED — every figure on this screen is invented. Nothing here is measurement
     evidence and nothing is written anywhere.
   </div>
 
@@ -1651,7 +1771,7 @@
   <div id="qeBoardEmpty" style="display:none; padding:26px; text-align:center; color:var(--ink-dim); font-size:14px;"></div>
 
   <p style="font-size:11px; color:var(--ink-dim); margin-top:18px; line-height:1.5;">
-    A run reaches the repository when the machinist COMPLETES or SCRAPS a part &mdash; nothing is sent
+    A run reaches the repository when the machinist COMPLETES or SCRAPS a part — nothing is sent
     while a part is being measured. So this board is minutes behind the floor, not live. The age
     shown above is the age of the newest run it can see.
   </p>
@@ -1934,7 +2054,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1085";
+const APP_REV = "Rev-1093";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2078,8 +2198,61 @@ function renderActionLogPanel(){
 // THAT, converted to Eastern. The typed-in constant stays as an offline fallback, so a
 // device with no network still shows something sensible — it just is not trusted when
 // the truth is one request away. Public read: no token, no data leaves the device.
+/* ===== Rev-1090: THE STAMP MUST NOT LIE =====================================
+   The badge and the footer were repainted with the commit time of index.html on
+   GitHub, whatever this build actually was. Open a downloaded CP-Rev1089.html and
+   it announced "App Rev-1089 - Published 2026-08-28 8:10 PM ET" -- a revision that
+   had never been published, wearing the publish time of a different one. The same
+   thing happens on a website that is running ahead of what is on GitHub.
+   The stamp now only says "Published" when the file on GitHub really is this
+   revision. Otherwise it shows this file's own build time and says so.
+   ========================================================================== */
+function cpOwnStamp(){ return BUILD_DATE + ' ' + BUILD_TIME; }
+function cpPaintStamp(stamp, footer){
+  try{
+    const b = document.getElementById('brandRev');
+    if(b) b.innerHTML = APP_REV.toUpperCase()
+      + ' <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">' + stamp + '</span>';
+    const cr = document.getElementById('cpCardRev'); if(cr) cr.textContent = APP_REV.toUpperCase() + ' \u00b7 ' + stamp;
+    const rf = document.getElementById('revFooter'); if(rf) rf.textContent = 'App ' + APP_REV + ' \u00b7 ' + footer;
+    const hr = document.getElementById('headerRev'); if(hr) hr.textContent = APP_REV + ' \u00b7 ' + stamp;
+  }catch(e){}
+}
+/* Which revision is actually on the website? Only the first few kilobytes are
+   needed -- the <title> carries the rev -- so this asks for a byte range and
+   walks away if the server will not honour it, rather than pulling 2.6 MB on
+   every page load. */
+async function cpRawRevOf(user, repo, path, token){
+  try{
+    const h = { 'Range': 'bytes=0-8191' };
+    if(token) h['Authorization'] = 'Bearer ' + token;
+    const r = await fetch('https://raw.githubusercontent.com/' + user + '/' + repo + '/main/' + path
+                          + '?cb=' + Date.now(), { cache: 'no-store', headers: h });
+    if(r.status !== 206){ try{ if(r.body && r.body.cancel) r.body.cancel(); }catch(e){} return null; }
+    const head = await r.text();
+    const m = /<title>CONTROL PLAN GENERATOR - (Rev-\d+)<\/title>/.exec(head);
+    return m ? m[1] : null;
+  }catch(e){ return null; }
+}
+async function cpPublishedRev(){
+  return await cpRawRevOf('richarnoldcamco', 'cp-app', 'index.html', null);
+}
+/* Rev-1093: the private data repo needs the token to be read at all. */
+async function cpDataRepoRev(){
+  try{
+    const c = (typeof ghConfig === 'function') ? ghConfig() : null;
+    if(!c || !c.user || !c.repo || !c.token) return null;
+    return await cpRawRevOf(c.user, c.repo, GH_APP_FILE, c.token);
+  }catch(e){ return null; }
+}
 async function cpSyncBuildStamp(){
   try{
+    /* a downloaded copy is never the published one, and does not need the network
+       to know it */
+    if(location.protocol === 'file:'){
+      cpPaintStamp(cpOwnStamp(), 'Built ' + cpOwnStamp() + ' ET \u00b7 downloaded copy, not the website');
+      return;
+    }
     const r = await fetch('https://api.github.com/repos/richarnoldcamco/cp-app/commits?path=index.html&per_page=1&cb=' + Date.now(),
       { cache: 'no-store', headers: { 'Accept': 'application/vnd.github+json' } });
     if(!r.ok) return;
@@ -2090,11 +2263,14 @@ async function cpSyncBuildStamp(){
     const date = d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' });          // YYYY-MM-DD
     const time = d.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
     const stamp = date + ' ' + time;
-    const put = (id, html) => { const e = document.getElementById(id); if(e) e.innerHTML = html; };
-    put('brandRev', APP_REV.toUpperCase() + ' <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">' + stamp + '</span>');
-    const cr = document.getElementById('cpCardRev'); if(cr) cr.textContent = APP_REV.toUpperCase() + ' \u00b7 ' + stamp;
-    const rf = document.getElementById('revFooter'); if(rf) rf.textContent = 'App ' + APP_REV + ' \u00b7 Published ' + stamp + ' ET';
-    const hr = document.getElementById('headerRev'); if(hr) hr.textContent = APP_REV + ' \u00b7 ' + stamp;
+    const pub = await cpPublishedRev();
+    if(pub && pub !== APP_REV){
+      cpPaintStamp(cpOwnStamp(), 'Built ' + cpOwnStamp() + ' ET \u00b7 NOT PUBLISHED \u2014 the website has ' + pub);
+      window._cpPublishedStamp = null;
+      logAct('nav', 'this build is ' + APP_REV + '; the website has ' + pub + ' \u2014 stamp left as the build time');
+      return;
+    }
+    cpPaintStamp(stamp, 'Published ' + stamp + ' ET');
     window._cpPublishedStamp = stamp;
     logAct('nav', 'build stamp from GitHub: ' + stamp);
   }catch(e){}
@@ -2306,6 +2482,53 @@ async function _cpShotViaDisplayMedia(){
     return _cpShotScale(cv).toDataURL('image/png');
   }finally{ try{ stream.getTracks().forEach(t => t.stop()); }catch(_){ } }
 }
+/* ===== Rev-1087: EVERY OUTSIDE LIBRARY HAS MORE THAN ONE ADDRESS ===========
+   All seven libraries this app borrows -- pdf.js, tesseract, exceljs, xlsx,
+   mammoth, html2canvas -- were loaded from cdnjs.cloudflare.com and nowhere else.
+   One blocked or unreachable address therefore took out reading a PDF drawing,
+   reading a CMM report, Excel export and Word import all at once, and the app
+   could only say "this needs internet the FIRST time on a device" -- which is
+   wrong and unhelpful when the device plainly has internet and it is that one
+   host that cannot be reached. Corporate networks block CDNs routinely.
+
+   Each library now has a list of addresses and is tried in turn. The error, if
+   they all fail, names the addresses tried so the next person can hand IT
+   something specific instead of a shrug. */
+const CP_LIBS = {
+  pdfjs: [
+    { js:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+      worker:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js' },
+    { js:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
+      worker:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js' },
+    { js:'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js',
+      worker:'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js' }
+  ],
+  tesseract: [
+    { js:'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js' },
+    { js:'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.0/dist/tesseract.min.js' },
+    { js:'https://unpkg.com/tesseract.js@5.1.0/dist/tesseract.min.js' }
+  ],
+  exceljs: [
+    { js:'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js' },
+    { js:'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js' },
+    { js:'https://unpkg.com/exceljs@4.4.0/dist/exceljs.min.js' }
+  ],
+  html2canvas: [
+    { js:'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js' },
+    { js:'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js' },
+    { js:'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js' }
+  ],
+  xlsx: [
+    { js:'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js' },
+    { js:'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js' },
+    { js:'https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js' }
+  ],
+  mammoth: [
+    { js:'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js' },
+    { js:'https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js' },
+    { js:'https://unpkg.com/mammoth@1.6.0/mammoth.browser.min.js' }
+  ]
+};
 function _cpLoadScript(src){
   return new Promise((res, rej) => {
     const s = document.createElement('script');
@@ -2313,9 +2536,28 @@ function _cpLoadScript(src){
     document.head.appendChild(s);
   });
 }
+/* Try each address in turn. `ready` says whether the library actually arrived --
+   a script tag can fire onload having loaded a 404 page from some proxies. */
+async function cpLoadLib(name, ready){
+  const list = CP_LIBS[name] || [];
+  if(ready && ready()) return list[0];
+  const tried = [];
+  for(let i = 0; i < list.length; i++){
+    try{
+      await _cpLoadScript(list[i].js);
+      if(!ready || ready()){
+        if(i > 0){ try{ logAct('sync', name + ' loaded from the backup address ' + list[i].js); }catch(e){} }
+        return list[i];
+      }
+      tried.push(list[i].js + ' (loaded but did not start)');
+    }catch(e){ tried.push(list[i].js); }
+  }
+  throw new Error('could not load ' + name + ' from any of: ' + tried.join(' , ')
+    + ' — this device is offline, or the network blocks these addresses. Ask IT to allow them.');
+}
 async function _cpShotViaRedraw(){
   if(typeof html2canvas === 'undefined'){
-    await _cpLoadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    await cpLoadLib('html2canvas', () => typeof html2canvas !== 'undefined');
   }
   const cv = await html2canvas(document.body, { backgroundColor: '#ffffff', useCORS: true, scale: 1, logging: false });
   return _cpShotScale(cv).toDataURL('image/png');
@@ -2389,6 +2631,88 @@ async function cpShotPush(){
 // Rev-804: full-screen animated curtain shown across a self-update reload. Drawn immediately
 // before location.replace, and again at boot while the just-updated flag is present, so the
 // old page's last frame and the new page's first frame are the same calm screen.
+/* ===== Rev-1089: STOP ASKING AN ADDRESS THAT NEVER MOVES ====================
+   toolcrib.camcomfginc.com/cpapp/ serves a FIXED copy of the app that IT
+   refreshes by hand. The updater sees GitHub is ahead, reloads
+   location.pathname + '?v=...' to move up, and the very same revision comes
+   back -- so it sets the flag and reloads again. That is the spinner Rich
+   photographed: "Publishing Rev-1086 - the site is catching up", 0:31 and
+   climbing, on an address that was never going to catch up.
+   Rev-1075 fixed the same trap for file:// only. The rule wanted is not "which
+   protocol" but "did the last reload actually move this address forward". Three
+   failed attempts is forgiving of a real GitHub Pages publish lag and decisive
+   about a copy that does not update at all.
+   ========================================================================== */
+var CP_LIVE_URL = 'https://richarnoldcamco.github.io/cp-app/';
+function cpHostKey(){ try{ return location.host + location.pathname; }catch(e){ return '?'; } }
+function cpRevNum(r){ return parseInt((String(r || '').match(/\d+/) || ['0'])[0], 10) || 0; }
+function cpReadJson(k){
+  try{ return JSON.parse(localStorage.getItem(k) || 'null'); }catch(e){ return null; }
+}
+/* Has this address already proved it cannot move itself forward? Cleared the
+   moment the address DOES arrive at or past the revision it was stuck on --
+   which is what happens when IT refreshes the copy. */
+function cpStuckHere(){
+  var ns = cpReadJson('cpNoSelfUpdate');
+  if(!ns || ns.url !== cpHostKey()) return null;
+  if(cpRevNum(APP_REV) >= cpRevNum(ns.want)){
+    try{ localStorage.removeItem('cpNoSelfUpdate'); localStorage.removeItem('cpUpdTries'); }catch(e){}
+    return null;
+  }
+  return ns;
+}
+function cpFadeCurtain(ms){
+  setTimeout(function(){
+    var c = document.getElementById('cpUpdateCurtain');
+    if(c){ c.style.transition = 'opacity .35s'; c.style.opacity = '0'; setTimeout(function(){ c.remove(); }, 400); }
+  }, ms);
+}
+/* The honest screen: this address is not going to update, here is what to do. */
+function cpStuckCurtain(want){
+  cpUpdateCurtain('This copy of the site does not update itself.');
+  try{
+    var c = document.getElementById('cpUpdateCurtain');
+    if(!c) return;
+    var box = document.createElement('div');
+    box.style.cssText = 'max-width:640px; padding:0 24px; text-align:center; color:#fff;'
+      + ' font:600 15px/1.6 system-ui; text-shadow:0 2px 12px rgba(0,0,0,.55);';
+    box.innerHTML = 'This address is showing <b>' + APP_REV + '</b>. GitHub has <b>' + want
+      + '</b>.<br>It was reloaded three times and came back the same each time, so it is a fixed'
+      + ' copy that somebody refreshes by hand &mdash; not a publishing delay.<br><br>'
+      + 'The live site always has the newest build. This copy still works exactly as it is.';
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:22px;';
+    var go = document.createElement('button');
+    go.textContent = 'OPEN THE LIVE SITE';
+    go.style.cssText = 'padding:13px 22px; font:800 15px system-ui; cursor:pointer; border:0;'
+      + ' border-radius:9px; background:#ffd54a; color:#2b0f10;';
+    go.onclick = function(){ try{ location.href = CP_LIVE_URL; }catch(e){} };
+    var stay = document.createElement('button');
+    stay.textContent = 'CARRY ON WITH ' + APP_REV;
+    stay.style.cssText = 'padding:13px 22px; font:800 15px system-ui; cursor:pointer;'
+      + ' border:2px solid rgba(255,255,255,.55); border-radius:9px; background:transparent; color:#fff;';
+    stay.onclick = function(){ cpFadeCurtain(0); };
+    row.appendChild(go); row.appendChild(stay);
+    box.appendChild(row);
+    c.appendChild(box);
+    var t = document.getElementById('cpUpdateCurtainTimer'); if(t) t.style.display = 'none';
+    var b = c.querySelector('.cpUpBar'); if(b) b.style.display = 'none';
+  }catch(e){}
+}
+/* Rev-1089: even a genuine publishing lag now has a way out that does not
+   involve waiting sixty seconds staring at a spinner. */
+function cpCurtainEscape(){
+  try{
+    var c = document.getElementById('cpUpdateCurtain'); if(!c) return;
+    var b = document.createElement('button');
+    b.textContent = 'STOP WAITING';
+    b.style.cssText = 'padding:10px 20px; font:800 13px system-ui; cursor:pointer;'
+      + ' border:2px solid rgba(255,255,255,.5); border-radius:8px; background:transparent;'
+      + ' color:#fff; letter-spacing:.04em;';
+    b.onclick = function(){ cpFadeCurtain(0); };
+    c.appendChild(b);
+  }catch(e){}
+}
 function cpUpdateCurtain(msg){
   try{
     let c = document.getElementById('cpUpdateCurtain');
@@ -2462,6 +2786,86 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+ {
+  "ts": "2026-08-30",
+  "rev": "App Rev-1093",
+  "type": "App",
+  "changes": [
+   "IMPORT APP CODE REFUSED TO PUBLISH THE VERY THING IT WAS FOR (Rev-1093) — Rich opened the downloaded CP-Rev1092.html, pressed Import App Code, chose that same file, and was told \"Rev-1092 is not newer than this tab (Rev-1092) — nothing published\", while the website sat on Rev-1085 and the data repo on Rev-1086. The guard compared the file being published against the RUNNING TAB. That is the wrong thing to compare: the tab's own revision has nothing to do with whether publishing would help. The normal case — running a build and wanting to put that same build on the website — was the one case it blocked, which is why nothing had been published for five revisions.",
+   "It now compares against GITHUB. Before publishing it reads what the website serves and what the data repo holds — two cheap eight-kilobyte probes, the same trick as Rev-1090 — and only objects if publishing would move either of them BACKWARDS. Then it says which one and by how much, and still lets it through on a confirm, because overwriting a newer version is sometimes deliberate. If neither can be read it falls back to the old cautious comparison rather than publishing blind. The ordinary confirmation now also states where things stand: \"Right now the website has Rev-1085 and GitHub has Rev-1086.\"",
+   "The two buttons beside it — Publish to Website and Push App Code — never had this restriction and would have worked all along; they publish the running tab to the website and the data repo respectively."
+  ]
+ },
+ {
+  "ts": "2026-08-29",
+  "rev": "App Rev-1092",
+  "type": "App",
+  "changes": [
+   "THE REAL CAUSE OF THE ETERNAL SPINNER, FOUND AND FIXED (Rev-1092) — checked against the live repositories rather than guessed at. The website (cp-app/index.html) was serving Rev-1085. The data repo (cp_app.html) held Rev-1086. Nothing after Rev-1086 had been published anywhere. Every device that booted read the DATA repo, saw Rev-1086, and reloaded to move onto it — but a reload can only ever bring back what the WEBSITE serves, which was Rev-1085. So it came back on the old revision, saw Rev-1086 again, and went round again. Not a toolcrib problem: every copy was doing it.",
+   "The revision being chased and the revision a reload can actually deliver were never the same thing, and nothing checked. Now, before reloading, it asks what the website is really serving — the cheap eight-kilobyte probe added in Rev-1090. If the website has not got the revision being chased, it does not reload at all. It says so instead: \"GitHub holds Rev-NNNN but the website is still serving Rev-MMMM — there is nothing to move onto yet. Publish it (Admin → Advanced → Import App Code), or wait for it.\"",
+   "This is the check that should have been there all along. Rev-1089's three-strikes counter is the safety net for an address that will not move at all — a hand-refreshed copy like toolcrib. This is the one that stops the chase starting when the target does not exist on the website in the first place, which is what happened today.",
+   "Nothing here can help a copy that is already running an older build; the fix has to be published before it can work. The way out of a looping copy is to open the downloaded CP-RevNNNN.html — downloaded copies have never self-updated, since Rev-1075 — enter the token, and publish with Import App Code, which writes BOTH the website and the data repo so the two can no longer disagree."
+  ]
+ },
+ {
+  "ts": "2026-08-29",
+  "rev": "App Rev-1091",
+  "type": "App",
+  "changes": [
+   "\"0 PROJECTS\" NO LONGER READS AS \"MY WORK IS GONE\" (Rev-1091) — Rich opened a freshly downloaded copy, saw CONTROL PLANS 0 Projects, and asked where his data went. Nothing had gone anywhere: that copy had never been connected to GitHub, so nothing was ever stored in that browser. The red banner at the top of the screen did say GitHub sync was not set up, but it is dismissible, sits away from the number, and does not connect the two facts. The nought is what the eye lands on, so the explanation now sits under the nought.",
+   "When the count is zero AND this device has no GitHub set up, the line under CONTROL PLANS reads \"NOTHING SAVED IN THIS BROWSER YET — NOT A LOSS. YOUR PLANS ARE ON GITHUB: SET IT UP IN ADMIN → SETTINGS, THEN PRESS PULL CODE & DATA.\" and is coloured as a notice rather than grey. On any device that is connected, or that has plans of its own, the line is exactly what it always was. Verified on the day: the private data file held 12 control plans, 2 drafts, 76 master-list rows, 11 customers and 109 change-history entries, last saved that morning."
+  ]
+ },
+ {
+  "ts": "2026-08-29",
+  "rev": "App Rev-1090",
+  "type": "App",
+  "changes": [
+   "THE REV STAMP NO LONGER CLAIMS A BUILD WAS PUBLISHED WHEN IT WAS NOT (Rev-1090) — Rich opened the downloaded CP-Rev1089.html from his Downloads folder and the header read \"REV-1089 · 2026-08-28 8:10 PM\" with the footer \"App Rev-1089 · Published 2026-08-28 8:10 PM ET\". Rev-1089 had never been published, and 8:10 PM the previous evening was the commit time of whatever index.html was on GitHub. cpSyncBuildStamp repainted the badge with GitHub's commit time regardless of which revision this file actually was, so a build could wear another build's publish time. That is precisely the kind of thing that costs an hour when a rev looks wrong.",
+   "It now checks. Before painting a \"Published\" time it reads the revision that is actually on the website — asking for only the first eight kilobytes of index.html, since the <title> carries the rev, and giving up rather than pulling 2.6 MB if the server will not honour a byte range. If the website is on the same revision, the publish time is shown exactly as before. If it is not, the badge shows THIS file's own build time and the footer says \"NOT PUBLISHED — the website has Rev-NNNN\", so the difference is on screen instead of being hidden behind a plausible date.",
+   "A file opened from the Downloads folder skips the network altogether and says \"downloaded copy, not the website\" — it can never be the published build, so there is nothing to ask GitHub about.",
+   "Housekeeping: the Rev-1089 build stamp was written as 02:05 PM when the real time was around 01:20 PM. Build times must be read off the clock at the moment of the build, not estimated; this one was estimated. Rev-1090 is stamped from the clock."
+  ]
+ },
+ {
+  "ts": "2026-08-29",
+  "rev": "App Rev-1089",
+  "type": "App",
+  "changes": [
+   "THE SPINNER THAT NEVER STOPS, FIXED (Rev-1089) — Rich photographed toolcrib.camcomfginc.com/cpapp/ sitting on \"Publishing Rev-1086 — the site is catching up…\" with the clock running. It was never going to catch up. That address serves a FIXED copy of the app that IT refreshes by hand. The updater sees GitHub is ahead, reloads the page with a ?v= cache-buster to move up, and the very same revision comes back — so it sets the flag and reloads again, forever. The ?v=1788022960402 in the address bar of the photograph is that reload.",
+   "Rev-1075 fixed exactly this trap for downloaded files, but the guard it added only covered file:// addresses, and toolcrib is served over https. The right rule is not which protocol it is but whether the last reload actually moved this address forward. It now counts: if a reload comes back on the same revision three times for the same target, that address is marked as one that does not update itself, and the updater stops reloading it. Three is forgiving of a genuine GitHub Pages publishing lag, which normally clears on the first or second try, and decisive about a copy that is not going to move at all.",
+   "Instead of the spinner it now puts up a plain screen: this copy is showing Rev-NNNN, GitHub has Rev-MMMM, it was reloaded three times and came back the same, so it is a fixed copy somebody refreshes by hand rather than a delay. Two buttons — OPEN THE LIVE SITE, and CARRY ON WITH Rev-NNNN, because the copy still works perfectly well as it is. The mark clears itself the moment that address does arrive at the revision it was stuck on, which is what happens when IT refreshes it.",
+   "The ordinary catching-up curtain now also carries a STOP WAITING button, so nobody has to sit through sixty seconds of spinner to find out whether anything is wrong. And the just-updated flag is cleared as soon as boot reads it, rather than sixty seconds later, so a reload can never inherit it."
+  ]
+ },
+ {
+  "ts": "2026-08-29",
+  "rev": "App Rev-1088",
+  "type": "App",
+  "changes": [
+   "IT CAN NOW READ A CMM EXPORT INSTEAD OF A PICTURE OF ONE (Rev-1088) — Rich is having the CMM operator export a CSV. That removes the guessing entirely: reading a scanned page filled ten values on SERIAL 64 and got one digit wrong (0.0001 read as 0.0000), and a wrong digit that looks perfectly ordinary is worse than a gap, because a gap gets typed and a plausible wrong number does not get caught. An export carries the numbers as the machine wrote them. LOAD A CMM REPORT now takes .csv, .tsv and .txt alongside PDFs and pictures, and routes them straight past the reader.",
+   "NO ASSUMPTION ABOUT WHAT THE EXPORT LOOKS LIKE. Every CMM writes a different layout, and this one has not been seen yet. So it works out the separator itself (comma, tab, semicolon or pipe — whichever gives the same column count on most lines, which is how a stray comma inside a feature name loses), handles quoted fields properly, and looks for headings it recognises: Characteristic/Feature/Name for the name, Actual/Measured/Result for the value. Nominal is identified FIRST and taken out of the running, because otherwise a column headed \"Nominal Value\" gets claimed as the actual by the word \"value\" and every reading comes out as the print size.",
+   "AND IF IT CANNOT WORK IT OUT, IT ASKS. Rather than failing on Monday morning with an export nobody has seen, it shows the first eight rows of the file as a table and asks which column is the feature name and which is the measured value. The answer is remembered against that part number, so it is asked once and never again. If the columns chosen turn out to match nothing, it says so and asks again rather than reporting an empty read.",
+   "THE SAME REFUSALS AS THE SCAN READER. A name that could be two different characteristics is skipped rather than guessed; two rows giving different values for the same characteristic mean neither is offered. The block-to-proposal logic is now one shared function rather than a second copy, so the two readers cannot drift apart. Rows whose name cell is just an axis (X, Y, D, TP) attach to the feature above them, which is how several exports lay out a position.",
+   "The review list marks exports differently from scans: it says the numbers are exactly as the machine wrote them and that what is worth checking is whether each landed on the right characteristic, and each filled value is noted \"from CMM export\" rather than \"from scan\"."
+  ]
+ },
+ {
+  "ts": "2026-08-29",
+  "rev": "App Rev-1087",
+  "type": "App",
+  "changes": [
+   "ONE BLOCKED ADDRESS NO LONGER TAKES SEVEN LIBRARIES DOWN (Rev-1087) — Rich hit 'Could not load L3H_912767-M_ODS-030_REV-07.pdf: the PDF reader could not be downloaded' on a machine that was plainly online and syncing with GitHub at the time. Every outside library the app borrows — pdf.js for drawings and CMM reports, tesseract for reading scans, exceljs, xlsx, mammoth, html2canvas — was fetched from cdnjs.cloudflare.com and from nowhere else, so that single host being blocked or unreachable took out reading a PDF drawing, reading a CMM report, Excel export and Word import together. Corporate networks block CDNs as a matter of routine, and the old message blamed the device's internet, which sent anyone reading it looking in the wrong place. Each library now carries three addresses — cdnjs, jsdelivr and unpkg — and is tried in turn, with the pdf.js worker taken from whichever one answered so the two never come from different places. A load is only counted as success if the library actually appears, because some proxies return a 404 page with a 200 and a script tag will happily 'load' that. The two libraries that sit as plain tags in the page head are checked at boot and quietly refetched from a backup if they are missing. And when everything fails the message now names the three addresses tried and says to ask IT to allow them, instead of insisting the device needs internet."
+  ]
+ },
+ {
+  "ts": "2026-08-18",
+  "rev": "App Rev-1086",
+  "type": "App",
+  "changes": [
+   "THE MAIN MENU IS TWO COLUMNS AND DOES NOT SCROLL (Rev-1086) — per Rich: a main menu should not need scrolling. Rev-1085 freed the page to scroll, which made every button reachable but still left him rolling down a menu to reach the bottom half of it. The real problem was the shape: thirteen buttons stacked in one 560-pixel column, with a third of the window empty down each side. The card is now up to 1180 pixels wide and the buttons sit in two columns, which fits the lot in about half the height — the whole menu lands on one screen on a normal laptop. Under 900 pixels wide it drops back to a single column, because a phone or a tablet held upright has no room for two. Checked in a real browser at four window sizes: every one of the thirteen buttons visible without scrolling at 1280x720 and above, and still all reachable on the narrow ones."
+  ]
+ },
  {
   "ts": "2026-08-18",
   "rev": "App Rev-1085",
@@ -2855,8 +3259,8 @@ let GH_CHANGELOG_REMOTE_N = 0;
   };
   Storage.prototype.__cpWriteGuard = true;
 })();
-const BUILD_DATE = "2026-08-18";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:06 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_DATE = "2026-08-30";   // set on every build (with BUILD_TIME below)
+const BUILD_TIME = "09:15 AM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3014,6 +3418,22 @@ function updateMenuBadges(){
   const totalCount = projects.length + drafts.length;
   const bp = $('badgeProjects');
   if(bp) bp.innerHTML = totalCount + ' <span class="bsub">Projects</span>';
+  /* Rev-1091: "0 Projects" on a copy that has never been connected reads as
+     "my work is gone". It is not: nothing was ever stored in THIS browser. Say
+     that on the card, where the nought is, rather than only in the banner at the
+     top which is easy to dismiss and easier to miss. */
+  try{
+    const sub = $('mProjectsSub');
+    if(sub){
+      const off = (typeof ghConfigured === 'function') ? !ghConfigured() : false;
+      const bare = (totalCount === 0 && off);
+      sub.textContent = bare
+        ? 'NOTHING SAVED IN THIS BROWSER YET \u2014 NOT A LOSS. YOUR PLANS ARE ON GITHUB: SET IT UP IN ADMIN \u2192 SETTINGS, THEN PRESS PULL CODE & DATA.'
+        : 'OPEN, EDIT, INSPECT OR DOWNLOAD ANY SAVED PLAN';
+      sub.style.color = bare ? '#7a4a00' : 'var(--ink-dim)';
+      sub.style.fontWeight = bare ? '700' : '';
+    }
+  }catch(e){}
 
   // Master List (control types) — Rev-275: seed the default set ONLY when the list is EMPTY. The old
   // check reinitialized whenever the count wasn't exactly 55, which wiped every added control type
@@ -3220,7 +3640,7 @@ async function handleODSUpload(file){
       // Rev-593: report the REAL reason instead of one canned guess
       const msg = String((e && e.message) || e);
       const help = /offline|Failed to fetch|load/i.test(msg)
-        ? 'the PDF reader could not be downloaded — this needs internet the FIRST time on a device'
+        ? 'the PDF reader could not be downloaded from any of its addresses — either this device is offline, or the network blocks cdnjs.cloudflare.com, cdn.jsdelivr.net and unpkg.com. Ask IT to allow those three.'
         : msg;
       if(pz) pz.innerHTML = '⚠ <strong>PDF not converted</strong>';
       flash('Could not convert the PDF: ' + help, true);
@@ -6257,12 +6677,8 @@ async function cpCustXlsx(idx){
   const m = (window._ccAllOps ? p.custCPPart : p.custCP) || cpCustBuildModel(p, JSON.parse(localStorage.getItem('cpProjects') || '[]'), window._ccAllOps);
   flash('Building the .xlsx\u2026');
   if(typeof ExcelJS === 'undefined'){
-    await new Promise((res, rej) => {
-      const s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
-      s.onload = res; s.onerror = () => rej(new Error('Could not load the Excel engine (offline?)'));
-      document.head.appendChild(s);
-    }).catch(e => { alert(e.message); });
+    /* Rev-1087: three addresses, not one */
+    await cpLoadLib('exceljs', () => typeof ExcelJS !== 'undefined').catch(e => { alert(e.message); });
     if(typeof ExcelJS === 'undefined') return;
   }
   try{
@@ -6985,7 +7401,7 @@ async function _cptvAddFiles(files){
     }catch(e){
       const msg = String((e && e.message) || e);
       let help = msg;
-      if(/offline|Failed to fetch|load|network/i.test(msg) && /pdf/i.test(nm)) help = 'the PDF reader could not be downloaded \u2014 this needs internet the FIRST time on a device';
+      if(/offline|Failed to fetch|load|network/i.test(msg) && /pdf/i.test(nm)) help = 'the PDF reader could not be downloaded from any of its addresses \u2014 either this device is offline, or the network blocks cdnjs.cloudflare.com, cdn.jsdelivr.net and unpkg.com. Ask IT to allow those three.';
       else if(/NotReadable|NotFound|permission/i.test(msg)) help = 'the file could not be read off the disk \u2014 if it is a OneDrive file showing a red X, open the folder and let it finish downloading, then try again';
       _cptvSay('Could not load ' + nm + ': ' + help, true);
       alert('Could not load ' + nm + '\n\n' + help);
@@ -7465,12 +7881,8 @@ async function cpTravXlsxDownload(){
   if(!d){ flash('No typed data', true); return; }
   flash('Building the .xlsx\u2026');
   if(typeof ExcelJS === 'undefined'){
-    await new Promise((res, rej) => {
-      const sc = document.createElement('script');
-      sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
-      sc.onload = res; sc.onerror = () => rej(new Error('Could not load the Excel engine (offline?)'));
-      document.head.appendChild(sc);
-    }).catch(e => { alert(e.message); });
+    /* Rev-1087: three addresses, not one */
+    await cpLoadLib('exceljs', () => typeof ExcelJS !== 'undefined').catch(e => { alert(e.message); });
     if(typeof ExcelJS === 'undefined') return;
   }
   try{
@@ -20890,6 +21302,16 @@ function fiParseReport(text, chars){
       cur = null;
     }
   });
+  var res = fiBlocksToProps(blocks, chars);
+  res.ambiguous = ambiguous;
+  res.conflicts = conflicts + (res.conflicts || 0);
+  return res;
+}
+/* Rev-1088: this used to be the tail of fiParseReport. The CSV reader finds the
+   same blocks by a completely different route and then needs exactly this, so it
+   is a function now rather than a second copy that would drift out of step. */
+function fiBlocksToProps(blocks, chars){
+  var conflicts = 0;
   var out = [];
   blocks.forEach(function(b){
     /* Rev-1082: ONE BLOCK CAN SERVE SEVERAL CHARACTERISTICS. A CMM block that
@@ -20920,23 +21342,272 @@ function fiParseReport(text, chars){
        apart, and a missing value gets typed while a plausible wrong one does not. */
     var already = out.find(function(o){ return o.index === b.target.i; });
     if(already){
-      if(already.value !== pick.meas){ already.conflict = true; }
+      /* Rev-1088: count it HERE. When the two blocks scored the same the old code
+         marked the conflict, returned, and never reached the counter below, so a
+         value was quietly dropped and the message said none had been. */
+      if(already.value !== pick.meas && !already.conflict){ already.conflict = true; conflicts++; }
       if(b.score <= already.score) return;
-      var keepConflict = already.conflict || (already.value !== pick.meas);
+      var keepConflict = already.conflict;
       out.splice(out.indexOf(already), 1);
-      if(keepConflict){ conflicts++; return; }
+      if(keepConflict){ return; }
     }
     out.push({ index: b.target.i, ch: b.target.ch, value: pick.meas,
                axis: pick.axis, score: b.score, matched: b.line, raw: pick.raw });
   });
   out = out.filter(function(o){ return !o.conflict; });
-  out.ambiguous = ambiguous;
   out.conflicts = conflicts;
   return out;
 }
+/* ===== Rev-1088: A CMM EXPORT, READ AS NUMBERS ==============================
+   Reading a picture of a report is guesswork: on the SERIAL 64 scan it filled ten
+   values and got one digit wrong, and a wrong digit that looks ordinary is worse
+   than a gap. A CSV or text export off the machine has no guessing in it at all --
+   the numbers arrive as the CMM wrote them. Every machine writes a different
+   layout, so nothing here assumes one: it works out the separator, tries to spot
+   the headings, and if it cannot, it shows the file and asks which column is
+   which. That answer is remembered per part, so it is asked once.
+   ========================================================================== */
+var FI_CSV = null;
+
+function fiCsvDelim(text){
+  var lines = String(text || '').split(/\r?\n/).filter(function(l){ return l.trim(); }).slice(0, 30);
+  if(!lines.length) return ',';
+  var best = ',', bestScore = -1;
+  [',', '\t', ';', '|'].forEach(function(d){
+    var counts = lines.map(function(l){ return l.split(d).length; });
+    var freq = {};
+    counts.forEach(function(n){ freq[n] = (freq[n] || 0) + 1; });
+    var mode = 1, hits = 0;
+    for(var k in freq){ if(freq[k] > hits){ hits = freq[k]; mode = parseInt(k, 10); } }
+    if(mode < 2) return;
+    /* a separator that gives the SAME number of columns on most lines is the
+       real one; a stray comma inside a feature name scores badly and loses. */
+    var score = (mode - 1) * (hits / counts.length);
+    if(score > bestScore){ bestScore = score; best = d; }
+  });
+  return best;
+}
+function fiCsvSplit(text){
+  var s = String(text || '').replace(/^\uFEFF/, '');
+  var d = fiCsvDelim(s);
+  var rows = [], row = [], cell = '', q = false;
+  for(var i = 0; i < s.length; i++){
+    var c = s.charAt(i);
+    if(q){
+      if(c === '"'){ if(s.charAt(i + 1) === '"'){ cell += '"'; i++; } else q = false; }
+      else cell += c;
+    }
+    else if(c === '"'){ q = true; }
+    else if(c === d){ row.push(cell); cell = ''; }
+    else if(c === '\n'){ row.push(cell); rows.push(row); row = []; cell = ''; }
+    else if(c === '\r'){ /* ignore */ }
+    else cell += c;
+  }
+  row.push(cell); rows.push(row);
+  rows = rows.filter(function(r){
+    return r.some(function(x){ return String(x).trim() !== ''; });
+  });
+  return { delim: d, rows: rows };
+}
+var FI_CSV_HEAD = {
+  nominal: ['nominal', 'basic', 'target', 'nom'],
+  actual:  ['actual', 'measured', 'meas', 'reading', 'result', 'value', 'act'],
+  name:    ['characteristic', 'feature', 'element', 'description', 'name', 'item', 'label', 'desc', 'char', 'id']
+};
+function fiCsvHeadScore(cell, words){
+  var c = String(cell || '').toLowerCase().replace(/[^a-z]/g, '');
+  if(!c) return 0;
+  for(var i = 0; i < words.length; i++){ if(c === words[i]) return 100 - i; }
+  for(var j = 0; j < words.length; j++){ if(c.indexOf(words[j]) >= 0) return 50 - j; }
+  return 0;
+}
+function fiCsvPick(cells, words, taken){
+  var bi = -1, bs = 0;
+  for(var i = 0; i < cells.length; i++){
+    if(taken.indexOf(i) >= 0) continue;
+    var sc = fiCsvHeadScore(cells[i], words);
+    if(sc > bs){ bs = sc; bi = i; }
+  }
+  return bi;
+}
+function fiCsvGuessCols(rows){
+  for(var r = 0; r < Math.min(rows.length, 25); r++){
+    var cells = rows[r];
+    var taken = [];
+    /* nominal first: "Nominal Value" would otherwise be claimed as the actual
+       by the word "value", and then every reading would be the print size. */
+    var nom = fiCsvPick(cells, FI_CSV_HEAD.nominal, taken);
+    if(nom >= 0) taken.push(nom);
+    var act = fiCsvPick(cells, FI_CSV_HEAD.actual, taken);
+    if(act >= 0) taken.push(act);
+    var nm = fiCsvPick(cells, FI_CSV_HEAD.name, taken);
+    if(nm >= 0 && act >= 0) return { header: r, name: nm, actual: act, nominal: nom };
+  }
+  return null;
+}
+function fiCsvNum(v){
+  var t = String(v == null ? '' : v).trim().replace(/,/g, '.');
+  var m = /-?\d*\.?\d+(?:[eE][-+]?\d+)?/.exec(t);
+  return m ? m[0] : '';
+}
+function fiParseCsvRows(rows, chars, map){
+  var known = [];
+  chars.forEach(function(ch, i){ if(ch.cmmId) known.push({ i: i, id: ch.cmmId, ch: ch }); });
+  var blocks = [], cur = null, ambiguous = 0, exact = 0;
+  var start = (map && map.header >= 0) ? map.header + 1 : 0;
+  for(var r = start; r < rows.length; r++){
+    var cells = rows[r] || [];
+    var nm = String(cells[map.name] == null ? '' : cells[map.name]).trim();
+    var av = fiCsvNum(cells[map.actual]);
+    var raw = cells.join(' | ').replace(/\s+/g, ' ').trim();
+    if(!nm && !av) continue;
+    /* an axis line: the name cell holds X, Y, D, TP and the block above owns it */
+    if(cur && av && /^[A-Za-z]{1,3}$/.test(nm)){
+      cur.rows.push({ axis: nm.toUpperCase(), meas: av, raw: raw });
+      continue;
+    }
+    if(!nm) continue;
+    var best = null, bestScore = 0, second = 0;
+    for(var k = 0; k < known.length; k++){
+      var sc = fiSimilar(nm, known[k].id);
+      if(sc > bestScore){ second = bestScore; bestScore = sc; best = known[k]; }
+      else if(sc > second){ second = sc; }
+    }
+    /* the same refusal the scan reader makes: if the runner-up is close behind,
+       this row could be either characteristic, and a number on the wrong line is
+       worse than an empty box. */
+    if(best && bestScore >= 0.60 && (bestScore >= 0.97 || (bestScore - second) >= 0.08)){
+      cur = { target: best, score: bestScore, rows: [], line: nm };
+      blocks.push(cur);
+      if(bestScore >= 0.999) exact++;
+      if(av) cur.rows.push({ axis: '', meas: av, raw: raw });
+    } else if(best && bestScore >= 0.60){
+      cur = null; ambiguous++;
+    } else {
+      cur = null;
+    }
+  }
+  var out = fiBlocksToProps(blocks, chars);
+  out.forEach(function(o){ o.src = 'csv'; });
+  out.ambiguous = ambiguous;
+  out.exact = exact;
+  out.src = 'csv';
+  return out;
+}
+function fiFileText(file){
+  if(file.text) return file.text();
+  return new Promise(function(res, rej){
+    var fr = new FileReader();
+    fr.onload = function(){ res(String(fr.result || '')); };
+    fr.onerror = function(){ rej(new Error('could not open that file')); };
+    fr.readAsText(file);
+  });
+}
+function fiCsvMapKey(){ return 'fi_csvmap_' + ((FI_STATE && FI_STATE.part) || ''); }
+function fiCsvSavedMap(){
+  try{ return JSON.parse(localStorage.getItem(fiCsvMapKey()) || 'null'); }catch(e){ return null; }
+}
+function fiShowMap(map, why){
+  var panel = document.getElementById('fiMap');
+  if(!panel || !FI_CSV) return;
+  var esc = function(x){ return String(x == null ? '' : x)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+  var rows = FI_CSV.rows, wide = 0;
+  rows.slice(0, 8).forEach(function(r){ if(r.length > wide) wide = r.length; });
+  var note = document.getElementById('fiMapNote');
+  if(note) note.textContent = (why || 'This export does not carry headings this app recognises.')
+    + ' Here are the first rows of ' + FI_CSV.name + '. Say which column holds the feature name and'
+    + ' which holds the measured value.';
+  var prev = document.getElementById('fiMapPreview');
+  if(prev){
+    prev.innerHTML = '<table style="border-collapse:collapse; font-size:11px; font-family:monospace;">'
+      + '<tr>' + Array.apply(null, Array(wide)).map(function(_, i){
+          return '<th style="padding:3px 8px; background:var(--panel-2); border:1px solid var(--line);'
+               + ' font-weight:800; white-space:nowrap;">COL ' + (i + 1) + '</th>'; }).join('') + '</tr>'
+      + rows.slice(0, 8).map(function(r){
+          return '<tr>' + Array.apply(null, Array(wide)).map(function(_, i){
+            return '<td style="padding:3px 8px; border:1px solid var(--line); white-space:nowrap;'
+                 + ' max-width:220px; overflow:hidden; text-overflow:ellipsis;">'
+                 + esc(r[i] == null ? '' : r[i]) + '</td>'; }).join('') + '</tr>';
+        }).join('') + '</table>';
+  }
+  var head = rows[0] || [];
+  var fill = function(id, sel){
+    var el = document.getElementById(id); if(!el) return;
+    el.innerHTML = '';
+    for(var i = 0; i < wide; i++){
+      var o = document.createElement('option');
+      o.value = String(i);
+      var lbl = String(head[i] == null ? '' : head[i]).trim();
+      o.textContent = 'COL ' + (i + 1) + (lbl ? ' \u2014 ' + lbl : '');
+      if(i === sel) o.selected = true;
+      el.appendChild(o);
+    }
+    el.value = String(sel >= 0 ? sel : 0);
+  };
+  fill('fiMapName', map && map.name >= 0 ? map.name : 0);
+  fill('fiMapAct',  map && map.actual >= 0 ? map.actual : (wide > 1 ? 1 : 0));
+  var hb = document.getElementById('fiMapHeader');
+  if(hb) hb.checked = map ? (map.header >= 0) : true;
+  panel.style.display = 'block';
+}
+function fiMapGo(){
+  var t = fiTemplate();
+  if(!t || !FI_CSV){ return; }
+  var nm = parseInt((document.getElementById('fiMapName') || {}).value, 10);
+  var ac = parseInt((document.getElementById('fiMapAct') || {}).value, 10);
+  var hd = !!(document.getElementById('fiMapHeader') || {}).checked;
+  if(isNaN(nm) || isNaN(ac)){ return; }
+  if(nm === ac){ fiScanSetMsg('The name and the value cannot be the same column.'); return; }
+  var map = { header: hd ? 0 : -1, name: nm, actual: ac, nominal: -1 };
+  try{ localStorage.setItem(fiCsvMapKey(), JSON.stringify(map)); }catch(e){}
+  var panel = document.getElementById('fiMap'); if(panel) panel.style.display = 'none';
+  fiCsvFinish(fiParseCsvRows(FI_CSV.rows, t.chars, map), map, true);
+}
+function fiCsvFinish(props, map, fromPicker){
+  var t = fiTemplate(); if(!t) return;
+  if(!props.length){
+    fiShowMap(map, fromPicker
+      ? 'Nothing in those two columns matched this part\u2019s characteristics \u2014 try a different pair.'
+      : 'The headings were read, but nothing matched this part\u2019s characteristics.');
+    return;
+  }
+  FI_SCAN = props;
+  var cmmTotal = t.chars.filter(function(c){ return c.cmmId; }).length;
+  fiScanSetMsg('Read straight out of the export \u2014 no guessing at all. '
+    + props.length + ' of ' + cmmTotal + ' CMM characteristics matched'
+    + (props.exact ? ', ' + props.exact + ' of them by an exact name' : '') + '.'
+    + (props.ambiguous ? ' ' + props.ambiguous + ' row(s) skipped \u2014 the name could have been two'
+      + ' different characteristics.' : '')
+    + (props.conflicts ? ' ' + props.conflicts + ' skipped \u2014 the file gave two different values for the'
+      + ' same characteristic.' : '')
+    + ' Anything not listed below has to be typed in.');
+  fiRenderReview();
+}
+async function fiLoadCsv(file){
+  var t = fiTemplate();
+  if(!t){ fiScanSetMsg('Load a part first.'); return; }
+  try{
+    fiScanSetMsg('Opening ' + file.name + '\u2026');
+    var text = await fiFileText(file);
+    var sp = fiCsvSplit(text);
+    if(sp.rows.length < 2){
+      fiScanSetMsg('There is nothing in that file that reads as rows and columns. If it came off the'
+        + ' machine as a report rather than an export, load it as a PDF instead.');
+      return;
+    }
+    FI_CSV = { rows: sp.rows, delim: sp.delim, name: file.name };
+    var saved = fiCsvSavedMap();
+    var map = saved || fiCsvGuessCols(sp.rows);
+    if(!map){ fiScanSetMsg(''); fiShowMap(null); return; }
+    fiCsvFinish(fiParseCsvRows(sp.rows, t.chars, map), map, false);
+  }catch(err){
+    fiScanSetMsg('Could not open that file \u2014 ' + ((err && err.message) || err));
+  }
+}
 async function fiLoadOcr(){
   if(window.Tesseract) return;
-  await _cpLoadScript('https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js');
+  await cpLoadLib('tesseract', () => !!window.Tesseract);
 }
 function fiScanSetMsg(m){ var el = document.getElementById('fiScanMsg'); if(el) el.textContent = m; }
 /* Rev-1082: A PDF PRINTED FROM PC-DMIS ALREADY CONTAINS ITS TEXT. Only a PDF
@@ -20998,6 +21669,11 @@ async function fiPagesFromFile(file){
 async function fiScanReport(file){
   var t = fiTemplate();
   if(!t){ fiScanSetMsg('Load a part first.'); return; }
+  /* Rev-1088: an export off the machine needs none of what follows. */
+  if(/\.(csv|tsv|txt)$/i.test(file.name || '')
+     || file.type === 'text/csv' || file.type === 'text/tab-separated-values'){
+    return fiLoadCsv(file);
+  }
   FI_SCAN_CANCEL = false;
   var readDirect = false;
   try{
@@ -21056,6 +21732,19 @@ function fiRenderReview(){
   var esc = function(x){ return String(x == null ? '' : x)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
   panel.style.display = 'block';
+  var isCsv = (FI_SCAN.src === 'csv');
+  var ttl = document.getElementById('fiReviewTitle');
+  if(ttl) ttl.textContent = isCsv
+    ? 'READ OFF THE EXPORT \u2014 NOTHING IS FILLED IN YET'
+    : 'READ OFF THE REPORT \u2014 NOTHING IS FILLED IN YET';
+  var nte = document.getElementById('fiReviewNote');
+  if(nte) nte.textContent = isCsv
+    ? 'The numbers below are exactly as the machine wrote them \u2014 nothing was guessed at. What is'
+      + ' still worth a look is whether each one landed on the right characteristic, since the names in'
+      + ' the export and the names on this sheet are not always written the same way.'
+    : 'Check each line against the report before accepting it. Reading a scan is not exact: a dropped'
+      + ' minus sign or a value landing on the wrong feature both look perfectly ordinary afterwards.'
+      + ' Only lines the app is confident about are ticked to start with.';
   host.innerHTML = FI_SCAN.map(function(p, k){
     var ch = p.ch;
     var judged = fiJudge(ch, p.value);
@@ -21072,7 +21761,7 @@ function fiRenderReview(){
       +       ' · matched ' + sure + '%'
       +       (sure < 90 ? ' <b style="color:#7a4a00;">— check this one</b>' : '') + '</div>'
       +     '<div style="margin-top:4px; font-size:14px;">reads <b>' + esc(p.value) + '</b>'
-      +       ' <span style="font-size:11px; color:var(--ink-dim);">(row ' + esc(p.axis) + ')</span> '
+      +       (p.axis ? ' <span style="font-size:11px; color:var(--ink-dim);">(row ' + esc(p.axis) + ')</span> ' : ' ')
       +       (judged === true  ? '<span style="color:#1f8a3b; font-weight:800; font-size:12px;">IN TOL</span>' : '')
       +       (judged === false ? '<span style="color:#c0392b; font-weight:800; font-size:12px;">OUT OF TOL</span>' : '')
       +       (existing ? ' <span style="color:#c0392b; font-size:11px; font-weight:800;">— replaces ' + esc(existing) + '</span>' : '')
@@ -21096,13 +21785,15 @@ function fiReviewAccept(){
     var j = fiJudge(p.ch, p.value);
     if(j === true) e.disp = 'GOOD';
     if(j === false) e.disp = 'BAD';
-    e.note = (e.note ? e.note + ' · ' : '') + 'from scan (' + Math.round(p.score * 100) + '%)';
+    e.note = (e.note ? e.note + ' · ' : '')
+      + (p.src === 'csv' ? 'from CMM export' : 'from scan')
+      + ' (' + Math.round(p.score * 100) + '%)';
     n++;
   });
   FI_SCAN = null;
   var panel = document.getElementById('fiReview'); if(panel) panel.style.display = 'none';
   fiSaveState(); fiRenderRows(); fiRenderTally();
-  fiScanSetMsg(n + ' value(s) filled in. Every one is marked "from scan" in its notes.');
+  fiScanSetMsg(n + ' value(s) filled in. Every one is marked in its notes with where it came from.');
 }
 
 /* ===== Rev-1077: FINAL INSPECTION ===========================================
@@ -22859,11 +23550,43 @@ async function cpImportAppCode(file){
     const incNum = parseInt((incoming.match(/\d+/) || ['0'])[0]);
     const hereNum = parseInt((APP_REV.match(/\d+/) || ['0'])[0]);
 
-    if(incNum <= hereNum){
-      const m = incoming + ' is not newer than this tab (' + APP_REV + ') — nothing published.';
-      ghSetStatus(m, true); flash(m, true); return;
+    /* ===== Rev-1093: COMPARE AGAINST GITHUB, NOT AGAINST THIS TAB ============
+       The old guard refused anything that was not NEWER than the running tab. But
+       the whole point of this button is to publish, and the commonest case of all
+       is running Rev-NNNN and wanting to put Rev-NNNN on the website — which is
+       exactly what it refused, with "Rev-1092 is not newer than this tab
+       (Rev-1092) — nothing published", while the website sat on Rev-1085 and the
+       data repo on Rev-1086. The tab's own revision has nothing to do with it.
+       What matters is whether this would move the REPOSITORIES backwards. ===== */
+    ghSetStatus('Checking what is on GitHub…');
+    const pubRev  = await cpPublishedRev();
+    const dataRev = await cpDataRepoRev();
+    const where = [];
+    if(pubRev)  where.push('the website has ' + pubRev);
+    if(dataRev) where.push('GitHub has ' + dataRev);
+    const behind = [];
+    if(pubRev  && incNum < cpRevNum(pubRev))  behind.push('the website already serves ' + pubRev);
+    if(dataRev && incNum < cpRevNum(dataRev)) behind.push('GitHub already holds ' + dataRev);
+    if(behind.length){
+      if(!confirm('WAIT — this would go BACKWARDS.\n\n' + behind.join('\n')
+        + '\n\nand you are about to publish ' + incoming
+        + '.\n\nPublishing would erase the newer version. Do it anyway?')){
+        const m = 'Nothing published — ' + behind.join(' and ') + '.';
+        ghSetStatus(m, true); flash(m, true); return;
+      }
     }
-    if(!confirm('Publish ' + incoming + ' to GitHub and the website?\n\nThis tab is ' + APP_REV + '.\nAfter it lands, tap Sync Now (or refresh the website) to move onto it.')) {
+    if(!pubRev && !dataRev && incNum < hereNum){
+      /* neither could be read: fall back to the old, cautious comparison */
+      if(!confirm('Could not read what is on GitHub right now, and ' + incoming
+        + ' is older than this tab (' + APP_REV + ').\n\nPublish it anyway?')){
+        const m = 'Nothing published — could not check what is on GitHub.';
+        ghSetStatus(m, true); flash(m, true); return;
+      }
+    }
+    if(!confirm('Publish ' + incoming + ' to GitHub and the website?\n\n'
+      + (where.length ? 'Right now ' + where.join(' and ') + '.\n' : '')
+      + 'This tab is ' + APP_REV
+      + '.\nAfter it lands, tap Sync Now (or refresh the website) to move onto it.')) {
       ghSetStatus('Import cancelled'); return;
     }
 
@@ -23040,6 +23763,41 @@ async function ghPullApp(silent, autoApply){
       ghSetStatus('This is a downloaded copy (' + APP_REV + '). GitHub has ' + remoteRev
                 + ' — open the website to move up, or publish this file with Import App Code.', true);
       if(!silent) flash('Downloaded copies do not self-update. Open the website for ' + remoteRev + '.', true);
+      return;
+    }
+    /* Rev-1089: an address that has already failed three times to move forward is
+       not going to move now, and reloading it is what built the spinner. Say so
+       instead, and leave the app perfectly usable at the revision it is on. */
+    /* ===== Rev-1092: DO NOT CHASE A REVISION THE WEBSITE HAS NOT GOT ==========
+       The rev being chased is read from cp_app.html in the DATA repo. But the only
+       thing a reload can bring back is whatever the WEBSITE serves. On 29 August
+       those two disagreed -- the data repo held Rev-1086 while the website was
+       still on Rev-1085 -- so every device that booted set off towards a revision
+       its own address could never give it, came back on the old one, and went
+       round again. That is what the eternal spinner was.
+       So: before reloading, ask what the website actually serves. If it does not
+       have the revision being chased, do not reload at all. ===================== */
+    const _served = await cpPublishedRev();
+    if(_served && cpRevNum(_served) < remoteNum){
+      try{ localStorage.removeItem('cpJustUpdatedTo'); localStorage.removeItem('cpJustUpdatedAt'); }catch(_){ }
+      const msg = 'GitHub holds ' + remoteRev + ' but the website is still serving ' + _served
+        + ' — there is nothing to move onto yet. Publish ' + remoteRev
+        + ' to the website (Admin → Advanced → Import App Code), or wait for it.';
+      ghSetStatus(msg, true);
+      if(!silent) flash('The website has not got ' + remoteRev + ' yet — nothing to update to.', true);
+      try{ logAct('nav', 'refused to chase ' + remoteRev + ': the website serves ' + _served); }catch(_){ }
+      if(typeof showAppUpdateAvailable === 'function' && cpRevNum(_served) > localNum) showAppUpdateAvailable(_served);
+      return;
+    }
+    /* Rev-1089: an address that has already failed three times to move forward is
+       not going to move now, and reloading it is what built the spinner. Say so
+       instead, and leave the app perfectly usable at the revision it is on. */
+    const _stuck = cpStuckHere();
+    if(_stuck){
+      ghSetStatus('This address serves a fixed copy (' + APP_REV + '). GitHub has ' + remoteRev
+        + ' — it does not update itself. Open ' + CP_LIVE_URL + ' for the newest build,'
+        + ' or ask IT to refresh this copy.', true);
+      if(!silent) flash('This copy does not update itself — open the live site for ' + remoteRev + '.', true);
       return;
     }
     try {
@@ -26250,6 +27008,9 @@ if($('fiScanFile')) $('fiScanFile').onchange = function(e){
 };
 if($('fiBusyCancel')) $('fiBusyCancel').onclick = function(){
   FI_SCAN_CANCEL = true; fiBusy(false); fiScanSetMsg('Stopping\u2026'); };
+if($('fiMapGo')) $('fiMapGo').onclick = fiMapGo;
+if($('fiMapCancel')) $('fiMapCancel').onclick = function(){
+  FI_CSV = null; var p = $('fiMap'); if(p) p.style.display = 'none'; fiScanSetMsg(''); };
 if($('fiReviewAccept')) $('fiReviewAccept').onclick = fiReviewAccept;
 if($('fiReviewCancel')) $('fiReviewCancel').onclick = function(){
   FI_SCAN = null; var p = $('fiReview'); if(p) p.style.display = 'none'; fiScanSetMsg(''); };
@@ -26665,13 +27426,10 @@ let _pdfjsReady = null;
 function loadPdfJs(){
   if(window.pdfjsLib) return Promise.resolve();
   if(_pdfjsReady) return _pdfjsReady;
-  _pdfjsReady = new Promise((res, rej) => {
-    const sc = document.createElement('script');
-    sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-    sc.onload = () => { try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; res(); } catch(e){ rej(e); } };
-    sc.onerror = () => rej(new Error('offline'));
-    document.head.appendChild(sc);
-  });
+  _pdfjsReady = (async () => {
+    const hit = await cpLoadLib('pdfjs', () => !!window.pdfjsLib);
+    try{ window.pdfjsLib.GlobalWorkerOptions.workerSrc = hit.worker; }catch(e){}
+  })();
   return _pdfjsReady;
 }
 async function convertPdfToImageFile(file){
@@ -26747,22 +27505,34 @@ try{
   }
 }catch(_){ }
 try{ if(localStorage.getItem('cpJustUpdatedTo')){
-  // Rev-837: if the site is still serving the OLDER rev (publishing lag), keep ONE
-  // continuous curtain up while the retries happen behind it - no blink cycles. It
-  // fades when the wanted rev truly arrives, and gives up after 60s so it can never stick.
   const _want = localStorage.getItem('cpJustUpdatedTo') || '';
-  const _wn = parseInt((_want.match(/\d+/) || ['0'])[0]);
-  const _ln = parseInt((APP_REV.match(/\d+/) || ['0'])[0]);
+  const _wn = cpRevNum(_want);
+  const _ln = cpRevNum(APP_REV);
+  /* Rev-1089: whatever happens next, the flag has done its job. Clearing it here
+     rather than sixty seconds later means a reload can never inherit it. */
+  try{ localStorage.removeItem('cpJustUpdatedTo'); localStorage.removeItem('cpJustUpdatedAt'); }catch(_){ }
   if(_ln < _wn){
-    cpUpdateCurtain('Publishing ' + _want + ' \u2014 the site is catching up\u2026');
-    setTimeout(() => { const c = document.getElementById('cpUpdateCurtain');
-      if(c){ c.style.transition = 'opacity .35s'; c.style.opacity = '0'; setTimeout(() => c.remove(), 400); }
-      try{ localStorage.removeItem('cpJustUpdatedTo');
-            localStorage.removeItem('cpJustUpdatedAt'); }catch(_){ } }, 60000);
+    /* the reload ran and brought back the SAME revision: count it against this address */
+    let _t = cpReadJson('cpUpdTries');
+    if(!_t || _t.url !== cpHostKey() || _t.want !== _want) _t = { url: cpHostKey(), want: _want, n: 0 };
+    _t.n++;
+    try{ localStorage.setItem('cpUpdTries', JSON.stringify(_t)); }catch(_){ }
+    if(_t.n >= 3){
+      try{ localStorage.setItem('cpNoSelfUpdate',
+             JSON.stringify({ url: cpHostKey(), want: _want, at: Date.now() })); }catch(_){ }
+      cpStuckCurtain(_want);
+    } else {
+      /* one or two misses is an ordinary GitHub Pages publishing lag */
+      cpUpdateCurtain('Publishing ' + _want + ' \u2014 the site is catching up\u2026');
+      cpCurtainEscape();
+      cpFadeCurtain(60000);
+    }
   } else {
-  cpUpdateCurtain('Now on ' + APP_REV);
-  setTimeout(() => { const c = document.getElementById('cpUpdateCurtain');
-    if(c){ c.style.transition = 'opacity .35s'; c.style.opacity = '0'; setTimeout(() => c.remove(), 400); } }, 700); } } }catch(e){ console.warn(e); }
+    /* we arrived on the revision we wanted: this address DOES move. forget it all. */
+    try{ localStorage.removeItem('cpUpdTries'); localStorage.removeItem('cpNoSelfUpdate'); }catch(_){ }
+    cpUpdateCurtain('Now on ' + APP_REV);
+    cpFadeCurtain(700);
+  } } }catch(e){ console.warn(e); }
 if($('headerRev')) $('headerRev').textContent = APP_REV + ' · ' + BUILD_DATE + ' ' + BUILD_TIME;
 try{ cpStartLogArchive(); }catch(e){ console.warn('log archiver did not start:', e); }   // Rev-756
 
@@ -27259,14 +28029,11 @@ report can be read instead of guessed at.
       }
     };
     // Rev-515: PDFs accepted — rendered to a high-resolution image inside the app via pdf.js
-    const loadPdfJs = () => new Promise((res, rej) => {
-      if(window.pdfjsLib){ res(); return; }
-      const s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-      s.onload = () => { try{ window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; res(); }catch(e){ rej(e); } };
-      s.onerror = () => rej(new Error('pdf.js failed to load — is this device online?'));
-      document.head.appendChild(s);
-    });
+    const loadPdfJs = async () => {                      /* Rev-1087: mirrors */
+      if(window.pdfjsLib) return;
+      const hit = await cpLoadLib('pdfjs', () => !!window.pdfjsLib);
+      try{ window.pdfjsLib.GlobalWorkerOptions.workerSrc = hit.worker; }catch(e){}
+    };
     const pdfToImage = async (file) => {
       await loadPdfJs();
       const buf = await file.arrayBuffer();
@@ -27611,4 +28378,4 @@ report can be read instead of guessed at.
 </div>
 
 
-</body></html>
+<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div></body></html>
