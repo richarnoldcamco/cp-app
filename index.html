@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1107</title>
+<title>CONTROL PLAN GENERATOR - Rev-1108</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -529,13 +529,13 @@ window.addEventListener('DOMContentLoaded', function(){
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1107 · 2026-08-30 03:22 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1108 · 2026-08-30 03:36 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
   <button id="hcChkBtn" title="Is this machine safe to leave?" onclick="hcOpenCheck()" style="background:#1E7A34; color:#fff; border:1px solid #124A1F; border-radius:6px; padding:6px 12px; font-family:monospace; font-size:10.5px; font-weight:800; letter-spacing:.08em; cursor:pointer; white-space:nowrap; margin-right:8px;">✓ HANDOFF CHECK</button>
   <button id="headerPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-right:8px;">⬆️ Push App</button>
-  <button class="ob-back" id="headerBack">← Back</button>
+  <button class="ob-back hidden" id="headerBack">← Back</button>
 </header>
 
 <div id="newerVersionBanner" style="display:none; background:#2c6e49; color:#fff; padding:6px 12px; font-size:12px; line-height:1.3; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
@@ -549,13 +549,13 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- MAIN MENU -->
-<div id="menuScreen" class="menu hidden">
+<div id="menuScreen" class="menu">
   <div class="brand" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
     <div style="display:flex; align-items:center; gap:12px;">
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1107 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 03:22 PM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1108 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 03:36 PM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -568,7 +568,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1107 · 2026-08-30 03:22 PM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1108 · 2026-08-30 03:36 PM</div>
 
       <div class="menu-grid">
       <button class="menu-btn" id="mNewPlan" onclick="showNewCP(true)" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -633,7 +633,7 @@ window.addEventListener('DOMContentLoaded', function(){
       </button>
       <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
         <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
-        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1107 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUBLISHING TO THE WEBSITE…</small>
       </button>
       </div>
       <div style="display:none">
@@ -643,7 +643,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1107 · Built 2026-08-30 03:22 PM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1108 · Built 2026-08-30 03:36 PM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -1028,85 +1028,25 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- PROJECTS SCREEN -->
-<div id="projectsScreen" class="setup wide">
+<div id="projectsScreen" class="setup wide hidden">
   <button class="ob-back" id="projectsBack">← Back</button>
-  <h1>Control Plans</h1>
-  <p class="sub">All Control Plans on this device — drafts and saved projects together</p>
+  <h1 id="projectsTitle">Control Plans</h1>
+  <p class="sub" id="projectsSub">All Control Plans on this device — drafts and saved projects together</p>
   <div id="cpPartsCrumb" style="display:none; align-items:center; gap:10px; margin:2px 0 10px;"></div>
-  <button id="projectsNewBtn" onclick="showNewCP(true)" style="align-items: center; gap: 8px; background: rgb(44, 110, 73); color: rgb(255, 255, 255); border: 1px solid rgb(33, 82, 54); border-radius: 8px; padding: 12px 20px; font-size: 15px; font-weight: 800; cursor: pointer; margin: 6px 0px 16px; display: none;">＋ New Control Plan</button>
+  <button id="projectsNewBtn" onclick="showNewCP(true)" style="display:inline-flex; align-items:center; gap:8px; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:8px; padding:12px 20px; font-size:15px; font-weight:800; cursor:pointer; margin:6px 0 16px;">＋ New Control Plan</button>
   <table id="projectsTable">
     <thead>
-      <tr class="cp-plan-head" id="cpPlanHeadRow"><th>Operation</th><th style="min-width:196px;">Status</th><th style="border-left:2px solid #c9c0b4;">Construction Steps</th><th style="border-left:2px solid #c9c0b4;">Actions</th><th style="text-align:right;">CP Rev</th></tr>
+      <tr class="cp-plan-head" id="cpPlanHeadRow">
+        <th>Part Number</th>
+        <th>Status</th>
+        <th style="border-left:2px solid #c9c0b4;">Construction Steps</th>
+        <th style="border-left:2px solid #c9c0b4;">Actions</th>
+        <th style="text-align:right;">CP Rev</th>
+      </tr>
     </thead>
-    <tbody id="projectsTbody"><tr><td colspan="3" style="background: rgb(228, 222, 212); border-top: 2px solid rgb(122, 26, 28); border-bottom: 1px solid rgb(207, 198, 184); padding: 8px 10px;"><b style="font-size: 33px; font-weight: 800; letter-spacing: 0.02em; color: rgb(0, 0, 0); vertical-align: middle; line-height: 1.15;">1000237620</b><span style="font-size: 22px; font-weight: 700; letter-spacing: 0.02em; color: rgb(107, 98, 87); vertical-align: middle; margin-left: 16px;">AIR COIL</span></td><td colspan="2" style="background: rgb(228, 222, 212); border-top: 2px solid rgb(122, 26, 28); border-bottom: 1px solid rgb(207, 198, 184); border-left: 2px solid rgb(207, 198, 184); padding: 8px 10px;"><button class="cp-btn cp-btn-primary" title="No traveller on file for this part — tap to upload the routing (image or PDF)" style="width: 140px; vertical-align: middle; background: rgb(122, 92, 42); border-color: rgb(99, 72, 31);">Upload Traveller</button><button class="cp-btn cp-btn-quiet" title="Build ONE Control Plan for the whole part, combining every operation in routing order. Separate document from each operation’s own Excel Control Plan." style="margin-left: 8px; vertical-align: middle; white-space: normal; max-width: 340px; line-height: 1.25; text-align: left;">Stitch together all OP Control Plans into one Part Control Plan</button></td></tr><tr class="cp-op-row"><td style="padding-left: 68px; white-space: nowrap;"><strong style="font-weight: 800; letter-spacing: 0.03em; font-size: 23px;">↳ OP-030</strong><span style="font-size: 21px; color: rgb(90, 81, 72); font-weight: 600;">  —  1ST TURN</span><button title="Set what this operation is (e.g. TURN COMPLETE)" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 18px; opacity: 0.55;">✏️</button><span title="7 cells on this operation differ from the Master List:
-
-Balloon 5 · Machinist check freq: master 10 → 5
-Balloon 7 · machinist does not check (controlled by balloon 11)
-Balloon 4 · Machinist check freq: master 10 → 5
-Balloon 6 · machinist does not check (controlled by balloon 7)
-Balloon 8 · Machinist check freq: master TBD → CALIPERS
-Balloon 8 · Freq (QE): master NO CHECK → 10
-Balloon 8 · Meas method (CMM): master TBD → CMM
-
-Each one is recorded with who changed it and when. Open the row and press ? on the cell." style="margin-left: 12px; font-size: 13px; font-weight: 800; letter-spacing: 0.03em; padding: 3px 9px; border-radius: 999px; background: rgb(255, 232, 204); color: rgb(138, 75, 18); border: 1px solid rgb(224, 177, 132); vertical-align: middle; cursor: help; white-space: nowrap;">✎ 7 hand-edited</span></td><td style="vertical-align: top; min-width: 196px;"><span class="cp-pill" title="Not complete yet:
-• no traveller uploaded for this part
-• Step 2 UPLOAD ODS — no ODS drawing loaded" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">IN PROGRESS <span style="font-weight:700; opacity:.8;">(2)</span></span><div style="margin-top: 7px;"><div style="width:180px; padding:14px 6px; text-align:center; font:700 10px system-ui; letter-spacing:.05em; color:#a5342a; background:#fdecea; border:1px dashed #e6b3ad; border-radius:5px;">NO ODS DRAWING</div></div></td><td class="cp-steps-cell" style="border-left: 2px solid rgb(226, 221, 212);"><div class="cp-act" style="gap: 6px; flex-wrap: nowrap; align-items: flex-start;"><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 1</span><button class="cp-step cp-step-done" title="Operation 030 · 1ST TURN — click to change it." style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">✏️ EDIT OP #</span><span class="cp-step-s">COMPLETED</span></button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 2</span><button class="cp-step cp-step-todo" title="STEP 2 — load the ODS drawing for this operation. Nothing can be ballooned without it." style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">📄 UPLOAD ODS</span><span class="cp-step-s">DO THIS NEXT</span></button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 3</span><button class="cp-step cp-step-done" title="STEP 3 — give every ODS balloon its row and pin it on the drawing (green dot).
-14 of 14 approved  ·  all pinned." style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">⭕ ASSIGN BUBBLES</span><span class="cp-step-s">COMPLETED</span></button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 4</span><button class="cp-step cp-step-done" title="STEP 4 — confirm each row’s spec / tolerance and limits, and approve the numbers row by row." style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">📏 ASSIGN TOLERANCES</span><span class="cp-step-s">COMPLETED</span></button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 5</span><button class="cp-step cp-step-done" title="STEP 5 — pick the Control Type for each balloon; the methods fill themselves from the Master List.
-14 of 14 approved  ·  data complete." style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">🏷️ ASSIGN CONTROL TYPES</span><span class="cp-step-s">COMPLETED</span></button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 6</span><button class="cp-step cp-step-done" title="STEP 6 — review the measurement methods, set any special gage, confirm the reaction plan.
-14 of 14 approved  ·  data complete." style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">📐 ASSIGN MEASUREMENT TYPES</span><span class="cp-step-s">COMPLETED</span></button><button type="button" title="2 special gage(s) called for on this operation, 2 still open.
-Click to see which bubble each one is for and where it has got to." style="display: block; width: 100%; margin-top: 6px; background: rgb(255, 255, 255); border: 1px solid rgb(165, 52, 42); border-radius: 8px; padding: 7px 6px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.04em; color: rgb(165, 52, 42); cursor: pointer; line-height: 1.35;">GAGES · 2 OPEN / 2</button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 7</span><button class="cp-step cp-step-done" title="STEP 7 — reviewed by RICHARD ARNOLD.
-Open it again to re-check, or to withdraw the release." style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">🔍 REVIEW INSPECTION</span><span class="cp-step-s">COMPLETED</span></button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 8</span><button class="cp-step cp-step-done" title="STEP 8 — 9 of 14 features have a line-inspection level.
-Level 1, 2 or 3 sets how often the quality technician re-checks that feature." style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">📋 LINE INSPECTION</span><span class="cp-step-s">ALL 14 · 7 L2 · 2 L3</span></button><button type="button" title="Run the inspection for this operation — the SAME program the machinist runs,
-feature for feature. Readings are saved like any other run." style="display: block; width: 100%; margin-top: 6px; background: rgb(255, 255, 255); border: 1px solid rgb(26, 82, 118); border-radius: 8px; padding: 7px 6px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.04em; color: rgb(26, 82, 118); line-height: 1.35; cursor: pointer;">▶ PERFORM LINE INSPECTION</button></span></div></td><td style="border-left: 2px solid rgb(226, 221, 212); white-space: nowrap;"><div class="cp-act" style="flex-wrap: wrap;"><button class="cp-btn cp-btn-quiet" title="Read every stored run for this operation and show mean, spread, Cpk and any
-out-of-tolerance pieces, one line per feature. Simulated runs are excluded
-unless they are switched on in Reports." style="width: 78px;">📊 REVIEW</button><button class="cp-btn cp-btn-quiet" title="Simulate a machinist making and measuring parts on this operation,
-and watch which serial the line inspector is told to fetch.
-Counts parts only — it writes no readings." style="width: 96px;">▶ INSPECT SIM</button><button class="cp-btn cp-btn-go" title="Machinist: start a real inspection run for this plan (readings are saved)" style="width: 62px;">Inspect</button><button class="cp-btn cp-btn-quiet" title="Build the L3Harris-format Control Plan xlsx for THIS operation" style="width: 66px;">Excel CP</button><button class="cp-btn cp-btn-quiet" title="File the LINE INSPECTION / FIRST ARTICLE forms for this operation.
-The exported form is stored in the private data repository, so every device gets it." style="width: 82px;">LINE INSP</button><button class="cp-btn cp-btn-quiet" title="OPTIONAL — upload the CNC program for this operation.
-It is stored in the private data repository, so every device gets it." style="width: 62px;">CNC</button><button class="cp-btn cp-btn-quiet" title="Download this plan’s .xlsx" style="width: 68px;">Download</button><button class="cp-btn cp-btn-quiet" title="Change this plan’s part number (and rev) IN PLACE — no duplicate is created" style="width: 58px;">Rename</button><button class="cp-btn cp-btn-danger" title="Delete this Control Plan" style="width: 54px;">Delete</button></div></td><td style="text-align: right; white-space: nowrap;"><div class="cp-pct" style="color:#8a6a12;" title="Edit op # (worth 5): done → 5 pts
-Upload ODS (worth 5): 0 of 1 = 0% → 0 pts
-Assign bubbles (worth 20): done → 20 pts
-Assign tolerances (worth 15): done → 15 pts
-Control types (worth 20): done → 20 pts
-Measurement methods (worth 20): done → 20 pts
-Review inspection (worth 15): done → 15 pts
-——————————————————
-TOTAL 95%">95%</div><div class="cp-rev" title="Control Plan revision — advances each time you press Save to Project.
-● There are edits since Rev-9 — they are saved on this device; press Save to Project to issue the next revision.
-Part / drawing rev: Rev-1">Rev-9 <span style="color:#a35400;">●</span></div></td></tr><tr class="cp-op-row"><td colspan="2" style="border-bottom: 1px solid rgb(226, 221, 212);"></td><td colspan="1" style="padding: 2px 10px 10px; border-bottom: 1px solid rgb(226, 221, 212); border-left: 2px solid rgb(226, 221, 212);"><div class="cp-uc" title="This operation is still being built. The stripes run faster the closer this plan is to 100% — a nearly-still ribbon means barely started. numbered · no ODS drawing · 14 of 14 approved  ·  all pinned · 14 of 14 approved  ·  data complete · 14 of 14 approved  ·  data complete" style="animation-duration: 0.51s;"><b>UNDER CONSTRUCTION — 95% COMPLETE</b></div><div class="cp-prog" title="95% complete — numbered · no ODS drawing · 14 of 14 approved  ·  all pinned · 14 of 14 approved  ·  data complete · 14 of 14 approved  ·  data complete"><div class="cp-prog-fill live" style="width: 95%;"></div><div class="cp-prog-ticks"><span></span><span></span><span></span><span></span><span></span></div></div></td><td colspan="2" style="border-bottom: 1px solid rgb(226, 221, 212); border-left: 2px solid rgb(226, 221, 212);"></td></tr><tr class="cp-op-row"><td style="padding-left: 68px; white-space: nowrap;"><strong style="font-weight: 800; letter-spacing: 0.03em; font-size: 23px;">↳ OP-040</strong><span style="font-size: 21px; color: rgb(90, 81, 72); font-weight: 600;">  —  2ND TURN</span><button title="Set what this operation is (e.g. TURN COMPLETE)" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 18px; opacity: 0.55;">✏️</button></td><td style="vertical-align: top; min-width: 196px;"><span class="cp-pill" title="Not complete yet:
-• no traveller uploaded for this part
-• Step 2 UPLOAD ODS — no ODS drawing loaded
-• Step 5 ASSIGN CONTROL TYPES — 0 of 4 approved
-• Step 6 ASSIGN MEASUREMENT TYPES — 0 of 4 approved
-• Step 7 REVIEW INSPECTION — not reviewed / released yet" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">IN PROGRESS <span style="font-weight:700; opacity:.8;">(5)</span></span><div style="margin-top: 7px;"><div style="width:180px; padding:14px 6px; text-align:center; font:700 10px system-ui; letter-spacing:.05em; color:#a5342a; background:#fdecea; border:1px dashed #e6b3ad; border-radius:5px;">NO ODS DRAWING</div></div></td><td class="cp-steps-cell" style="border-left: 2px solid rgb(226, 221, 212);"><div class="cp-act" style="gap: 6px; flex-wrap: nowrap; align-items: flex-start;"><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 1</span><button class="cp-step cp-step-done" title="Operation 040 · 2ND TURN — click to change it." style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">✏️ EDIT OP #</span><span class="cp-step-s">COMPLETED</span></button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 2</span><button class="cp-step cp-step-todo" title="STEP 2 — load the ODS drawing for this operation. Nothing can be ballooned without it." style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">📄 UPLOAD ODS</span><span class="cp-step-s">DO THIS NEXT</span></button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 3</span><button class="cp-step cp-step-done" title="STEP 3 — give every ODS balloon its row and pin it on the drawing (green dot).
-4 of 4 approved  ·  all pinned." style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">⭕ ASSIGN BUBBLES</span><span class="cp-step-s">COMPLETED</span></button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 4</span><button class="cp-step cp-step-done" title="STEP 4 — confirm each row’s spec / tolerance and limits, and approve the numbers row by row." style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">📏 ASSIGN TOLERANCES</span><span class="cp-step-s">COMPLETED</span></button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 5</span><button class="cp-step cp-step-lock" title="🔒 LOCKED — finish STEP 2 — UPLOAD ODS first.
-
-Every step has to be completed in order." disabled="" style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">🔒 ASSIGN CONTROL TYPES</span><span class="cp-step-s">NEEDS EARLIER STEP</span></button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 6</span><button class="cp-step cp-step-lock" title="🔒 LOCKED — finish STEP 2 — UPLOAD ODS first.
-
-Every step has to be completed in order." disabled="" style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">🔒 ASSIGN MEASUREMENT TYPES</span><span class="cp-step-s">NEEDS EARLIER STEP</span></button><button type="button" title="No special gage or fixture has been called for on any row of this operation.
-They appear the moment the Special Gage / Fixture box is filled on a row here." style="display: block; width: 100%; margin-top: 6px; background: rgb(255, 255, 255); border: 1px solid rgb(201, 192, 180); border-radius: 8px; padding: 7px 6px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.04em; color: rgb(58, 53, 46); cursor: pointer; line-height: 1.35;">GAGES · NONE NEEDED</button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 7</span><button class="cp-step cp-step-lock" title="🔒 LOCKED — finish STEP 2 — UPLOAD ODS first.
-
-Every step has to be completed in order." disabled="" style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">🔒 REVIEW INSPECTION</span><span class="cp-step-s">DO THIS NEXT</span></button></span><span class="cp-stepwrap" style="display: flex; flex-direction: column; align-items: stretch;"><span class="cp-stepcap">STEP 8</span><button class="cp-step cp-step-done" title="STEP 8 — 0 of 4 features have a line-inspection level.
-Level 1, 2 or 3 sets how often the quality technician re-checks that feature." style="min-width: 132px; padding: 0px 12px; width: 100%;"><span class="cp-step-t" style="font-size: 11px; white-space: nowrap;">📋 LINE INSPECTION</span><span class="cp-step-s">ALL 4 · 0 L2 · 0 L3</span></button><button type="button" title="Run the inspection for this operation — the SAME program the machinist runs,
-feature for feature. Readings are saved like any other run." style="display: block; width: 100%; margin-top: 6px; background: rgb(255, 255, 255); border: 1px solid rgb(26, 82, 118); border-radius: 8px; padding: 7px 6px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.04em; color: rgb(26, 82, 118); line-height: 1.35; cursor: pointer;">▶ PERFORM LINE INSPECTION</button></span></div></td><td style="border-left: 2px solid rgb(226, 221, 212); white-space: nowrap;"><div class="cp-act" style="flex-wrap: wrap;"><button class="cp-btn cp-btn-quiet" title="Read every stored run for this operation and show mean, spread, Cpk and any
-out-of-tolerance pieces, one line per feature. Simulated runs are excluded
-unless they are switched on in Reports." style="width: 78px;">📊 REVIEW</button><button class="cp-btn cp-btn-quiet" title="Simulate a machinist making and measuring parts on this operation,
-and watch which serial the line inspector is told to fetch.
-Counts parts only — it writes no readings." style="width: 96px;">▶ INSPECT SIM</button><button class="cp-btn cp-btn-go" title="Machinist: start a real inspection run for this plan (readings are saved)" style="width: 62px;">Inspect</button><button class="cp-btn cp-btn-quiet" title="Build the L3Harris-format Control Plan xlsx for THIS operation" style="width: 66px;">Excel CP</button><button class="cp-btn cp-btn-quiet" title="File the LINE INSPECTION / FIRST ARTICLE forms for this operation.
-The exported form is stored in the private data repository, so every device gets it." style="width: 82px;">LINE INSP</button><button class="cp-btn cp-btn-quiet" title="OPTIONAL — upload the CNC program for this operation.
-It is stored in the private data repository, so every device gets it." style="width: 62px;">CNC</button><button class="cp-btn cp-btn-quiet" title="Download this plan’s .xlsx" style="width: 68px;">Download</button><button class="cp-btn cp-btn-quiet" title="Change this plan’s part number (and rev) IN PLACE — no duplicate is created" style="width: 58px;">Rename</button><button class="cp-btn cp-btn-danger" title="Delete this Control Plan" style="width: 54px;">Delete</button></div></td><td style="text-align: right; white-space: nowrap;"><div class="cp-pct" style="color:#8a6a12;" title="Edit op # (worth 5): done → 5 pts
-Upload ODS (worth 5): 0 of 1 = 0% → 0 pts
-Assign bubbles (worth 20): done → 20 pts
-Assign tolerances (worth 15): done → 15 pts
-Control types (worth 20): 0 of 4 = 0% → 0 pts
-Measurement methods (worth 20): 0 of 4 = 0% → 0 pts
-Review inspection (worth 15): 0 of 1 = 0% → 0 pts
-——————————————————
-TOTAL 40%">40%</div><div class="cp-rev" title="Control Plan revision — advances each time you press Save to Project.
-No edits since this revision was issued.
-Part / drawing rev: Rev-1">Rev-3</div></td></tr><tr class="cp-op-row"><td colspan="2" style="border-bottom: 1px solid rgb(226, 221, 212);"></td><td colspan="1" style="padding: 2px 10px 10px; border-bottom: 1px solid rgb(226, 221, 212); border-left: 2px solid rgb(226, 221, 212);"><div class="cp-uc" title="This operation is still being built. The stripes run faster the closer this plan is to 100% — a nearly-still ribbon means barely started. numbered · no ODS drawing · 4 of 4 approved  ·  all pinned · 0 of 4 approved  ·  4 still need a control type · 0 of 4 approved  ·  4 still need a measurement method / reaction plan" style="animation-duration: 2.13s;"><b>UNDER CONSTRUCTION — 40% COMPLETE · CONTROL TYPES 0/4</b></div><div class="cp-prog" title="40% complete — numbered · no ODS drawing · 4 of 4 approved  ·  all pinned · 0 of 4 approved  ·  4 still need a control type · 0 of 4 approved  ·  4 still need a measurement method / reaction plan"><div class="cp-prog-fill live" style="width: 40%;"></div><div class="cp-prog-ticks"><span></span><span></span><span></span><span></span><span></span></div></div></td><td colspan="2" style="border-bottom: 1px solid rgb(226, 221, 212); border-left: 2px solid rgb(226, 221, 212);"></td></tr><tr><td colspan="5" style="padding: 16px 10px 18px 68px; background: rgb(250, 247, 242); border-bottom: 1px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" title="Add another routing operation to 1000237620" style="width: auto; padding: 12px 24px; font-size: 16px; font-weight: 800; letter-spacing: 0.03em;">➕ ADD NEW OPERATION</button></td></tr></tbody>
+    <tbody id="projectsTbody"></tbody>
   </table>
-  <p id="projectsEmpty" class="sub" style="margin-top: 24px; text-align: center; display: none;">No saved projects yet</p>
+  <p id="projectsEmpty" class="sub" style="margin-top:24px;text-align:center">No saved projects yet</p>
 </div>
 
 <!-- CONTROL PLAN MASTER LIST SCREEN -->
@@ -1373,7 +1313,7 @@ Part / drawing rev: Rev-1">Rev-3</div></td></tr><tr class="cp-op-row"><td colspa
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 3:49:22 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 3:51:02 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -2059,7 +1999,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1107";
+const APP_REV = "Rev-1108";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2830,6 +2770,20 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-30",
+  "rev": "App Rev-1108",
+  "type": "App",
+  "changes": [
+   "THE OPERATION CHOOSER, TIDIED (Rev-1108) — per Rich: it did not look professional. Two things were wrong with it. The missing-drawing placeholder was a translucent grey panel inside a green button, which reads as a fault rather than as a blank; it is now a white card with black type and a thin border, the same shape and size a drawing would be, so an operation with no ODS on this device looks deliberate.",
+   "And the operation number and its description were both heavy white capitals stacked on top of each other, so OP-030 and 1ST TURN ran together as one shouted line. The number keeps the weight; the description is lighter, smaller and letter-spaced beneath it, and the workcenter and feature count sit quieter again below that. Three sizes, three weights, one thing said at a time.",
+   "THE INSPECT LIST IS AN OPERATOR'S SCREEN NOW (Rev-1108) — per Rich: \"this is an operator inspection screen only, no editing should be able to be done on this screen.\" Reached from INSPECT PARTS it is headed INSPECTION, with \"Pick the part you are inspecting, then the operation\" beneath it. The + NEW CONTROL PLAN button is gone, and so are the pencil that renames a part number across every one of its operations and the bin that deletes one — three ways to change what a control plan says, on a screen a machinist uses with a part in his hand.",
+   "Reached from the CONTROL PLANS tile the screen is exactly as it was, heading, subtitle, New Control Plan, pencil and bin included. That IS the building screen. One list, two errands, and only one of them can change anything.",
+   "The workcenter is also dropped from the operation chooser when it is only the operation number said again — his plans carry it as \"030\", which is what produced \"OP-030 … 030 · 14 features\".",
+   "THE LOWER LIMIT CAME BACK (Rev-1108) — Rich: \"where did the lower limit tolerance go?\" FACE GROOVE OD is .733/.730 on the print and the inspection screen showed HIGH .733 with nothing under it; WALL THICKNESS, .029/.027, showed HIGH .029 alone. Rev-418 made the manual Upper/Lower Limit columns beat the parsed Spec text, which is right, but it applied that rule to BOTH limits the moment EITHER column was filled in and deleted the parsed one. A row with .733 typed in Upper Limit and Lower Limit left blank therefore lost the .730 its own Spec column plainly states, and a two-sided dimension was inspected as a maximum.",
+   "Each limit is decided on its own now: the manual column wins wherever it is filled in, and where it is blank the limit read out of the Spec text stands. A parsed limit is only kept if it makes sense against the manual one — a low below the high, a high above the low. A genuine MAX-only feature is untouched, because its spec has no second limit to keep."
+  ]
+ },
+ {
+  "ts": "2026-08-30",
   "rev": "App Rev-1107",
   "type": "App",
   "changes": [
@@ -3451,7 +3405,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "03:22 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "03:36 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4158,7 +4112,11 @@ function cpPickOpToInspect(part, list){
          desc = String(it.p.opDesc || bs.opDesc || it.p.operation || '').trim().toUpperCase(); }catch(e){}
     /* the workcenter is only worth showing when it says something the
        description does not */
-    const tail = (wc && wc !== desc) ? wc : '';
+    /* Rev-1108: nor when it is only the operation number said again -- his plans
+       carry the workcenter as "030", which printed as "OP-030 ... 030 - 14
+       features". */
+    const opn = String(it.p.opNum || '').trim().toUpperCase();
+    const tail = (wc && wc !== desc && wc !== opn && wc !== ('OP-' + opn)) ? wc : '';
     let ods = '';
     try{ ods = cpOpOdsImage(it.p) || ''; }catch(e){ ods = ''; }
     const b = document.createElement('button');
@@ -4171,17 +4129,28 @@ function cpPickOpToInspect(part, list){
           ? '<img class="cpOpPickOds" src="' + esc(ods) + '" alt="ODS for OP-'
             + esc(it.p.opNum || '') + '" style="width:128px; height:92px; object-fit:contain;'
             + ' background:#fff; border-radius:8px; flex:0 0 auto;">'
+          /* Rev-1108: per Rich - a translucent grey hole in a green button looked
+             like a fault. White card, black type, the same shape a drawing would
+             be, so a missing drawing reads as a labelled blank rather than damage. */
           : '<div class="cpOpPickNoOds" style="width:128px; height:92px; border-radius:8px;'
-            + ' background:rgba(255,255,255,.14); flex:0 0 auto; display:flex;'
+            + ' background:#fff; border:1px solid #cfc8bc; flex:0 0 auto; display:flex;'
             + ' align-items:center; justify-content:center; text-align:center;'
-            + ' font:800 11px system-ui; letter-spacing:.06em; color:rgba(255,255,255,.8);">'
+            + ' font:800 10.5px system-ui; letter-spacing:.09em; line-height:1.5;'
+            + ' color:#1d1a17;">'
             + 'NO ODS<br>DRAWING</div>')
       + '<span style="flex:1; min-width:0;">'
-      +   '<span style="display:block; font:900 24px system-ui;">OP-' + esc(it.p.opNum || '?') + '</span>'
-      +   (desc ? '<span class="cpOpPickDesc" style="display:block; font:700 15px system-ui;'
-                  + ' margin-top:3px; opacity:.95; overflow:hidden; text-overflow:ellipsis;'
-                  + ' white-space:nowrap;">' + esc(desc) + '</span>' : '')
-      +   '<span style="display:block; font:600 13px system-ui; margin-top:3px; opacity:.82;">'
+      /* Rev-1108: the operation number and its description were both heavy white
+         capitals, one under the other, so they read as one shouted line. The
+         number stays the loud part; the description is lighter, smaller and
+         letter-spaced, the way a subtitle behaves. */
+      +   '<span style="display:block; font:900 24px system-ui; letter-spacing:.01em;">'
+      +     'OP-' + esc(it.p.opNum || '?') + '</span>'
+      +   (desc ? '<span class="cpOpPickDesc" style="display:block; font:600 13.5px system-ui;'
+                  + ' letter-spacing:.11em; margin-top:5px; color:rgba(255,255,255,.86);'
+                  + ' overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">'
+                  + esc(desc) + '</span>' : '')
+      +   '<span style="display:block; font:600 12px system-ui; margin-top:6px;'
+      +     ' color:rgba(255,255,255,.62);">'
       +     (tail ? esc(tail) + ' \u00b7 ' : '') + n + ' feature' + (n === 1 ? '' : 's')
       +   '</span>'
       + '</span>';
@@ -4248,6 +4217,9 @@ function renderPartsIndex(tbody, combined){
       // Rev-612: with a pencil to rename the part across ALL of its operations
       const tdName = cell('<b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">'
         + (g.part || '') + '</b>');
+      /* Rev-1108: the pencil and the bin are editing, and there is no editing on
+         the inspect list. Built only when this is the building screen. */
+      if(!_insp){
       const pen = document.createElement('button');
       pen.textContent = '\u270f\ufe0f';
       pen.title = 'Edit this part number / rev \u2014 applies to every operation of the part';
@@ -4267,6 +4239,7 @@ function renderPartsIndex(tbody, combined){
       bin.onmouseleave = () => { bin.style.opacity = '.45'; };
       bin.onclick = (e) => { e.stopPropagation(); cpDeletePart(g.part); };
       tdName.appendChild(bin);
+      }
       tr.appendChild(tdName);
 
       /* Rev-959: the description is its OWN COLUMN now. Rev-932 hung it off the end of the
@@ -5425,9 +5398,25 @@ function renderProjects(){
   // Rev-591: LEVEL ONE — no part chosen yet, so show only the part numbers
   const crumb = $('cpPartsCrumb');
   const newBtn = $('projectsNewBtn');
+  /* ===== Rev-1108: AN OPERATOR'S SCREEN, NOT A BUILDING ONE =================
+     Per Rich. Reached from INSPECT PARTS this screen is where a machinist picks
+     the part in front of him, and nothing on it should be able to change what a
+     control plan says: no NEW CONTROL PLAN, no pencil to rename a part number,
+     no bin to delete one. It is called INSPECTION, because that is the errand.
+     Reached from CONTROL PLANS it is unchanged - that IS the building screen.
+     ====================================================================== */
+  try{
+    const _i = (typeof cpListMode !== 'undefined' && cpListMode === 'inspect');
+    const _t = $('projectsTitle'), _s = $('projectsSub');
+    if(_t) _t.textContent = _i ? 'Inspection' : 'Control Plans';
+    if(_s) _s.textContent = _i
+      ? 'Pick the part you are inspecting, then the operation'
+      : 'All Control Plans on this device \u2014 drafts and saved projects together';
+  }catch(e){ console.warn('Rev-1108 heading failed', e); }
   if(!cpPartFilter){
     if(crumb) crumb.style.display = 'none';
-    if(newBtn) newBtn.style.display = '';
+    if(newBtn) newBtn.style.display =
+      ((typeof cpListMode !== 'undefined' && cpListMode === 'inspect') ? 'none' : '');
     try{ $('projectsScreen').classList.add('parts-index'); }catch(e){}   // Rev-625: half width
     renderPartsIndex(tbody, combined);
     return;
@@ -6362,11 +6351,42 @@ async function mvBuildPartForProject(p){
     const __lo = parseFloat(__loStr), __hi = parseFloat(__hiStr);
     const __hasLo = __loStr !== '' && !isNaN(__lo), __hasHi = __hiStr !== '' && !isNaN(__hi);
     if(__hasLo || __hasHi){
-      ch.valueType = (__hasLo && __hasHi) ? 'dimensional' : 'max_only';
+      /* ===== Rev-1108: DO NOT THROW THE OTHER LIMIT AWAY =====================
+         Rich: "where did the lower limit tolerance go?" FACE GROOVE OD is
+         .733/.730 on the print and the inspection screen showed HIGH .733 and
+         nothing else; WALL THICKNESS, .029/.027, showed HIGH .029 alone.
+         Rev-418 made the manual Upper/Lower Limit columns win over the parsed
+         Spec text, which is right -- but it applied that rule to BOTH limits
+         whenever EITHER column was filled in, and deleted the parsed one. A row
+         with .733 in Upper Limit and Lower Limit left blank therefore lost the
+         .730 that its own Spec column plainly states, and a two-sided dimension
+         was inspected as a maximum.
+         Each limit is now decided on its own: the manual column wins where it is
+         filled in, and where it is not, the limit read out of the Spec text
+         stands. A genuine MAX-only feature is unaffected -- its spec has no
+         second limit to keep. ================================================= */
       if(__hasHi) ch.high = __hi;
-      if(__hasLo) ch.low = __lo; else delete ch.low;
+      if(__hasLo) ch.low  = __lo;
+      /* keep a parsed limit only where the manual column is silent AND it makes
+         sense against the manual one */
+      if(!__hasLo){
+        if(parsed.low != null && (!__hasHi || parsed.low < __hi)) ch.low = parsed.low;
+        else delete ch.low;
+      }
+      if(!__hasHi){
+        if(parsed.high != null && (!__hasLo || parsed.high > __lo)) ch.high = parsed.high;
+        else delete ch.high;
+      }
+      ch.valueType = (ch.low != null && ch.high != null) ? 'dimensional' : 'max_only';
       delete ch.attrText;
-      ch.tolRaw = (__hasHi ? __hiStr : '') + ((__hasHi && __hasLo) ? ' / ' : '') + (__hasLo ? __loStr : '');
+      /* show a borrowed limit exactly as the print writes it -- .730, not 0.73 */
+      const _sp = String(r.spec || '').match(/(-?\d*\.?\d+)\s*[\/]\s*(-?\d*\.?\d+)/);
+      const _txt = (v) => { if(_sp){ if(parseFloat(_sp[1]) === v) return _sp[1];
+                                     if(parseFloat(_sp[2]) === v) return _sp[2]; }
+                            return String(v); };
+      const _hiTxt = (ch.high != null) ? (__hasHi ? __hiStr : _txt(ch.high)) : '';
+      const _loTxt = (ch.low  != null) ? (__hasLo ? __loStr : _txt(ch.low))  : '';
+      ch.tolRaw = _hiTxt + ((_hiTxt && _loTxt) ? ' / ' : '') + _loTxt;
     }
     return ch;
   });
@@ -29299,4 +29319,4 @@ report can be read instead of guessed at.
 </div>
 
 
-<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div><div id="mvPanel" style="position: fixed; inset: 0px; z-index: 100000; background: rgb(233, 230, 223); display: flex; flex-direction: column;"><iframe id="mvFrame" style="flex: 1 1 auto; width: 100%; height: 100%; border: 0px; background: rgb(255, 255, 255);"></iframe><button style="position: fixed; top: 7px; left: 10px; z-index: 100002; background: rgb(122, 20, 20); color: rgb(255, 255, 255); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 6px; font-weight: 800; padding: 7px 12px; cursor: pointer; font-size: 13px; box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 6px;">← Control Plans</button></div></body></html>
+<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpGate" style="position: fixed; inset: 0px; z-index: 2147482000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; background: rgb(233, 230, 225);"><div style="font:900 15px system-ui; letter-spacing:.14em; color:#7a1a1c;">CONTROL PLAN GENERATOR</div><div id="cpGateHead" style="font:800 30px system-ui; color:#1d1a17; line-height:1.2; max-width:760px;">THIS BUILD IS NOT PUBLISHED YET</div><div id="cpGateBody" style="font:600 15px/1.6 system-ui; color:#5a5148; max-width:640px;">You are running <b>Rev-1108</b> from your Downloads folder, but the website is on Rev-1107 and GitHub is on Rev-1107.<br>Everything you do in here would be in a build nobody else has.<br><br>Publish it and the whole shop moves to Rev-1108.</div><button id="cpGateGo" style="margin-top: 10px; padding: 30px 60px; font: 900 30px system-ui; cursor: default; border: 0px; border-radius: 16px; background: rgb(29, 78, 137); color: rgb(255, 255, 255); letter-spacing: 0.02em; box-shadow: rgba(0, 0, 0, 0.22) 0px 6px 18px; opacity: 0.6;" disabled="">🚀 PUBLISH THIS BUILD</button><div id="cpGateWork" style="display: block; border-color: rgb(29, 78, 137); background: rgba(29, 78, 137, 0.06);"><div class="cpGwTop"><span class="cpGwIcon" style="animation: 1.1s ease-in-out 0s infinite normal none running cpGatePulse;">🚀</span><div style="flex:1; min-width:240px;"><div class="cpGwTitle" id="cpGateWorkTitle" style="color: rgb(18, 50, 79);">PUBLISHING…</div><div id="cpGateStatus" style="font:700 17px system-ui; color:#4a4139; margin-top:6px;">PUBLISHING TO THE WEBSITE…</div></div><div style="text-align:right;"><div class="cpGwClock" id="cpGateClock">0:01</div><div style="font:700 11px system-ui; color:#6b6257;">ELAPSED</div></div></div><div class="cpGwBar" style="background: rgba(29, 78, 137, 0.18);"><i></i></div></div><button id="cpGateSkip" style="margin-top:10px; padding:8px 14px; font:600 12px system-ui; cursor:pointer; border:0; background:none; color:#8a8279; text-decoration:underline;">carry on without publishing</button><style>@keyframes cpGateSweep{0%{left:-40%}100%{left:100%}}@keyframes cpGatePulse{0%,100%{opacity:1}50%{opacity:.55}}@keyframes cpGateFill{from{width:0}to{width:100%}}@keyframes cpGatePop{0%{transform:scale(.4); opacity:0}60%{transform:scale(1.25); opacity:1}100%{transform:scale(1); opacity:1}}#cpGateWork{display:none; width:min(760px,92vw); margin-top:6px; border:3px solid #1d4e89; border-radius:16px; padding:26px 24px; background:rgba(29,78,137,.06); text-align:left;}#cpGateWork .cpGwTop{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}#cpGateWork .cpGwIcon{font-size:44px; line-height:1; animation:cpGatePulse 1.1s ease-in-out infinite;}#cpGateWork .cpGwTitle{font:900 30px system-ui; letter-spacing:.01em; line-height:1.15; color:#12324f;}#cpGateWork .cpGwClock{font:900 30px system-ui; font-variant-numeric:tabular-nums; color:#1d4e89;}#cpGateWork .cpGwBar{position:relative; height:22px; border-radius:11px; overflow:hidden; background:rgba(29,78,137,.18); margin-top:18px;}#cpGateWork .cpGwBar>i{position:absolute; top:0; bottom:0; width:40%; border-radius:11px; background:linear-gradient(90deg,rgba(29,78,137,0) 0%,#1d4e89 50%,rgba(29,78,137,0) 100%); animation:cpGateSweep 1.15s linear infinite;}</style></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div></body></html>
