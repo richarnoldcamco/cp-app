@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1115</title>
+<title>CONTROL PLAN GENERATOR - Rev-1116</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -561,7 +561,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1115 · 2026-08-30 05:28 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1116 · 2026-08-30 07:42 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -587,7 +587,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1115 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 05:28 PM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1116 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 07:42 PM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -600,7 +600,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1115 · 2026-08-30 05:28 PM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1116 · 2026-08-30 07:42 PM</div>
 
       <div class="menu-grid">
       <button class="menu-btn" id="mNewPlan" onclick="showNewCP(true)" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -665,7 +665,7 @@ window.addEventListener('DOMContentLoaded', function(){
       </button>
       <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
         <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
-        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1115 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1116 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
       </button>
       </div>
       <div style="display:none">
@@ -675,7 +675,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1115 · Built 2026-08-30 05:28 PM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1116 · Built 2026-08-30 07:42 PM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -1403,7 +1403,7 @@ Part / drawing rev: Rev-1">Rev-3</div></td></tr><tr class="cp-op-row"><td colspa
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 7:50:22 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 7:53:22 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -2063,9 +2063,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- FLASH MESSAGE -->
-<div id="flash" class="flash error hidden">❌ Push failed: GitHub PUT failed: 409 {
-  "message": "cp_data.json does not match fbb682ca90a2fc33bd1f477a804b0ccf6e5dbd1a",
-  "documentat</div>
+<div id="flash" class="flash hidden">✓ Data pushed to GitHub</div>
 
 <!-- BOOT -->
 <script>
@@ -2091,7 +2089,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1115";
+const APP_REV = "Rev-1116";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2904,6 +2902,16 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-08-30",
+  "rev": "App Rev-1116",
+  "type": "App",
+  "changes": [
+   "WHY THE CROPPED AREA DISAPPEARS (Rev-1116) — Rich asked, and the answer is a leftover of a rule the editor had already abandoned. REV-195 settled that the crop rectangle shows whenever a crop exists — every mode, every zoom — and its own note records that the rule cost three rounds of \"where did my crop go\" before it was written down. Two places were missed and still ran the old rule, which hid the box whenever the zoomed flag was set: pressing Escape out of a drag, and every undo and every redo.",
+   "So the way to make it vanish was: draw a crop, press Enter to zoom into it, then undo a white-out. The rectangle went; the crop did not. It was still there, still saved, and still what the next Enter would have saved — which is the worst kind of disappearance, because nothing was actually lost and there was no way to tell.",
+   "Both places now repaint from the crop like everything else does, which also puts the ⏎ PRESS ENTER TO ZOOM INTO CROPPED AREA hint and the other overlays back in step with it."
+  ]
+ },
+ {
+  "ts": "2026-08-30",
   "rev": "App Rev-1115",
   "type": "App",
   "changes": [
@@ -3613,7 +3621,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "05:28 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "07:42 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -6994,6 +7002,27 @@ async function mvOpenPanelWithParts(partBlocks, titleText, autoOpenPart, autoOpe
     + '    }catch(e){ console.error("edit in control plan failed", e); }\n'
     + '  };\n'
     + '  btns.appendChild(__ed); btns.appendChild(sv); btns.appendChild(x);');
+
+  /* ===== Rev-1116: WHY THE CROPPED AREA DISAPPEARS ==========================
+     Rich, on the bubble editor: "why does the cropped area disappear?" It is a
+     leftover of a rule the editor already abandoned. REV-195 settled that the
+     crop rectangle shows WHENEVER a crop exists -- every mode, every zoom -- and
+     its own note says that rule cost three rounds of "where did my crop go"
+     before it was written. Two places were missed and still run the old rule,
+     which hid the box whenever the zoomed flag was set:
+       - pressing Escape out of a drag, and
+       - every undo and every redo.
+     So: draw a crop, press Enter to zoom into it, then undo a white-out -- and
+     the crop rectangle vanishes while the crop itself is still there, still
+     saved, still what Enter would save. The box was gone; the crop never was.
+     Both now do what everything else does and repaint from the crop, which also
+     puts the Enter hint and the other overlays back in step. ================ */
+  appHtml = appHtml.replace(
+      'if(_odsDrag){ _odsDrag=null; odsWoPreview(null); $("odsMarkBox").classList.toggle("hidden", !odsMarkBoxFrac || _odsZoomed); return; }',
+      'if(_odsDrag){ _odsDrag=null; odsWoPreview(null); odsRepaintBoxes(); return; }');
+  appHtml = appHtml.replace(
+      '    const mb = $("odsMarkBox");\n    if(mb) mb.classList.toggle("hidden", !odsMarkBoxFrac || _odsZoomed);',
+      '    const mb = $("odsMarkBox");\n    if(mb) mb.classList.toggle("hidden", !odsMarkBoxFrac);');
 
   const marker = 'let PARTS = [';
   const at = appHtml.indexOf(marker);
