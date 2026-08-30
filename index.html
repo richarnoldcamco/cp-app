@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1113</title>
+<title>CONTROL PLAN GENERATOR - Rev-1114</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -561,7 +561,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1113 · 2026-08-30 04:55 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1114 · 2026-08-30 05:14 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -587,7 +587,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1113 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 04:55 PM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1114 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-30 05:14 PM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -600,7 +600,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1113 · 2026-08-30 04:55 PM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1114 · 2026-08-30 05:14 PM</div>
 
       <div class="menu-grid">
       <button class="menu-btn" id="mNewPlan" onclick="showNewCP(true)" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -665,7 +665,7 @@ window.addEventListener('DOMContentLoaded', function(){
       </button>
       <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
         <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
-        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1113 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUBLISHING TO THE WEBSITE…</small>
       </button>
       </div>
       <div style="display:none">
@@ -675,7 +675,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1113 · Built 2026-08-30 04:55 PM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1114 · Built 2026-08-30 05:14 PM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -1345,7 +1345,7 @@ window.addEventListener('DOMContentLoaded', function(){
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 8/30/2026, 5:23:22 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ App Rev-1114 pushed at 8/30/2026, 5:24:05 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -2031,7 +2031,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1113";
+const APP_REV = "Rev-1114";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2256,7 +2256,49 @@ async function cpDataRepoRev(){
    website repo is public, so the plain raw address needs no token and no
    credentialed cross-origin request; its one weakness is a CDN that lags the
    commit by a few seconds, and the retry loop around this already rides that out. */
+/* ===== Rev-1114: WHAT THIS DEVICE PUBLISHED, REMEMBERED ====================
+   Rich published Rev-1113, closed the app, opened it again, and was told the
+   website was still on Rev-1112 and to publish it a second time. Nothing was
+   wrong with his publish: the check was reading raw.githubusercontent.com, the
+   CDN that Rev-1103 already caught serving the previous file for half a minute
+   and more after a commit is made. Rev-1103 stopped the PUBLISH trusting it and
+   left the opening check still asking it.
+   Two things are done about it. First, a publish that GitHub accepted is written
+   down here, so opening the same build again answers from a fact instead of a
+   round trip. Second, when the question does have to go to GitHub, it goes to
+   the API rather than the cache -- see cpWebsiteRevNow below.
+   ========================================================================== */
+function cpPublishedHere(){
+  try{
+    const j = JSON.parse(localStorage.getItem('cpPublishedHere') || 'null');
+    return (j && j.rev) ? j : null;
+  }catch(e){ return null; }
+}
+function cpNotePublished(rev){
+  try{ localStorage.setItem('cpPublishedHere',
+    JSON.stringify({ rev: String(rev || ''), at: Date.now(), who: (typeof cpWhoAmI === 'function' ? cpWhoAmI() : '') })); }catch(e){}
+}
 async function cpWebsiteRevNow(){
+  /* ===== Rev-1114: ASK GITHUB, NOT THE CDN ==================================
+     Publishing writes the SAME BYTES to the website file and to the data repo
+     file, so if GitHub reports the same blob sha for both, the website file IS
+     whatever revision the data repo holds -- and both shas come from the API,
+     which serves the commit rather than a cached copy of it. Only if the two
+     differ does this fall back to reading raw.githubusercontent.com, which at
+     least names a revision when the two repositories genuinely disagree.
+     ====================================================================== */
+  try{
+    if(typeof ghConfigured === 'function' && ghConfigured()){
+      const [pg, ap] = await Promise.all([
+        (async () => { try{ return await ghGetPagesFile(); }catch(e){ return null; } })(),
+        (async () => { try{ return await ghGetAppFile();   }catch(e){ return null; } })()
+      ]);
+      if(pg && ap && pg.sha && ap.sha && pg.sha === ap.sha){
+        const r = cpRevIn(ap.html);
+        if(r) return r;
+      }
+    }
+  }catch(e){ /* fall through to the cache */ }
   try{ return await cpPublishedRev(); }catch(e){ return null; }
 }
 async function cpSyncBuildStamp(){
@@ -2800,6 +2842,16 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+ {
+  "ts": "2026-08-30",
+  "rev": "App Rev-1114",
+  "type": "App",
+  "changes": [
+   "A BUILD THAT WAS PUBLISHED IS NO LONGER ASKED TO PUBLISH AGAIN (Rev-1114) — Rich published Rev-1113, closed the app, opened it again and was told the website was still on Rev-1112 and to publish a second time. Nothing was wrong with his publish. The opening check was reading raw.githubusercontent.com — the CDN that Rev-1103 already caught serving the previous file for well over half a minute after a commit is made. Rev-1103 stopped the PUBLISH trusting that cache and left the opening check still asking it.",
+   "A publish that GitHub accepted is now written down on the device that made it. Opening the same build again answers from that fact — instantly, with no round trip — and the screen says so: \"✓ REV-1113 IS PUBLISHED · published from this device on Aug 30, 4:52 PM\", then it carries on to the menu as it does now.",
+   "And when the question does have to go to GitHub, it goes to the API rather than the cache. Publishing writes the same bytes to the website file and to the data repo file, so if GitHub reports the same blob sha for both — and both shas come from the API, which serves the commit and not a copy of it — the website file IS whatever revision the data repo holds. The CDN is consulted only if the two genuinely differ, where it is the only thing that can name what the website is serving."
+  ]
+ },
  {
   "ts": "2026-08-30",
   "rev": "App Rev-1113",
@@ -3491,7 +3543,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-08-30";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "04:55 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "05:14 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -7078,6 +7130,11 @@ async function cpPublishThisBuild(){
       ghSetStatus('\u2713 ' + APP_REV + ' published to the website and GitHub. The website address'
         + ' can take a minute to serve the new file \u2014 the commit is already made.');
       try{ logAct('sync', 'published ' + APP_REV + ' to both repositories, verified'); }catch(e){}
+      /* Rev-1114: GitHub accepted both writes. Write that down, so opening this
+         same build again does not ask a cache whether it happened. Wrapped: not
+         being able to remember a publish must never turn a good publish into a
+         reported failure. */
+      try{ cpNotePublished(APP_REV); }catch(e){ console.warn('could not note the publish', e); }
       return true;
     }
     const bad = [];
@@ -7315,6 +7372,24 @@ async function cpPublishGate(){
         btn.textContent = '🚀 TRY PUBLISHING AGAIN';
       }
     };
+
+    /* Rev-1114: if THIS build was published from this device, that is the answer.
+       No network, no wait, and no CDN to be misled by. */
+    const mine = cpPublishedHere();
+    if(mine && cpRevNum(mine.rev) === here){
+      let when = '';
+      try{ when = new Date(mine.at).toLocaleString(undefined,
+             { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }); }catch(e){}
+      const h0 = document.getElementById('cpGateHead');
+      if(h0) h0.textContent = 'THIS BUILD IS PUBLISHED';
+      const b0 = document.getElementById('cpGateBody');
+      if(b0) b0.innerHTML = '<b>' + APP_REV + '</b> was published from this device'
+        + (when ? ' on ' + when : '') + ', and GitHub accepted both writes.';
+      try{ logAct('sync', 'publish check: ' + APP_REV + ' was published from this device'); }catch(e){}
+      finishWork('\u2713 ' + APP_REV.toUpperCase() + ' IS PUBLISHED',
+        'Published from this device' + (when ? ' on ' + when : '') + '. Taking you to the menu\u2026');
+      return true;
+    }
 
     /* ---- the check, on screen ---- */
     startWork('CHECKING…', '🔎');
@@ -29573,7 +29648,7 @@ report can be read instead of guessed at.
 }
 
 }catch(__bootErr){ try{ const d=document.createElement('div'); d.style.cssText='position:fixed;top:68px;left:0;right:0;z-index:9999;background:#7a1a1c;color:#fff;padding:10px 14px;font:700 13px system-ui;'; d.textContent='⚠️ BOOT-TAIL ERROR — screenshot for Claude: '+(__bootErr.message||__bootErr)+' | '+String(__bootErr.stack||'').split('\n')[1]; document.body.appendChild(d); }catch(e){} }
-</script><div id="cpGate" style="position: fixed; inset: 0px; z-index: 2147482000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; background: rgb(233, 230, 225);"><div style="font:900 15px system-ui; letter-spacing:.14em; color:#7a1a1c;">CONTROL PLAN GENERATOR</div><div id="cpGateHead" style="font:800 30px system-ui; color:#1d1a17; line-height:1.2; max-width:760px;">THIS BUILD IS NOT PUBLISHED YET</div><div id="cpGateBody" style="font:600 15px/1.6 system-ui; color:#5a5148; max-width:640px;">You are running <b>Rev-1113</b> from your Downloads folder, but the website is on Rev-1112.<br>Everything you do in here would be in a build nobody else has.<br><br>Publish it and the whole shop moves to Rev-1113.</div><button id="cpGateGo" style="margin-top: 10px; padding: 30px 60px; font: 900 30px system-ui; cursor: pointer; border: 0px; border-radius: 16px; background: rgb(29, 78, 137); color: rgb(255, 255, 255); letter-spacing: 0.02em; box-shadow: rgba(0, 0, 0, 0.22) 0px 6px 18px;">🚀 PUBLISH THIS BUILD</button><div id="cpGateWork" style="display: none; border-color: rgb(29, 78, 137); background: rgba(29, 78, 137, 0.06);"><div class="cpGwTop"><span class="cpGwIcon" style="animation: 1.1s ease-in-out 0s infinite normal none running cpGatePulse;">🔎</span><div style="flex:1; min-width:240px;"><div class="cpGwTitle" id="cpGateWorkTitle" style="color: rgb(18, 50, 79);">CHECKING…</div><div id="cpGateStatus" style="font:700 17px system-ui; color:#4a4139; margin-top:6px;">Reading the website and GitHub…</div></div><div style="text-align:right;"><div class="cpGwClock" id="cpGateClock">0:01</div><div style="font:700 11px system-ui; color:#6b6257;">ELAPSED</div></div></div><div class="cpGwBar" style="background: rgba(29, 78, 137, 0.18);"><i></i></div></div><button id="cpGateSkip" style="margin-top:10px; padding:8px 14px; font:600 12px system-ui; cursor:pointer; border:0; background:none; color:#8a8279; text-decoration:underline;">carry on without publishing</button><style>@keyframes cpGateSweep{0%{left:-40%}100%{left:100%}}@keyframes cpGatePulse{0%,100%{opacity:1}50%{opacity:.55}}@keyframes cpGateFill{from{width:0}to{width:100%}}@keyframes cpGatePop{0%{transform:scale(.4); opacity:0}60%{transform:scale(1.25); opacity:1}100%{transform:scale(1); opacity:1}}#cpGateWork{display:none; width:min(760px,92vw); margin-top:6px; border:3px solid #1d4e89; border-radius:16px; padding:26px 24px; background:rgba(29,78,137,.06); text-align:left;}#cpGateWork .cpGwTop{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}#cpGateWork .cpGwIcon{font-size:44px; line-height:1; animation:cpGatePulse 1.1s ease-in-out infinite;}#cpGateWork .cpGwTitle{font:900 30px system-ui; letter-spacing:.01em; line-height:1.15; color:#12324f;}#cpGateWork .cpGwClock{font:900 30px system-ui; font-variant-numeric:tabular-nums; color:#1d4e89;}#cpGateWork .cpGwBar{position:relative; height:22px; border-radius:11px; overflow:hidden; background:rgba(29,78,137,.18); margin-top:18px;}#cpGateWork .cpGwBar>i{position:absolute; top:0; bottom:0; width:40%; border-radius:11px; background:linear-gradient(90deg,rgba(29,78,137,0) 0%,#1d4e89 50%,rgba(29,78,137,0) 100%); animation:cpGateSweep 1.15s linear infinite;}</style></div>
+</script><div id="cpGate" style="position: fixed; inset: 0px; z-index: 2147482000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; background: rgb(233, 230, 225);"><div style="font:900 15px system-ui; letter-spacing:.14em; color:#7a1a1c;">CONTROL PLAN GENERATOR</div><div id="cpGateHead" style="font:800 30px system-ui; color:#1d1a17; line-height:1.2; max-width:760px;">THIS BUILD IS NOT PUBLISHED YET</div><div id="cpGateBody" style="font:600 15px/1.6 system-ui; color:#5a5148; max-width:640px;">You are running <b>Rev-1114</b> from your Downloads folder, but the website is on Rev-1113 and GitHub is on Rev-1113.<br>Everything you do in here would be in a build nobody else has.<br><br>Publish it and the whole shop moves to Rev-1114.</div><button id="cpGateGo" style="margin-top: 10px; padding: 30px 60px; font: 900 30px system-ui; cursor: default; border: 0px; border-radius: 16px; background: rgb(29, 78, 137); color: rgb(255, 255, 255); letter-spacing: 0.02em; box-shadow: rgba(0, 0, 0, 0.22) 0px 6px 18px; opacity: 0.6;" disabled="">🚀 PUBLISH THIS BUILD</button><div id="cpGateWork" style="display: block; border-color: rgb(29, 78, 137); background: rgba(29, 78, 137, 0.06);"><div class="cpGwTop"><span class="cpGwIcon" style="animation: 1.1s ease-in-out 0s infinite normal none running cpGatePulse;">🚀</span><div style="flex:1; min-width:240px;"><div class="cpGwTitle" id="cpGateWorkTitle" style="color: rgb(18, 50, 79);">PUBLISHING…</div><div id="cpGateStatus" style="font:700 17px system-ui; color:#4a4139; margin-top:6px;">PUBLISHING TO THE WEBSITE…</div></div><div style="text-align:right;"><div class="cpGwClock" id="cpGateClock">0:02</div><div style="font:700 11px system-ui; color:#6b6257;">ELAPSED</div></div></div><div class="cpGwBar" style="background: rgba(29, 78, 137, 0.18);"><i></i></div></div><button id="cpGateSkip" style="margin-top:10px; padding:8px 14px; font:600 12px system-ui; cursor:pointer; border:0; background:none; color:#8a8279; text-decoration:underline;">carry on without publishing</button><style>@keyframes cpGateSweep{0%{left:-40%}100%{left:100%}}@keyframes cpGatePulse{0%,100%{opacity:1}50%{opacity:.55}}@keyframes cpGateFill{from{width:0}to{width:100%}}@keyframes cpGatePop{0%{transform:scale(.4); opacity:0}60%{transform:scale(1.25); opacity:1}100%{transform:scale(1); opacity:1}}#cpGateWork{display:none; width:min(760px,92vw); margin-top:6px; border:3px solid #1d4e89; border-radius:16px; padding:26px 24px; background:rgba(29,78,137,.06); text-align:left;}#cpGateWork .cpGwTop{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}#cpGateWork .cpGwIcon{font-size:44px; line-height:1; animation:cpGatePulse 1.1s ease-in-out infinite;}#cpGateWork .cpGwTitle{font:900 30px system-ui; letter-spacing:.01em; line-height:1.15; color:#12324f;}#cpGateWork .cpGwClock{font:900 30px system-ui; font-variant-numeric:tabular-nums; color:#1d4e89;}#cpGateWork .cpGwBar{position:relative; height:22px; border-radius:11px; overflow:hidden; background:rgba(29,78,137,.18); margin-top:18px;}#cpGateWork .cpGwBar>i{position:absolute; top:0; bottom:0; width:40%; border-radius:11px; background:linear-gradient(90deg,rgba(29,78,137,0) 0%,#1d4e89 50%,rgba(29,78,137,0) 100%); animation:cpGateSweep 1.15s linear infinite;}</style></div>
 
 <!-- Master List File Viewer Modal -->
 <div id="masterViewerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:9999; overflow:auto; box-sizing:border-box;">
