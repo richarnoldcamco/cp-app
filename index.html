@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1127</title>
+<title>CONTROL PLAN GENERATOR - Rev-1128</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -561,13 +561,13 @@ window.addEventListener('DOMContentLoaded', function(){
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1127 · 2026-09-05 12:18 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1128 · 2026-09-05 01:30 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
   <button id="hcChkBtn" title="Is this machine safe to leave?" onclick="hcOpenCheck()" style="background:#1E7A34; color:#fff; border:1px solid #124A1F; border-radius:6px; padding:6px 12px; font-family:monospace; font-size:10.5px; font-weight:800; letter-spacing:.08em; cursor:pointer; white-space:nowrap; margin-right:8px;">✓ HANDOFF CHECK</button>
   <button id="headerPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; margin-right:8px;">⬆️ Push App</button>
-  <button class="ob-back" id="headerBack">← Back</button>
+  <button class="ob-back hidden" id="headerBack">← Back</button>
 </header>
 
 <div id="newerVersionBanner" style="display:none; background:#2c6e49; color:#fff; padding:6px 12px; font-size:12px; line-height:1.3; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
@@ -581,13 +581,13 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- MAIN MENU -->
-<div id="menuScreen" class="menu hidden">
+<div id="menuScreen" class="menu">
   <div class="brand" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
     <div style="display:flex; align-items:center; gap:12px;">
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1127 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-09-05 12:18 PM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1128 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-09-05 01:30 PM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -600,7 +600,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1127 · 2026-09-05 12:18 PM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1128 · 2026-09-05 01:30 PM</div>
 
       <div class="menu-grid">
       <button class="menu-btn" id="mNewPlan" onclick="showNewCP(true)" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -665,7 +665,7 @@ window.addEventListener('DOMContentLoaded', function(){
       </button>
       <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
         <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
-        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1127 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUBLISHING TO THE WEBSITE…</small>
       </button>
       </div>
       <div style="display:none">
@@ -675,7 +675,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1127 · Built 2026-09-05 12:18 PM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1128 · Built 2026-09-05 01:30 PM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -1060,19 +1060,25 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- PROJECTS SCREEN -->
-<div id="projectsScreen" class="setup wide parts-index">
+<div id="projectsScreen" class="setup wide hidden">
   <button class="ob-back" id="projectsBack">← Back</button>
   <h1 id="projectsTitle">Control Plans</h1>
   <p class="sub" id="projectsSub">All Control Plans on this device — drafts and saved projects together</p>
   <div id="cpPartsCrumb" style="display:none; align-items:center; gap:10px; margin:2px 0 10px;"></div>
-  <button id="projectsNewBtn" onclick="showNewCP(true)" style="align-items: center; gap: 8px; background: rgb(44, 110, 73); color: rgb(255, 255, 255); border: 1px solid rgb(33, 82, 54); border-radius: 8px; padding: 12px 20px; font-size: 15px; font-weight: 800; cursor: pointer; margin: 6px 0px 16px;">＋ New Control Plan</button>
+  <button id="projectsNewBtn" onclick="showNewCP(true)" style="display:inline-flex; align-items:center; gap:8px; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:8px; padding:12px 20px; font-size:15px; font-weight:800; cursor:pointer; margin:6px 0 16px;">＋ New Control Plan</button>
   <table id="projectsTable">
     <thead>
-      <tr class="cp-plan-head" id="cpPlanHeadRow"><th>Part Number</th><th>Part Description</th><th>Open</th><th>Operations</th><th>Progress</th><th>Last Updated</th><th style="border-left:2px solid #c9c0b4;">Traveller</th><th style="border-left:2px solid #c9c0b4;">Improvement Ideas</th></tr>
+      <tr class="cp-plan-head" id="cpPlanHeadRow">
+        <th>Part Number</th>
+        <th>Status</th>
+        <th style="border-left:2px solid #c9c0b4;">Construction Steps</th>
+        <th style="border-left:2px solid #c9c0b4;">Actions</th>
+        <th style="text-align:right;">CP Rev</th>
+      </tr>
     </thead>
-    <tbody id="projectsTbody"><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">1000237620</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 1000237620. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; font-weight:600; color:#5a5148;">AIR COIL</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" title="Open 1000237620 — its operations" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>2</b> <span style="font-size:11px; color:#6b6257;">OP-030 · OP-040</span></td><td style="text-align: left;"><span class="cp-pill" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">0 OF 2 COMPLETE</span></td><td style="text-align: left;">8/30/2026</td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" style="width: 150px; height: auto; min-height: 44px; padding: 8px 10px; white-space: normal; line-height: 1.15; font-size: 11px; font-weight: 800; letter-spacing: 0.03em; background: rgb(29, 78, 137); border-color: rgb(22, 61, 107); color: rgb(255, 255, 255);">Upload Traveller</button></td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" title="2 ideas for 1000237620, 2 still open" style="width: 200px; height: auto; min-height: 44px; white-space: normal; line-height: 1.15; padding: 8px 10px; font-size: 11px; font-weight: 800; letter-spacing: 0.03em; background: rgb(29, 78, 137); border-color: rgb(22, 61, 107); color: rgb(255, 255, 255); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;"><span>CONTROL PLAN<br>IMPROVEMENT IDEAS</span><span style="display:inline-block; padding:1px 8px; border-radius:10px; font-size:10px; background:#fff; color:#1d4e89;">2 OPEN</span></button></td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">1000237498</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 1000237498. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; font-weight:600; color:#5a5148;">COMPRESSOR HOUSING</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" title="Open 1000237498 — its operations" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>6</b> <span style="font-size:11px; color:#6b6257;">OP-040 · OP-050 · OP-100 · OP-110 · OP-150 · OP-160</span></td><td style="text-align: left;"><span class="cp-pill" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">0 OF 6 COMPLETE</span></td><td style="text-align: left;">8/6/2026</td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" style="width: 150px; height: auto; min-height: 44px; padding: 8px 10px; white-space: normal; line-height: 1.15; font-size: 11px; font-weight: 800; letter-spacing: 0.03em; background: rgb(29, 78, 137); border-color: rgb(22, 61, 107); color: rgb(255, 255, 255);">Upload Traveller</button></td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" title="No improvement ideas yet for 1000237498 — open to add one" style="width: 200px; height: auto; min-height: 44px; white-space: normal; line-height: 1.15; padding: 8px 10px; font-size: 11px; font-weight: 800; letter-spacing: 0.03em; background: rgb(29, 78, 137); border-color: rgb(22, 61, 107); color: rgb(255, 255, 255); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;"><span>CONTROL PLAN<br>IMPROVEMENT IDEAS</span></button></td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">912993</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 912993. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; color:#b3aa9c;" title="No part description yet — add one with the ✏️ pencil beside the part number">—</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" title="Open 912993 — its operations" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;"><span class="cp-pill" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">0 OF 1 COMPLETE</span></td><td style="text-align: left;">7/30/2026</td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" style="width: 150px; height: auto; min-height: 44px; padding: 8px 10px; white-space: normal; line-height: 1.15; font-size: 11px; font-weight: 800; letter-spacing: 0.03em; background: rgb(29, 78, 137); border-color: rgb(22, 61, 107); color: rgb(255, 255, 255);">Upload Traveller</button></td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" title="No improvement ideas yet for 912993 — open to add one" style="width: 200px; height: auto; min-height: 44px; white-space: normal; line-height: 1.15; padding: 8px 10px; font-size: 11px; font-weight: 800; letter-spacing: 0.03em; background: rgb(29, 78, 137); border-color: rgb(22, 61, 107); color: rgb(255, 255, 255); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;"><span>CONTROL PLAN<br>IMPROVEMENT IDEAS</span></button></td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">912767-M</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 912767-M. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; color:#b3aa9c;" title="No part description yet — add one with the ✏️ pencil beside the part number">—</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" title="Open 912767-M — its operations" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;"><span class="cp-pill" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">0 OF 1 COMPLETE</span></td><td style="text-align: left;">7/27/2026</td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" style="width: 150px; height: auto; min-height: 44px; padding: 8px 10px; white-space: normal; line-height: 1.15; font-size: 11px; font-weight: 800; letter-spacing: 0.03em; background: rgb(29, 78, 137); border-color: rgb(22, 61, 107); color: rgb(255, 255, 255);">Upload Traveller</button></td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" title="No improvement ideas yet for 912767-M — open to add one" style="width: 200px; height: auto; min-height: 44px; white-space: normal; line-height: 1.15; padding: 8px 10px; font-size: 11px; font-weight: 800; letter-spacing: 0.03em; background: rgb(29, 78, 137); border-color: rgb(22, 61, 107); color: rgb(255, 255, 255); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;"><span>CONTROL PLAN<br>IMPROVEMENT IDEAS</span></button></td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">1000222892</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for 1000222892. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; font-weight:600; color:#5a5148;">COMPRESSOR BORE</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" title="Open 1000222892 — its operations" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;"><span class="cp-pill" style="background:#f0e2c0; color:#5c4708; border:1px solid #d9c48a;">0 OF 1 COMPLETE</span></td><td style="text-align: left;">7/16/2026</td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" style="width: 150px; height: auto; min-height: 44px; padding: 8px 10px; white-space: normal; line-height: 1.15; font-size: 11px; font-weight: 800; letter-spacing: 0.03em; background: rgb(29, 78, 137); border-color: rgb(22, 61, 107); color: rgb(255, 255, 255);">Upload Traveller</button></td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" title="No improvement ideas yet for 1000222892 — open to add one" style="width: 200px; height: auto; min-height: 44px; white-space: normal; line-height: 1.15; padding: 8px 10px; font-size: 11px; font-weight: 800; letter-spacing: 0.03em; background: rgb(29, 78, 137); border-color: rgb(22, 61, 107); color: rgb(255, 255, 255); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;"><span>CONTROL PLAN<br>IMPROVEMENT IDEAS</span></button></td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">Test1</b><button title="Edit this part number / rev — applies to every operation of the part" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.55;">✏️</button><button class="cp-del-part" title="Delete this part number — every control plan and draft for Test1. Cannot be undone." style="margin-left: 4px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 13px; opacity: 0.45;">🗑️</button></td><td style="text-align: left;"><span style="font-size:14px; color:#b3aa9c;" title="No part description yet — add one with the ✏️ pencil beside the part number">—</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" title="Open Test1 — its operations" style="width: 94px;">Open →</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;"><span class="cp-pill" style="background:#f2efe9; color:#8a8279; border:1px solid #ddd6cc;">NOT STARTED</span></td><td style="text-align: left;">7/4/2026</td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" style="width: 150px; height: auto; min-height: 44px; padding: 8px 10px; white-space: normal; line-height: 1.15; font-size: 11px; font-weight: 800; letter-spacing: 0.03em; background: rgb(29, 78, 137); border-color: rgb(22, 61, 107); color: rgb(255, 255, 255);">Upload Traveller</button></td><td style="text-align: left; border-left: 2px solid rgb(226, 221, 212);"><button class="cp-btn cp-btn-primary" title="No improvement ideas yet for Test1 — open to add one" style="width: 200px; height: auto; min-height: 44px; white-space: normal; line-height: 1.15; padding: 8px 10px; font-size: 11px; font-weight: 800; letter-spacing: 0.03em; background: rgb(29, 78, 137); border-color: rgb(22, 61, 107); color: rgb(255, 255, 255); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;"><span>CONTROL PLAN<br>IMPROVEMENT IDEAS</span></button></td></tr></tbody>
+    <tbody id="projectsTbody"></tbody>
   </table>
-  <p id="projectsEmpty" class="sub" style="margin-top: 24px; text-align: center; display: none;">No saved projects yet</p>
+  <p id="projectsEmpty" class="sub" style="margin-top:24px;text-align:center">No saved projects yet</p>
 </div>
 
 <!-- CONTROL PLAN MASTER LIST SCREEN -->
@@ -1339,7 +1345,7 @@ window.addEventListener('DOMContentLoaded', function(){
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ App Rev-1127 pushed at 9/5/2026, 1:28:42 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 9/5/2026, 2:06:21 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -2025,7 +2031,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1127";
+const APP_REV = "Rev-1128";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2836,6 +2842,14 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+ {
+  "ts": "2026-09-05",
+  "rev": "App Rev-1128",
+  "type": "App",
+  "changes": [
+   "ONE HEIGHT ACROSS THE ROW (Rev-1128) \u2014 per Rich, on the Control Plans list: Open, Traveller and Improvement Ideas are all 44 pixels tall now. The Improvement Ideas button is wider and exactly two lines: CONTROL PLAN over IMPROVEMENT IDEAS, with the open count sitting beside the words on the second line instead of making a third."
+  ]
+ },
  {
   "ts": "2026-09-05",
   "rev": "App Rev-1127",
@@ -3670,7 +3684,7 @@ let GH_CHANGELOG_REMOTE_N = 0;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-09-05";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "12:18 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "01:30 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -4530,6 +4544,7 @@ function renderPartsIndex(tbody, combined){
       ob.className = 'cp-btn cp-btn-primary';
       ob.textContent = _insp ? 'BEGIN INSPECTION' : 'Open \u2192';
       ob.style.width = _insp ? '186px' : '94px';
+      ob.style.height = '44px';   /* Rev-1128: one height across the row's buttons, per Rich */
       if(_insp){ ob.style.fontWeight = '800'; ob.style.letterSpacing = '.02em'; }
       /* Rev-1105: same button, same words, the errand decides where it goes. */
       ob.title = _insp
@@ -4566,7 +4581,7 @@ function renderPartsIndex(tbody, combined){
         tb.className = 'cp-btn cp-btn-primary';
         tb.textContent = hasTrav ? 'View Traveller' : 'Upload Traveller';
         /* Rev-1127: blue with white text, per Rich -- the same as Improvement Ideas beside it */
-        tb.style.cssText = 'width:150px; height:auto; min-height:44px; padding:8px 10px; white-space:normal;'
+        tb.style.cssText = 'width:150px; height:44px; padding:0 10px; white-space:normal;'
           + ' line-height:1.15; font-size:11px; font-weight:800; letter-spacing:.03em;'
           + ' background:#1d4e89; border-color:#163d6b; color:#fff;';
         tb.onclick = (e) => { e.stopPropagation(); hasTrav ? cpViewTraveller(g.part) : cpTravellerPick(g.part); };
@@ -4582,13 +4597,17 @@ function renderPartsIndex(tbody, combined){
         ib.className = 'cp-btn cp-btn-primary';
         /* Rev-1127: blue with white text, and TALL ENOUGH -- .cp-btn is 26px high by
            default and two lines of label were running out of the bottom of it. */
-        ib.style.cssText = 'width:200px; height:auto; min-height:44px; white-space:normal; line-height:1.15; padding:8px 10px;'
+        /* Rev-1128: the same 44px as Open and Traveller, wider, and TWO lines only -- the
+           count sits on the second line beside the words instead of making a third. */
+        ib.style.cssText = 'width:250px; height:44px; white-space:nowrap; line-height:1.2; padding:0 10px;'
           + ' font-size:11px; font-weight:800; letter-spacing:.03em; background:#1d4e89; border-color:#163d6b; color:#fff;'
-          + ' display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;';
-        ib.innerHTML = '<span>CONTROL PLAN<br>IMPROVEMENT IDEAS</span>'
-          + (_ideas.length ? ('<span style="display:inline-block; padding:1px 8px; border-radius:10px; font-size:10px;'
+          + ' display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;';
+        ib.innerHTML = '<span>CONTROL PLAN</span>'
+          + '<span style="display:inline-flex; align-items:center; gap:7px;">IMPROVEMENT IDEAS'
+          + (_ideas.length ? ('<span style="display:inline-block; padding:0 7px; border-radius:9px; font-size:10px; line-height:15px;'
               + ' background:' + (_open ? '#fff' : 'rgba(255,255,255,.28)') + '; color:' + (_open ? '#1d4e89' : '#fff') + ';">'
-              + (_open ? (_open + ' OPEN') : (_ideas.length + ' DONE')) + '</span>') : '');
+              + (_open ? (_open + ' OPEN') : (_ideas.length + ' DONE')) + '</span>') : '')
+          + '</span>';
         ib.title = _ideas.length
           ? (_ideas.length + ' idea' + (_ideas.length > 1 ? 's' : '') + ' for ' + g.part + ', ' + _open + ' still open')
           : 'No improvement ideas yet for ' + g.part + ' \u2014 open to add one';
@@ -30643,7 +30662,7 @@ report can be read instead of guessed at.
 }
 
 }catch(__bootErr){ try{ const d=document.createElement('div'); d.style.cssText='position:fixed;top:68px;left:0;right:0;z-index:9999;background:#7a1a1c;color:#fff;padding:10px 14px;font:700 13px system-ui;'; d.textContent='⚠️ BOOT-TAIL ERROR — screenshot for Claude: '+(__bootErr.message||__bootErr)+' | '+String(__bootErr.stack||'').split('\n')[1]; document.body.appendChild(d); }catch(e){} }
-</script>
+</script><div id="cpGate" style="position: fixed; inset: 0px; z-index: 2147482000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; background: rgb(233, 230, 225);"><div style="font:900 15px system-ui; letter-spacing:.14em; color:#7a1a1c;">CONTROL PLAN GENERATOR</div><div id="cpGateHead" style="font:800 30px system-ui; color:#1d1a17; line-height:1.2; max-width:760px;">PUBLISHING THIS BUILD</div><div id="cpGateBody" style="font:600 15px/1.6 system-ui; color:#5a5148; max-width:640px;">You are running <b>Rev-1128</b> from your Downloads folder, but the website is on Rev-1127 and GitHub is on Rev-1127.<br>Publishing it now, so the whole shop moves to Rev-1128.</div><button id="cpGateGo" style="display: none; margin-top: 10px; padding: 30px 60px; font: 900 30px system-ui; cursor: default; border: 0px; border-radius: 16px; background: rgb(29, 78, 137); color: rgb(255, 255, 255); letter-spacing: 0.02em; box-shadow: rgba(0, 0, 0, 0.22) 0px 6px 18px; opacity: 0.6;" disabled="">🚀 PUBLISH THIS BUILD</button><div id="cpGateWork" style="display: block; border-color: rgb(29, 78, 137); background: rgba(29, 78, 137, 0.06);"><div class="cpGwTop"><span class="cpGwIcon" style="animation: 1.1s ease-in-out 0s infinite normal none running cpGatePulse;">🚀</span><div style="flex:1; min-width:240px;"><div class="cpGwTitle" id="cpGateWorkTitle" style="color: rgb(18, 50, 79);">PUBLISHING…</div><div id="cpGateStatus" style="font:700 17px system-ui; color:#4a4139; margin-top:6px;">PUBLISHING TO THE WEBSITE…</div></div><div style="text-align:right;"><div class="cpGwClock" id="cpGateClock">0:01</div><div style="font:700 11px system-ui; color:#6b6257;">ELAPSED</div></div></div><div class="cpGwBar" style="background: rgba(29, 78, 137, 0.18);"><i></i></div></div><button id="cpGateSkip" style="margin-top:10px; padding:8px 14px; font:600 12px system-ui; cursor:pointer; border:0; background:none; color:#8a8279; text-decoration:underline;">carry on without publishing</button><style>@keyframes cpGateSweep{0%{left:-40%}100%{left:100%}}@keyframes cpGatePulse{0%,100%{opacity:1}50%{opacity:.55}}@keyframes cpGateFill{from{width:0}to{width:100%}}@keyframes cpGatePop{0%{transform:scale(.4); opacity:0}60%{transform:scale(1.25); opacity:1}100%{transform:scale(1); opacity:1}}#cpGateWork{display:none; width:min(760px,92vw); margin-top:6px; border:3px solid #1d4e89; border-radius:16px; padding:26px 24px; background:rgba(29,78,137,.06); text-align:left;}#cpGateWork .cpGwTop{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}#cpGateWork .cpGwIcon{font-size:44px; line-height:1; animation:cpGatePulse 1.1s ease-in-out infinite;}#cpGateWork .cpGwTitle{font:900 30px system-ui; letter-spacing:.01em; line-height:1.15; color:#12324f;}#cpGateWork .cpGwClock{font:900 30px system-ui; font-variant-numeric:tabular-nums; color:#1d4e89;}#cpGateWork .cpGwBar{position:relative; height:22px; border-radius:11px; overflow:hidden; background:rgba(29,78,137,.18); margin-top:18px;}#cpGateWork .cpGwBar>i{position:absolute; top:0; bottom:0; width:40%; border-radius:11px; background:linear-gradient(90deg,rgba(29,78,137,0) 0%,#1d4e89 50%,rgba(29,78,137,0) 100%); animation:cpGateSweep 1.15s linear infinite;}</style></div>
 
 <!-- Master List File Viewer Modal -->
 <div id="masterViewerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:9999; overflow:auto; box-sizing:border-box;">
