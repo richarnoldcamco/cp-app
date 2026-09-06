@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1146</title>
+<title>CONTROL PLAN GENERATOR - Rev-1147</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -524,7 +524,7 @@ window.addEventListener('DOMContentLoaded', function(){
   }
 </style>
 </head>
-<body><div id="appUpdateBanner" style="background: rgb(26, 82, 118); color: rgb(255, 255, 255); padding: 8px 14px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;"><span>⬇️ App update available: Rev-1146 → Rev-1147 (your token &amp; data are kept)</span><button style="background: rgb(255, 255, 255); color: rgb(26, 82, 118); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 5px; padding: 5px 14px; font-size: 13px; font-weight: 800; cursor: pointer;">Update now</button><button title="Dismiss" style="background: transparent; color: rgb(255, 255, 255); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 5px; padding: 4px 9px; font-size: 12px; cursor: pointer;">✕</button></div>
+<body>
 <script>
 /* ===== Rev-1109: THE MENU IS VISIBLE WHILE THE PAGE IS STILL PARSING ========
    Putting the publish check up before showMenu() was not enough, and measuring
@@ -561,7 +561,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1146 · 2026-09-06 03:54 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1147 · 2026-09-06 04:19 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -587,7 +587,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1146 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-09-06 03:54 PM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1147 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-09-06 04:19 PM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -600,7 +600,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1146 · 2026-09-06 03:54 PM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1147 · 2026-09-06 04:19 PM</div>
 
       <div class="menu-grid">
       <button class="menu-btn" id="mNewPlan" onclick="showNewCP(true)" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -665,7 +665,7 @@ window.addEventListener('DOMContentLoaded', function(){
       </button>
       <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
         <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
-        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1146 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1147 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
       </button>
       </div>
       <div style="display:none">
@@ -675,7 +675,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1146 · Built 2026-09-06 03:54 PM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1147 · Built 2026-09-06 04:19 PM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -1405,7 +1405,7 @@ Part / drawing rev: Rev-1">Rev-3</div></td></tr><tr><td colspan="5" style="paddi
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 9/6/2026, 5:05:19 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 9/6/2026, 5:06:50 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -1758,17 +1758,18 @@ Part / drawing rev: Rev-1">Rev-3</div></td></tr><tr><td colspan="5" style="paddi
     <label style="font-size:12px; display:flex; align-items:center; gap:6px; padding-bottom:8px;">
       <input type="checkbox" id="qiAuto" checked=""> Refresh every 30 seconds
     </label>
-    <span id="qiAge" style="font-size:12px; font-weight:700; color:var(--ink-dim); padding-bottom:9px;">0 inspections on record · checked 0s ago</span>
+    <span id="qiAge" style="font-size:12px; font-weight:700; color:var(--ink-dim); padding-bottom:9px;">0 inspections on record · checked 14s ago</span>
   </div>
 
-  <div id="qiSimBanner" style="display: none; background: rgb(122, 74, 0); color: rgb(255, 255, 255); font-weight: 800; padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px;">
+  <div id="qiSimBanner" style="display:none; background:#7a4a00; color:#fff; font-weight:800;
+       padding:10px 12px; border-radius:8px; margin-bottom:12px; font-size:13px;">
     ⚠ LINE SIMULATOR — every part, serial and reading on this screen comes from the Line
     Simulator and is invented. Nothing is written anywhere and none of it is measurement evidence.
     Switch to LIVE FLOOR for the real floor.
   </div>
 
   <div id="qiStation" style="display: block; border: 1px solid rgb(168, 196, 214); background: rgb(238, 244, 248); color: rgb(26, 82, 118); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; font-size: 12.5px; max-width: 1180px; opacity: 1;">📡 No station is reporting this operation right now · last serial with a completed run: <b>—</b></div>
-  <div id="qiPanel" style="max-width:1180px;"><div style="font-size:13px; font-weight:800; letter-spacing:.08em; color:#8a3a12; border-bottom:3px solid #8a3a12; padding-bottom:6px; margin-bottom:14px;">📋 LINE INSPECTOR</div><div style="display:flex; gap:14px; align-items:stretch;"><div style="flex:0 0 260px; border:2px solid #a35400; border-radius:12px; padding:16px; background:#fff;"><div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">NEXT SERIAL TO LINE INSPECT</div><div style="font-size:46px; font-weight:800; color:#a35400; line-height:1.1; margin-top:4px;">5</div><div style="font-size:12.5px; font-weight:800; color:#a35400;">LEVEL 2 · CRITICAL ONLY</div><div style="font-size:11.5px; font-weight:700; color:#6b6257; margin-top:3px;">waiting · 5 more part(s) to go</div></div><div style="flex:1 1 auto; min-width:0;"><table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;"><thead><tr><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;">LEVEL</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:left;">COVERS</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;">FEAT</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;">EVERY</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;">BLOCK</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;">SERIAL</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;">STATE</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;"></th></tr></thead><tbody><tr><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-size:15px; font-weight:800; color:#a5342a;">1</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; font-weight:700; color:#000;">COMPLETE CHECK</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">10</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">30 parts</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#6b6257;">1</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-size:15px; font-weight:800; color:#000;">19</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-weight:800; color:#6b6257;">WAITING<div style="font-size:10px; font-weight:700; color:#6b6257;">19 more part(s) to go · 0 done so far</div></td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;"></td></tr><tr><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-size:15px; font-weight:800; color:#a35400;">2</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; font-weight:700; color:#000;">CRITICAL ONLY</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">2</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">15 parts</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#6b6257;">1</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-size:15px; font-weight:800; color:#000;">5</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-weight:800; color:#6b6257;">WAITING<div style="font-size:10px; font-weight:700; color:#6b6257;">5 more part(s) to go · 0 done so far</div></td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;"></td></tr><tr><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-size:15px; font-weight:800; color:#1d6b3f;">3</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; font-weight:700; color:#000;">ODD CHECKS</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">0</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">100 parts</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#6b6257;">1</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-size:15px; font-weight:800; color:#000;">49</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-weight:800; color:#6b6257;">WAITING<div style="font-size:10px; font-weight:700; color:#6b6257;">49 more part(s) to go · 0 done so far</div></td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;"></td></tr></tbody></table></div></div><div style="display:grid; grid-template-columns:1fr; gap:10px; margin-top:12px;"><div title="Runs saved by PERFORM LINE INSPECTION on Step 8, one per serial the machinist had already measured." style="border:1px solid #d8d3ca; border-radius:10px; padding:7px 11px; background:#fff;"><div style="font-size:9.5px; font-weight:800; letter-spacing:.05em; color:#6b6257; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">INSPECTIONS COMPLETED</div><div style="font-size:22px; font-weight:800; line-height:1.1; color:#8a3a12;">0</div><div style="font-size:10px; color:#6b6257; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">all three levels · none on record yet</div></div></div><div style="margin-top:14px; border:1px dashed #c9c0b4; border-radius:10px; padding:16px; font-size:12.5px; color:#6b6257;">No line inspection is on record for this operation yet — press PERFORM LINE INSPECTION on Step 8, or INSPECT on a row above, and the results appear here.</div></div>
+  <div id="qiPanel" style="max-width:1180px;"><div style="font-size:13px; font-weight:800; letter-spacing:.08em; color:#8a3a12; border-bottom:3px solid #8a3a12; padding-bottom:6px; margin-bottom:14px;">📋 LINE INSPECTOR</div><div style="display:flex; gap:14px; align-items:stretch;"><div style="flex:0 0 260px; border:2px solid #a35400; border-radius:12px; padding:16px; background:#fff;"><div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">NEXT SERIAL TO LINE INSPECT</div><div style="font-size:46px; font-weight:800; color:#a35400; line-height:1.1; margin-top:4px;">5</div><div style="font-size:12.5px; font-weight:800; color:#a35400;">LEVEL 2 · CRITICAL ONLY</div><div style="font-size:11.5px; font-weight:700; color:#6b6257; margin-top:3px;">waiting · 5 more part(s) to go</div></div><div style="flex:1 1 auto; min-width:0;"><table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;"><thead><tr><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;">LEVEL</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:left;">COVERS</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;">FEAT</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;">EVERY</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;">BLOCK</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;">SERIAL</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;">STATE</th><th style="border-bottom:1px solid #d8d3ca; padding:8px 9px; background:#f3efe8; color:#3a352e; font-weight:800; font-size:11px; letter-spacing:.05em; text-align:center;"></th></tr></thead><tbody><tr><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-size:15px; font-weight:800; color:#a5342a;">1</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; font-weight:700; color:#000;">COMPLETE CHECK</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">10</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">30 parts</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#6b6257;">1</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-size:15px; font-weight:800; color:#000;">19</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-weight:800; color:#6b6257;">WAITING<div style="font-size:10px; font-weight:700; color:#6b6257;">19 more part(s) to go · 0 done so far</div></td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;"></td></tr><tr><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-size:15px; font-weight:800; color:#a35400;">2</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; font-weight:700; color:#000;">CRITICAL ONLY</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">2</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">15 parts</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#6b6257;">1</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-size:15px; font-weight:800; color:#000;">5</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-weight:800; color:#6b6257;">WAITING<div style="font-size:10px; font-weight:700; color:#6b6257;">5 more part(s) to go · 0 done so far</div></td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;"></td></tr><tr><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-size:15px; font-weight:800; color:#1d6b3f;">3</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; font-weight:700; color:#000;">ODD CHECKS</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">0</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#3a352e;">100 parts</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; color:#6b6257;">1</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-size:15px; font-weight:800; color:#000;">49</td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center; font-weight:800; color:#6b6257;">WAITING<div style="font-size:10px; font-weight:700; color:#6b6257;">49 more part(s) to go · 0 done so far</div></td><td style="border-bottom:1px solid #eee7dc; padding:4px 8px; text-align:center;"></td></tr></tbody></table></div></div><div style="margin-top:14px;"><div style="font-size:13px; font-weight:800; letter-spacing:.08em; color:#5b2a86; border-bottom:3px solid #5b2a86; padding-bottom:6px; margin-bottom:12px;">⚖ MACHINIST vs LINE INSPECTOR · CRITICAL FEATURES</div><div title="Runs saved by PERFORM LINE INSPECTION on Step 8, one per serial the machinist had already measured." style="display:flex; align-items:baseline; gap:10px; margin:14px 0 6px; flex-wrap:wrap;"><span style="font-size:9.5px; font-weight:800; letter-spacing:.05em; color:#6b6257;">INSPECTIONS COMPLETED</span><span style="font-size:22px; font-weight:800; line-height:1; color:#8a3a12;">0</span><span style="font-size:10px; color:#6b6257;">all three levels · none on record yet</span></div><div style="border:1px dashed #c9c0b4; border-radius:10px; padding:16px; font-size:12.5px; color:#6b6257;">No line inspection is on record for this operation yet — press PERFORM LINE INSPECTION on Step 8, or INSPECT on a row above, and the results appear here.</div></div></div>
   <div id="qiEmpty" style="display:none; padding:26px; text-align:center; color:var(--ink-dim); font-size:14px;"></div>
 
   <p style="font-size:11px; color:var(--ink-dim); margin-top:18px; line-height:1.5; max-width:1180px;">
@@ -2068,7 +2069,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- FLASH MESSAGE -->
-<div id="flash" class="flash hidden">✓ Data pushed to GitHub</div>
+<div id="flash" class="flash hidden">🔧 Inspect Parts opened — 1000237620 OP-030 Rev-1</div>
 
 <!-- BOOT -->
 <script>
@@ -2094,7 +2095,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1146";
+const APP_REV = "Rev-1147";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2930,6 +2931,16 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-09-06",
+  "rev": "App Rev-1147",
+  "type": "App",
+  "changes": [
+   "INSPECTIONS COMPLETED JOINS THE COMPARISON TABLE (Rev-1147) \u2014 per Rich's two red rings on the Quality Inspector screen: the INSPECTIONS COMPLETED tile and the per-serial MACHINIST vs LINE INSPECTOR table are one section now. The count stands as the table's heading (INSPECTIONS COMPLETED \u00b7 4 \u00b7 all three levels) directly above the S/N rows, and the tile of its own is gone. Drawn in cpLiPanelHtml, so the LINE SIMULATOR's inspector column changes the same way.",
+   "LINE SIMULATOR: WORSE CPK OPTIONS (Rev-1147) \u2014 per Rich's rings on SET UP A SIMULATION: PROCESS CPK, MACHINIST GAUGE CPK and LINE INSPECTOR GAUGE CPK now offer 0.33 and 0.15 below 0.67, on the setup sheet and on the run screen's compact selectors alike. The maths already took any value (sd = band / 6\u00b7Cpk), so a 0.15 process scatters parts well outside the band and a 0.15 gauge reads all over the place.",
+   "Fix, simulator: since Rev-1058 CRITICAL ONLY has meant the KC set, but the per-serial table still filtered those features by a hand-set Step 8 mark of 2 that nobody sets \u2014 so every CRITICAL ONLY row read \"0 critical features checked\" and contributed nothing to the five figures. A CRITICAL ONLY inspection now compares the KC features."
+  ]
+ },
+ {
+  "ts": "2026-09-06",
   "rev": "App Rev-1146",
   "type": "App",
   "changes": [
@@ -3318,7 +3329,7 @@ let GH_CHANGELOG_LOCAL_ONLY = null;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-09-06";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "03:54 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "04:19 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -18210,7 +18221,10 @@ function cpSimCritResults(key, rows, marks, every, made, pcpk, icpk, mgcpk,
   const diffs = [];
   let overCount = 0;
   const lines = insp.slice(0, 250).map(x => {
+    /* Rev-1147 fix: since Rev-1058 CRITICAL ONLY is the KC set, not a hand-set mark of 2 --
+       filtering by that mark left every CRITICAL ONLY row reading "0 critical features checked". */
     const feats = use.filter(r => x.level === 1 ? true
+                    : x.level === 2 ? (critNamed ? cpSimIsKC(r) : true)
                     : (marks[String(r.bubble).trim()] === x.level));
     const rowsOut = feats.map(r => {
       const bb = String(r.bubble).trim(), lim = cpSimLimits(r.spec);
@@ -18324,22 +18338,24 @@ function cpLiPanelHtml(o){
         +   (dueBtn(d) || '') + '</td>'
         + '</tr>').join('')
     + '</tbody></table>';
-  /* Rev-1040: one line, half the height; the long explanation lives in the tooltip. */
-  const liTile = (label, value, colour, note, tip) =>
-    '<div title="' + esc(tip || '') + '" style="border:1px solid #d8d3ca; border-radius:10px;'
-    + ' padding:7px 11px; background:#fff;">'
-    + '<div style="font-size:9.5px; font-weight:800; letter-spacing:.05em; color:#6b6257;'
-    +   ' white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + label + '</div>'
-    + '<div style="font-size:22px; font-weight:800; line-height:1.1; color:' + colour + ';">'
-    +   value + '</div>'
-    + '<div style="font-size:10px; color:#6b6257; white-space:nowrap; overflow:hidden;'
-    +   ' text-overflow:ellipsis;">' + note + '</div></div>';
+  /* Rev-1147: INSPECTIONS COMPLETED and the per-serial table are one thing, per Rich -- the
+     count stands as the table's heading instead of a tile of its own above the section. */
+  const countHtml = '<div title="' + esc(o.insTip || '') + '" style="display:flex; align-items:baseline;'
+    + ' gap:10px; margin:14px 0 6px; flex-wrap:wrap;">'
+    + '<span style="font-size:9.5px; font-weight:800; letter-spacing:.05em; color:#6b6257;">INSPECTIONS COMPLETED</span>'
+    + '<span style="font-size:22px; font-weight:800; line-height:1; color:#8a3a12;">' + (o.insDone == null ? 0 : o.insDone) + '</span>'
+    + '<span style="font-size:10px; color:#6b6257;">' + (o.insNote || 'all three levels') + '</span></div>';
   /* ----- Rev-1038: what every completed line inspection actually found ----- */
   const cmpHtml = (function(){
-    if(!cr) return '<div style="margin-top:14px; border:1px dashed #c9c0b4; border-radius:10px;'
+    if(!cr) return '<div style="margin-top:14px;">'
+      + '<div style="font-size:13px; font-weight:800; letter-spacing:.08em; color:#5b2a86;'
+      +   ' border-bottom:3px solid #5b2a86; padding-bottom:6px; margin-bottom:12px;">'
+      +   '⚖ MACHINIST vs LINE INSPECTOR · CRITICAL FEATURES</div>'
+      + countHtml
+      + '<div style="border:1px dashed #c9c0b4; border-radius:10px;'
       + ' padding:16px; font-size:12.5px; color:#6b6257;">'
       + (o.emptyText || ('No line inspection has finished yet '
-         + '— results appear here as the inspector completes them.')) + '</div>';
+         + '— results appear here as the inspector completes them.')) + '</div></div>';
     const t2 = (label, value, colour, note) =>
       '<div style="border:1px solid #d8d3ca; border-radius:10px; padding:9px 12px; background:#fff;">'
       + '<div style="font-size:9.5px; font-weight:800; letter-spacing:.05em; color:#6b6257;">'
@@ -18377,6 +18393,7 @@ function cpLiPanelHtml(o){
            cr.over ? '#a5342a' : '#1d6b3f',
            cr.pct.toFixed(1) + '% of ' + cr.n + ' critical reading(s)')
       + '</div>'
+      + countHtml
       + '<table style="border-collapse:collapse; width:100%; font-size:12.5px; background:#fff;">'
       + '<thead><tr>'
       + ['S/N','INSPECTION','CRITICAL FEATURES CHECKED',
@@ -18455,11 +18472,8 @@ function cpLiPanelHtml(o){
   return '<div style="display:flex; gap:14px; align-items:stretch;">'
     + liCardHtml
     + '<div style="flex:1 1 auto; min-width:0;">' + tableHtml + '</div></div>'
-    /* Rev-1145: INSPECTOR'S OWN CPK is struck out, per Rich; the comparison says it feature by feature. */
-    + '<div style="display:grid; grid-template-columns:1fr; gap:10px; margin-top:12px;">'
-    + liTile('INSPECTIONS COMPLETED', (o.insDone == null ? 0 : o.insDone), '#8a3a12',
-             o.insNote || 'all three levels', o.insTip || '')
-    + '</div>'
+    /* Rev-1145: INSPECTOR'S OWN CPK is struck out, per Rich. Rev-1147: the INSPECTIONS
+       COMPLETED tile is folded into the comparison table's heading, per Rich. */
     + cmpHtml;
 }
 /* ----- Rev-1033/1051: the two measurements of the same part, side by side, as an overlay.
@@ -18636,21 +18650,24 @@ function cpSimPanel(wantIdx){
                   + '>' + g[1] + '</option>').join('') + '</select>',
               'How fast the machinist finishes parts.')
         +   fld('PROCESS CPK', '<select id="cpSimPcpk"' + selCss + '>'
-              + [[0.67,'0.67 \u00b7 not capable'],[1.00,'1.00 \u00b7 marginal'],
+              + [[0.15,'0.15 \u00b7 out of control'],[0.33,'0.33 \u00b7 well below'],   /* Rev-1147: worse, per Rich */
+                 [0.67,'0.67 \u00b7 not capable'],[1.00,'1.00 \u00b7 marginal'],
                  [1.33,'1.33 \u00b7 capable'],[1.67,'1.67 \u00b7 good'],
                  [2.00,'2.00 \u00b7 excellent']].map(g =>
                   '<option value="' + g[0] + '"' + ((st.pcpk || CP_SIM_PCPK) === g[0] ? ' selected' : '')
                   + '>' + g[1] + '</option>').join('') + '</select>',
               'How tightly the PARTS are held. Nothing to do with measuring.')
         +   fld('MACHINIST GAUGE CPK', '<select id="cpSimMgcpk"' + selCss + '>'
-              + [[0.67,'0.67 \u00b7 poor gauge'],[1.00,'1.00 \u00b7 marginal'],
+              + [[0.15,'0.15 \u00b7 useless gauge'],[0.33,'0.33 \u00b7 bad gauge'],   /* Rev-1147: worse, per Rich */
+                 [0.67,'0.67 \u00b7 poor gauge'],[1.00,'1.00 \u00b7 marginal'],
                  [1.33,'1.33 \u00b7 capable'],[1.67,'1.67 \u00b7 good'],
                  [2.00,'2.00 \u00b7 excellent']].map(g =>
                   '<option value="' + g[0] + '"' + ((st.mgcpk || CP_SIM_MGCPK) === g[0] ? ' selected' : '')
                   + '>' + g[1] + '</option>').join('') + '</select>',
               'How accurate HIS gauge is.')
         +   fld('LINE INSPECTOR GAUGE CPK', '<select id="cpSimIcpk"' + selCss + '>'
-              + [[0.67,'0.67 \u00b7 poor gauge'],[1.00,'1.00 \u00b7 marginal'],
+              + [[0.15,'0.15 \u00b7 useless gauge'],[0.33,'0.33 \u00b7 bad gauge'],   /* Rev-1147: worse, per Rich */
+                 [0.67,'0.67 \u00b7 poor gauge'],[1.00,'1.00 \u00b7 marginal'],
                  [1.33,'1.33 \u00b7 capable'],[1.67,'1.67 \u00b7 good'],
                  [2.00,'2.00 \u00b7 excellent']].map(g =>
                   '<option value="' + g[0] + '"' + ((st.icpk || CP_SIM_ICPK) === g[0] ? ' selected' : '')
@@ -18752,7 +18769,7 @@ function cpSimPanel(wantIdx){
             + c[1]
             + '<select id="' + c[0] + '" style="display:block; margin-top:2px; padding:5px 8px;'
             + ' font-size:13px; font-weight:700; border:1px solid #c9c0b4; border-radius:7px;">'
-            + [0.67, 1.00, 1.33, 1.67, 2.00].map(v =>
+            + [0.15, 0.33, 0.67, 1.00, 1.33, 1.67, 2.00].map(v =>   /* Rev-1147: 0.15 and 0.33 added */
                 '<option value="' + v + '"' + (c[2] === v ? ' selected' : '') + '>'
                 + v.toFixed(2) + '</option>').join('')
             + '</select></label>').join('')
@@ -30452,4 +30469,4 @@ report can be read instead of guessed at.
 </div>
 
 
-<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div><div id="cpSimScreen" style="position: fixed; inset: 0px; z-index: 10690; background: rgb(247, 244, 239); overflow: auto;"><div style="background:#1a5276; color:#fff; padding:12px 20px; display:flex; align-items:center; gap:14px;"><div style="font-weight:800; letter-spacing:.04em; font-size:17px; flex:1 1 auto;">▶ LINE SIMULATOR</div><button id="cpSimX" style="background:#a02020; color:#fff; border:2px solid #7a1414; border-radius:8px; padding:8px 22px; font-weight:800; font-size:13px; cursor:pointer;">✕ Close</button></div><div id="cpSimBody" style="width:100%; margin:0; padding:16px 18px 60px;"><div style="max-width:860px;"><div style="font-size:20px; font-weight:800; color:#000; margin-bottom:4px;">SET UP A SIMULATION</div><div style="font-size:12.5px; color:#6b6257; margin-bottom:20px; line-height:1.6;">These are the settings last used on this operation. Change what you like and start again, or carry on with the run already going.</div><div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px;"><label style="display:block;"><div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">OPERATION</div><select id="cpSimSel" style="width:100%; margin-top:5px; padding:11px; font-size:15px; font-weight:700; border:1px solid #c9c0b4; border-radius:8px; background:#fafa96;"><option value="0">912993</option><option value="1">1000222892</option><option value="2">912767-M</option><option value="3" selected="">1000237620 · OP-030</option><option value="4">1000237620 · OP-040</option><option value="5">1000237498 · OP-040</option><option value="6">1000237498 · OP-100</option><option value="7">1000237498 · OP-110</option><option value="8">1000237498 · OP-150</option><option value="9">1000237498 · OP-160</option></select></label><label style="display:block;"><div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">A PART EVERY</div><select id="cpSimGap" style="width:100%; margin-top:5px; padding:11px; font-size:15px; font-weight:700; border:1px solid #c9c0b4; border-radius:8px; background:#fafa96;"><option value="600">10 minutes · real pace</option><option value="60">1 minute</option><option value="10">10 seconds · demo</option><option value="2">2 seconds · fast demo</option><option value="1" selected="">1 second · fastest</option></select><div style="font-size:11px; color:#6b6257; margin-top:4px;">How fast the machinist finishes parts.</div></label><label style="display:block;"><div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">PROCESS CPK</div><select id="cpSimPcpk" style="width:100%; margin-top:5px; padding:11px; font-size:15px; font-weight:700; border:1px solid #c9c0b4; border-radius:8px; background:#fafa96;"><option value="0.67" selected="">0.67 · not capable</option><option value="1">1.00 · marginal</option><option value="1.33">1.33 · capable</option><option value="1.67">1.67 · good</option><option value="2">2.00 · excellent</option></select><div style="font-size:11px; color:#6b6257; margin-top:4px;">How tightly the PARTS are held. Nothing to do with measuring.</div></label><label style="display:block;"><div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">MACHINIST GAUGE CPK</div><select id="cpSimMgcpk" style="width:100%; margin-top:5px; padding:11px; font-size:15px; font-weight:700; border:1px solid #c9c0b4; border-radius:8px; background:#fafa96;"><option value="0.67" selected="">0.67 · poor gauge</option><option value="1">1.00 · marginal</option><option value="1.33">1.33 · capable</option><option value="1.67">1.67 · good</option><option value="2">2.00 · excellent</option></select><div style="font-size:11px; color:#6b6257; margin-top:4px;">How accurate HIS gauge is.</div></label><label style="display:block;"><div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">LINE INSPECTOR GAUGE CPK</div><select id="cpSimIcpk" style="width:100%; margin-top:5px; padding:11px; font-size:15px; font-weight:700; border:1px solid #c9c0b4; border-radius:8px; background:#fafa96;"><option value="0.67">0.67 · poor gauge</option><option value="1">1.00 · marginal</option><option value="1.33">1.33 · capable</option><option value="1.67">1.67 · good</option><option value="2" selected="">2.00 · excellent</option></select><div style="font-size:11px; color:#6b6257; margin-top:4px;">How accurate the inspector’s gauge is. A poor gauge does not change the part — it makes that man’s data read worse.</div></label><label style="display:block;"><div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257;">START AT SERIAL</div><input id="cpSimBase" type="number" min="0" value="0" style="width:100%; margin-top:5px; padding:11px; font-size:15px; font-weight:700; border:1px solid #c9c0b4; border-radius:8px; background:#fafa96;"><div style="font-size:11px; color:#6b6257; margin-top:4px;">The first part will be this number plus one.</div></label></div><div style="margin-top:20px; border:1px solid #e2ddd4; border-radius:10px; padding:14px; background:#fff;"><div style="font-size:11px; font-weight:800; letter-spacing:.06em; color:#6b6257; margin-bottom:8px;">LINE INSPECTION INTERVALS · FROM STEP 8</div><div style="display:flex; gap:22px; flex-wrap:wrap; font-size:13px;"><div><b style="color:#a5342a;">LEVEL 1</b> · COMPLETE CHECK · every <b>30</b> parts</div><div><b style="color:#a35400;">LEVEL 2</b> · CRITICAL ONLY · every <b>15</b> parts</div><div><b style="color:#1d6b3f;">LEVEL 3</b> · ODD CHECKS · every <b>100</b> parts</div></div><div style="font-size:11px; color:#6b6257; margin-top:8px;">Changed on the operation’s STEP 8 tile, not here.</div></div><div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:22px;"><button id="cpSimGo" style="padding:14px 26px; border:none; background:#1d6b3f; color:#fff; border-radius:9px; font-size:14px; font-weight:800; cursor:pointer;">▶ START A NEW SIMULATION</button><button id="cpSimCont" style="padding:14px 22px; border:1px solid #1a5276; background:#fff; color:#1a5276; border-radius:9px; font-size:13.5px; font-weight:800; cursor:pointer;">CARRY ON — 24 part(s) already made</button></div><div style="font-size:11.5px; color:#6b6257; margin-top:16px; line-height:1.6;">Starting a new simulation sets the count back to the serial above and clears which blocks have been inspected. Carrying on changes nothing.</div></div></div></div></body></html>
+<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div><div id="mvPanel" style="position: fixed; inset: 0px; z-index: 100000; background: rgb(233, 230, 223); display: flex; flex-direction: column;"><iframe id="mvFrame" style="flex: 1 1 auto; width: 100%; height: 100%; border: 0px; background: rgb(255, 255, 255);"></iframe><button style="position: fixed; top: 7px; left: 10px; z-index: 100002; background: rgb(122, 20, 20); color: rgb(255, 255, 255); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 6px; font-weight: 800; padding: 7px 12px; cursor: pointer; font-size: 13px; box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 6px;">← Control Plans</button></div></body></html>
