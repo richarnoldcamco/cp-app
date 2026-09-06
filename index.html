@@ -1062,25 +1062,19 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- PROJECTS SCREEN -->
-<div id="projectsScreen" class="setup wide hidden">
+<div id="projectsScreen" class="setup wide parts-index">
   <button class="ob-back" id="projectsBack">← Back</button>
-  <h1 id="projectsTitle">Control Plans</h1>
-  <p class="sub" id="projectsSub">All Control Plans on this device — drafts and saved projects together</p>
+  <h1 id="projectsTitle">Inspection</h1>
+  <p class="sub" id="projectsSub">Pick the part you are inspecting, then the operation</p>
   <div id="cpPartsCrumb" style="display:none; align-items:center; gap:10px; margin:2px 0 10px;"></div>
-  <button id="projectsNewBtn" onclick="showNewCP(true)" style="display:inline-flex; align-items:center; gap:8px; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:8px; padding:12px 20px; font-size:15px; font-weight:800; cursor:pointer; margin:6px 0 16px;">＋ New Control Plan</button>
+  <button id="projectsNewBtn" onclick="showNewCP(true)" style="display: none; align-items: center; gap: 8px; background: rgb(44, 110, 73); color: rgb(255, 255, 255); border: 1px solid rgb(33, 82, 54); border-radius: 8px; padding: 12px 20px; font-size: 15px; font-weight: 800; cursor: pointer; margin: 6px 0px 16px;">＋ New Control Plan</button>
   <table id="projectsTable">
     <thead>
-      <tr class="cp-plan-head" id="cpPlanHeadRow">
-        <th>Part Number</th>
-        <th>Status</th>
-        <th style="border-left:2px solid #c9c0b4;">Construction Steps</th>
-        <th style="border-left:2px solid #c9c0b4;">Actions</th>
-        <th style="text-align:right;">CP Rev</th>
-      </tr>
+      <tr class="cp-plan-head" id="cpPlanHeadRow"><th>Part Number</th><th>Part Description</th><th>Begin Inspection</th><th>Operations</th><th>Last Updated</th></tr>
     </thead>
-    <tbody id="projectsTbody"></tbody>
+    <tbody id="projectsTbody"><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">1000237620</b></td><td style="text-align: left;"><span style="font-size:14px; font-weight:600; color:#5a5148;">AIR COIL</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" title="Inspect 1000237620 — straight to the shop order" style="width: 186px; height: 44px; font-weight: 800; letter-spacing: 0.02em;">BEGIN INSPECTION</button></td><td style="text-align: left;"><b>2</b> <span style="font-size:11px; color:#6b6257;">OP-030 · OP-040</span></td><td style="text-align: left;">9/6/2026</td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">1000237498</b></td><td style="text-align: left;"><span style="font-size:14px; font-weight:600; color:#5a5148;">COMPRESSOR HOUSING</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" title="Inspect 1000237498 — straight to the shop order" style="width: 186px; height: 44px; font-weight: 800; letter-spacing: 0.02em;">BEGIN INSPECTION</button></td><td style="text-align: left;"><b>6</b> <span style="font-size:11px; color:#6b6257;">OP-040 · OP-050 · OP-100 · OP-110 · OP-150 · OP-160</span></td><td style="text-align: left;">8/6/2026</td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">912993</b></td><td style="text-align: left;"><span style="font-size:14px; color:#b3aa9c;" title="No part description yet — add one with the ✏️ pencil beside the part number">—</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" title="Inspect 912993 — straight to the shop order" style="width: 186px; height: 44px; font-weight: 800; letter-spacing: 0.02em;">BEGIN INSPECTION</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;">7/30/2026</td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">912767-M</b></td><td style="text-align: left;"><span style="font-size:14px; color:#b3aa9c;" title="No part description yet — add one with the ✏️ pencil beside the part number">—</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" title="Inspect 912767-M — straight to the shop order" style="width: 186px; height: 44px; font-weight: 800; letter-spacing: 0.02em;">BEGIN INSPECTION</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;">7/27/2026</td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">1000222892</b></td><td style="text-align: left;"><span style="font-size:14px; font-weight:600; color:#5a5148;">COMPRESSOR BORE</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" title="Inspect 1000222892 — straight to the shop order" style="width: 186px; height: 44px; font-weight: 800; letter-spacing: 0.02em;">BEGIN INSPECTION</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;">7/16/2026</td></tr><tr class="cp-op-row" style="cursor: pointer;"><td style="text-align: left;"><b style="font-size:19px; font-weight:800; letter-spacing:.03em; color:#000;">Test1</b></td><td style="text-align: left;"><span style="font-size:14px; color:#b3aa9c;" title="No part description yet — add one with the ✏️ pencil beside the part number">—</span></td><td style="text-align: left;"><button class="cp-btn cp-btn-primary" title="Inspect Test1 — straight to the shop order" style="width: 186px; height: 44px; font-weight: 800; letter-spacing: 0.02em;">BEGIN INSPECTION</button></td><td style="text-align: left;"><b>1</b> <span style="font-size:11px; color:#a49a8d;">not numbered</span></td><td style="text-align: left;">7/4/2026</td></tr></tbody>
   </table>
-  <p id="projectsEmpty" class="sub" style="margin-top:24px;text-align:center">No saved projects yet</p>
+  <p id="projectsEmpty" class="sub" style="margin-top: 24px; text-align: center; display: none;">No saved projects yet</p>
 </div>
 
 <!-- CONTROL PLAN MASTER LIST SCREEN -->
@@ -1347,7 +1341,7 @@ window.addEventListener('DOMContentLoaded', function(){
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 9/6/2026, 1:06:05 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 9/6/2026, 1:08:19 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -1690,14 +1684,14 @@ window.addEventListener('DOMContentLoaded', function(){
 
   <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
     <div style="display:flex; border:2px solid var(--line); border-radius:8px; overflow:hidden;">
-      <button id="qiModeLive" class="qi-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">LIVE STATIONS</button>
-      <button id="qiModeSim" class="qi-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">SIMULATED TABLETS</button>
+      <button id="qiModeLive" class="qi-mode" style="border: 0px; padding: 9px 18px; font-weight: 800; cursor: pointer; background: rgb(26, 82, 118); color: rgb(255, 255, 255);">LIVE STATIONS</button>
+      <button id="qiModeSim" class="qi-mode" style="border: 0px; padding: 9px 18px; font-weight: 800; cursor: pointer; background: transparent; color: var(--ink);">SIMULATED TABLETS</button>
     </div>
     <button id="qiRefresh" class="btn-primary" style="padding:9px 16px;">↻ REFRESH NOW</button>
     <label style="font-size:12px; display:flex; align-items:center; gap:6px;">
       <input type="checkbox" id="qiAuto" checked=""> Refresh every 30 seconds
     </label>
-    <span id="qiAge" style="font-size:12px; font-weight:700; color:var(--ink-dim);"></span>
+    <span id="qiAge" style="font-size:12px; font-weight:700; color:var(--ink-dim);">1 station · checked 14s ago</span>
   </div>
 
   <div id="qiSimBanner" style="display:none; background:#7a4a00; color:#fff; font-weight:800;
@@ -1707,7 +1701,7 @@ window.addEventListener('DOMContentLoaded', function(){
     evidence. Switch to LIVE STATIONS for the real floor.
   </div>
 
-  <div id="qiCards" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:14px;"></div>
+  <div id="qiCards" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:14px;"><div style="border:2px solid #8a8a8a; border-radius:12px; padding:14px; opacity:0.62;"><div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px;"><div style="font-weight:800; font-size:15px;">DEMO-BUILD</div><div style="font-size:10px; font-weight:800; color:#8a8a8a;">QUIET</div></div><div style="font-size:12px; color:var(--ink-dim); margin-bottom:10px;">1000237620 · OP - 030 · 12345</div><div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:10px;"><div><div style="font-size:24px; font-weight:800;">49</div><div style="font-size:10px; color:var(--ink-dim);">SERIAL ON THE MACHINE</div></div><div><div style="font-size:24px; font-weight:800;">1 / 14</div><div style="font-size:10px; color:var(--ink-dim);">FEATURES MEASURED</div></div><div><div style="font-size:24px; font-weight:800; color:inherit;">0</div><div style="font-size:10px; color:var(--ink-dim);">OUT OF TOL</div></div></div><div style="font-size:11px; line-height:1.7; padding:8px 10px; border-radius:8px; background:rgba(127,127,127,0.10);">LAST READING · bubble <b>3</b> SMALL ID<br><b>.6035</b> <span style="color:#1f8a3b; font-weight:800;">IN TOL</span></div><div style="font-size:11px; color:var(--ink-dim); line-height:1.7; margin-top:8px;">RUN BY <b>REA</b><br>STATION LAST SPOKE <b>1h 10m ago</b></div></div></div>
   <div id="qiEmpty" style="display:none; padding:26px; text-align:center; color:var(--ink-dim); font-size:14px;"></div>
 
   <p style="font-size:11px; color:var(--ink-dim); margin-top:18px; line-height:1.5;">
@@ -1756,7 +1750,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </p>
 </div>
 
-<div id="reportsScreen" class="setup">
+<div id="reportsScreen" class="setup hidden">
   <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
     <button class="ob-back" id="reportsBack" style="margin:0;">← Back</button>
     <h1 style="margin:0; font-size:20px;">Inspection Reports</h1>
@@ -2007,7 +2001,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- FLASH MESSAGE -->
-<div id="flash" class="flash hidden">✓ Data pushed to GitHub</div>
+<div id="flash" class="flash hidden">🔧 Inspect Parts opened — 1000237620 OP-030 Rev-1</div>
 
 <!-- BOOT -->
 <script>
@@ -30151,4 +30145,4 @@ report can be read instead of guessed at.
 </div>
 
 
-<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div></body></html>
+<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div><div id="mvPanel" style="position: fixed; inset: 0px; z-index: 100000; background: rgb(233, 230, 223); display: flex; flex-direction: column;"><iframe id="mvFrame" style="flex: 1 1 auto; width: 100%; height: 100%; border: 0px; background: rgb(255, 255, 255);"></iframe><button style="position: fixed; top: 7px; left: 10px; z-index: 100002; background: rgb(122, 20, 20); color: rgb(255, 255, 255); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 6px; font-weight: 800; padding: 7px 12px; cursor: pointer; font-size: 13px; box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 6px;">← Control Plans</button></div></body></html>
