@@ -881,7 +881,7 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- CP BUILDER SCREEN (per-balloon control type + master autofill) -->
-<div id="cpBuilderScreen" class="setup wide">
+<div id="cpBuilderScreen" class="setup wide hidden">
   <!-- Rev-193: info/hint text deleted; Save/Build parked LEFT next to the title; one compact row -->
   <div style="display:flex; align-items:center; gap:10px; flex-wrap:nowrap; overflow:hidden; position:sticky; top:0; z-index:20; background:var(--bg); padding:8px; margin:0 -8px 6px; box-shadow:0 2px 6px rgba(40,30,30,0.12);">
     <button class="ob-back" id="cpBuilderBack" style="margin:0;">← Back</button>
@@ -1086,7 +1086,7 @@ Click to un-approve.
 </div>
 
 <!-- PROJECTS SCREEN -->
-<div id="projectsScreen" class="setup wide hidden">
+<div id="projectsScreen" class="setup wide">
   <button class="ob-back" id="projectsBack">← Back</button>
   <h1 id="projectsTitle">Control Plans</h1>
   <p class="sub" id="projectsSub">All Control Plans on this device — drafts and saved projects together</p>
@@ -1131,8 +1131,8 @@ Measurement methods (worth 20): done → 20 pts
 Review inspection (worth 15): 0 of 1 = 0% → 0 pts
 ——————————————————
 TOTAL 85%">85%</div><div class="cp-rev" title="Control Plan revision — advances each time you press Save to Project.
-● There are edits since Rev-13 — they are saved on this device; press Save to Project to issue the next revision.
-Part / drawing rev: Rev-1">Rev-13 <span style="color:#a35400;">●</span></div></td></tr><tr class="cp-op-row"><td colspan="2" style="border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor;"></td><td colspan="1" style="padding: 10px 10px 2px; border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor; border-left: 2px solid rgb(226, 221, 212);"><div class="cp-uc" title="This operation is still being built. The stripes run faster the closer this plan is to 100% — a nearly-still ribbon means barely started. numbered · no ODS drawing · 4 of 4 approved  ·  all pinned · 0 of 4 approved  ·  4 still need a control type · 0 of 4 approved  ·  4 still need a measurement method / reaction plan" style="animation-duration: 2.13s;"><b>UNDER CONSTRUCTION — 40% COMPLETE · CONTROL TYPES 0/4</b></div><div class="cp-prog" title="40% complete — numbered · no ODS drawing · 4 of 4 approved  ·  all pinned · 0 of 4 approved  ·  4 still need a control type · 0 of 4 approved  ·  4 still need a measurement method / reaction plan"><div class="cp-prog-fill live" style="width: 40%;"></div><div class="cp-prog-ticks"><span></span><span></span><span></span><span></span><span></span></div></div></td><td colspan="2" style="border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor; border-left: 2px solid rgb(226, 221, 212);"></td></tr><tr class="cp-op-row"><td style="padding-left: 68px; white-space: nowrap;"><strong style="font-weight: 800; letter-spacing: 0.03em; font-size: 23px;">↳ OP-040</strong><span style="font-size: 21px; color: rgb(90, 81, 72); font-weight: 600;">  —  2ND TURN</span><button title="Set what this operation is (e.g. TURN COMPLETE)" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 18px; opacity: 0.55;">✏️</button></td><td style="vertical-align: top; min-width: 196px;"><span class="cp-pill" title="Not complete yet:
+No edits since this revision was issued.
+Part / drawing rev: Rev-1">Rev-14</div></td></tr><tr class="cp-op-row"><td colspan="2" style="border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor;"></td><td colspan="1" style="padding: 10px 10px 2px; border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor; border-left: 2px solid rgb(226, 221, 212);"><div class="cp-uc" title="This operation is still being built. The stripes run faster the closer this plan is to 100% — a nearly-still ribbon means barely started. numbered · no ODS drawing · 4 of 4 approved  ·  all pinned · 0 of 4 approved  ·  4 still need a control type · 0 of 4 approved  ·  4 still need a measurement method / reaction plan" style="animation-duration: 2.13s;"><b>UNDER CONSTRUCTION — 40% COMPLETE · CONTROL TYPES 0/4</b></div><div class="cp-prog" title="40% complete — numbered · no ODS drawing · 4 of 4 approved  ·  all pinned · 0 of 4 approved  ·  4 still need a control type · 0 of 4 approved  ·  4 still need a measurement method / reaction plan"><div class="cp-prog-fill live" style="width: 40%;"></div><div class="cp-prog-ticks"><span></span><span></span><span></span><span></span><span></span></div></div></td><td colspan="2" style="border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor; border-left: 2px solid rgb(226, 221, 212);"></td></tr><tr class="cp-op-row"><td style="padding-left: 68px; white-space: nowrap;"><strong style="font-weight: 800; letter-spacing: 0.03em; font-size: 23px;">↳ OP-040</strong><span style="font-size: 21px; color: rgb(90, 81, 72); font-weight: 600;">  —  2ND TURN</span><button title="Set what this operation is (e.g. TURN COMPLETE)" style="margin-left: 10px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: none; cursor: pointer; font-size: 18px; opacity: 0.55;">✏️</button></td><td style="vertical-align: top; min-width: 196px;"><span class="cp-pill" title="Not complete yet:
 • no traveller uploaded for this part
 • Step 2 UPLOAD ODS — no ODS drawing loaded
 • Step 5 ASSIGN CONTROL TYPES — 0 of 4 approved
@@ -1432,7 +1432,7 @@ Part / drawing rev: Rev-1">Rev-3</div></td></tr><tr><td colspan="5" style="paddi
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 9/6/2026, 5:18:04 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pushed at 9/6/2026, 5:18:54 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -2096,7 +2096,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- FLASH MESSAGE -->
-<div id="flash" class="flash hidden">✓ Data pushed to GitHub (1 project file)</div>
+<div id="flash" class="flash hidden">✓ Data pushed to GitHub</div>
 
 <!-- BOOT -->
 <script>
