@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1155</title>
+<title>CONTROL PLAN GENERATOR - Rev-1156</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -561,7 +561,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1155 · 2026-09-07 08:56 AM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1156 · 2026-09-07 03:49 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -677,7 +677,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1155 · Built Sep 7, 2026</span>
+    <span id="revFooter">App Rev-1156 · Built Sep 7, 2026</span>
   </div>
 </div>
 
@@ -2061,7 +2061,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1155";
+const APP_REV = "Rev-1156";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2897,6 +2897,14 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-09-07",
+  "rev": "App Rev-1156",
+  "type": "App",
+  "changes": [
+   "\"BUTTONS DON'T WORK\" ON THE LINE SIMULATOR \u2014 FIXED (Rev-1156). At one part a second the whole panel was redrawn every second. A click is a press and a release on the SAME element; when the redraw fell between the two, the release landed on a fresh element and the click was lost \u2014 SAVE on a senior QE reading, \u2715 CLOSE on an alert, even STOP THE MACHINIST. And whatever had been typed into a SENIOR QE READING box went with the redraw. Reproduced with a real mouse on Rev-1155: 3 of 8 presses on SAVE lost, STOP lost. Now every press on the panel holds the redraw off for 700 ms, a focused button holds it off too, and a redraw carries typed values and the focused box across. The Quality Inspector screen gets the same guard on its LINE SIMULATOR mode. A new check drives the running simulator with real key presses and slow mouse presses; on Rev-1156 every one lands."
+  ]
+ },
+ {
+  "ts": "2026-09-07",
   "rev": "App Rev-1155",
   "type": "App",
   "changes": [
@@ -3200,7 +3208,7 @@ let GH_CHANGELOG_LOCAL_ONLY = null;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-09-07";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "08:56 AM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "03:49 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -18695,6 +18703,9 @@ function cpSimPanel(wantIdx){
     }
     let tick = null;
     xb.onclick = () => { try{ clearInterval(tick); }catch(e){} ov.remove(); };
+    /* Rev-1156: every press on the panel holds the redraw off for 700 ms */
+    ['pointerdown', 'pointerup', 'touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(ev =>
+      ov.addEventListener(ev, () => { window._cpSimPress = Date.now(); }, true));
     try{ logAct('nav', 'line simulator'); }catch(_){ }
 
     const keyOf = pl => String(pl.p.partNum || '') + '|OP-' + String(pl.p.opNum || '');
@@ -19071,7 +19082,24 @@ function cpSimPanel(wantIdx){
         +   'stored. The part count comes from the clock, so it keeps running whether this screen is '
         +   'open or not.</div>';
 
+      /* Rev-1156: "buttons don't work". At one part a second the whole panel was redrawn every
+         second. A click is a press and a release on the SAME element; when the redraw fell
+         between the two, the release landed on a fresh element and the click was lost -- and
+         whatever had been typed into a SENIOR QE READING box went with it. The redraw now
+         carries typed values and focus across, and (below) stands off for 700 ms around any
+         press on the panel. */
+      const keepVals = {};
+      let keepFocus = null;
+      try{
+        b.querySelectorAll('[data-sqin]').forEach(i => { if(i.value) keepVals[i.getAttribute('data-sqin')] = i.value; });
+        const a0 = document.activeElement;
+        if(a0 && b.contains(a0) && a0.getAttribute) keepFocus = a0.getAttribute('data-sqin') || null;
+      }catch(_){ }
       b.innerHTML = h;
+      try{
+        Object.keys(keepVals).forEach(k => { const i = b.querySelector('[data-sqin="' + k + '"]'); if(i) i.value = keepVals[k]; });
+        if(keepFocus){ const i = b.querySelector('[data-sqin="' + keepFocus + '"]'); if(i){ i.focus(); try{ i.setSelectionRange(i.value.length, i.value.length); }catch(_){ } } }
+      }catch(_){ }
 
       const sl = document.getElementById('cpSimSel');
       if(sl) sl.onchange = () => { sel = parseInt(sl.value, 10) || 0; render(); };
@@ -19184,7 +19212,8 @@ function cpSimPanel(wantIdx){
         const body = document.getElementById('cpSimBody');
         if(!body){ clearInterval(tick); return; }
         const a = document.activeElement;
-        if(a && body.contains(a) && /^(SELECT|INPUT|TEXTAREA|OPTION)$/.test(a.tagName || '')) return;
+        if(a && body.contains(a) && /^(SELECT|INPUT|TEXTAREA|OPTION|BUTTON)$/.test(a.tagName || '')) return;   /* Rev-1156: BUTTON too */
+        if(Date.now() - (window._cpSimPress || 0) < 700) return;   /* Rev-1156: a press is in flight */
         const pl = plans[sel]; const st = pl ? stOf(pl) : null;
         if(view !== 'run') return;   /* Rev-1035: the setup sheet is never redrawn under you */
         if(!st || !st.on) return;
@@ -24258,8 +24287,7 @@ function qiRenderReal(pl, data){
     + (QI_CMP ? cpLiCompareHtml({ serial: QI_CMP.serial, level: QI_CMP.level,
           cmp: qiCompareRows(data, QI_CMP.serial), ods: (function(){ try{ return cpOpOdsImage(p) || ''; }catch(e){ return ''; } })(),
           opNum: String(p.opNum || ''), bgId: 'qiCmpBg', xId: 'qiCmpX' }) : '');
-  var sen = document.getElementById('qiSenior');
-  if(sen) sen.innerHTML = qiSeniorHtml(cr, p.seniorDone || {});
+  qiSeniorPaint(qiSeniorHtml(cr, p.seniorDone || {}));
   qiWire(pl);
 }
 function qiRenderSim(pl){
@@ -24307,9 +24335,18 @@ function qiRenderSim(pl){
           cmp: cpSimCompare(key, rows, marks, QI_CMP.level, QI_CMP.serial, st.icpk, st.pcpk, st.mgcpk),
           ods: (function(){ try{ return cpOpOdsImage(p) || ''; }catch(e){ return ''; } })(),
           opNum: String(p.opNum || ''), bgId: 'qiCmpBg', xId: 'qiCmpX' }) : '');
-  var sen = document.getElementById('qiSenior');
-  if(sen) sen.innerHTML = qiSeniorHtml(cr, st.seniorDone || {});
+  qiSeniorPaint(qiSeniorHtml(cr, st.seniorDone || {}));
   qiWire(pl);
+}
+/* Rev-1156: a redraw never wipes a reading that is being typed */
+function qiSeniorPaint(html){
+  var sen = document.getElementById('qiSenior'); if(!sen) return;
+  var kv = {}, focusKey = null;
+  try{ sen.querySelectorAll('[data-sqin]').forEach(function(i){ if(i.value) kv[i.getAttribute('data-sqin')] = i.value; });
+       var a0 = document.activeElement; if(a0 && sen.contains(a0) && a0.getAttribute) focusKey = a0.getAttribute('data-sqin'); }catch(e){}
+  sen.innerHTML = html;
+  try{ Object.keys(kv).forEach(function(k){ var i = sen.querySelector('[data-sqin="' + k + '"]'); if(i) i.value = kv[k]; });
+       if(focusKey){ var f = sen.querySelector('[data-sqin="' + focusKey + '"]'); if(f) f.focus(); } }catch(e){}
 }
 function qiWire(pl){
   var panel = document.getElementById('qiPanel'); if(!panel) return;
@@ -24425,6 +24462,7 @@ function qiStartTimer(){
     /* the simulator's clock moves every second; the real floor holds to the 30 s poll */
     if(QI_MODE === 'SIM'){
       var ae = document.activeElement;
+      if(Date.now() - (window._cpSimPress || 0) < 700) return;   /* Rev-1156: a press is in flight */
       if(!(ae && scr.contains(ae) && /^(SELECT|INPUT|BUTTON)$/.test(ae.tagName))) qiLoad();
       return;
     }
@@ -24438,6 +24476,9 @@ function showQiLive(){
    'historyScreen','gagesScreen','qeBoardScreen']
     .forEach(function(id){ var e = document.getElementById(id); if(e) e.classList.add('hidden'); });
   var g = document.getElementById('qiScreen'); if(g) g.classList.remove('hidden');
+  if(g && !g._cpPressWired){ g._cpPressWired = true;   /* Rev-1156 */
+    ['pointerdown', 'pointerup', 'touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function(ev){
+      g.addEventListener(ev, function(){ window._cpSimPress = Date.now(); }, true); }); }
   try{ setHeaderBackVisible(true); }catch(e){}
   qiSetMode(QI_MODE);
   qiStartTimer();
