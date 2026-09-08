@@ -587,7 +587,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1064 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-08-09 5:54 PM ET</span></div>
+        <div class="brand-sub" id="brandRev">REV-1157 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-09-07 07:47 PM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -600,7 +600,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;"></div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1157 · 2026-09-07 07:47 PM</div>
 
       <div class="menu-grid">
       <!-- Rev-1153: per Rich -- the floor down the left (INSPECT PARTS, QUALITY INSPECTOR, QE BOARD ...),
@@ -614,24 +614,24 @@ window.addEventListener('DOMContentLoaded', function(){
         <small style="font-size:11px; color:var(--ink-dim);">UPLOAD AN ODS AND BUILD A NEW PLAN</small>
       </button>
       <button class="menu-btn" id="mQiLive" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">&#128225; QUALITY INSPECTOR</b><br>
+        <b style="font-size:15px;">📡 QUALITY INSPECTOR</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">WHAT IS DUE TO BE LINE INSPECTED, AND HOW THE TWO MEN AGREE</small>
       </button>
       <button class="menu-btn" id="mProjects" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">📁 CONTROL PLANS <span id="badgeProjects" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">0</span></b><br>
+        <b style="font-size:15px;">📁 CONTROL PLANS <span id="badgeProjects" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">13 <span class="bsub">Projects</span></span></b><br>
         <small id="mProjectsSub" style="font-size:11px; color:var(--ink-dim);">OPEN, EDIT, INSPECT OR DOWNLOAD ANY SAVED PLAN</small>
       </button>
       <button class="menu-btn" id="mQeBoard" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">&#128300; QE BOARD</b><br>
+        <b style="font-size:15px;">🔬 QE BOARD</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">EVERY JOB RUNNING, ONE SCREEN</small>
       </button>
       <button class="menu-btn" id="mGages" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">🔧 GAGES TO BE MADE <span id="badgeGages" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">0</span></b><br>
+        <b style="font-size:15px;">🔧 GAGES TO BE MADE <span id="badgeGages" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">2 OPEN / 2</span></b><br>
         <small style="font-size:11px; color:var(--ink-dim);">SPECIAL GAGES AND FIXTURES CALLED OUT ON ANY CONTROL PLAN</small>
       </button>
       <button class="menu-btn" id="mFinalInsp" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">&#129534; FINAL INSPECTION</b><br>
-        <small style="font-size:11px; color:var(--ink-dim);">ENTER A FINAL VALIDATION CHECK &mdash; NO SPREADSHEET</small>
+        <b style="font-size:15px;">🧾 FINAL INSPECTION</b><br>
+        <small style="font-size:11px; color:var(--ink-dim);">ENTER A FINAL VALIDATION CHECK — NO SPREADSHEET</small>
       </button>
       <button class="menu-btn" id="mReports" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
         <b style="font-size:15px;">📊 REPORTS</b><br>
@@ -665,19 +665,19 @@ window.addEventListener('DOMContentLoaded', function(){
         <b style="font-size:15px;">↻ PULL CODE &amp; DATA</b><br>
         <small style="font-size:11px; color:var(--ink-dim);">GET THE NEWEST APP CODE AND DATA FROM GITHUB RIGHT NOW — DON'T WAIT FOR THE TIMER</small>
       </button>
-      <button class="menu-btn" id="mPublishNow" style="display:none; width:100%; text-align:left; border-radius:12px; padding:14px 16px; background:#1d4e89; border-color:#14375f; color:#fff;">
-        <b style="font-size:15px;">&#128640; PUBLISH THIS BUILD</b><br>
-        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT THIS REVISION ON THE WEBSITE AND GITHUB &mdash; ONE PRESS, THEN IT CHECKS IT LANDED</small>
+      <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
+        <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUBLISHING TO THE WEBSITE…</small>
       </button>
       </div>
       <div style="display:none">
-        <span id="badgeMaster"></span><span id="badgeCustomers"></span><span id="badgeInstructions"></span>
+        <span id="badgeMaster">76<span class="bsub">Control Types</span></span><span id="badgeCustomers">11<span class="bsub">Customers</span></span><span id="badgeInstructions">Rev-92<span class="bsub">Instructions</span></span>
       </div>
     </div>
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1157 · Built Sep 7, 2026</span>
+    <span id="revFooter">App Rev-1157 · Built 2026-09-07 07:47 PM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -835,7 +835,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <button type="button" id="enhanceOdsBtn" style="background:#1a5276; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🔧 Make Clearer</button>
         <button type="button" id="addBalloonsBtn" style="background:#6e1414; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🎯 Add Balloons with AI</button>
         <button type="button" id="downloadBalloonedBtn" style="background:#2c6e49; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">👁️ View Ballooned Drawing</button>
-        <button type="button" id="odsRevsBtn" onclick="openDrawingRevs()" style="background:#5a4a2a; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🕐 Revisions (0)</button>
+        <button type="button" id="odsRevsBtn" onclick="openDrawingRevs()" style="background:#5a4a2a; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🕐 Revisions (1)</button>
         <span id="balloonStatusMsg" style="font-size:12px; color:var(--ink-dim);"></span>
       </div>
     </div>
@@ -1246,14 +1246,14 @@ window.addEventListener('DOMContentLoaded', function(){
   <p class="sub">Configure Anthropic API key for ODS balloon analysis</p>
 
   <div class="field" id="cpUserNameBox" style="border:2px solid var(--signal); border-radius:8px; padding:12px; margin-bottom:22px;">
-    <label>&#128100; WHO IS USING THIS DEVICE</label>
+    <label>👤 WHO IS USING THIS DEVICE</label>
     <input type="text" id="cpUserName" placeholder="R. ARNOLD" autocapitalize="characters" autocorrect="off" spellcheck="false">
     <p style="font-size:12px; color:var(--ink-dim); margin-top:8px;">
       This name is stamped on every sign-off, override and inspection run made on THIS device.
       Set it once per device. It is stored on the device only and is never sent anywhere.
     </p>
     <p style="font-size:12px; font-weight:700; margin:6px 0 0;" id="cpUserNameNow"></p>
-    <button class="btn-primary" id="cpUserNameSaveBtn" style="width:100%; margin-top:10px;">&#128190; SAVE NAME</button>
+    <button class="btn-primary" id="cpUserNameSaveBtn" style="width:100%; margin-top:10px;">💾 SAVE NAME</button>
   </div>
 
   <div class="field">
@@ -1349,19 +1349,19 @@ window.addEventListener('DOMContentLoaded', function(){
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ App Rev-467 pushed at 7/17/2026, 9:32:21 AM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 9/7/2026, 8:08:59 PM</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
 
   <!-- Rev-1155: the server folder -->
   <div id="cpSrvCard" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line);">
-    <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">🗄 Server Folder &mdash; the data home</h2>
+    <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">🗄 Server Folder — the data home</h2>
     <p class="sub" style="margin-bottom: 12px;">Pick the folder IT gave you on the CAMCO server (for example <b>\\server\Staff\Richard Arnold\CLAUDE DATA\CONTROL PLAN</b>).
       From then on every save writes <b>cp_data.json</b> there first, keeps one dated copy a day in <b>history\</b>, and mirrors to GitHub as before. On opening,
       the app reads the server folder first and falls back to GitHub only if the folder cannot be reached. Chrome or Edge on Windows; each device picks the folder once
-      &mdash; choose <b>Allow on every visit</b> when the browser asks.</p>
-    <p id="cpSrvStatus" style="font-size:12px; color:var(--ink-dim); padding:10px; background:var(--panel-2); border-radius:6px; margin-bottom:10px;">&mdash;</p>
+      — choose <b>Allow on every visit</b> when the browser asks.</p>
+    <p id="cpSrvStatus" style="font-size:12px; color:var(--ink-dim); padding:10px; background:var(--panel-2); border-radius:6px; margin-bottom:10px;">—</p>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
       <button class="btn-ghost" id="cpSrvPickBtn" style="min-height:48px; background:#1a5276; color:#fff; border:1px solid #154360;">🗄 Choose the server folder</button>
       <button class="btn-ghost" id="cpSrvSaveBtn" style="min-height:48px;">⬆️ Save to the server now</button>
@@ -1523,7 +1523,7 @@ window.addEventListener('DOMContentLoaded', function(){
     <button class="ob-back" id="gagesBack" style="margin:0;">← Back</button>
     <h1 style="margin:0; font-size:20px;">Gages To Be Made</h1>
     <select id="gagesFilter" style="height:34px; border:1px solid var(--line-strong); border-radius:8px; padding:0 8px; font-size:13px; margin-left:auto;">
-      <option value="OPEN" selected>Open only</option>
+      <option value="OPEN" selected="">Open only</option>
       <option value="ALL">All</option>
       <option value="TO BE MADE">To be made</option>
       <option value="DESIGNED">Designed</option>
@@ -1553,8 +1553,8 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <div id="fiScreen" class="setup hidden">
-  <button class="ob-back" id="fiBack">&#8592; Back</button>
-  <h2 style="margin:6px 0 2px;">&#129534; FINAL INSPECTION</h2>
+  <button class="ob-back" id="fiBack">← Back</button>
+  <h2 style="margin:6px 0 2px;">🧾 FINAL INSPECTION</h2>
   <div style="font-size:12px; color:var(--ink-dim); margin-bottom:12px;">
     The final validation check, entered here instead of on a spreadsheet.
   </div>
@@ -1576,32 +1576,30 @@ window.addEventListener('DOMContentLoaded', function(){
        background:rgba(127,127,127,0.12); margin-bottom:10px;"></div>
 
   <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
-    <button class="fi-filter" data-f="ALL"    style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">ALL</button>
-    <button class="fi-filter" data-f="CMM"    style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">CMM</button>
-    <button class="fi-filter" data-f="GAGE"   style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">GAGE &amp; INDICATOR</button>
+    <button class="fi-filter" data-f="ALL" style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">ALL</button>
+    <button class="fi-filter" data-f="CMM" style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">CMM</button>
+    <button class="fi-filter" data-f="GAGE" style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">GAGE &amp; INDICATOR</button>
     <button class="fi-filter" data-f="VISUAL" style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">VISUAL</button>
-    <button class="fi-filter" data-f="TODO"   style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">NOT DONE</button>
-    <button class="fi-filter" data-f="BAD"    style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid #c0392b; border-radius:8px; color:#c0392b;">PROBLEMS</button>
+    <button class="fi-filter" data-f="TODO" style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">NOT DONE</button>
+    <button class="fi-filter" data-f="BAD" style="padding:7px 14px; font-weight:800; cursor:pointer; border:2px solid #c0392b; border-radius:8px; color:#c0392b;">PROBLEMS</button>
   </div>
 
   <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
     <span style="font-size:11px; font-weight:800; color:var(--ink-dim); letter-spacing:.06em;">VIEW</span>
     <div style="display:flex; border:2px solid var(--line); border-radius:8px; overflow:hidden;">
-      <button id="fiViewCards"  class="fi-view" style="border:0; padding:8px 16px; font-weight:800; cursor:pointer;">CARDS</button>
+      <button id="fiViewCards" class="fi-view" style="border:0; padding:8px 16px; font-weight:800; cursor:pointer;">CARDS</button>
       <button id="fiViewReport" class="fi-view" style="border:0; padding:8px 16px; font-weight:800; cursor:pointer;">REPORT LAYOUT</button>
     </div>
-    <span style="font-size:11px; color:var(--ink-dim);">Report layout reads down the page like the CMM printout &mdash; Tab and Enter jump straight to the next value.</span>
+    <span style="font-size:11px; color:var(--ink-dim);">Report layout reads down the page like the CMM printout — Tab and Enter jump straight to the next value.</span>
   </div>
 
   <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
     <button id="fiScan" style="padding:10px 18px; font-weight:800; cursor:pointer; border-radius:8px;
-      border:2px solid #1a5276; background:#1a5276; color:#fff;">&#128196; LOAD A CMM REPORT</button>
-    <input type="file" id="fiScanFile"
-      accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain,application/pdf,image/*"
-      style="display:none;">
+      border:2px solid #1a5276; background:#1a5276; color:#fff;">📄 LOAD A CMM REPORT</button>
+    <input type="file" id="fiScanFile" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain,application/pdf,image/*" style="display:none;">
     <span id="fiScanMsg" style="font-size:12px; font-weight:700; color:var(--ink-dim);"></span>
     <span style="font-size:11px; color:var(--ink-dim); flex-basis:100%;">
-      A <b>CSV or text export from the CMM</b> is read exactly &mdash; the numbers come across as the machine
+      A <b>CSV or text export from the CMM</b> is read exactly — the numbers come across as the machine
       wrote them. A PDF or a picture has to be guessed at letter by letter, so ask for the export if you can get one.
     </span>
   </div>
@@ -1622,12 +1620,12 @@ window.addEventListener('DOMContentLoaded', function(){
   <div id="fiBusy" style="display:none; border:3px solid #1a5276; border-radius:14px;
        padding:26px 24px; margin-bottom:16px; background:rgba(26,82,118,0.06);">
     <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-      <span class="fiDot" style="font-size:40px; line-height:1;">&#128444;&#65039;</span>
+      <span class="fiDot" style="font-size:40px; line-height:1;">🖼️</span>
       <div style="flex:1; min-width:220px;">
         <div id="fiBusyTitle" style="font-size:30px; font-weight:900; letter-spacing:.01em; line-height:1.15;">
           READING THE REPORT</div>
         <div id="fiBusyDetail" style="font-size:17px; font-weight:700; color:var(--ink-dim); margin-top:4px;">
-          Starting&hellip;</div>
+          Starting…</div>
       </div>
       <div style="text-align:right;">
         <div id="fiBusyTimer" style="font-size:30px; font-weight:900; font-variant-numeric:tabular-nums;">0:00</div>
@@ -1637,7 +1635,7 @@ window.addEventListener('DOMContentLoaded', function(){
     <div class="fiBar" style="margin-top:18px;"><i></i><b id="fiBusyFill"></b></div>
     <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap;">
       <div style="font-size:13px; color:var(--ink-dim);">
-        This runs on this machine &mdash; the scan is not sent anywhere. A long report takes a few minutes.
+        This runs on this machine — the scan is not sent anywhere. A long report takes a few minutes.
       </div>
       <button id="fiBusyCancel" style="padding:9px 18px; font-weight:800; cursor:pointer;
         border:2px solid var(--line); border-radius:8px;">CANCEL</button>
@@ -1669,7 +1667,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 
   <div id="fiReview" style="display:none; border:2px solid #1a5276; border-radius:10px; padding:12px; margin-bottom:16px;">
-    <div id="fiReviewTitle" style="font-weight:800; font-size:14px; margin-bottom:4px;">READ OFF THE REPORT &mdash; NOTHING IS FILLED IN YET</div>
+    <div id="fiReviewTitle" style="font-weight:800; font-size:14px; margin-bottom:4px;">READ OFF THE REPORT — NOTHING IS FILLED IN YET</div>
     <div id="fiReviewNote" style="font-size:11px; color:var(--ink-dim); line-height:1.5; margin-bottom:10px;">
       Check each line against the report before accepting it. Reading a scan is not exact: a dropped
       minus sign or a value landing on the wrong feature both look perfectly ordinary afterwards.
@@ -1687,14 +1685,14 @@ window.addEventListener('DOMContentLoaded', function(){
   <div id="fiRows"></div>
 
   <div style="display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 6px;">
-    <button id="fiSave" class="btn-primary" style="padding:11px 20px;">&#128190; SAVE ON THIS DEVICE</button>
-    <button id="fiPush" style="padding:11px 20px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">&#9729;&#65039; SAVE TO GITHUB</button>
+    <button id="fiSave" class="btn-primary" style="padding:11px 20px;">💾 SAVE ON THIS DEVICE</button>
+    <button id="fiPush" style="padding:11px 20px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">☁️ SAVE TO GITHUB</button>
     <button id="fiClear" style="padding:11px 20px; font-weight:800; cursor:pointer; border:2px solid var(--line); border-radius:8px;">START A NEW SERIAL</button>
   </div>
   <div id="fiStatus" style="font-size:12px; font-weight:700; margin-top:6px;"></div>
 
   <p style="font-size:11px; color:var(--ink-dim); margin-top:18px; line-height:1.5;">
-    Every entry is kept on this device as you type &mdash; closing the screen does not lose it. A value
+    Every entry is kept on this device as you type — closing the screen does not lose it. A value
     typed against a characteristic with numeric limits is judged in or out of tolerance immediately;
     plug gage, drop indicator and visual checks are marked by hand, because there is no number to judge.
     RE-MEASURE opens a second value and a second call on the same line, the way the spreadsheet does.
@@ -1702,8 +1700,8 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <div id="qiScreen" class="setup hidden">
-  <button class="ob-back" id="qiBack">&#8592; Back</button>
-  <h2 style="margin:6px 0 2px;">&#128225; QUALITY INSPECTOR</h2>
+  <button class="ob-back" id="qiBack">← Back</button>
+  <h2 style="margin:6px 0 2px;">📡 QUALITY INSPECTOR</h2>
   <div style="font-size:12px; color:var(--ink-dim); margin-bottom:12px;">
     What is due to be line inspected on the operation running now, and how the machinist and the line inspector agree on it.
   </div>
@@ -1714,18 +1712,18 @@ window.addEventListener('DOMContentLoaded', function(){
     </label>
     <div style="display:flex; border:2px solid var(--line); border-radius:8px; overflow:hidden;">
       <button id="qiModeLive" class="qi-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">LIVE FLOOR</button>
-      <button id="qiModeSim"  class="qi-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">LINE SIMULATOR</button>
+      <button id="qiModeSim" class="qi-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">LINE SIMULATOR</button>
     </div>
-    <button id="qiRefresh" class="btn-primary" style="padding:9px 16px; width:auto; flex:0 0 auto; margin:0;">&#8635; REFRESH NOW</button>
+    <button id="qiRefresh" class="btn-primary" style="padding:9px 16px; width:auto; flex:0 0 auto; margin:0;">↻ REFRESH NOW</button>
     <label style="font-size:12px; display:flex; align-items:center; gap:6px; padding-bottom:8px;">
-      <input type="checkbox" id="qiAuto" checked> Refresh every 30 seconds
+      <input type="checkbox" id="qiAuto" checked=""> Refresh every 30 seconds
     </label>
     <span id="qiAge" style="font-size:12px; font-weight:700; color:var(--ink-dim); padding-bottom:9px;"></span>
   </div>
 
   <div id="qiSimBanner" style="display:none; background:#7a4a00; color:#fff; font-weight:800;
        padding:10px 12px; border-radius:8px; margin-bottom:12px; font-size:13px;">
-    &#9888; LINE SIMULATOR &mdash; every part, serial and reading on this screen comes from the Line
+    ⚠ LINE SIMULATOR — every part, serial and reading on this screen comes from the Line
     Simulator and is invented. Nothing is written anywhere and none of it is measurement evidence.
     Switch to LIVE FLOOR for the real floor.
   </div>
@@ -1739,19 +1737,19 @@ window.addEventListener('DOMContentLoaded', function(){
   <div id="qiEmpty" style="display:none; padding:26px; text-align:center; color:var(--ink-dim); font-size:14px;"></div>
 
   <p style="font-size:11px; color:var(--ink-dim); margin-top:18px; line-height:1.5; max-width:1180px;">
-    The intervals come from <b>STEP 8 &middot; LINE INSPECTION</b> on the operation and are changed there,
+    The intervals come from <b>STEP 8 · LINE INSPECTION</b> on the operation and are changed there,
     not here. One serial inside each block is chosen before the part exists and cannot be predicted from
-    the bench. A part that came due while nobody was there stays owed &mdash; the queue does not skip it.
+    the bench. A part that came due while nobody was there stays owed — the queue does not skip it.
     A line inspection is a run saved by <b>PERFORM LINE INSPECTION</b> on Step 8, so a serial the
     machinist and the inspector have both measured is a completed inspection; the parts made are the
     highest serial with a completed run, and the station's own heartbeat says which serial is on the
-    machine at the moment. Nothing on this screen is measurement evidence &mdash; the record of a part
+    machine at the moment. Nothing on this screen is measurement evidence — the record of a part
     is still the run written when it is completed or scrapped.
   </p>
 </div>
 <div id="qeBoardScreen" class="setup hidden">
-  <button class="ob-back" id="qeBoardBack">&#8592; Back</button>
-  <h2 style="margin:6px 0 2px;">&#128300; QE BOARD</h2>
+  <button class="ob-back" id="qeBoardBack">← Back</button>
+  <h2 style="margin:6px 0 2px;">🔬 QE BOARD</h2>
   <div id="qeBoardSubtitle" style="font-size:12px; color:var(--ink-dim); margin-bottom:12px;">
     Every job, one screen.
   </div>
@@ -1759,18 +1757,18 @@ window.addEventListener('DOMContentLoaded', function(){
   <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
     <div style="display:flex; border:2px solid var(--line); border-radius:8px; overflow:hidden;">
       <button id="qeModeReal" class="qe-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">REAL RUNS</button>
-      <button id="qeModeSim"  class="qe-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">SIMULATED</button>
+      <button id="qeModeSim" class="qe-mode" style="border:0; padding:9px 18px; font-weight:800; cursor:pointer;">SIMULATED</button>
     </div>
-    <button id="qeBoardRefresh" class="btn-primary" style="padding:9px 16px;">&#8635; REFRESH NOW</button>
+    <button id="qeBoardRefresh" class="btn-primary" style="padding:9px 16px;">↻ REFRESH NOW</button>
     <label style="font-size:12px; display:flex; align-items:center; gap:6px;">
-      <input type="checkbox" id="qeAutoRefresh" checked> Refresh every 60 seconds
+      <input type="checkbox" id="qeAutoRefresh" checked=""> Refresh every 60 seconds
     </label>
     <span id="qeBoardAge" style="font-size:12px; font-weight:700; color:var(--ink-dim);"></span>
   </div>
 
   <div id="qeSimBanner" style="display:none; background:#7a4a00; color:#fff; font-weight:800;
        padding:10px 12px; border-radius:8px; margin-bottom:12px; font-size:13px;">
-    &#9888; SIMULATED &mdash; every figure on this screen is invented. Nothing here is measurement
+    ⚠ SIMULATED — every figure on this screen is invented. Nothing here is measurement
     evidence and nothing is written anywhere.
   </div>
 
@@ -1778,7 +1776,7 @@ window.addEventListener('DOMContentLoaded', function(){
   <div id="qeBoardEmpty" style="display:none; padding:26px; text-align:center; color:var(--ink-dim); font-size:14px;"></div>
 
   <p style="font-size:11px; color:var(--ink-dim); margin-top:18px; line-height:1.5;">
-    A run reaches the repository when the machinist COMPLETES or SCRAPS a part &mdash; nothing is sent
+    A run reaches the repository when the machinist COMPLETES or SCRAPS a part — nothing is sent
     while a part is being measured. So this board is minutes behind the floor, not live. The age
     shown above is the age of the newest run it can see.
   </p>
@@ -30802,7 +30800,7 @@ report can be read instead of guessed at.
 }
 
 }catch(__bootErr){ try{ const d=document.createElement('div'); d.style.cssText='position:fixed;top:68px;left:0;right:0;z-index:9999;background:#7a1a1c;color:#fff;padding:10px 14px;font:700 13px system-ui;'; d.textContent='⚠️ BOOT-TAIL ERROR — screenshot for Claude: '+(__bootErr.message||__bootErr)+' | '+String(__bootErr.stack||'').split('\n')[1]; document.body.appendChild(d); }catch(e){} }
-</script>
+</script><div id="cpGate" style="position: fixed; inset: 0px; z-index: 2147482000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; background: rgb(233, 230, 225);"><div style="font:900 15px system-ui; letter-spacing:.14em; color:#7a1a1c;">CONTROL PLAN GENERATOR</div><div id="cpGateHead" style="font:800 30px system-ui; color:#1d1a17; line-height:1.2; max-width:760px;">PUBLISHING THIS BUILD</div><div id="cpGateBody" style="font:600 15px/1.6 system-ui; color:#5a5148; max-width:640px;">You are running <b>Rev-1157</b> from your Downloads folder, but GitHub is on Rev-1156.<br>Publishing it now, so the whole shop moves to Rev-1157.</div><button id="cpGateGo" style="display: none; margin-top: 10px; padding: 30px 60px; font: 900 30px system-ui; cursor: default; border: 0px; border-radius: 16px; background: rgb(29, 78, 137); color: rgb(255, 255, 255); letter-spacing: 0.02em; box-shadow: rgba(0, 0, 0, 0.22) 0px 6px 18px; opacity: 0.6;" disabled="">🚀 PUBLISH THIS BUILD</button><div id="cpGateWork" style="display: block; border-color: rgb(29, 78, 137); background: rgba(29, 78, 137, 0.06);"><div class="cpGwTop"><span class="cpGwIcon" style="animation: 1.1s ease-in-out 0s infinite normal none running cpGatePulse;">🚀</span><div style="flex:1; min-width:240px;"><div class="cpGwTitle" id="cpGateWorkTitle" style="color: rgb(18, 50, 79);">PUBLISHING…</div><div id="cpGateStatus" style="font:700 17px system-ui; color:#4a4139; margin-top:6px;">PUBLISHING TO THE WEBSITE…</div></div><div style="text-align:right;"><div class="cpGwClock" id="cpGateClock">0:03</div><div style="font:700 11px system-ui; color:#6b6257;">ELAPSED</div></div></div><div class="cpGwBar" style="background: rgba(29, 78, 137, 0.18);"><i></i></div></div><button id="cpGateSkip" style="margin-top:10px; padding:8px 14px; font:600 12px system-ui; cursor:pointer; border:0; background:none; color:#8a8279; text-decoration:underline;">carry on without publishing</button><style>@keyframes cpGateSweep{0%{left:-40%}100%{left:100%}}@keyframes cpGatePulse{0%,100%{opacity:1}50%{opacity:.55}}@keyframes cpGateFill{from{width:0}to{width:100%}}@keyframes cpGatePop{0%{transform:scale(.4); opacity:0}60%{transform:scale(1.25); opacity:1}100%{transform:scale(1); opacity:1}}#cpGateWork{display:none; width:min(760px,92vw); margin-top:6px; border:3px solid #1d4e89; border-radius:16px; padding:26px 24px; background:rgba(29,78,137,.06); text-align:left;}#cpGateWork .cpGwTop{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}#cpGateWork .cpGwIcon{font-size:44px; line-height:1; animation:cpGatePulse 1.1s ease-in-out infinite;}#cpGateWork .cpGwTitle{font:900 30px system-ui; letter-spacing:.01em; line-height:1.15; color:#12324f;}#cpGateWork .cpGwClock{font:900 30px system-ui; font-variant-numeric:tabular-nums; color:#1d4e89;}#cpGateWork .cpGwBar{position:relative; height:22px; border-radius:11px; overflow:hidden; background:rgba(29,78,137,.18); margin-top:18px;}#cpGateWork .cpGwBar>i{position:absolute; top:0; bottom:0; width:40%; border-radius:11px; background:linear-gradient(90deg,rgba(29,78,137,0) 0%,#1d4e89 50%,rgba(29,78,137,0) 100%); animation:cpGateSweep 1.15s linear infinite;}</style></div>
 
 <!-- Master List File Viewer Modal -->
 <div id="masterViewerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:9999; overflow:auto; box-sizing:border-box;">
@@ -30995,4 +30993,4 @@ report can be read instead of guessed at.
 </div>
 
 
-</body></html>
+<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div></body></html>
