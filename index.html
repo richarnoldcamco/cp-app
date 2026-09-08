@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1157</title>
+<title>CONTROL PLAN GENERATOR - Rev-1158</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -524,7 +524,7 @@ window.addEventListener('DOMContentLoaded', function(){
   }
 </style>
 </head>
-<body><div id="appUpdateBanner" style="background: rgb(26, 82, 118); color: rgb(255, 255, 255); padding: 8px 14px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;"><span>⬇️ App update available: Rev-1157 → Rev-1158 (your token &amp; data are kept)</span><button style="background: rgb(255, 255, 255); color: rgb(26, 82, 118); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 5px; padding: 5px 14px; font-size: 13px; font-weight: 800; cursor: pointer;">Update now</button><button title="Dismiss" style="background: transparent; color: rgb(255, 255, 255); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 5px; padding: 4px 9px; font-size: 12px; cursor: pointer;">✕</button></div>
+<body>
 <script>
 /* ===== Rev-1109: THE MENU IS VISIBLE WHILE THE PAGE IS STILL PARSING ========
    Putting the publish check up before showMenu() was not enough, and measuring
@@ -561,7 +561,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1157 · 2026-09-07 07:47 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1158 · 2026-09-07 08:17 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -587,7 +587,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1157 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-09-07 07:47 PM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1158 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-09-07 08:17 PM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -600,7 +600,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1157 · 2026-09-07 07:47 PM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1158 · 2026-09-07 08:17 PM</div>
 
       <div class="menu-grid">
       <!-- Rev-1153: per Rich -- the floor down the left (INSPECT PARTS, QUALITY INSPECTOR, QE BOARD ...),
@@ -618,7 +618,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <small style="font-size:11px; color:var(--ink-dim);">WHAT IS DUE TO BE LINE INSPECTED, AND HOW THE TWO MEN AGREE</small>
       </button>
       <button class="menu-btn" id="mProjects" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">📁 CONTROL PLANS <span id="badgeProjects" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">13 <span class="bsub">Projects</span></span></b><br>
+        <b style="font-size:15px;">📁 CONTROL PLANS <span id="badgeProjects" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">2 <span class="bsub">Projects</span></span></b><br>
         <small id="mProjectsSub" style="font-size:11px; color:var(--ink-dim);">OPEN, EDIT, INSPECT OR DOWNLOAD ANY SAVED PLAN</small>
       </button>
       <button class="menu-btn" id="mQeBoard" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -626,7 +626,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <small style="font-size:11px; color:var(--ink-dim);">EVERY JOB RUNNING, ONE SCREEN</small>
       </button>
       <button class="menu-btn" id="mGages" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">🔧 GAGES TO BE MADE <span id="badgeGages" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">2 OPEN / 2</span></b><br>
+        <b style="font-size:15px;">🔧 GAGES TO BE MADE <span id="badgeGages" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">0</span></b><br>
         <small style="font-size:11px; color:var(--ink-dim);">SPECIAL GAGES AND FIXTURES CALLED OUT ON ANY CONTROL PLAN</small>
       </button>
       <button class="menu-btn" id="mFinalInsp" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -667,17 +667,17 @@ window.addEventListener('DOMContentLoaded', function(){
       </button>
       <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
         <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
-        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1157 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUBLISHING TO THE WEBSITE…</small>
       </button>
       </div>
       <div style="display:none">
-        <span id="badgeMaster">76<span class="bsub">Control Types</span></span><span id="badgeCustomers">11<span class="bsub">Customers</span></span><span id="badgeInstructions">Rev-92<span class="bsub">Instructions</span></span>
+        <span id="badgeMaster">55<span class="bsub">Control Types</span></span><span id="badgeCustomers">11<span class="bsub">Customers</span></span><span id="badgeInstructions">Rev-92<span class="bsub">Instructions</span></span>
       </div>
     </div>
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1157 · Built 2026-09-07 07:47 PM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1158 · Built 2026-09-07 08:17 PM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -835,7 +835,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <button type="button" id="enhanceOdsBtn" style="background:#1a5276; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🔧 Make Clearer</button>
         <button type="button" id="addBalloonsBtn" style="background:#6e1414; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🎯 Add Balloons with AI</button>
         <button type="button" id="downloadBalloonedBtn" style="background:#2c6e49; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">👁️ View Ballooned Drawing</button>
-        <button type="button" id="odsRevsBtn" onclick="openDrawingRevs()" style="background:#5a4a2a; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🕐 Revisions (1)</button>
+        <button type="button" id="odsRevsBtn" onclick="openDrawingRevs()" style="background:#5a4a2a; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🕐 Revisions (0)</button>
         <span id="balloonStatusMsg" style="font-size:12px; color:var(--ink-dim);"></span>
       </div>
     </div>
@@ -1349,7 +1349,7 @@ window.addEventListener('DOMContentLoaded', function(){
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 9/8/2026, 11:38:18 AM</p>
+    <p id="ghStatus" style="font-size: 12px; color: rgb(198, 40, 40); padding: 10px; background: var(--panel-2); border-radius: 6px;">Pull failed: Browser storage is full — 10237 KB in use; biggest: fvc_1000237498_v1 5411 KB, qs_drawings_v1 4464 KB, qs_trash_v1 164 KB. Nothing was lost; ADMIN → ACTION LOG has the detail.</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -2033,7 +2033,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- FLASH MESSAGE -->
-<div id="flash" class="flash hidden">✓ Data pushed to GitHub</div>
+<div id="flash" class="flash error hidden">SAVE FAILED - this device is out of storage. Your last change was NOT saved. Push to GitHub, then reload.</div>
 
 <!-- BOOT -->
 <script>
@@ -2059,7 +2059,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1157";
+const APP_REV = "Rev-1158";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2893,6 +2893,15 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+{
+ "ts": "2026-09-07",
+ "rev": "App Rev-1158",
+ "type": "App",
+ "changes": [
+  "A COPY WITHOUT THE SERVER FOLDER IS TOLD SO, AND NO SAVE CAN WRITE OVER A PLAN THE SERVER HOLDS (Rev-1158) \u2014 per Rich: \"i loaded cp rev 1157 onto the server; loaded the app; now im missing my data.\" He opened CP-Rev1157.html straight off the share (a file:// address). To the browser that is a different place from the website, with its own empty store: 2 old plans showed, no server folder was held, and nothing on screen said where the 13 were. Nothing was lost. Three changes: (1) at boot, a copy that holds no server folder gets a blue bar naming the folder (\\\\server\\Staff\\Richard Arnold\\CLAUDE DATA\\CONTROL PLAN) with CHOOSE THE SERVER FOLDER on it, dismissable for a day. (2) CHOOSE THE SERVER FOLDER now LOADS the folder first and then saves the union \u2014 before this, the first save wrote the device's plans over the server file, and from that copy it would have written 2 over 11 (the Rev-423 guard only bites at zero; the new check proves the old build did exactly that). (3) Every server write compares the file with what this device holds: a plan on the server that this device lacks and never deleted is merged in before the write, named in the action log and on screen; a deletion made on this device still goes through. The menu tile recounts after every server load.",
+  "TESTS: check_srvpick.js (bar at boot; choosing loads 11 then saves 13; a plan added on the server by another device survives a save here; a tombstoned plan stays deleted; Not now) \u2014 9 bites on Rev-1157. Retired stub_count (it tested the station-count UI removed in Rev-1146; stub_qi covers the module); stub_view's end anchor moved to the QUALITY INSPECTOR module."
+ ]
+},
  {
   "ts": "2026-09-07",
   "rev": "App Rev-1157",
@@ -3214,7 +3223,7 @@ let GH_CHANGELOG_LOCAL_ONLY = null;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-09-07";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "07:47 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "08:17 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -25573,8 +25582,17 @@ async function cpSrvPick(){
     await _cpSrvStore(h);
     localStorage.setItem('cpSrvName', h.name || 'server folder');
     try{ logAct('server', 'server folder chosen: ' + (h.name || '?')); }catch(_){ }
-    flash('✓ Server folder: ' + (h.name || '') + ' — saving now');
+    /* Rev-1158: direction matters (Rev-423). A copy that has just been pointed at the folder
+       takes what the folder holds FIRST, then saves the union. Before this, the first save
+       wrote this device's plans over the server file -- 2 over 11, in Rich's case. */
+    const before = (JSON.parse(localStorage.getItem('cpProjects') || '[]') || []).length;
+    let loaded = false;
+    try{ loaded = await cpSrvLoad(true); }catch(e){ try{ logAct('server', 'load after choosing failed: ' + (e && e.message || e)); }catch(_){ } }
+    const after = (JSON.parse(localStorage.getItem('cpProjects') || '[]') || []).length;
+    try{ const bar = document.getElementById('cpSrvNoFolder'); if(bar) bar.remove(); }catch(_){ }
+    flash('✓ Server folder: ' + (h.name || '') + (loaded ? (' — loaded, ' + after + ' plan(s) on this device now' + (after > before ? (' (' + (after - before) + ' came from the server)') : '')) : ' — nothing to load yet') + ' — saving');
     await cpSrvWriteBundle(buildDataBundle(), 'first save after choosing the folder');
+    try{ updateHomeScreen(); updateMenuBadges(); }catch(_){ }
     cpSrvRenderStatus();
   }catch(e){
     if(e && e.name === 'AbortError') return;   /* cancelled */
@@ -25618,8 +25636,26 @@ async function cpSrvWriteBundle(bundle, why){
           try{ logAct('server', msg); }catch(_){ }
           flash(msg, true); return false;
         }
+        /* Rev-1158: the server file may hold plans this device has never seen (another device
+           saved them, or this copy is new). Writing over them would lose them. Any such plan
+           that this device did not itself delete is merged in first, and the union is saved. */
+        if(prevCount > 0 && Array.isArray(bundle.projects)){
+          const keyOf = p => p.id || ((p.partNum||'?') + '::' + (p.rev||'?') + '::' + (p.created||''));
+          const have = new Set(bundle.projects.map(keyOf));
+          const tomb = new Set((JSON.parse(localStorage.getItem('deletedProjectKeys') || '[]') || []).filter(t => t && t.key && cpTombLives(t)).map(t => t.key));
+          const missing = prev.projects.filter(p => !have.has(keyOf(p)) && !tomb.has(keyOf(p)));
+          if(missing.length){
+            const summary = mergeRestore(prev);
+            bundle = buildDataBundle();
+            try{ updateHomeScreen(); updateMenuBadges(); }catch(_){ }
+            const msg = 'the server folder held ' + missing.length + ' plan(s) this device did not have (' + missing.slice(0, 4).map(p => (p.partNum || '?') + (p.opNum ? (' OP-' + p.opNum) : '')).join(', ') + (missing.length > 4 ? ', …' : '') + ') — merged in before saving; nothing was written over';
+            try{ logAct('server', msg + ' · ' + (summary || []).join(', ')); }catch(_){ }
+            flash('🗄 ' + msg.charAt(0).toUpperCase() + msg.slice(1));
+          }
+        }
       }catch(e){ /* unreadable previous file: write over it, it is kept in history anyway */ }
     }
+    const localCountNow = (bundle && Array.isArray(bundle.projects)) ? bundle.projects.length : 0;
     const text = JSON.stringify(bundle, null, 2);
     await _cpSrvWriteText(h, CP_SRV_FILE, text);
     const day = new Date().toLocaleDateString('en-CA');
@@ -25629,9 +25665,9 @@ async function cpSrvWriteBundle(bundle, why){
     }catch(e){ try{ logAct('server', 'history copy failed: ' + (e && e.message || e)); }catch(_){ } }
     const who = (typeof cpWhoAmI === 'function') ? cpWhoAmI() : '';
     const stamp = new Date().toISOString();
-    try{ await _cpSrvWriteText(h, 'LAST_WRITE.txt', 'CONTROL PLAN GENERATOR ' + APP_REV + '\n' + stamp + '\n' + who + '\n' + localCount + ' plan(s)\n' + (why || '') + '\n'); }catch(e){}
+    try{ await _cpSrvWriteText(h, 'LAST_WRITE.txt', 'CONTROL PLAN GENERATOR ' + APP_REV + '\n' + stamp + '\n' + who + '\n' + localCountNow + ' plan(s)\n' + (why || '') + '\n'); }catch(e){}
     localStorage.setItem('cpSrvLastWrite', stamp);
-    try{ logAct('server', 'saved ' + localCount + ' plan(s) to the server folder' + (why ? (' — ' + why) : '')); }catch(_){ }
+    try{ logAct('server', 'saved ' + localCountNow + ' plan(s) to the server folder' + (why ? (' — ' + why) : '')); }catch(_){ }
     cpSrvRenderStatus();
     return true;
   }catch(e){
@@ -25657,7 +25693,7 @@ async function cpSrvLoad(silent){
   const b = await cpSrvReadBundle();
   if(!b){ if(!silent) flash('Nothing readable in the server folder yet — save to it first.', true); return false; }
   const summary = mergeRestore(b);
-  try{ updateHomeScreen(); }catch(_){ }
+  try{ updateHomeScreen(); updateMenuBadges(); }catch(_){ }   /* Rev-1158: the menu tile counts what just arrived */
   try{ logAct('server', 'loaded from the server folder: ' + (summary || []).join(', ')); }catch(_){ }
   if(!silent) flash('✓ Loaded from the server folder: ' + (summary || []).join(', '));
   cpSrvRenderStatus();
@@ -25698,9 +25734,34 @@ async function cpSrvRenderStatus(){
   if(p !== 'granted') cpSrvNeedClick();
 }
 /* at boot: if the folder is held and readable, it is the home -- load it */
+/* Rev-1158: a copy that holds no server folder is told so at boot -- once a day, dismissable.
+   Rich opened the build straight off the share and saw 2 plans where he expected 13: a new
+   browser store, no folder, and nothing on screen to say "your plans are in the folder". */
+function cpSrvNoFolderBar(){
+  try{
+    if(document.getElementById('cpSrvNoFolder')) return;
+    const last = parseInt(localStorage.getItem('cpSrvBarDismissed') || '0', 10);
+    if(last && (Date.now() - last) < 24 * 3600 * 1000) return;
+    const bar = document.createElement('div');
+    bar.id = 'cpSrvNoFolder';
+    bar.style.cssText = 'background:#1a5276; color:#fff; padding:8px 14px; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;';
+    bar.innerHTML = '<span>🗄 This copy is not connected to the server folder yet — the shop\'s Control Plans live in <b>\\\\server\\Staff\\Richard Arnold\\CLAUDE DATA\\CONTROL PLAN</b>. Choose that folder and they load in; every save then lands there too.</span>';
+    const b = document.createElement('button');
+    b.textContent = 'Choose the server folder';
+    b.style.cssText = 'background:#fff; color:#1a5276; border:none; border-radius:5px; padding:5px 14px; font-size:13px; font-weight:800; cursor:pointer;';
+    b.onclick = async () => { await cpSrvPick(); if(await cpSrvHandle()) bar.remove(); };
+    const x = document.createElement('button');
+    x.textContent = 'Not now'; x.style.cssText = 'background:transparent; color:#fff; border:1px solid rgba(255,255,255,.5); border-radius:5px; padding:4px 9px; font-size:12px; cursor:pointer;';
+    x.onclick = () => { bar.remove(); try{ localStorage.setItem('cpSrvBarDismissed', String(Date.now())); }catch(_){ } };
+    bar.appendChild(b); bar.appendChild(x);
+    document.body.insertBefore(bar, document.body.firstChild);
+    try{ logAct('server', 'no server folder on this device — the bar offered to choose one'); }catch(_){ }
+  }catch(e){}
+}
 async function cpSrvBoot(){
   try{
-    const h = await cpSrvHandle(); if(!h) return;
+    const h = await cpSrvHandle();
+    if(!h){ if(cpSrvSupported()) cpSrvNoFolderBar(); return; }
     const p = await cpSrvPerm(false);
     if(p !== 'granted'){ cpSrvNeedClick(); return; }
     await cpSrvLoad(true);
@@ -30800,7 +30861,7 @@ report can be read instead of guessed at.
 }
 
 }catch(__bootErr){ try{ const d=document.createElement('div'); d.style.cssText='position:fixed;top:68px;left:0;right:0;z-index:9999;background:#7a1a1c;color:#fff;padding:10px 14px;font:700 13px system-ui;'; d.textContent='⚠️ BOOT-TAIL ERROR — screenshot for Claude: '+(__bootErr.message||__bootErr)+' | '+String(__bootErr.stack||'').split('\n')[1]; document.body.appendChild(d); }catch(e){} }
-</script>
+</script><div id="cpGate" style="position: fixed; inset: 0px; z-index: 2147482000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; background: rgb(233, 230, 225);"><div style="font:900 15px system-ui; letter-spacing:.14em; color:#7a1a1c;">CONTROL PLAN GENERATOR</div><div id="cpGateHead" style="font:800 30px system-ui; color:#1d1a17; line-height:1.2; max-width:760px;">PUBLISHING THIS BUILD</div><div id="cpGateBody" style="font:600 15px/1.6 system-ui; color:#5a5148; max-width:640px;">You are running <b>Rev-1158</b> from your Downloads folder, but the website is on Rev-1157.<br>Publishing it now, so the whole shop moves to Rev-1158.</div><button id="cpGateGo" style="display: none; margin-top: 10px; padding: 30px 60px; font: 900 30px system-ui; cursor: default; border: 0px; border-radius: 16px; background: rgb(29, 78, 137); color: rgb(255, 255, 255); letter-spacing: 0.02em; box-shadow: rgba(0, 0, 0, 0.22) 0px 6px 18px; opacity: 0.6;" disabled="">🚀 PUBLISH THIS BUILD</button><div id="cpGateWork" style="display: block; border-color: rgb(29, 78, 137); background: rgba(29, 78, 137, 0.06);"><div class="cpGwTop"><span class="cpGwIcon" style="animation: 1.1s ease-in-out 0s infinite normal none running cpGatePulse;">🚀</span><div style="flex:1; min-width:240px;"><div class="cpGwTitle" id="cpGateWorkTitle" style="color: rgb(18, 50, 79);">PUBLISHING…</div><div id="cpGateStatus" style="font:700 17px system-ui; color:#4a4139; margin-top:6px;">PUBLISHING TO THE WEBSITE…</div></div><div style="text-align:right;"><div class="cpGwClock" id="cpGateClock">0:01</div><div style="font:700 11px system-ui; color:#6b6257;">ELAPSED</div></div></div><div class="cpGwBar" style="background: rgba(29, 78, 137, 0.18);"><i></i></div></div><button id="cpGateSkip" style="margin-top:10px; padding:8px 14px; font:600 12px system-ui; cursor:pointer; border:0; background:none; color:#8a8279; text-decoration:underline;">carry on without publishing</button><style>@keyframes cpGateSweep{0%{left:-40%}100%{left:100%}}@keyframes cpGatePulse{0%,100%{opacity:1}50%{opacity:.55}}@keyframes cpGateFill{from{width:0}to{width:100%}}@keyframes cpGatePop{0%{transform:scale(.4); opacity:0}60%{transform:scale(1.25); opacity:1}100%{transform:scale(1); opacity:1}}#cpGateWork{display:none; width:min(760px,92vw); margin-top:6px; border:3px solid #1d4e89; border-radius:16px; padding:26px 24px; background:rgba(29,78,137,.06); text-align:left;}#cpGateWork .cpGwTop{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}#cpGateWork .cpGwIcon{font-size:44px; line-height:1; animation:cpGatePulse 1.1s ease-in-out infinite;}#cpGateWork .cpGwTitle{font:900 30px system-ui; letter-spacing:.01em; line-height:1.15; color:#12324f;}#cpGateWork .cpGwClock{font:900 30px system-ui; font-variant-numeric:tabular-nums; color:#1d4e89;}#cpGateWork .cpGwBar{position:relative; height:22px; border-radius:11px; overflow:hidden; background:rgba(29,78,137,.18); margin-top:18px;}#cpGateWork .cpGwBar>i{position:absolute; top:0; bottom:0; width:40%; border-radius:11px; background:linear-gradient(90deg,rgba(29,78,137,0) 0%,#1d4e89 50%,rgba(29,78,137,0) 100%); animation:cpGateSweep 1.15s linear infinite;}</style></div>
 
 <!-- Master List File Viewer Modal -->
 <div id="masterViewerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:9999; overflow:auto; box-sizing:border-box;">
