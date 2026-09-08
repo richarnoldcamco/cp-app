@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1156</title>
+<title>CONTROL PLAN GENERATOR - Rev-1157</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -561,7 +561,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1156 · 2026-09-07 03:49 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1157 · 2026-09-07 07:47 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -677,7 +677,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1156 · Built Sep 7, 2026</span>
+    <span id="revFooter">App Rev-1157 · Built Sep 7, 2026</span>
   </div>
 </div>
 
@@ -2061,7 +2061,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1156";
+const APP_REV = "Rev-1157";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2897,6 +2897,14 @@ function cpUpdateCurtain(msg){
 const CHANGE_LOG = [
  {
   "ts": "2026-09-07",
+  "rev": "App Rev-1157",
+  "type": "App",
+  "changes": [
+   "A FULL BROWSER STORE NO LONGER STOPS A PULL (Rev-1157) \u2014 per Rich: \"Pull failed: Setting the value of 'cpProjects' exceeded the quota.\" A browser gives an address about 5 MB of local storage; this one was full and the merge had the data and nowhere to put it. The merge now frees space in a fixed, safe order and tries again after each step: saved drawing revisions; the action log trimmed to the newest 500 (the archive is logs/ on GitHub); change history trimmed to 100; embedded drawings moved to IndexedDB; each plan's xlsx blob (GitHub holds every one as projects/<part>_<rev>.b64 and DOWNLOAD fetches it back); last, the uploaded Instructions document (re-upload from INSTRUCTIONS). What was freed is written to the action log and shown; if the store is still full the pull says how much is in use and which keys are biggest instead of a bare quota error. API SETTINGS now shows a line under the GitHub status: how many MB this browser's store holds and its four biggest keys."
+  ]
+ },
+ {
+  "ts": "2026-09-07",
   "rev": "App Rev-1156",
   "type": "App",
   "changes": [
@@ -3208,7 +3216,7 @@ let GH_CHANGELOG_LOCAL_ONLY = null;
   Storage.prototype.__cpWriteGuard = true;
 })();
 const BUILD_DATE = "2026-09-07";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "03:49 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_TIME = "07:47 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -22187,6 +22195,16 @@ function showSettings(){
   try{ cpLoadUserName(); }catch(_){ }
   loadGitHubSettings();
   try{ cpSrvRenderStatus(); }catch(_){ }   /* Rev-1155 */
+  /* Rev-1157: what is in this browser's store, so a full one is not a mystery */
+  try{
+    const gs = document.getElementById('ghStatus');
+    if(gs){
+      let line = document.getElementById('cpStoreLine');
+      if(!line){ line = document.createElement('p'); line.id = 'cpStoreLine'; line.style.cssText = 'font-size:11px; color:var(--ink-dim); margin:6px 0 0;'; gs.parentNode.insertBefore(line, gs.nextSibling); }
+      const rp = cpStorageReport();
+      line.textContent = 'Browser storage: about ' + Math.round(rp.total / 1024 * 10) / 10 + ' MB in use (of roughly 5) · biggest: ' + rp.top.slice(0, 4).map(x => x.key + ' ' + x.kb + ' KB').join(', ');
+    }
+  }catch(_){ }
   cpUpdateLearnStatus();
   const dm = $('cpDeviceModeSel'); if(dm){ const cur = localStorage.getItem('cpDeviceMode') || 'auto'; dm.value = cur; const note = $('cpDeviceModeNote'); if(note) note.textContent = (cur === 'auto' ? ('Auto-detect — currently seeing this as a ' + (cpAutoIsMobile() ? 'PHONE.' : 'DESKTOP.')) : ('Forced ' + (cur === 'phone' ? 'PHONE.' : 'DESKTOP.'))) + ' Phone-specific hints adjust accordingly.'; }
 }
@@ -24862,6 +24880,76 @@ function downloadBackup(){
 }
 
 // MERGE-mode restore: keeps both sets, newer wins per item
+
+/* ===== Rev-1157: A FULL BROWSER STORE IS FREED, NOT FATAL =========================
+   localStorage gives an address about 5 MB. Rich's pull died on "Setting the value of
+   'cpProjects' exceeded the quota" -- the merge had the data and nowhere to put it. The
+   things that fill the store are all recoverable or disposable, so a failed write now frees
+   them in this order and tries again after each:
+     1. drawingRevs           -- saved drawing revisions (a convenience)
+     2. the action log        -- trimmed to the newest 500 (the archive is logs/ on GitHub)
+     3. changeHistory         -- trimmed to the newest 100
+     4. embedded drawings     -- moved to IndexedDB when it is up, else the clean copies dropped
+     5. each plan's xlsx blob -- p.data; GitHub holds every one as projects/<part>_<rev>.b64 and
+                                 Download fetches it back when it is missing
+     6. instructionsDoc       -- the uploaded Instructions file (re-upload from INSTRUCTIONS)
+   What was freed is logged and shown. cpStorageReport() lists the biggest keys for ADMIN. */
+function cpStorageReport(){
+  const out = [];
+  try{
+    for(let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i); const v = localStorage.getItem(k) || '';
+      out.push({ key: k, kb: Math.round(v.length * 2 / 1024) });
+    }
+  }catch(e){}
+  out.sort((a, b) => b.kb - a.kb);
+  const total = out.reduce((a, x) => a + x.kb, 0);
+  return { total: total, top: out.slice(0, 8) };
+}
+function cpStoreSet(key, value, why){
+  const freed = [];
+  const attempt = () => { try{ localStorage.setItem(key, value); return true; }catch(e){ return false; } };
+  if(attempt()) return { ok: true, freed: freed };
+  const steps = [
+    ['saved drawing revisions', () => { localStorage.removeItem('drawingRevs'); }],
+    ['action log trimmed to 500', () => { const L = JSON.parse(localStorage.getItem(CP_LOG_KEY) || '[]'); if(L.length > 500) localStorage.setItem(CP_LOG_KEY, JSON.stringify(L.slice(-500))); }],
+    ['change history trimmed to 100', () => { const H = JSON.parse(localStorage.getItem('changeHistory') || '[]'); if(H.length > 100) localStorage.setItem('changeHistory', JSON.stringify(H.slice(0, 100))); }],
+    ['embedded drawings moved out of the store', () => {
+        const wc = JSON.parse(localStorage.getItem('cpWorkingCopy') || 'null');
+        if(wc && (wc.odsImage || wc.cleanOdsImage)){
+          if(_idbReady && wc.odsImage) _idbPutOds(wc.partNum, wc.opNum, wc.odsImage, wc.cleanOdsImage);
+          if(_idbReady){ delete wc.odsImage; wc._idb = 1; }
+          delete wc.cleanOdsImage; localStorage.setItem('cpWorkingCopy', JSON.stringify(wc));
+        }
+        const ds = JSON.parse(localStorage.getItem('cpDrafts') || '[]'); let ch = false;
+        ds.forEach(d => { if(d.odsImage || d.cleanOdsImage){ if(_idbReady && d.odsImage){ _idbPutDrawing(d.partNum, d.odsImage, d.cleanOdsImage); delete d.odsImage; d._idb = 1; } delete d.cleanOdsImage; ch = true; } });
+        if(ch) localStorage.setItem('cpDrafts', JSON.stringify(ds));
+        if(key !== 'cpProjects'){
+          const ps = JSON.parse(localStorage.getItem('cpProjects') || '[]'); let pc = false;
+          ps.forEach(p => { const b = p.builderState || {};
+            if(b.odsImage || b.cleanOdsImage){ if(_idbReady && b.odsImage){ _idbPutOds(p.partNum, p.opNum || b.opNum, b.odsImage, b.cleanOdsImage); delete b.odsImage; } delete b.cleanOdsImage; pc = true; }
+            if(p.odsImage || p.cleanOdsImage){ if(_idbReady && p.odsImage){ _idbPutOds(p.partNum, p.opNum, p.odsImage, p.cleanOdsImage); delete p.odsImage; } delete p.cleanOdsImage; pc = true; } });
+          if(pc) localStorage.setItem('cpProjects', JSON.stringify(ps));
+        } }],
+    ['plan xlsx blobs (GitHub keeps them; Download fetches them back)', () => {
+        const src = (key === 'cpProjects') ? JSON.parse(value) : JSON.parse(localStorage.getItem('cpProjects') || '[]');
+        let ch = false; src.forEach(p => { if(p.data){ delete p.data; ch = true; } });
+        if(ch){ if(key === 'cpProjects') value = JSON.stringify(src); else localStorage.setItem('cpProjects', JSON.stringify(src)); } }],
+    ['the uploaded Instructions document (re-upload it from INSTRUCTIONS)', () => { localStorage.removeItem('instructionsDoc'); }]
+  ];
+  for(const st of steps){
+    try{ st[1](); }catch(e){ /* a step that cannot run is skipped */ }
+    freed.push(st[0]);
+    if(attempt()){
+      try{ logAct('storage', 'browser store was full' + (why ? (' during ' + why) : '') + ' — freed: ' + freed.join('; ')); }catch(_){ }
+      try{ flash('Browser storage was full — freed ' + freed.length + ' thing(s) and finished. See the action log.', false); }catch(_){ }
+      return { ok: true, freed: freed };
+    }
+  }
+  const rep = cpStorageReport();
+  try{ logAct('storage', 'STORE STILL FULL after freeing ' + freed.join('; ') + ' — ' + rep.total + ' KB in use; biggest: ' + rep.top.map(x => x.key + ' ' + x.kb + 'KB').join(', ')); }catch(_){ }
+  return { ok: false, freed: freed, report: rep };
+}
 function mergeRestore(backup){
   let summary = [];
   
@@ -24957,8 +25045,11 @@ function mergeRestore(backup){
       delete byKey[key];
     });
     const merged = Object.values(byKey);
-    localStorage.setItem('cpProjects', JSON.stringify(merged));
-    summary.push(merged.length + ' projects');
+    /* Rev-1157: a full store is freed, not fatal */
+    const w = cpStoreSet('cpProjects', JSON.stringify(merged), 'a data pull');
+    if(!w.ok) throw new Error('Browser storage is full — ' + w.report.total + ' KB in use; biggest: '
+      + w.report.top.slice(0, 3).map(x => x.key + ' ' + x.kb + ' KB').join(', ') + '. Nothing was lost; ADMIN → ACTION LOG has the detail.');
+    summary.push(merged.length + ' projects' + (w.freed.length ? ' (storage freed: ' + w.freed.length + ')' : ''));
   }
   
   // Master List — Rev-280: PER-ROW multi-machine merge. Each row has a stable uid (survives H#
