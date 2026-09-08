@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1157</title>
+<title>CONTROL PLAN GENERATOR - Rev-1160</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -524,7 +524,7 @@ window.addEventListener('DOMContentLoaded', function(){
   }
 </style>
 </head>
-<body><div id="appUpdateBanner" style="background: rgb(26, 82, 118); color: rgb(255, 255, 255); padding: 8px 14px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;"><span>⬇️ App update available: Rev-1157 → Rev-1158 (your token &amp; data are kept)</span><button style="background: rgb(255, 255, 255); color: rgb(26, 82, 118); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 5px; padding: 5px 14px; font-size: 13px; font-weight: 800; cursor: pointer;">Update now</button><button title="Dismiss" style="background: transparent; color: rgb(255, 255, 255); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 5px; padding: 4px 9px; font-size: 12px; cursor: pointer;">✕</button></div>
+<body>
 <script>
 /* ===== Rev-1109: THE MENU IS VISIBLE WHILE THE PAGE IS STILL PARSING ========
    Putting the publish check up before showMenu() was not enough, and measuring
@@ -561,7 +561,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1157 · 2026-09-07 07:47 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1160 · 2026-09-08 04:19 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -587,7 +587,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1157 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-09-07 07:47 PM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1160 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-09-08 04:19 PM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -600,7 +600,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1157 · 2026-09-07 07:47 PM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1160 · 2026-09-08 04:19 PM</div>
 
       <div class="menu-grid">
       <!-- Rev-1153: per Rich -- the floor down the left (INSPECT PARTS, QUALITY INSPECTOR, QE BOARD ...),
@@ -618,7 +618,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <small style="font-size:11px; color:var(--ink-dim);">WHAT IS DUE TO BE LINE INSPECTED, AND HOW THE TWO MEN AGREE</small>
       </button>
       <button class="menu-btn" id="mProjects" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">📁 CONTROL PLANS <span id="badgeProjects" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">13 <span class="bsub">Projects</span></span></b><br>
+        <b style="font-size:15px;">📁 CONTROL PLANS <span id="badgeProjects" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">2 <span class="bsub">Projects</span></span></b><br>
         <small id="mProjectsSub" style="font-size:11px; color:var(--ink-dim);">OPEN, EDIT, INSPECT OR DOWNLOAD ANY SAVED PLAN</small>
       </button>
       <button class="menu-btn" id="mQeBoard" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -626,7 +626,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <small style="font-size:11px; color:var(--ink-dim);">EVERY JOB RUNNING, ONE SCREEN</small>
       </button>
       <button class="menu-btn" id="mGages" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">🔧 GAGES TO BE MADE <span id="badgeGages" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">2 OPEN / 2</span></b><br>
+        <b style="font-size:15px;">🔧 GAGES TO BE MADE <span id="badgeGages" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">0</span></b><br>
         <small style="font-size:11px; color:var(--ink-dim);">SPECIAL GAGES AND FIXTURES CALLED OUT ON ANY CONTROL PLAN</small>
       </button>
       <button class="menu-btn" id="mFinalInsp" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -667,17 +667,17 @@ window.addEventListener('DOMContentLoaded', function(){
       </button>
       <button class="menu-btn" id="mPublishNow" style="display: block; width: 100%; text-align: left; border-radius: 12px; padding: 14px 16px; background: rgb(29, 78, 137); border-color: rgb(20, 55, 95); color: rgb(255, 255, 255);">
         <b style="font-size:15px;">🚀 PUBLISH THIS BUILD</b><br>
-        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUT REV-1157 ON THE WEBSITE AND GITHUB — ONE PRESS, THEN IT CHECKS IT LANDED</small>
+        <small id="mPublishNowSub" style="font-size:11px; opacity:.92;">PUBLISHING TO THE WEBSITE…</small>
       </button>
       </div>
       <div style="display:none">
-        <span id="badgeMaster">76<span class="bsub">Control Types</span></span><span id="badgeCustomers">11<span class="bsub">Customers</span></span><span id="badgeInstructions">Rev-92<span class="bsub">Instructions</span></span>
+        <span id="badgeMaster">55<span class="bsub">Control Types</span></span><span id="badgeCustomers">11<span class="bsub">Customers</span></span><span id="badgeInstructions">Rev-92<span class="bsub">Instructions</span></span>
       </div>
     </div>
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1157 · Built 2026-09-07 07:47 PM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1160 · Built 2026-09-08 04:19 PM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -835,7 +835,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <button type="button" id="enhanceOdsBtn" style="background:#1a5276; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🔧 Make Clearer</button>
         <button type="button" id="addBalloonsBtn" style="background:#6e1414; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🎯 Add Balloons with AI</button>
         <button type="button" id="downloadBalloonedBtn" style="background:#2c6e49; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">👁️ View Ballooned Drawing</button>
-        <button type="button" id="odsRevsBtn" onclick="openDrawingRevs()" style="background:#5a4a2a; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🕐 Revisions (1)</button>
+        <button type="button" id="odsRevsBtn" onclick="openDrawingRevs()" style="background:#5a4a2a; color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; display:none;">🕐 Revisions (0)</button>
         <span id="balloonStatusMsg" style="font-size:12px; color:var(--ink-dim);"></span>
       </div>
     </div>
@@ -1349,7 +1349,7 @@ window.addEventListener('DOMContentLoaded', function(){
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 9/8/2026, 5:51:18 PM</p>
+    <p id="ghStatus" style="font-size: 12px; color: rgb(198, 40, 40); padding: 10px; background: var(--panel-2); border-radius: 6px;">Pull failed: Browser storage is full — 10238 KB in use; biggest: fvc_1000237498_v1 5411 KB, qs_drawings_v1 4464 KB, qs_trash_v1 164 KB. Nothing was lost; ADMIN → ACTION LOG has the detail.</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -1367,7 +1367,10 @@ window.addEventListener('DOMContentLoaded', function(){
       <button class="btn-ghost" id="cpSrvSaveBtn" style="min-height:48px;">⬆️ Save to the server now</button>
       <button class="btn-ghost" id="cpSrvLoadBtn" style="min-height:48px;">⬇️ Load from the server</button>
       <button class="btn-ghost" id="cpSrvForgetBtn" style="min-height:48px; color:#a5342a; border-color:#a5342a;">Forget this folder</button>
+      <button class="btn-ghost" id="cpSrvAppBtn" style="min-height:48px; grid-column:1 / span 2;">🖥 Place this build in the server folder as CONTROL PLAN GENERATOR.html</button>
     </div>
+    <p class="sub" style="margin-top:10px;">Rev-1160: every device holding the folder re-reads it every 45 seconds (GitHub or not) and writes back any plan the folder lacks. Opening a plan to edit records who has it in <b>EDITING.json</b>; anyone else opening the same plan is told and can go back — the app does not merge changes inside one plan, so the last save wins.</p>
+    <p class="sub" style="margin-top:10px;">Rev-1159: the folder holds the program too. <b>CONTROL PLAN GENERATOR.html</b> is the newest build — every shop computer double-clicks that one file. Any device holding the folder puts a newer build there on opening, after choosing the folder, and after PUBLISH THIS BUILD; the build it replaced goes to <b>app_history\</b>. A copy older than the folder's is told, and never writes over it.</p>
   </div>
 
   <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line);">
@@ -2033,7 +2036,7 @@ KEYBOARD SHORTCUTS
 </div>
 
 <!-- FLASH MESSAGE -->
-<div id="flash" class="flash hidden">✓ Data pushed to GitHub</div>
+<div id="flash" class="flash hidden">SAVE FAILED - this device is out of storage. Your last change was NOT saved. Push to GitHub, then reload.</div>
 
 <!-- BOOT -->
 <script>
@@ -2059,7 +2062,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1157";
+const APP_REV = "Rev-1160";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2893,6 +2896,35 @@ function cpUpdateCurtain(msg){
   }catch(e){ console.warn('update curtain failed:', e); }
 }
 const CHANGE_LOG = [
+{
+ "ts": "2026-09-08",
+ "rev": "App Rev-1160",
+ "type": "App",
+ "changes": [
+  "MANY COMPUTERS, ONE FOLDER (Rev-1160) \u2014 Rich asked \"can data be updated from multiple computers at the same time?\" and said \"add both\" to the two gaps. THE SERVER TICK: until now only a device with GitHub set up re-read anything on a timer (ghAutoPull needs ghConfigured); a shop computer holding just the folder read it at boot and never again. Every device holding the folder now reads it every 45 seconds, merges, recounts the menu and redraws the list or builder if open \u2014 and, the self-heal, if it holds a plan the folder lacks (a save that lost a race, a plan made while the share was down) it writes the union back then and there, named in the action log.",
+  "THE EDIT NOTICE (Rev-1160) \u2014 opening a plan to edit records {who, device, plan, since, hb} under the plan's key in EDITING.json in the server folder. Anyone else opening the same plan gets SOMEONE ELSE IS IN THIS PLAN \u2014 who, on which device, since when, last seen \u2014 with Go back / Open anyway, and the plain warning that the app does not merge changes inside one plan, so the last save wins. The claim beats every 45 s while the builder is open, is released the moment the builder screen hides (or the tab is left), and counts as gone after three minutes without a beat. It is a notice, not a lock; a device without the folder edits exactly as before. Both are described on the SERVER FOLDER card.",
+  "TESTS: check_srvtick.js (tick merges without GitHub; menu recounts; self-heal writes the missing plan; the notice names JOE on DESKTOP-OTHER; Go back / Open anyway; the beat; release on BACK; a 5-minute-stale claim asks nothing; no folder = no change) \u2014 bites Rev-1159, which has no tick."
+ ]
+},
+{
+ "ts": "2026-09-08",
+ "rev": "App Rev-1159",
+ "type": "App",
+ "changes": [
+  "THE SERVER FOLDER HOLDS THE PROGRAM TOO (Rev-1159) \u2014 per Rich, on the offer to have the app write its own newest build into the server folder: \"that would be great as long as multiple computers on the shop floor will be able to do the same thing.\" The folder that holds the data now holds the app: CONTROL PLAN GENERATOR.html is the newest build, one fixed name every shop computer double-clicks; the build it replaced is kept as app_history\\CP-RevNNNN.html. Any device holding the folder places it there \u2014 at boot, after choosing the folder, after PUBLISH THIS BUILD, and from a new button on the SERVER FOLDER card \u2014 but only when its build is NEWER than the one in the folder (the rev is read from the file's <title>, the way the website's is). A tab OLDER than the folder's build never writes over it; it gets an amber bar naming the newer rev with a link to the file when the tab was opened from the folder. The card's status line says which build the folder holds. Nothing here touches GitHub.",
+  "THE APP'S OWN HTML IS TAKEN CLEAN (Rev-1159) \u2014 cpOwnHtml() clones the page and strips the live bars (#cpSrvNoFolder, #cpSrvReconnect, #cpSrvNewer) and the flash before the copy is made; saveThisApp, ghPushApp and the Pages push now all use it. Before this, a copy taken while a bar stood would have baked a dead bar into every device that opened it, and the live one would never have been drawn.",
+  "TESTS: check_srvapp.js (placed at boot; the copy boots clean with one live bar; same rev left alone; a newer build never written over, bar and link; an older build replaced and kept in app_history/; card line and button; cpOwnHtml strips) \u2014 bites Rev-1158, which places nothing in the folder."
+ ]
+},
+{
+ "ts": "2026-09-07",
+ "rev": "App Rev-1158",
+ "type": "App",
+ "changes": [
+  "A COPY WITHOUT THE SERVER FOLDER IS TOLD SO, AND NO SAVE CAN WRITE OVER A PLAN THE SERVER HOLDS (Rev-1158) \u2014 per Rich: \"i loaded cp rev 1157 onto the server; loaded the app; now im missing my data.\" He opened CP-Rev1157.html straight off the share (a file:// address). To the browser that is a different place from the website, with its own empty store: 2 old plans showed, no server folder was held, and nothing on screen said where the 13 were. Nothing was lost. Three changes: (1) at boot, a copy that holds no server folder gets a blue bar naming the folder (\\\\server\\Staff\\Richard Arnold\\CLAUDE DATA\\CONTROL PLAN) with CHOOSE THE SERVER FOLDER on it, dismissable for a day. (2) CHOOSE THE SERVER FOLDER now LOADS the folder first and then saves the union \u2014 before this, the first save wrote the device's plans over the server file, and from that copy it would have written 2 over 11 (the Rev-423 guard only bites at zero; the new check proves the old build did exactly that). (3) Every server write compares the file with what this device holds: a plan on the server that this device lacks and never deleted is merged in before the write, named in the action log and on screen; a deletion made on this device still goes through. The menu tile recounts after every server load.",
+  "TESTS: check_srvpick.js (bar at boot; choosing loads 11 then saves 13; a plan added on the server by another device survives a save here; a tombstoned plan stays deleted; Not now) \u2014 9 bites on Rev-1157. Retired stub_count (it tested the station-count UI removed in Rev-1146; stub_qi covers the module); stub_view's end anchor moved to the QUALITY INSPECTOR module."
+ ]
+},
  {
   "ts": "2026-09-07",
   "rev": "App Rev-1157",
@@ -3213,8 +3245,8 @@ let GH_CHANGELOG_LOCAL_ONLY = null;
   };
   Storage.prototype.__cpWriteGuard = true;
 })();
-const BUILD_DATE = "2026-09-07";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "07:47 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_DATE = "2026-09-08";   // set on every build (with BUILD_TIME below)
+const BUILD_TIME = "04:19 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3443,10 +3475,24 @@ function setHeaderBackVisible(visible){
   }
 }
 
+
+/* ===== Rev-1159: THE APP'S OWN HTML, CLEAN ==========================================
+   Three places used to take document.documentElement.outerHTML raw. Since Rev-1155 the
+   page grows live bars (#cpSrvNoFolder, #cpSrvReconnect, #cpSrvNewer); a copy taken
+   with one of them present bakes a dead bar into every device that opens the copy --
+   and cpSrvNoFolderBar() sees the dead one and never draws a live one. So: clone, strip. */
+function cpOwnHtml(){
+  try{
+    const root = document.documentElement.cloneNode(true);
+    ['cpSrvNoFolder', 'cpSrvReconnect', 'cpSrvNewer'].forEach(id => { const e = root.querySelector('#' + id); if(e) e.remove(); });
+    const f = root.querySelector('#flash'); if(f){ f.classList.add('hidden'); f.classList.remove('error'); }
+    return '<!DOCTYPE html>\n' + root.outerHTML;
+  }catch(e){ return '<!DOCTYPE html>\n' + document.documentElement.outerHTML; }
+}
 function saveThisApp(){
   try {
     // Grab the entire current document HTML
-    const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    const html = cpOwnHtml();   /* Rev-1159 */
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -6454,7 +6500,10 @@ function cpMvEditRow(partNum, bubble){
     try{ const el = document.getElementById('mvPanel'); if(el) el.remove(); }catch(e){}
     try{ window._cpStep6Walk = null; }catch(e){}
     try{ window._cpMvWantCurtain = false; window._cpMvCurtainText = ''; }catch(e){}
-    editProject(i);
+    /* Rev-1160: this path must stay synchronous (the row focus below needs the builder open
+       now), so the edit notice is given AFTER opening, as a warning rather than a question. */
+    _editProjectNow(i);
+    try{ cpSrvEditEnter(projects[i]); }catch(e){}
     /* and open on the row that balloon belongs to */
     const b = String(bubble == null ? '' : bubble).trim();
     if(b){
@@ -7100,6 +7149,7 @@ async function cpPublishThisBuild(){
       ghSetStatus('\u2713 ' + APP_REV + ' published to the website and GitHub. The website address'
         + ' can take a minute to serve the new file \u2014 the commit is already made.');
       try{ logAct('sync', 'published ' + APP_REV + ' to both repositories, verified'); }catch(e){}
+      try{ cpSrvWriteApp('after PUBLISH THIS BUILD'); }catch(e){}   /* Rev-1159: and into the server folder */
       /* Rev-1114: GitHub accepted both writes. Write that down, so opening this
          same build again does not ask a cache whether it happened. Wrapped: not
          being able to remember a publish must never turn a good publish into a
@@ -8203,7 +8253,29 @@ function saveProject(partNum, rev, base64Data, customerName, qualityLevel){
 }
 
 // Reopen a saved project's builder state back into the CP Builder for editing
-function editProject(idx){
+/* Rev-1160: before a plan opens for editing, ask the server folder who else is in it. */
+async function editProject(idx){
+  let p = null;
+  try{
+    const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]'); p = projects[idx];
+    if(p && p.builderState){
+      const other = await cpSrvEditHeld(cpMergeKey(p));
+      if(other){
+        const since = (() => { try{ return new Date(other.since).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }catch(e){ return ''; } })();
+        const okGo = await cpConfirmBox('SOMEONE ELSE IS IN THIS PLAN',
+          '<b>' + cpLiEsc(other.who || '?') + '</b> is editing <b>' + cpLiEsc(cpPlanLabel(p)) + '</b> on <b>' + cpLiEsc(other.device || '?') + '</b>'
+          + (since ? (' since ' + cpLiEsc(since)) : '') + ' (last seen ' + cpLiEsc(cpEditAgo(other.hb)) + ').<br><br>'
+          + 'The app does not merge changes inside one plan: if you both save, the <b>last save wins</b> and the other person\'s changes to this plan are lost. Wait for them to finish, or open it anyway.',
+          'Open anyway', { tone: 'move', cancelLabel: 'Go back' });
+        if(!okGo){ try{ logAct('edit-lock', 'went back: ' + cpPlanLabel(p) + ' is with ' + (other.who || '?') + ' on ' + (other.device || '?')); }catch(_){ } return; }
+        try{ logAct('edit-lock', 'opened anyway: ' + cpPlanLabel(p) + ' is also with ' + (other.who || '?') + ' on ' + (other.device || '?')); }catch(_){ }
+      }
+    }
+  }catch(e){}
+  _editProjectNow(idx);
+  try{ if(p && p.builderState && cpBuilderOpen()) cpSrvEditClaim(cpMergeKey(p), cpPlanLabel(p)); }catch(e){}
+}
+function _editProjectNow(idx){
   const projects = JSON.parse(localStorage.getItem('cpProjects') || '[]');
   const p = projects[idx];
   if(!p){ flash('Project not found', true); return; }
@@ -25573,8 +25645,18 @@ async function cpSrvPick(){
     await _cpSrvStore(h);
     localStorage.setItem('cpSrvName', h.name || 'server folder');
     try{ logAct('server', 'server folder chosen: ' + (h.name || '?')); }catch(_){ }
-    flash('✓ Server folder: ' + (h.name || '') + ' — saving now');
+    /* Rev-1158: direction matters (Rev-423). A copy that has just been pointed at the folder
+       takes what the folder holds FIRST, then saves the union. Before this, the first save
+       wrote this device's plans over the server file -- 2 over 11, in Rich's case. */
+    const before = (JSON.parse(localStorage.getItem('cpProjects') || '[]') || []).length;
+    let loaded = false;
+    try{ loaded = await cpSrvLoad(true); }catch(e){ try{ logAct('server', 'load after choosing failed: ' + (e && e.message || e)); }catch(_){ } }
+    const after = (JSON.parse(localStorage.getItem('cpProjects') || '[]') || []).length;
+    try{ const bar = document.getElementById('cpSrvNoFolder'); if(bar) bar.remove(); }catch(_){ }
+    flash('✓ Server folder: ' + (h.name || '') + (loaded ? (' — loaded, ' + after + ' plan(s) on this device now' + (after > before ? (' (' + (after - before) + ' came from the server)') : '')) : ' — nothing to load yet') + ' — saving');
     await cpSrvWriteBundle(buildDataBundle(), 'first save after choosing the folder');
+    try{ updateHomeScreen(); updateMenuBadges(); }catch(_){ }
+    try{ await cpSrvWriteApp('after choosing the folder'); }catch(_){ }   /* Rev-1159 */
     cpSrvRenderStatus();
   }catch(e){
     if(e && e.name === 'AbortError') return;   /* cancelled */
@@ -25618,8 +25700,26 @@ async function cpSrvWriteBundle(bundle, why){
           try{ logAct('server', msg); }catch(_){ }
           flash(msg, true); return false;
         }
+        /* Rev-1158: the server file may hold plans this device has never seen (another device
+           saved them, or this copy is new). Writing over them would lose them. Any such plan
+           that this device did not itself delete is merged in first, and the union is saved. */
+        if(prevCount > 0 && Array.isArray(bundle.projects)){
+          const keyOf = p => p.id || ((p.partNum||'?') + '::' + (p.rev||'?') + '::' + (p.created||''));
+          const have = new Set(bundle.projects.map(keyOf));
+          const tomb = new Set((JSON.parse(localStorage.getItem('deletedProjectKeys') || '[]') || []).filter(t => t && t.key && cpTombLives(t)).map(t => t.key));
+          const missing = prev.projects.filter(p => !have.has(keyOf(p)) && !tomb.has(keyOf(p)));
+          if(missing.length){
+            const summary = mergeRestore(prev);
+            bundle = buildDataBundle();
+            try{ updateHomeScreen(); updateMenuBadges(); }catch(_){ }
+            const msg = 'the server folder held ' + missing.length + ' plan(s) this device did not have (' + missing.slice(0, 4).map(p => (p.partNum || '?') + (p.opNum ? (' OP-' + p.opNum) : '')).join(', ') + (missing.length > 4 ? ', …' : '') + ') — merged in before saving; nothing was written over';
+            try{ logAct('server', msg + ' · ' + (summary || []).join(', ')); }catch(_){ }
+            flash('🗄 ' + msg.charAt(0).toUpperCase() + msg.slice(1));
+          }
+        }
       }catch(e){ /* unreadable previous file: write over it, it is kept in history anyway */ }
     }
+    const localCountNow = (bundle && Array.isArray(bundle.projects)) ? bundle.projects.length : 0;
     const text = JSON.stringify(bundle, null, 2);
     await _cpSrvWriteText(h, CP_SRV_FILE, text);
     const day = new Date().toLocaleDateString('en-CA');
@@ -25629,9 +25729,9 @@ async function cpSrvWriteBundle(bundle, why){
     }catch(e){ try{ logAct('server', 'history copy failed: ' + (e && e.message || e)); }catch(_){ } }
     const who = (typeof cpWhoAmI === 'function') ? cpWhoAmI() : '';
     const stamp = new Date().toISOString();
-    try{ await _cpSrvWriteText(h, 'LAST_WRITE.txt', 'CONTROL PLAN GENERATOR ' + APP_REV + '\n' + stamp + '\n' + who + '\n' + localCount + ' plan(s)\n' + (why || '') + '\n'); }catch(e){}
+    try{ await _cpSrvWriteText(h, 'LAST_WRITE.txt', 'CONTROL PLAN GENERATOR ' + APP_REV + '\n' + stamp + '\n' + who + '\n' + localCountNow + ' plan(s)\n' + (why || '') + '\n'); }catch(e){}
     localStorage.setItem('cpSrvLastWrite', stamp);
-    try{ logAct('server', 'saved ' + localCount + ' plan(s) to the server folder' + (why ? (' — ' + why) : '')); }catch(_){ }
+    try{ logAct('server', 'saved ' + localCountNow + ' plan(s) to the server folder' + (why ? (' — ' + why) : '')); }catch(_){ }
     cpSrvRenderStatus();
     return true;
   }catch(e){
@@ -25657,7 +25757,7 @@ async function cpSrvLoad(silent){
   const b = await cpSrvReadBundle();
   if(!b){ if(!silent) flash('Nothing readable in the server folder yet — save to it first.', true); return false; }
   const summary = mergeRestore(b);
-  try{ updateHomeScreen(); }catch(_){ }
+  try{ updateHomeScreen(); updateMenuBadges(); }catch(_){ }   /* Rev-1158: the menu tile counts what just arrived */
   try{ logAct('server', 'loaded from the server folder: ' + (summary || []).join(', ')); }catch(_){ }
   if(!silent) flash('✓ Loaded from the server folder: ' + (summary || []).join(', '));
   cpSrvRenderStatus();
@@ -25696,14 +25796,239 @@ async function cpSrvRenderStatus(){
     + (p === 'granted' ? '<span style="color:#1d6b3f; font-weight:800;">connected</span>' : ('<span style="color:#a35400; font-weight:800;">needs a click to reconnect (' + p + ')</span>'))
     + (lw ? (' · last save ' + fmt(lw)) : ' · nothing saved yet') + (lr ? (' · last load ' + fmt(lr)) : '');
   if(p !== 'granted') cpSrvNeedClick();
+  /* Rev-1159: which build the folder holds */
+  try{
+    if(p === 'granted'){
+      const ar = await cpSrvAppRev();
+      const mine = cpRevNum(APP_REV), his = ar && ar.rev ? cpRevNum(ar.rev) : 0;
+      el.innerHTML += '<br>App in the folder: ' + (ar && ar.present ? ('<b>' + cpLiEsc(ar.rev || 'unknown rev') + '</b>' + (his > mine ? ' <span style="color:#a35400; font-weight:800;">— newer than this tab</span>' : his === mine ? ' — this build' : ' <span style="color:#a35400; font-weight:800;">— older than this tab; it will be replaced</span>')) : ('none yet — <b>' + cpLiEsc(CP_SRV_APP) + '</b> is written when this build is placed there'));
+    }
+  }catch(e){}
 }
 /* at boot: if the folder is held and readable, it is the home -- load it */
+
+/* ===== Rev-1159: THE APP LIVES IN THE SERVER FOLDER TOO ==============================
+   Rich: "that would be great as long as multiple computers on the shop floor will be
+   able to do the same thing." So the folder that holds the data holds the program:
+     CONTROL PLAN GENERATOR.html   -- the newest build, one fixed name for every shop
+                                      computer to double-click
+     app_history\CP-RevNNNN.html   -- the build it replaced
+   Any device holding the folder writes it: at boot, after choosing the folder, after
+   PUBLISH THIS BUILD, and from a button on the card -- but only when this build is NEWER
+   than the one in the folder. A folder holding a NEWER build than this tab gets a bar
+   saying so, with the file to open. The rev is read from the <title> in the file's first
+   bytes, the way cpRemoteRev reads the website's. Nothing here touches GitHub. */
+const CP_SRV_APP = 'CONTROL PLAN GENERATOR.html';
+async function _cpSrvReadHead(dir, name, n){
+  try{ const fh = await dir.getFileHandle(name); const f = await fh.getFile(); return await f.slice(0, n || 4096).text(); }
+  catch(e){ return null; }
+}
+async function cpSrvAppRev(){
+  const h = await cpSrvHandle(); if(!h) return null;
+  if((await cpSrvPerm(false)) !== 'granted') return null;
+  const head = await _cpSrvReadHead(h, CP_SRV_APP, 4096);
+  if(head === null) return { rev: null, present: false };
+  const m = /<title>CONTROL PLAN GENERATOR - (Rev-\d+)<\/title>/.exec(head);
+  return { rev: m ? m[1] : null, present: true };
+}
+var _cpSrvAppBusy = false;
+async function cpSrvWriteApp(why, force){
+  if(_cpSrvAppBusy) return { did: false, reason: 'busy' };
+  _cpSrvAppBusy = true;
+  try{
+    const h = await cpSrvHandle(); if(!h) return { did: false, reason: 'no folder' };
+    if((await cpSrvPerm(false)) !== 'granted'){ cpSrvNeedClick(); return { did: false, reason: 'needs a click' }; }
+    const there = await cpSrvAppRev();
+    const mine = cpRevNum(APP_REV), his = there && there.rev ? cpRevNum(there.rev) : 0;
+    if(there && there.present && his > mine){
+      cpSrvNewerBar(there.rev);
+      try{ logAct('server', 'the server folder holds ' + there.rev + ', newer than this tab (' + APP_REV + ') — not written over'); }catch(_){ }
+      return { did: false, reason: 'newer in folder', rev: there.rev };
+    }
+    if(there && there.present && his === mine && !force) return { did: false, reason: 'same', rev: there.rev };
+    /* keep the one being replaced */
+    if(there && there.present && there.rev){
+      try{
+        const old = await _cpSrvReadText(h, CP_SRV_APP);
+        if(old){ const ah = await h.getDirectoryHandle('app_history', { create: true }); await _cpSrvWriteText(ah, 'CP-' + String(there.rev).replace('-', '') + '.html', old); }   /* CP-Rev1158.html, Rich's naming */
+      }catch(e){ try{ logAct('server', 'app_history copy failed: ' + (e && e.message || e)); }catch(_){ } }
+    }
+    await _cpSrvWriteText(h, CP_SRV_APP, cpOwnHtml());
+    localStorage.setItem('cpSrvAppWrite', new Date().toISOString());
+    try{ logAct('server', 'placed ' + APP_REV + ' in the server folder as ' + CP_SRV_APP + (there && there.rev ? (' (was ' + there.rev + ')') : '') + (why ? (' — ' + why) : '')); }catch(_){ }
+    flash('✓ ' + APP_REV + ' placed in the server folder — every computer that opens ' + CP_SRV_APP + ' there gets it');
+    cpSrvRenderStatus();
+    return { did: true, was: there && there.rev };
+  }catch(e){
+    try{ logAct('server', 'APP WRITE TO THE SERVER FAILED: ' + (e && e.message || e)); }catch(_){ }
+    flash('⚠ Could not place the app in the server folder — ' + (e && e.message || e), true);
+    return { did: false, reason: String(e && e.message || e) };
+  }finally{ _cpSrvAppBusy = false; }
+}
+/* the folder holds a newer build than this tab */
+function cpSrvNewerBar(rev){
+  try{
+    if(document.getElementById('cpSrvNewer')) return;
+    const bar = document.createElement('div');
+    bar.id = 'cpSrvNewer';
+    bar.style.cssText = 'background:#7a4a00; color:#fff; padding:8px 14px; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;';
+    const fromFolder = location.protocol === 'file:';
+    const href = fromFolder ? location.href.replace(/[^\/]*$/, encodeURIComponent(CP_SRV_APP)) : '';
+    bar.innerHTML = '<span>⬆ The server folder holds <b>' + cpLiEsc(rev) + '</b> — newer than this copy (' + cpLiEsc(APP_REV) + '). Open <b>' + cpLiEsc(CP_SRV_APP) + '</b> from the folder instead.</span>';
+    if(href){ const a = document.createElement('a'); a.href = href; a.textContent = 'Open ' + rev; a.style.cssText = 'background:#fff; color:#7a4a00; border-radius:5px; padding:5px 14px; font-size:13px; font-weight:800; text-decoration:none;'; bar.appendChild(a); }
+    const x = document.createElement('button');
+    x.textContent = '✕'; x.style.cssText = 'background:transparent; color:#fff; border:1px solid rgba(255,255,255,.5); border-radius:5px; padding:4px 9px; font-size:12px; cursor:pointer;';
+    x.onclick = () => bar.remove();
+    bar.appendChild(x);
+    document.body.insertBefore(bar, document.body.firstChild);
+  }catch(e){}
+}
+
+/* ===== Rev-1160: MANY COMPUTERS, ONE FOLDER ==========================================
+   Rich asked whether data can be updated from several computers at once, and said "add
+   both" to the two gaps that were left:
+   THE SERVER TICK. Until now only a device with GitHub set up re-read anything on a timer
+   (ghAutoPull needs ghConfigured). A shop computer holding just the folder read it at boot
+   and never again. Now every device holding the folder reads it every 45 seconds, merges,
+   and -- the self-heal -- if it holds a plan the folder lacks (a save that lost a race, or
+   a plan made offline) it writes the union back then and there.
+   THE EDIT NOTICE. Opening a plan to edit writes {who, device, plan, since, hb} under the
+   plan's key in EDITING.json. Anyone else opening the same plan is told who has it and
+   since when, and can go back or open anyway. The claim beats every 45 s while the builder
+   is open, is released the moment the builder screen hides, and counts as gone after three
+   minutes without a beat (a closed lid, a crashed browser). It is a notice, not a lock. */
+const CP_SRV_EDIT = 'EDITING.json';
+const CP_EDIT_STALE_MS = 3 * 60 * 1000;
+var _cpEditHeld = null;          /* {key, label} while this device is in a plan */
+var _cpSrvTickBusy = false;
+function cpMergeKey(p){ return p.id || ((p.partNum||'?') + '::' + (p.rev||'?') + '::' + (p.created||'')); }
+function cpPlanLabel(p){ return (p.partNum || '?') + (p.opNum ? (' OP-' + p.opNum) : '') + (p.rev ? (' Rev ' + p.rev) : ''); }
+function cpBuilderOpen(){ const el = document.getElementById('cpBuilderScreen'); return !!(el && !el.classList.contains('hidden')); }
+function _cpEditFresh(e, now){ if(!e || !e.hb) return false; const t = Date.parse(e.hb); return isFinite(t) && (now - t) < CP_EDIT_STALE_MS; }
+async function _cpSrvReadEditing(h){
+  const t = await _cpSrvReadText(h, CP_SRV_EDIT);
+  try{ const o = t ? JSON.parse(t) : {}; return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {}; }catch(e){ return {}; }
+}
+async function _cpSrvFolderReady(){
+  const h = await cpSrvHandle(); if(!h) return null;
+  if((await cpSrvPerm(false)) !== 'granted') return null;
+  return h;
+}
+/* who else holds this plan right now, or null */
+async function cpSrvEditHeld(key){
+  try{
+    const h = await _cpSrvFolderReady(); if(!h) return null;
+    const m = await _cpSrvReadEditing(h); window._cpSrvEditing = m;
+    const e = m[key]; if(!e || e.device === cpDeviceId()) return null;
+    return _cpEditFresh(e, Date.now()) ? e : null;
+  }catch(e){ return null; }
+}
+async function cpSrvEditClaim(key, label){
+  _cpEditHeld = { key: key, label: label || (_cpEditHeld && _cpEditHeld.label) || key };
+  try{
+    const h = await _cpSrvFolderReady(); if(!h) return false;
+    const m = await _cpSrvReadEditing(h);
+    const now = Date.now(), iso = new Date(now).toISOString();
+    Object.keys(m).forEach(k => { if(!_cpEditFresh(m[k], now)) delete m[k]; });   /* sweep the stale */
+    const prev = m[key];
+    m[key] = { who: cpWhoAmI(), device: cpDeviceId(), plan: _cpEditHeld.label, since: (prev && prev.device === cpDeviceId() && prev.since) ? prev.since : iso, hb: iso };
+    await _cpSrvWriteText(h, CP_SRV_EDIT, JSON.stringify(m, null, 1));
+    window._cpSrvEditing = m;
+    return true;
+  }catch(e){ try{ logAct('server', 'edit notice not written: ' + (e && e.message || e)); }catch(_){ } return false; }
+}
+async function cpSrvEditRelease(){
+  const held = _cpEditHeld; _cpEditHeld = null;
+  if(!held) return;
+  try{
+    const h = await _cpSrvFolderReady(); if(!h) return;
+    const m = await _cpSrvReadEditing(h);
+    if(m[held.key] && m[held.key].device === cpDeviceId()){ delete m[held.key]; await _cpSrvWriteText(h, CP_SRV_EDIT, JSON.stringify(m, null, 1)); }
+    window._cpSrvEditing = m;
+  }catch(e){}
+}
+/* opened without the question (a synchronous path): claim, and warn if someone else is in it */
+async function cpSrvEditEnter(p){
+  if(!p || !p.builderState) return;
+  const key = cpMergeKey(p);
+  try{
+    const other = await cpSrvEditHeld(key);
+    if(other) flash('⚠ ' + (other.who || '?') + ' is also editing ' + cpPlanLabel(p) + ' on ' + (other.device || '?') + ' — the last save wins', true);
+  }catch(e){}
+  try{ if(cpBuilderOpen()) cpSrvEditClaim(key, cpPlanLabel(p)); }catch(e){}
+}
+function cpEditAgo(iso){
+  const t = Date.parse(iso || ''); if(!isFinite(t)) return '';
+  const m = Math.round((Date.now() - t) / 60000);
+  return m < 1 ? 'just now' : (m === 1 ? '1 minute ago' : m + ' minutes ago');
+}
+/* the 45-second tick: read, merge, self-heal, beat */
+async function cpSrvTick(){
+  if(_cpSrvTickBusy) return;
+  try{
+    const h = await _cpSrvFolderReady(); if(!h) return;
+    if(typeof masterEditingIdx !== 'undefined' && masterEditingIdx >= 0) return;
+    const mem = $('masterEditModal'); if(mem && mem.style.display && mem.style.display !== 'none') return;
+    if(document.getElementById('levelMgrOverlay')) return;
+    if((typeof _autoPullBusy !== 'undefined' && _autoPullBusy) || _cpSrvBusy) return;
+    _cpSrvTickBusy = true;
+    const ghDoesIt = (localStorage.getItem('ghAutoSync') === '1' && ghConfigured());
+    const b = await cpSrvReadBundle();
+    if(b){
+      if(!ghDoesIt){
+        const summary = mergeRestore(b);
+        try{ updateHomeScreen(); updateMenuBadges(); }catch(_){ }
+        try{ const ps = document.getElementById('projectsScreen'); if(ps && !ps.classList.contains('hidden') && typeof renderProjects === 'function') renderProjects(); }catch(_){ }
+        try{ if(cpBuilderOpen() && typeof renderCPBuilder === 'function' && typeof cpBuildState !== 'undefined' && cpBuildState) renderCPBuilder(); }catch(_){ }
+        window._cpSrvTickLast = { at: Date.now(), summary: summary };
+      }
+      /* self-heal: a plan on this device that the folder has not got goes back now */
+      const have = new Set((b.projects || []).map(cpMergeKey));
+      const local = JSON.parse(localStorage.getItem('cpProjects') || '[]') || [];
+      const missing = local.filter(p => !have.has(cpMergeKey(p)));
+      if(missing.length){
+        const okW = await cpSrvWriteBundle(buildDataBundle(), 'self-heal: ' + missing.length + ' plan(s) were on this device but not on the server (' + missing.slice(0, 3).map(cpPlanLabel).join(', ') + (missing.length > 3 ? ', …' : '') + ')');
+        try{ logAct('server', (okW ? 'self-heal wrote ' : 'self-heal could not write ') + missing.length + ' plan(s) the server lacked: ' + missing.slice(0, 4).map(cpPlanLabel).join(', ')); }catch(_){ }
+      }
+    }
+    /* the edit notice: beat while the builder is open, release when it is not */
+    if(_cpEditHeld){ if(cpBuilderOpen()) await cpSrvEditClaim(_cpEditHeld.key, _cpEditHeld.label); else await cpSrvEditRelease(); }
+    else window._cpSrvEditing = await _cpSrvReadEditing(h);
+  }catch(e){ try{ logAct('server', 'server tick failed: ' + (e && e.message || e)); }catch(_){ } }
+  finally{ _cpSrvTickBusy = false; }
+}
+/* Rev-1158: a copy that holds no server folder is told so at boot -- once a day, dismissable.
+   Rich opened the build straight off the share and saw 2 plans where he expected 13: a new
+   browser store, no folder, and nothing on screen to say "your plans are in the folder". */
+function cpSrvNoFolderBar(){
+  try{
+    if(document.getElementById('cpSrvNoFolder')) return;
+    const last = parseInt(localStorage.getItem('cpSrvBarDismissed') || '0', 10);
+    if(last && (Date.now() - last) < 24 * 3600 * 1000) return;
+    const bar = document.createElement('div');
+    bar.id = 'cpSrvNoFolder';
+    bar.style.cssText = 'background:#1a5276; color:#fff; padding:8px 14px; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;';
+    bar.innerHTML = '<span>🗄 This copy is not connected to the server folder yet — the shop\'s Control Plans live in <b>\\\\server\\Staff\\Richard Arnold\\CLAUDE DATA\\CONTROL PLAN</b>. Choose that folder and they load in; every save then lands there too. (Shop computers: open <b>CONTROL PLAN GENERATOR.html</b> in that folder.)</span>';
+    const b = document.createElement('button');
+    b.textContent = 'Choose the server folder';
+    b.style.cssText = 'background:#fff; color:#1a5276; border:none; border-radius:5px; padding:5px 14px; font-size:13px; font-weight:800; cursor:pointer;';
+    b.onclick = async () => { await cpSrvPick(); if(await cpSrvHandle()) bar.remove(); };
+    const x = document.createElement('button');
+    x.textContent = 'Not now'; x.style.cssText = 'background:transparent; color:#fff; border:1px solid rgba(255,255,255,.5); border-radius:5px; padding:4px 9px; font-size:12px; cursor:pointer;';
+    x.onclick = () => { bar.remove(); try{ localStorage.setItem('cpSrvBarDismissed', String(Date.now())); }catch(_){ } };
+    bar.appendChild(b); bar.appendChild(x);
+    document.body.insertBefore(bar, document.body.firstChild);
+    try{ logAct('server', 'no server folder on this device — the bar offered to choose one'); }catch(_){ }
+  }catch(e){}
+}
 async function cpSrvBoot(){
   try{
-    const h = await cpSrvHandle(); if(!h) return;
+    const h = await cpSrvHandle();
+    if(!h){ if(cpSrvSupported()) cpSrvNoFolderBar(); return; }
     const p = await cpSrvPerm(false);
     if(p !== 'granted'){ cpSrvNeedClick(); return; }
     await cpSrvLoad(true);
+    try{ await cpSrvWriteApp('boot'); }catch(_){ }   /* Rev-1159: the newest build goes into the folder */
   }catch(e){ try{ logAct('server', 'boot load failed: ' + (e && e.message || e)); }catch(_){ } }
 }
 async function ghPutFile(bundle, sha){
@@ -25933,7 +26258,7 @@ async function ghPushApp(silent){
     if(!silent) ghSetStatus('Pushing app code...');
     const c = ghConfig();
     const url = 'https://api.github.com/repos/' + c.user + '/' + c.repo + '/contents/' + GH_APP_FILE;
-    const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    const html = cpOwnHtml();   /* Rev-1159 */
     const encoded = btoa(unescape(encodeURIComponent(html)));
     // Rev-313: PUT with retry on 409 conflict. GitHub rejects a PUT whose sha doesn't match the
     // current file (happens when another tab/device pushed in between — the "does not match" 409).
@@ -26181,7 +26506,7 @@ async function ghPublishPages(silent){
     if(!silent) ghSetStatus('Publishing to website…');
     const c = ghConfig();
     const url = 'https://api.github.com/repos/' + c.user + '/' + ghPagesRepo() + '/contents/' + GH_PAGES_FILE;
-    const html2 = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    const html2 = cpOwnHtml();   /* Rev-1159 */
     const encoded = btoa(unescape(encodeURIComponent(html2)));
     let resp = null, lastTxt = '';
     for(let attempt = 0; attempt < 3; attempt++){
@@ -29877,7 +30202,12 @@ if($('cpSrvPickBtn')) $('cpSrvPickBtn').onclick = cpSrvPick;
 if($('cpSrvSaveBtn')) $('cpSrvSaveBtn').onclick = async () => { const okW = await cpSrvWriteBundle(buildDataBundle(), 'saved by hand'); if(okW) flash('✓ Saved to the server folder'); else if(!(await cpSrvHandle())) flash('Choose the server folder first.', true); };
 if($('cpSrvLoadBtn')) $('cpSrvLoadBtn').onclick = () => cpSrvLoad(false);
 if($('cpSrvForgetBtn')) $('cpSrvForgetBtn').onclick = cpSrvForget;
+if($('cpSrvAppBtn')) $('cpSrvAppBtn').onclick = async () => { const r = await cpSrvWriteApp('by hand', true); if(!r.did && r.reason === 'no folder') flash('Choose the server folder first.', true); else if(!r.did && r.reason === 'newer in folder') flash('The folder already holds ' + r.rev + ', newer than this tab — not written over.', true); };   /* Rev-1159 */
 try{ setTimeout(cpSrvBoot, 800); }catch(e){}
+/* Rev-1160: the server tick, and the edit notice's release */
+try{ setInterval(cpSrvTick, 45000); }catch(e){}
+try{ const _bs = document.getElementById('cpBuilderScreen'); if(_bs) new MutationObserver(() => { if(_cpEditHeld && !cpBuilderOpen()) cpSrvEditRelease(); }).observe(_bs, { attributes: true, attributeFilter: ['class'] }); }catch(e){}
+try{ window.addEventListener('pagehide', () => { if(_cpEditHeld) cpSrvEditRelease(); }); }catch(e){}
 $('adminRestoreFile').onchange = function(e){
   const file = e.target.files[0];
   if(!file) return;
@@ -30800,7 +31130,7 @@ report can be read instead of guessed at.
 }
 
 }catch(__bootErr){ try{ const d=document.createElement('div'); d.style.cssText='position:fixed;top:68px;left:0;right:0;z-index:9999;background:#7a1a1c;color:#fff;padding:10px 14px;font:700 13px system-ui;'; d.textContent='⚠️ BOOT-TAIL ERROR — screenshot for Claude: '+(__bootErr.message||__bootErr)+' | '+String(__bootErr.stack||'').split('\n')[1]; document.body.appendChild(d); }catch(e){} }
-</script>
+</script><div id="cpGate" style="position: fixed; inset: 0px; z-index: 2147482000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; background: rgb(233, 230, 225);"><div style="font:900 15px system-ui; letter-spacing:.14em; color:#7a1a1c;">CONTROL PLAN GENERATOR</div><div id="cpGateHead" style="font:800 30px system-ui; color:#1d1a17; line-height:1.2; max-width:760px;">PUBLISHING THIS BUILD</div><div id="cpGateBody" style="font:600 15px/1.6 system-ui; color:#5a5148; max-width:640px;">You are running <b>Rev-1160</b> from your Downloads folder, but the website is on Rev-1157 and GitHub is on Rev-1158.<br>Publishing it now, so the whole shop moves to Rev-1160.</div><button id="cpGateGo" style="display: none; margin-top: 10px; padding: 30px 60px; font: 900 30px system-ui; cursor: default; border: 0px; border-radius: 16px; background: rgb(29, 78, 137); color: rgb(255, 255, 255); letter-spacing: 0.02em; box-shadow: rgba(0, 0, 0, 0.22) 0px 6px 18px; opacity: 0.6;" disabled="">🚀 PUBLISH THIS BUILD</button><div id="cpGateWork" style="display: block; border-color: rgb(29, 78, 137); background: rgba(29, 78, 137, 0.06);"><div class="cpGwTop"><span class="cpGwIcon" style="animation: 1.1s ease-in-out 0s infinite normal none running cpGatePulse;">🚀</span><div style="flex:1; min-width:240px;"><div class="cpGwTitle" id="cpGateWorkTitle" style="color: rgb(18, 50, 79);">PUBLISHING…</div><div id="cpGateStatus" style="font:700 17px system-ui; color:#4a4139; margin-top:6px;">PUBLISHING TO THE WEBSITE…</div></div><div style="text-align:right;"><div class="cpGwClock" id="cpGateClock">0:01</div><div style="font:700 11px system-ui; color:#6b6257;">ELAPSED</div></div></div><div class="cpGwBar" style="background: rgba(29, 78, 137, 0.18);"><i></i></div></div><button id="cpGateSkip" style="margin-top:10px; padding:8px 14px; font:600 12px system-ui; cursor:pointer; border:0; background:none; color:#8a8279; text-decoration:underline;">carry on without publishing</button><style>@keyframes cpGateSweep{0%{left:-40%}100%{left:100%}}@keyframes cpGatePulse{0%,100%{opacity:1}50%{opacity:.55}}@keyframes cpGateFill{from{width:0}to{width:100%}}@keyframes cpGatePop{0%{transform:scale(.4); opacity:0}60%{transform:scale(1.25); opacity:1}100%{transform:scale(1); opacity:1}}#cpGateWork{display:none; width:min(760px,92vw); margin-top:6px; border:3px solid #1d4e89; border-radius:16px; padding:26px 24px; background:rgba(29,78,137,.06); text-align:left;}#cpGateWork .cpGwTop{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}#cpGateWork .cpGwIcon{font-size:44px; line-height:1; animation:cpGatePulse 1.1s ease-in-out infinite;}#cpGateWork .cpGwTitle{font:900 30px system-ui; letter-spacing:.01em; line-height:1.15; color:#12324f;}#cpGateWork .cpGwClock{font:900 30px system-ui; font-variant-numeric:tabular-nums; color:#1d4e89;}#cpGateWork .cpGwBar{position:relative; height:22px; border-radius:11px; overflow:hidden; background:rgba(29,78,137,.18); margin-top:18px;}#cpGateWork .cpGwBar>i{position:absolute; top:0; bottom:0; width:40%; border-radius:11px; background:linear-gradient(90deg,rgba(29,78,137,0) 0%,#1d4e89 50%,rgba(29,78,137,0) 100%); animation:cpGateSweep 1.15s linear infinite;}</style></div>
 
 <!-- Master List File Viewer Modal -->
 <div id="masterViewerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:9999; overflow:auto; box-sizing:border-box;">
