@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0, user-scalable=yes">
 <!-- Rev-295: pinch-to-zoom enabled (was user-scalable=no). Custom drag/pinch on the drawing & balloon editor still work via their own touch-action handling. -->
 
-<title>CONTROL PLAN GENERATOR - Rev-1163</title>
+<title>CONTROL PLAN GENERATOR - Rev-1164</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -561,7 +561,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <header id="header" style="display: none;">
   <span class="doc" id="headerTitle">CONTROL PLAN GENERATOR</span>
   <span class="spacer"></span>
-  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1163 · 2026-09-09 03:14 PM</span>
+  <span id="headerRev" style="font-size:12px; font-weight:600; opacity:0.85; margin-right:8px; white-space:nowrap;">Rev-1164 · 2026-11-20 02:36 PM</span>
   <!-- Rev-660: handoff subsystem -->
   <!-- Rev-661: the home-screen button opens the wizard now; a second one here would be
        the same twin-button confusion again. -->
@@ -677,7 +677,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1163 · Built 2026-09-09 03:14 PM ET · downloaded copy, not the website</span>
+    <span id="revFooter">App Rev-1164 · Built Nov 20, 2026</span>
   </div>
 </div>
 
@@ -2063,7 +2063,7 @@ window.addEventListener('error', function(ev){
     document.body ? document.body.appendChild(d) : document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(d));
   }catch(e){}
 });
-const APP_REV = "Rev-1163";
+const APP_REV = "Rev-1164";
 // Rev-298/299: detect phone/tablet vs desktop, overridable by a Settings toggle
 // (cpDeviceMode: 'auto' | 'desktop' | 'phone').
 function cpAutoIsMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (('ontouchstart' in window) && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 820); }
@@ -2930,6 +2930,15 @@ function cpUpdateCurtain(msg){
 }
 const CHANGE_LOG = [
 {
+ "ts": "2026-11-20",
+ "rev": "App Rev-1164",
+ "type": "App",
+ "changes": [
+  "THE DEAD GATE BAKED INTO THE WEBSITE (Rev-1164) \u2014 per Rich: \"stuck\". Every device opening the website (and controlplan.camcomfginc.com, and the server-folder copy) since 2026-10-14 has been met by PUBLISHING THIS BUILD\u2026 0:01 with a 'carry on' link that does nothing. Cause: on Oct 14 Rich opened the downloaded Rev-1163, the publish gate came up, he pressed PUBLISH THIS BUILD \u2014 and cpOwnHtml (Rev-1159) copied the page as it stood, gate overlay and all, into index.html on both repositories. The gate's buttons are wired by script, so the copy's gate is a picture that cannot be pressed, and the live gate never runs on a website address to replace it. Three fixes: the baked overlay is cut out of this build; cpOwnHtml now strips the gate (and every element whose id starts cpGate, and the update banner) before any copy of the app is made; and at start, a gate found in the page before the live one has run is treated as a relic and removed, with a line in the action log. Rev-1164 is built from the file the website actually served (fetched from GitHub), not from the September workspace, which was lost.",
+  "NOTE: controlplan.camcomfginc.com is a new internal address IT set up; what it serves and how it is refreshed is still to be confirmed with IT."
+ ]
+},
+{
  "ts": "2026-09-09",
  "rev": "App Rev-1163",
  "type": "App",
@@ -3304,8 +3313,8 @@ let GH_CHANGELOG_LOCAL_ONLY = null;
   };
   Storage.prototype.__cpWriteGuard = true;
 })();
-const BUILD_DATE = "2026-09-09";   // set on every build (with BUILD_TIME below)
-const BUILD_TIME = "03:14 PM";   // Rev-505: 24-hour build time, shown beside the date
+const BUILD_DATE = "2026-11-20";   // set on every build (with BUILD_TIME below)
+const BUILD_TIME = "02:36 PM";   // Rev-505: 24-hour build time, shown beside the date
 // Rev-521: defined EARLY so the home-card button works even if later boot code fails
 window.cpPullCodeAndData = async function(){
   try{
@@ -3543,7 +3552,12 @@ function setHeaderBackVisible(visible){
 function cpOwnHtml(){
   try{
     const root = document.documentElement.cloneNode(true);
-    ['cpSrvNoFolder', 'cpSrvReconnect', 'cpSrvNewer'].forEach(id => { const e = root.querySelector('#' + id); if(e) e.remove(); });
+    ['cpSrvNoFolder', 'cpSrvReconnect', 'cpSrvNewer', 'cpGate', 'appUpdateBanner'].forEach(id => { const e = root.querySelector('#' + id); if(e) e.remove(); });
+    /* Rev-1164: the publish gate is on screen at the very moment PUBLISH THIS BUILD is pressed,
+       so the copy taken here carried the gate with it -- a dead "PUBLISHING… 0:01" overlay baked
+       into every device that opened the website from 2026-10-14 on. Strip it, and anything else
+       the app only ever builds by script. */
+    root.querySelectorAll('[id^="cpGate"]').forEach(e => e.remove());
     const f = root.querySelector('#flash'); if(f){ f.classList.add('hidden'); f.classList.remove('error'); }
     return '<!DOCTYPE html>\n' + root.outerHTML;
   }catch(e){ return '<!DOCTYPE html>\n' + document.documentElement.outerHTML; }
@@ -30686,6 +30700,10 @@ document.addEventListener('focusin', e => {
    before -- a device that cannot reach GitHub is still never left looking at
    nothing, because the gate itself gives up and lifts after seven seconds.
    ========================================================================== */
+/* Rev-1164: a copy published from the gate screen (Rev-1163, 2026-10-14) carried a dead gate
+   overlay in its own HTML. If one is in the page before the live gate has run, it is a relic:
+   remove it, say so in the log, and carry on. */
+try{ const relic = document.getElementById('cpGate'); if(relic){ relic.remove(); try{ logAct('gate', 'a baked-in publish gate from an older copy was removed at start'); }catch(_){ } } }catch(e){}
 try{ cpPublishGate(); }catch(e){ console.warn('publish gate failed to start', e); }
 showMenu();
 /* Rev-1109: the cover goes now, in the same task that put the real screen up, so
@@ -31351,7 +31369,7 @@ report can be read instead of guessed at.
 }
 
 }catch(__bootErr){ try{ const d=document.createElement('div'); d.style.cssText='position:fixed;top:68px;left:0;right:0;z-index:9999;background:#7a1a1c;color:#fff;padding:10px 14px;font:700 13px system-ui;'; d.textContent='⚠️ BOOT-TAIL ERROR — screenshot for Claude: '+(__bootErr.message||__bootErr)+' | '+String(__bootErr.stack||'').split('\n')[1]; document.body.appendChild(d); }catch(e){} }
-</script><div id="cpGate" style="position: fixed; inset: 0px; z-index: 2147482000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; background: rgb(233, 230, 225);"><div style="font:900 15px system-ui; letter-spacing:.14em; color:#7a1a1c;">CONTROL PLAN GENERATOR</div><div id="cpGateHead" style="font:800 30px system-ui; color:#1d1a17; line-height:1.2; max-width:760px;">PUBLISHING THIS BUILD</div><div id="cpGateBody" style="font:600 15px/1.6 system-ui; color:#5a5148; max-width:640px;">You are running <b>Rev-1163</b> from your Downloads folder, but the website is on Rev-1157 and GitHub is on Rev-1160.<br>Publishing it now, so the whole shop moves to Rev-1163.</div><button id="cpGateGo" style="display: none; margin-top: 10px; padding: 30px 60px; font: 900 30px system-ui; cursor: default; border: 0px; border-radius: 16px; background: rgb(29, 78, 137); color: rgb(255, 255, 255); letter-spacing: 0.02em; box-shadow: rgba(0, 0, 0, 0.22) 0px 6px 18px; opacity: 0.6;" disabled="">🚀 PUBLISH THIS BUILD</button><div id="cpGateWork" style="display: block; border-color: rgb(29, 78, 137); background: rgba(29, 78, 137, 0.06);"><div class="cpGwTop"><span class="cpGwIcon" style="animation: 1.1s ease-in-out 0s infinite normal none running cpGatePulse;">🚀</span><div style="flex:1; min-width:240px;"><div class="cpGwTitle" id="cpGateWorkTitle" style="color: rgb(18, 50, 79);">PUBLISHING…</div><div id="cpGateStatus" style="font:700 17px system-ui; color:#4a4139; margin-top:6px;">PUBLISHING TO THE WEBSITE…</div></div><div style="text-align:right;"><div class="cpGwClock" id="cpGateClock">0:01</div><div style="font:700 11px system-ui; color:#6b6257;">ELAPSED</div></div></div><div class="cpGwBar" style="background: rgba(29, 78, 137, 0.18);"><i></i></div></div><button id="cpGateSkip" style="margin-top:10px; padding:8px 14px; font:600 12px system-ui; cursor:pointer; border:0; background:none; color:#8a8279; text-decoration:underline;">carry on without publishing</button><style>@keyframes cpGateSweep{0%{left:-40%}100%{left:100%}}@keyframes cpGatePulse{0%,100%{opacity:1}50%{opacity:.55}}@keyframes cpGateFill{from{width:0}to{width:100%}}@keyframes cpGatePop{0%{transform:scale(.4); opacity:0}60%{transform:scale(1.25); opacity:1}100%{transform:scale(1); opacity:1}}#cpGateWork{display:none; width:min(760px,92vw); margin-top:6px; border:3px solid #1d4e89; border-radius:16px; padding:26px 24px; background:rgba(29,78,137,.06); text-align:left;}#cpGateWork .cpGwTop{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}#cpGateWork .cpGwIcon{font-size:44px; line-height:1; animation:cpGatePulse 1.1s ease-in-out infinite;}#cpGateWork .cpGwTitle{font:900 30px system-ui; letter-spacing:.01em; line-height:1.15; color:#12324f;}#cpGateWork .cpGwClock{font:900 30px system-ui; font-variant-numeric:tabular-nums; color:#1d4e89;}#cpGateWork .cpGwBar{position:relative; height:22px; border-radius:11px; overflow:hidden; background:rgba(29,78,137,.18); margin-top:18px;}#cpGateWork .cpGwBar>i{position:absolute; top:0; bottom:0; width:40%; border-radius:11px; background:linear-gradient(90deg,rgba(29,78,137,0) 0%,#1d4e89 50%,rgba(29,78,137,0) 100%); animation:cpGateSweep 1.15s linear infinite;}</style></div>
+</script>
 
 <!-- Master List File Viewer Modal -->
 <div id="masterViewerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:9999; overflow:auto; box-sizing:border-box;">
