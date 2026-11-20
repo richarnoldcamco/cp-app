@@ -587,7 +587,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="brand-mark">📋</div>
       <div>
         <div class="brand-title">Control Plan Generator <span id="cpHeaderHi" style="font-weight:800;">HI</span></div>
-        <div class="brand-sub" id="brandRev">REV-1163 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-09-09 03:14 PM</span></div>
+        <div class="brand-sub" id="brandRev">REV-1164 <span style="font-size:9px; font-weight:400; opacity:0.8; letter-spacing:0;">2026-11-20 02:36 PM</span></div>
       </div>
     </div>
     <button id="menuPushAppBtn" title="Push app HTML to GitHub now" onclick="ghPushApp(false)" style="display:none; background:#2c6e49; color:#fff; border:1px solid #215236; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">⬆️ Push App</button>
@@ -600,7 +600,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div style="display:inline-block; background:#7a1a1c; color:#fff; font-weight:900; font-size:15px; letter-spacing:.05em; border-radius:9px; padding:6px 11px; margin-bottom:6px;">CP</div>
       <div style="font-size:21px; font-weight:900; letter-spacing:.04em; color:#7a1a1c; margin-bottom:1px;">CONTROL PLAN GENERATOR</div>
       <div style="font-size:11px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:4px;">AEROSPACE QUALITY DOCUMENTATION</div>
-      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1163 · 2026-09-09 03:14 PM</div>
+      <div id="cpCardRev" style="font-size:12px; font-weight:800; color:#7a1a1c; letter-spacing:.06em; margin-bottom:20px;">REV-1164 · 2026-11-20 02:36 PM</div>
 
       <div class="menu-grid">
       <!-- Rev-1153: per Rich -- the floor down the left (INSPECT PARTS, QUALITY INSPECTOR, QE BOARD ...),
@@ -618,7 +618,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <small style="font-size:11px; color:var(--ink-dim);">WHAT IS DUE TO BE LINE INSPECTED, AND HOW THE TWO MEN AGREE</small>
       </button>
       <button class="menu-btn" id="mProjects" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
-        <b style="font-size:15px;">📁 CONTROL PLANS <span id="badgeProjects" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">2 <span class="bsub">Projects</span></span></b><br>
+        <b style="font-size:15px;">📁 CONTROL PLANS <span id="badgeProjects" style="color:var(--signal); font-size:14px; margin-left:18px; white-space:nowrap;">13 <span class="bsub">Projects</span></span></b><br>
         <small id="mProjectsSub" style="font-size:11px; color:var(--ink-dim);">OPEN, EDIT, INSPECT OR DOWNLOAD ANY SAVED PLAN</small>
       </button>
       <button class="menu-btn" id="mQeBoard" style="width:100%; text-align:left; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:block;">
@@ -671,13 +671,13 @@ window.addEventListener('DOMContentLoaded', function(){
       </button>
       </div>
       <div style="display:none">
-        <span id="badgeMaster">55<span class="bsub">Control Types</span></span><span id="badgeCustomers">11<span class="bsub">Customers</span></span><span id="badgeInstructions">Rev-92<span class="bsub">Instructions</span></span>
+        <span id="badgeMaster">76<span class="bsub">Control Types</span></span><span id="badgeCustomers">11<span class="bsub">Customers</span></span><span id="badgeInstructions">Rev-92<span class="bsub">Instructions</span></span>
       </div>
     </div>
   </div>
   <div class="menu-foot">
     CAMCO Manufacturing Inc. • 317 South Thomas Ave, Sayre PA<br>
-    <span id="revFooter">App Rev-1164 · Built Nov 20, 2026</span>
+    <span id="revFooter">App Rev-1164 · Built 2026-11-20 02:36 PM ET · downloaded copy, not the website</span>
   </div>
 </div>
 
@@ -1349,7 +1349,7 @@ window.addEventListener('DOMContentLoaded', function(){
       App-sync: automatically push the app file (HTML) to GitHub whenever you open a newer version — no manual "Push Now" needed. Runs independently of data auto-sync. Turn OFF to get the manual push banner instead.
     </label>
 
-    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ Pulled + merged at 10/14/2026, 8:50:49 AM</p>
+    <p id="ghStatus" style="font-size: 12px; color: var(--ink-dim); padding: 10px; background: var(--panel-2); border-radius: 6px;">✓ App Rev-1164 pushed at 21/11/2026, 00:46:56</p>
 
     <button id="ghTestBtn" class="btn-ghost" style="width:100%; margin-top:10px; min-height:44px;">🔌 Test Connection</button>
   </div>
@@ -31369,7 +31369,7 @@ report can be read instead of guessed at.
 }
 
 }catch(__bootErr){ try{ const d=document.createElement('div'); d.style.cssText='position:fixed;top:68px;left:0;right:0;z-index:9999;background:#7a1a1c;color:#fff;padding:10px 14px;font:700 13px system-ui;'; d.textContent='⚠️ BOOT-TAIL ERROR — screenshot for Claude: '+(__bootErr.message||__bootErr)+' | '+String(__bootErr.stack||'').split('\n')[1]; document.body.appendChild(d); }catch(e){} }
-</script>
+</script><div id="cpUserNameFirstRun" style="position: fixed; left: 0px; right: 0px; bottom: 0px; z-index: 9998; background: rgb(192, 57, 43); color: rgb(255, 255, 255); font-family: inherit; font-size: 13px; font-weight: 700; padding: 10px 12px; display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap;"><span>This device has no name set — work is being recorded as RICHARD ARNOLD.</span><button style="background: rgb(255, 255, 255); color: rgb(192, 57, 43); border: 0px; border-radius: 6px; padding: 6px 14px; font-weight: 800; font-size: 13px; cursor: pointer;">SET NAME</button></div>
 
 <!-- Master List File Viewer Modal -->
 <div id="masterViewerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:9999; overflow:auto; box-sizing:border-box;">
@@ -31562,4 +31562,4 @@ report can be read instead of guessed at.
 </div>
 
 
-<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div></body></html>
+<div id="cpTopStrip" style="position: fixed; bottom: 14px; right: 14px; z-index: 310; display: flex; align-items: center; gap: 8px; max-width: 70vw; flex-wrap: wrap; justify-content: flex-end;"><button id="cpModeBtn" type="button" title="NEW USER: how-to videos are highlighted. Click to switch to EXPERT USER." style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; background: rgb(138, 75, 18); color: rgb(255, 255, 255); border: 1px solid rgb(107, 58, 14);">👤 NEW USER</button><button id="cpHelpFab" type="button" title="Ask how to do something in this app" style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 7px 13px; border-radius: 999px; border: 1px solid rgb(21, 67, 96); background: rgb(26, 82, 118); color: rgb(255, 255, 255); cursor: pointer; font-family: inherit; box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 10px; white-space: nowrap;">ℹ HELP</button></div><div id="cpVideoBar" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 310; display: none; justify-content: flex-end; align-items: center; padding: 8px 16px; background: transparent; pointer-events: none;"></div><div id="cpTabFollowNote" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 99998; background: rgb(230, 168, 23); color: rgb(58, 44, 0); font: 800 12px system-ui; letter-spacing: 0.04em; text-align: center; padding: 6px 12px; box-shadow: rgba(0, 0, 0, 0.25) 0px 2px 8px;">⚠ ANOTHER COPY OF THIS APP IS OPEN AND IS DRIVING — THIS ONE WILL NOT UPDATE ITSELF. CLOSE THE OTHER TAB, OR WORK IN IT.</div></body></html>
